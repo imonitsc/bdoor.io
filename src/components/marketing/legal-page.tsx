@@ -10,13 +10,7 @@ import type { Locale } from '@/features/catalog/types';
  * while `awaitingCounselReview` is true, and it always shows the version stamp
  * so a customer can tell which text they accepted.
  */
-export async function LegalPage({
-  document,
-  locale,
-}: {
-  document: LegalDocument;
-  locale: Locale;
-}) {
+export async function LegalPage({ document, locale }: { document: LegalDocument; locale: Locale }) {
   const [t, format] = await Promise.all([getTranslations('legal'), getFormatter()]);
   const title = await getTranslations();
 
@@ -25,7 +19,7 @@ export async function LegalPage({
       <div className="container-page">
         <div className="grid gap-10 lg:grid-cols-[0.28fr_0.72fr] lg:gap-14">
           <nav aria-label={t('tableOfContents')} className="h-fit lg:sticky lg:top-24">
-            <h2 className="text-xs font-semibold uppercase tracking-[0.1em] text-muted">
+            <h2 className="text-muted text-xs font-semibold tracking-[0.1em] uppercase">
               {t('tableOfContents')}
             </h2>
             <ol className="mt-3 flex flex-col gap-2">
@@ -33,7 +27,7 @@ export async function LegalPage({
                 <li key={section.id}>
                   <a
                     href={`#${section.id}`}
-                    className="rounded text-sm text-muted underline-offset-4 hover:text-ink hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+                    className="text-muted hover:text-ink rounded text-sm underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
                   >
                     {locale === 'bn' ? section.heading.bn : section.heading.en}
                   </a>
@@ -43,8 +37,10 @@ export async function LegalPage({
           </nav>
 
           <div>
-            <h1 className="text-3xl leading-tight text-ink md:text-4xl">{title(document.titleKey)}</h1>
-            <p className="mt-3 text-sm text-muted">
+            <h1 className="text-ink text-3xl leading-tight md:text-4xl">
+              {title(document.titleKey)}
+            </h1>
+            <p className="text-muted mt-3 text-sm">
               {t('lastUpdated', {
                 date: format.dateTime(new Date(document.lastUpdated), 'long'),
               })}{' '}
@@ -57,7 +53,7 @@ export async function LegalPage({
               </Alert>
             ) : null}
 
-            <div className="prose-bdoor mt-8 max-w-none text-ink">
+            <div className="prose-bdoor text-ink mt-8 max-w-none">
               {document.sections.map((section) => (
                 <section key={section.id} id={section.id} className="scroll-mt-24">
                   <h2>{locale === 'bn' ? section.heading.bn : section.heading.en}</h2>

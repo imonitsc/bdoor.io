@@ -92,12 +92,16 @@ export async function recordAudit(entry: AuditEntry): Promise<void> {
       organization_id: entry.organizationId ?? null,
       case_id: entry.caseId ?? null,
       correlation_id: correlationId,
-      metadata: (redactMetadata(entry.metadata ?? {}) as never),
+      metadata: redactMetadata(entry.metadata ?? {}) as never,
       origin: entry.origin ?? null,
     });
 
     if (error) {
-      logger.error('audit.write_failed', { action: entry.action, correlationId, message: error.message });
+      logger.error('audit.write_failed', {
+        action: entry.action,
+        correlationId,
+        message: error.message,
+      });
     }
   } catch (error) {
     logger.error('audit.write_threw', {

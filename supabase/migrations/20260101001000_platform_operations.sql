@@ -217,21 +217,36 @@ create policy partners_staff_read on public.partners
 create policy partners_admin on public.partners
   for all to authenticated using (app.is_admin()) with check (app.is_admin());
 
+/**
+ * Guards the two fields a partner must not be able to set for itself.
+ *
+ * The checks apply to Data API callers only: when `auth.uid()` is null there is
+ * no end user, which means the service role or a migration is writing. Those
+ * paths are trusted by definition and are constrained in application code
+ * instead — blocking them here would make the column unwritable by any backfill
+ * or admin tool, which is not the intent.
+ */
 create or replace function app.partners_guard()
 returns trigger
 language plpgsql
 set search_path = ''
 as $$
 begin
+  if auth.uid() is null then
+    return new;
+  end if;
+
   if new.verification_status is distinct from old.verification_status
      and not app.is_admin() then
     raise exception 'Only a BDoor administrator may change partner verification status';
   end if;
+
   if new.payment_details is distinct from old.payment_details
      and not app.is_finance() and not app.is_org_member(
        old.organization_id, array['partner_owner']::public.organization_role[]) then
     raise exception 'Not permitted to change partner payment details';
   end if;
+
   return new;
 end;
 $$;

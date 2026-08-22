@@ -9,7 +9,7 @@ export function Card({
   return (
     <Comp
       className={cn(
-        'rounded-[var(--radius-card)] border border-border bg-surface shadow-xs',
+        'border-border bg-surface rounded-[var(--radius-card)] border shadow-xs',
         className,
       )}
       {...props}
@@ -26,11 +26,14 @@ export function CardTitle({
   as: Comp = 'h3',
   ...props
 }: React.HTMLAttributes<HTMLHeadingElement> & { as?: React.ElementType }) {
-  return <Comp className={cn('text-base font-semibold text-ink', className)} {...props} />;
+  return <Comp className={cn('text-ink text-base font-semibold', className)} {...props} />;
 }
 
-export function CardDescription({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
-  return <p className={cn('text-sm leading-relaxed text-muted', className)} {...props} />;
+export function CardDescription({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLParagraphElement>) {
+  return <p className={cn('text-muted text-sm leading-relaxed', className)} {...props} />;
 }
 
 export function CardContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
@@ -40,7 +43,10 @@ export function CardContent({ className, ...props }: React.HTMLAttributes<HTMLDi
 export function CardFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn('flex flex-wrap items-center gap-3 border-t border-border p-5 md:p-6', className)}
+      className={cn(
+        'border-border flex flex-wrap items-center gap-3 border-t p-5 md:p-6',
+        className,
+      )}
       {...props}
     />
   );

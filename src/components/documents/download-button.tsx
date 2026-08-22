@@ -53,7 +53,7 @@ export function DownloadButton({
         )}
         {label ?? (action === 'download' ? t('download') : t('view'))}
       </Button>
-      {error ? <span className="text-xs font-medium text-danger">{tErrors(error)}</span> : null}
+      {error ? <span className="text-danger text-xs font-medium">{tErrors(error)}</span> : null}
     </span>
   );
 }

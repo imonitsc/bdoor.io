@@ -38,40 +38,37 @@ export default async function NotificationsPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeading
-        title={t('title')}
-        actions={hasUnread ? <MarkAllReadButton /> : undefined}
-      />
+      <PageHeading title={t('title')} actions={hasUnread ? <MarkAllReadButton /> : undefined} />
 
       {notifications.length === 0 ? (
         <EmptyState icon={<Bell className="size-5" />} title={t('empty')} />
       ) : (
-        <ul className="divide-y divide-border border-y border-border">
+        <ul className="divide-border border-border divide-y border-y">
           {notifications.map((notification) => (
-            <li key={notification.id} className="flex flex-wrap items-start justify-between gap-3 py-4">
+            <li
+              key={notification.id}
+              className="flex flex-wrap items-start justify-between gap-3 py-4"
+            >
               <div className="min-w-0">
-                <p className="flex items-center gap-2 text-sm font-medium text-ink">
+                <p className="text-ink flex items-center gap-2 text-sm font-medium">
                   {label(notification.title_en, notification.title_bn)}
                   {!notification.read_at ? <Badge tone="info">{t('title')}</Badge> : null}
                 </p>
                 {notification.body_en ? (
-                  <p className="mt-1 text-sm leading-relaxed text-muted">
+                  <p className="text-muted mt-1 text-sm leading-relaxed">
                     {label(notification.body_en, notification.body_bn)}
                   </p>
                 ) : null}
                 {notification.href ? (
                   <Link
                     href={notification.href.replace(/^\/(en|bn)/, '')}
-                    className="mt-1.5 inline-block rounded text-sm text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+                    className="text-primary mt-1.5 inline-block rounded text-sm underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
                   >
                     {t('title')}
                   </Link>
                 ) : null}
               </div>
-              <time
-                dateTime={notification.created_at}
-                className="shrink-0 text-xs text-muted"
-              >
+              <time dateTime={notification.created_at} className="text-muted shrink-0 text-xs">
                 {format.dateTime(new Date(notification.created_at), 'short')}
               </time>
             </li>

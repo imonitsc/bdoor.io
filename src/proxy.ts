@@ -54,7 +54,11 @@ export async function proxy(request: NextRequest) {
     intlResponse.cookies.set(cookie);
   }
   for (const [key, value] of authResponse.headers) {
-    if (key.toLowerCase().startsWith('cache-control') || key.toLowerCase() === 'expires' || key.toLowerCase() === 'pragma') {
+    if (
+      key.toLowerCase().startsWith('cache-control') ||
+      key.toLowerCase() === 'expires' ||
+      key.toLowerCase() === 'pragma'
+    ) {
       intlResponse.headers.set(key, value);
     }
   }

@@ -26,7 +26,7 @@ export function Progress({
       value={clamped}
       max={max}
       aria-label={label}
-      className={cn('h-2 w-full overflow-hidden rounded-full bg-surface-sunken', className)}
+      className={cn('bg-surface-sunken h-2 w-full overflow-hidden rounded-full', className)}
     >
       <ProgressPrimitive.Indicator
         className={cn(

@@ -15,7 +15,13 @@ export function Input({ className, type = 'text', ...props }: React.ComponentPro
 }
 
 export function Textarea({ className, rows = 4, ...props }: React.ComponentProps<'textarea'>) {
-  return <textarea rows={rows} className={cn(controlBase, 'py-2.5 leading-relaxed', className)} {...props} />;
+  return (
+    <textarea
+      rows={rows}
+      className={cn(controlBase, 'py-2.5 leading-relaxed', className)}
+      {...props}
+    />
+  );
 }
 
 export function NativeSelect({ className, children, ...props }: React.ComponentProps<'select'>) {

@@ -15,27 +15,34 @@ export function Table({ className, ...props }: React.HTMLAttributes<HTMLTableEle
 }
 
 export function THead({ className, ...props }: React.HTMLAttributes<HTMLTableSectionElement>) {
-  return <thead className={cn('border-b border-border text-start', className)} {...props} />;
+  return <thead className={cn('border-border border-b text-start', className)} {...props} />;
 }
 
 export function TBody({ className, ...props }: React.HTMLAttributes<HTMLTableSectionElement>) {
-  return <tbody className={cn('divide-y divide-border', className)} {...props} />;
+  return <tbody className={cn('divide-border divide-y', className)} {...props} />;
 }
 
 export function TR({ className, ...props }: React.HTMLAttributes<HTMLTableRowElement>) {
   return <tr className={cn('align-top', className)} {...props} />;
 }
 
-export function TH({ className, scope = 'col', ...props }: React.ThHTMLAttributes<HTMLTableCellElement>) {
+export function TH({
+  className,
+  scope = 'col',
+  ...props
+}: React.ThHTMLAttributes<HTMLTableCellElement>) {
   return (
     <th
       scope={scope}
-      className={cn('px-3 py-2.5 text-start text-xs font-semibold uppercase tracking-wide text-muted', className)}
+      className={cn(
+        'text-muted px-3 py-2.5 text-start text-xs font-semibold tracking-wide uppercase',
+        className,
+      )}
       {...props}
     />
   );
 }
 
 export function TD({ className, ...props }: React.TdHTMLAttributes<HTMLTableCellElement>) {
-  return <td className={cn('px-3 py-3 text-ink', className)} {...props} />;
+  return <td className={cn('text-ink px-3 py-3', className)} {...props} />;
 }

@@ -36,7 +36,13 @@ export type QuoteView = {
   acceptedAt: string | null;
   expired: boolean;
   items: QuoteItemView[];
-  invoice: { id: string; number: string; totalMinor: number; paidMinor: number; status: string } | null;
+  invoice: {
+    id: string;
+    number: string;
+    totalMinor: number;
+    paidMinor: number;
+    status: string;
+  } | null;
 };
 
 export function QuotePanel({ quote, sandbox }: { quote: QuoteView; sandbox: boolean }) {
@@ -80,19 +86,28 @@ export function QuotePanel({ quote, sandbox }: { quote: QuoteView; sandbox: bool
           <table className="w-full min-w-[34rem] border-collapse text-sm">
             <caption className="sr-only">{t('quotes')}</caption>
             <thead>
-              <tr className="border-b border-border">
-                <th scope="col" className="px-3 py-2.5 text-start text-xs font-semibold uppercase tracking-wide text-muted">
+              <tr className="border-border border-b">
+                <th
+                  scope="col"
+                  className="text-muted px-3 py-2.5 text-start text-xs font-semibold tracking-wide uppercase"
+                >
                   {t('quotes')}
                 </th>
-                <th scope="col" className="px-3 py-2.5 text-start text-xs font-semibold uppercase tracking-wide text-muted">
+                <th
+                  scope="col"
+                  className="text-muted px-3 py-2.5 text-start text-xs font-semibold tracking-wide uppercase"
+                >
                   {t('payableTo')}
                 </th>
-                <th scope="col" className="px-3 py-2.5 text-end text-xs font-semibold uppercase tracking-wide text-muted">
+                <th
+                  scope="col"
+                  className="text-muted px-3 py-2.5 text-end text-xs font-semibold tracking-wide uppercase"
+                >
                   {t('total')}
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border">
+            <tbody className="divide-border divide-y">
               {quote.items.map((item) => (
                 <tr key={item.id}>
                   <td className="px-3 py-3">
@@ -101,37 +116,53 @@ export function QuotePanel({ quote, sandbox }: { quote: QuoteView; sandbox: bool
                       <Badge tone={isPassThrough(item.category) ? 'neutral' : 'info'}>
                         {tFees(item.category)}
                       </Badge>
-                      {item.isEstimate ? <Badge tone="warning">{tCommon('estimated')}</Badge> : null}
+                      {item.isEstimate ? (
+                        <Badge tone="warning">{tCommon('estimated')}</Badge>
+                      ) : null}
                       <Badge tone={item.isRefundable ? 'success' : 'neutral'}>
                         {item.isRefundable ? t('refundable') : t('nonRefundable')}
                       </Badge>
                     </p>
                   </td>
-                  <td className="px-3 py-3 text-muted">{item.payeeName ?? '—'}</td>
-                  <td className="px-3 py-3 text-end font-medium text-ink">
+                  <td className="text-muted px-3 py-3">{item.payeeName ?? '—'}</td>
+                  <td className="text-ink px-3 py-3 text-end font-medium">
                     {money(item.unitAmountMinor * item.quantity)}
                   </td>
                 </tr>
               ))}
             </tbody>
-            <tfoot className="border-t-2 border-border">
+            <tfoot className="border-border border-t-2">
               <tr>
-                <th scope="row" colSpan={2} className="px-3 py-2 text-end text-sm font-normal text-muted">
+                <th
+                  scope="row"
+                  colSpan={2}
+                  className="text-muted px-3 py-2 text-end text-sm font-normal"
+                >
                   {t('subtotal')}
                 </th>
-                <td className="px-3 py-2 text-end text-sm text-ink">{money(quote.subtotalMinor)}</td>
+                <td className="text-ink px-3 py-2 text-end text-sm">
+                  {money(quote.subtotalMinor)}
+                </td>
               </tr>
               <tr>
-                <th scope="row" colSpan={2} className="px-3 py-2 text-end text-sm font-normal text-muted">
+                <th
+                  scope="row"
+                  colSpan={2}
+                  className="text-muted px-3 py-2 text-end text-sm font-normal"
+                >
                   {tFees('tax')}
                 </th>
-                <td className="px-3 py-2 text-end text-sm text-ink">{money(quote.taxMinor)}</td>
+                <td className="text-ink px-3 py-2 text-end text-sm">{money(quote.taxMinor)}</td>
               </tr>
               <tr>
-                <th scope="row" colSpan={2} className="px-3 py-2 text-end text-base font-semibold text-ink">
+                <th
+                  scope="row"
+                  colSpan={2}
+                  className="text-ink px-3 py-2 text-end text-base font-semibold"
+                >
                   {t('total')}
                 </th>
-                <td className="px-3 py-2 text-end text-base font-semibold text-ink">
+                <td className="text-ink px-3 py-2 text-end text-base font-semibold">
                   {money(quote.totalMinor)}
                 </td>
               </tr>
@@ -142,7 +173,7 @@ export function QuotePanel({ quote, sandbox }: { quote: QuoteView; sandbox: bool
         <Alert tone="info" icon={<Info className="size-5" />}>
           {t('capitalNote')}
         </Alert>
-        <p className="text-xs leading-relaxed text-muted">{t('separateEngagementNote')}</p>
+        <p className="text-muted text-xs leading-relaxed">{t('separateEngagementNote')}</p>
 
         {acceptState.status === 'error' && acceptState.message ? (
           <Alert tone="danger" live="assertive">

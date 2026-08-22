@@ -37,8 +37,15 @@ export function AppShell({
   const t = useTranslations('common');
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [drawerPath, setDrawerPath] = useState(pathname);
 
-  useEffect(() => setOpen(false), [pathname]);
+  // Close the drawer on navigation. See the note in marketing-header.tsx: this
+  // is a render-time adjustment rather than an effect, so the drawer never
+  // flashes open on the new route.
+  if (drawerPath !== pathname) {
+    setDrawerPath(pathname);
+    if (open) setOpen(false);
+  }
 
   useEffect(() => {
     if (!open) return;
@@ -55,7 +62,9 @@ export function AppShell({
   function isActive(href: string) {
     if (pathname === href) return true;
     // Avoid /app matching everything: only treat deeper paths as active.
-    return href !== '/app' && href !== '/partner' && href !== '/admin' && pathname.startsWith(`${href}/`);
+    return (
+      href !== '/app' && href !== '/partner' && href !== '/admin' && pathname.startsWith(`${href}/`)
+    );
   }
 
   const nav = (
@@ -71,15 +80,16 @@ export function AppShell({
               className={cn(
                 'flex min-h-11 items-center gap-3 rounded-[var(--radius-control)] px-3 text-sm font-medium transition-colors',
                 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]',
-                active
-                  ? 'bg-primary-soft text-info'
-                  : 'text-ink hover:bg-surface-sunken',
+                active ? 'bg-primary-soft text-info' : 'text-ink hover:bg-surface-sunken',
               )}
             >
-              <Icon className={cn('size-4 shrink-0', active ? 'text-primary' : 'text-muted')} aria-hidden="true" />
+              <Icon
+                className={cn('size-4 shrink-0', active ? 'text-primary' : 'text-muted')}
+                aria-hidden="true"
+              />
               <span className="flex-1 truncate">{item.label}</span>
               {item.badge && item.badge > 0 ? (
-                <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-semibold text-on-primary">
+                <span className="bg-primary text-on-primary inline-flex min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-semibold">
                   {item.badge > 99 ? '99+' : item.badge}
                 </span>
               ) : null}
@@ -91,8 +101,8 @@ export function AppShell({
   );
 
   return (
-    <div className="min-h-dvh bg-canvas">
-      <header className="sticky top-0 z-30 border-b border-border bg-surface">
+    <div className="bg-canvas min-h-dvh">
+      <header className="border-border bg-surface sticky top-0 z-30 border-b">
         <div className="flex h-16 items-center gap-3 px-4 md:px-6">
           <Button
             variant="ghost"
@@ -113,7 +123,7 @@ export function AppShell({
             <BDoorLogo />
           </Link>
 
-          <span className="hidden rounded-full bg-surface-sunken px-2.5 py-1 text-xs font-medium text-muted sm:inline">
+          <span className="bg-surface-sunken text-muted hidden rounded-full px-2.5 py-1 text-xs font-medium sm:inline">
             {areaLabel}
           </span>
 
@@ -127,7 +137,7 @@ export function AppShell({
       <div className="lg:grid lg:grid-cols-[16rem_1fr]">
         <nav
           aria-label={areaLabel}
-          className="sticky top-16 hidden h-[calc(100dvh-4rem)] overflow-y-auto border-e border-border bg-surface p-3 lg:block"
+          className="border-border bg-surface sticky top-16 hidden h-[calc(100dvh-4rem)] overflow-y-auto border-e p-3 lg:block"
         >
           {nav}
         </nav>
@@ -136,7 +146,7 @@ export function AppShell({
           <nav
             id="app-navigation"
             aria-label={areaLabel}
-            className="fixed inset-x-0 bottom-0 top-16 z-30 overflow-y-auto border-t border-border bg-surface p-4 lg:hidden"
+            className="border-border bg-surface fixed inset-x-0 top-16 bottom-0 z-30 overflow-y-auto border-t p-4 lg:hidden"
           >
             {nav}
           </nav>

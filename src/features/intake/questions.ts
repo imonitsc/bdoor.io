@@ -36,38 +36,56 @@ export const EXISTING_REGISTRATIONS = [
 const country = z
   .string()
   .trim()
-  .length(2, 'invalidCountry')
-  .regex(/^[A-Za-z]{2}$/, 'invalidCountry')
+  .length(2, 'requiredChoice')
+  .regex(/^[A-Za-z]{2}$/, 'requiredChoice')
   .transform((v) => v.toUpperCase());
 
 export const answersSchema = z.object({
-  founder_location: z.enum(FOUNDER_LOCATIONS),
+  founder_location: z.enum(FOUNDER_LOCATIONS, { message: 'requiredChoice' }),
   nationality: country,
   residence: country,
   activity: z.string().trim().min(15, 'tooShort').max(1000, 'tooLong'),
   location: z.string().trim().min(2, 'requiredText').max(120, 'tooLong'),
-  structure: z.enum(STRUCTURES),
-  owner_count: z.number().int('invalidNumber').min(1, 'minOwners').max(200, 'tooLong'),
-  director_count: z.number().int('invalidNumber').min(1, 'invalidNumber').max(200, 'tooLong'),
-  foreign_owners: z.boolean(),
-  entity_owner: z.boolean(),
-  foreign_ownership_percent: z.number().min(0, 'percentRange').max(100, 'percentRange'),
-  remit_capital: z.boolean(),
-  founder_will_work: z.boolean(),
-  import_export: z.enum(IMPORT_EXPORT),
-  hire_employees: z.boolean(),
-  regulated_activity: z.boolean(),
-  need_address: z.boolean(),
-  start_window: z.enum(START_WINDOWS),
-  existing_business: z.boolean(),
-  existing_registrations: z.array(z.enum(EXISTING_REGISTRATIONS)),
+  structure: z.enum(STRUCTURES, { message: 'requiredChoice' }),
+  owner_count: z
+    .number({ message: 'invalidNumber' })
+    .int('invalidNumber')
+    .min(1, 'minOwners')
+    .max(200, 'tooLong'),
+  director_count: z
+    .number({ message: 'invalidNumber' })
+    .int('invalidNumber')
+    .min(1, 'invalidNumber')
+    .max(200, 'tooLong'),
+  foreign_owners: z.boolean({ message: 'requiredChoice' }),
+  entity_owner: z.boolean({ message: 'requiredChoice' }),
+  foreign_ownership_percent: z
+    .number({ message: 'invalidNumber' })
+    .min(0, 'percentRange')
+    .max(100, 'percentRange'),
+  remit_capital: z.boolean({ message: 'requiredChoice' }),
+  founder_will_work: z.boolean({ message: 'requiredChoice' }),
+  import_export: z.enum(IMPORT_EXPORT, { message: 'requiredChoice' }),
+  hire_employees: z.boolean({ message: 'requiredChoice' }),
+  regulated_activity: z.boolean({ message: 'requiredChoice' }),
+  need_address: z.boolean({ message: 'requiredChoice' }),
+  start_window: z.enum(START_WINDOWS, { message: 'requiredChoice' }),
+  existing_business: z.boolean({ message: 'requiredChoice' }),
+  existing_registrations: z.array(z.enum(EXISTING_REGISTRATIONS, { message: 'requiredChoice' })),
 });
 
 export type Answers = z.infer<typeof answersSchema>;
 export type PartialAnswers = Partial<Answers>;
 export type QuestionKey = keyof Answers;
 
-export type QuestionKind = 'choice' | 'boolean' | 'text' | 'textarea' | 'number' | 'country' | 'multi';
+export type QuestionKind =
+  | 'choice'
+  | 'boolean'
+  | 'text'
+  | 'textarea'
+  | 'number'
+  | 'country'
+  | 'multi';
 
 export type QuestionDefinition = {
   key: QuestionKey;
@@ -76,6 +94,12 @@ export type QuestionDefinition = {
   options?: readonly string[];
   /** Renders the "Why we ask" disclosure. Required for anything sensitive. */
   showWhy: boolean;
+  /**
+   * Whether `start.questions.<key>.help` exists. Declared rather than probed:
+   * the translator has no "does this key exist" API, so a missing lookup would
+   * render the raw key path into the page.
+   */
+  hasHelp?: boolean;
   shouldAsk: (answers: PartialAnswers) => boolean;
   schema: z.ZodTypeAny;
 };
@@ -88,6 +112,7 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     section: 'about_you',
     kind: 'choice',
     options: FOUNDER_LOCATIONS,
+    hasHelp: true,
     showWhy: true,
     shouldAsk: always,
     schema: answersSchema.shape.founder_location,
@@ -130,6 +155,7 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     key: 'activity',
     section: 'the_business',
     kind: 'textarea',
+    hasHelp: true,
     showWhy: true,
     shouldAsk: always,
     schema: answersSchema.shape.activity,
@@ -138,6 +164,7 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     key: 'location',
     section: 'the_business',
     kind: 'text',
+    hasHelp: true,
     showWhy: true,
     shouldAsk: always,
     schema: answersSchema.shape.location,
@@ -232,6 +259,7 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     key: 'regulated_activity',
     section: 'operations',
     kind: 'boolean',
+    hasHelp: true,
     showWhy: true,
     shouldAsk: always,
     schema: answersSchema.shape.regulated_activity,
@@ -291,11 +319,34 @@ export function pruneInapplicable(answers: PartialAnswers): PartialAnswers {
   return out;
 }
 
+/**
+ * The validation messages the UI knows how to translate. Anything else — a Zod
+ * default like "Invalid option: expected one of ..." — is mapped to a generic
+ * key, because feeding raw library prose to the translator renders the message
+ * itself as a missing key in the page.
+ */
+const VALIDATION_KEYS = new Set([
+  'requiredChoice',
+  'requiredText',
+  'tooShort',
+  'tooLong',
+  'invalidNumber',
+  'percentRange',
+  'minOwners',
+]);
+
 export function validateAnswer(key: QuestionKey, value: unknown) {
   const question = QUESTIONS.find((q) => q.key === key);
-  if (!question) return { success: false as const, error: 'unknownQuestion' };
+  if (!question) return { success: false as const, error: 'requiredText' };
+
   const result = question.schema.safeParse(value);
-  return result.success
-    ? { success: true as const, data: result.data }
-    : { success: false as const, error: result.error.issues[0]?.message ?? 'requiredText' };
+  if (result.success) return { success: true as const, data: result.data };
+
+  const message = result.error.issues[0]?.message ?? '';
+  const fallback =
+    question.kind === 'choice' || question.kind === 'boolean' || question.kind === 'multi'
+      ? 'requiredChoice'
+      : 'requiredText';
+
+  return { success: false as const, error: VALIDATION_KEYS.has(message) ? message : fallback };
 }

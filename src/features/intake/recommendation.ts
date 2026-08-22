@@ -55,7 +55,10 @@ export async function generateRecommendation(
 
   if (hasServiceRole()) {
     const admin = createAdminClient();
-    await admin.from('questionnaire_sessions').update({ completed_at: new Date().toISOString() }).eq('id', sessionId);
+    await admin
+      .from('questionnaire_sessions')
+      .update({ completed_at: new Date().toISOString() })
+      .eq('id', sessionId);
     const { error } = await admin.from('recommendation_results').insert({
       session_id: sessionId,
       suggested_structure: result.suggestedStructure,

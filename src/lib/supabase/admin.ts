@@ -38,7 +38,17 @@ export function createAdminClient() {
   return cached;
 }
 
-/** True when a service-role key is present, so callers can degrade gracefully. */
+/**
+ * True when a service-role key is present.
+ *
+ * Callers use this to degrade gracefully — the questionnaire, for instance,
+ * stays usable without persistence rather than returning a 500. It therefore
+ * must never throw, whatever else is misconfigured.
+ */
 export function hasServiceRole(): boolean {
-  return Boolean(serverEnv().SUPABASE_SECRET_KEY);
+  try {
+    return Boolean(serverEnv().SUPABASE_SECRET_KEY);
+  } catch {
+    return false;
+  }
 }

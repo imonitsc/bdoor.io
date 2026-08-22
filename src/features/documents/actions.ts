@@ -191,7 +191,12 @@ export async function uploadDocument(
     targetId: document.id,
     organizationId,
     caseId,
-    metadata: { category, byteSize: bytes.byteLength, mimeType: validation.mimeType, scan: scan.status },
+    metadata: {
+      category,
+      byteSize: bytes.byteLength,
+      mimeType: validation.mimeType,
+      scan: scan.status,
+    },
   });
 
   revalidatePath(`/${await getLocale()}/app/documents`);

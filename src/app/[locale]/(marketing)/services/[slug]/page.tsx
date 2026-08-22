@@ -57,9 +57,13 @@ function BulletList({ items, tone }: { items: string[]; tone: 'included' | 'excl
   return (
     <ul className="flex flex-col gap-2.5">
       {items.map((item) => (
-        <li key={item} className="flex gap-2.5 text-sm leading-relaxed text-ink">
+        <li key={item} className="text-ink flex gap-2.5 text-sm leading-relaxed">
           <Icon
-            className={tone === 'included' ? 'mt-0.5 size-4 shrink-0 text-success' : 'mt-0.5 size-4 shrink-0 text-muted'}
+            className={
+              tone === 'included'
+                ? 'text-success mt-0.5 size-4 shrink-0'
+                : 'text-muted mt-0.5 size-4 shrink-0'
+            }
             aria-hidden="true"
           />
           <span>{item}</span>
@@ -84,30 +88,39 @@ async function FeeTable({ service, locale }: { service: Service; locale: Locale 
       <table className="w-full min-w-[32rem] border-collapse text-sm">
         <caption className="sr-only">{t('fees')}</caption>
         <thead>
-          <tr className="border-b border-border">
-            <th scope="col" className="px-3 py-2.5 text-start text-xs font-semibold uppercase tracking-wide text-muted">
+          <tr className="border-border border-b">
+            <th
+              scope="col"
+              className="text-muted px-3 py-2.5 text-start text-xs font-semibold tracking-wide uppercase"
+            >
               {t('fees')}
             </th>
-            <th scope="col" className="px-3 py-2.5 text-start text-xs font-semibold uppercase tracking-wide text-muted">
+            <th
+              scope="col"
+              className="text-muted px-3 py-2.5 text-start text-xs font-semibold tracking-wide uppercase"
+            >
               {t('feeCategories.platform_service_fee').split(' ')[0]}
             </th>
-            <th scope="col" className="px-3 py-2.5 text-end text-xs font-semibold uppercase tracking-wide text-muted">
+            <th
+              scope="col"
+              className="text-muted px-3 py-2.5 text-end text-xs font-semibold tracking-wide uppercase"
+            >
               BDT
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-border">
+        <tbody className="divide-border divide-y">
           {service.feeComponents.map((component) => {
             const amount = displayableFee(component);
             return (
               <tr key={`${component.category}-${component.label.en}`}>
-                <td className="px-3 py-3 text-ink">{pick(component.label, locale)}</td>
+                <td className="text-ink px-3 py-3">{pick(component.label, locale)}</td>
                 <td className="px-3 py-3">
                   <Badge tone={component.payee === 'bdoor' ? 'info' : 'neutral'}>
                     {tFees(component.category)}
                   </Badge>
                 </td>
-                <td className="px-3 py-3 text-end font-medium text-ink">
+                <td className="text-ink px-3 py-3 text-end font-medium">
                   {amount !== null ? format.number(amount, 'bdt') : tPricing('noPublishedFee')}
                 </td>
               </tr>
@@ -147,12 +160,15 @@ export default async function ServiceDetailPage({
 
   return (
     <>
-      <Section tone="surface" className="border-b border-border py-12 md:py-16">
+      <Section tone="surface" className="border-border border-b py-12 md:py-16">
         <div className="container-page">
           <nav aria-label={tCommon('breadcrumb')} className="mb-5">
-            <ol className="flex flex-wrap items-center gap-2 text-sm text-muted">
+            <ol className="text-muted flex flex-wrap items-center gap-2 text-sm">
               <li>
-                <Link href="/services" className="rounded hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]">
+                <Link
+                  href="/services"
+                  className="hover:text-ink rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+                >
                   {t('indexTitle')}
                 </Link>
               </li>
@@ -167,15 +183,13 @@ export default async function ServiceDetailPage({
             <div>
               <div className="mb-4 flex flex-wrap gap-2">
                 {comingSoon ? <Badge tone="neutral">{tCommon('comingSoon')}</Badge> : null}
-                {service.requiresPartner ? (
-                  <Badge tone="accent">{t('authority')}</Badge>
-                ) : null}
+                {service.requiresPartner ? <Badge tone="accent">{t('authority')}</Badge> : null}
                 {service.isRegulated ? <Badge tone="warning">{t('eligibility')}</Badge> : null}
               </div>
-              <h1 className="text-3xl leading-tight text-ink md:text-4xl">
+              <h1 className="text-ink text-3xl leading-tight md:text-4xl">
                 {pick(service.name, loc)}
               </h1>
-              <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted">
+              <p className="text-muted mt-4 max-w-2xl text-lg leading-relaxed">
                 {pick(service.summary, loc)}
               </p>
             </div>
@@ -183,10 +197,10 @@ export default async function ServiceDetailPage({
             <Card className="h-fit p-5 md:p-6">
               <dl className="flex flex-col gap-4">
                 <div>
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-muted">
+                  <dt className="text-muted text-xs font-semibold tracking-wide uppercase">
                     {t('startingFrom')}
                   </dt>
-                  <dd className="mt-1 text-2xl font-semibold text-ink">
+                  <dd className="text-ink mt-1 text-2xl font-semibold">
                     {service.startingFeeBdt !== null
                       ? format.number(service.startingFeeBdt, 'bdt')
                       : tPricing('noPublishedFee')}
@@ -194,28 +208,34 @@ export default async function ServiceDetailPage({
                 </div>
                 {estimate ? (
                   <div>
-                    <dt className="text-xs font-semibold uppercase tracking-wide text-muted">
+                    <dt className="text-muted text-xs font-semibold tracking-wide uppercase">
                       {t('estimatedTime')}
                     </dt>
-                    <dd className="mt-1 flex items-center gap-2 text-sm font-medium text-ink">
-                      <Clock className="size-4 text-muted" aria-hidden="true" />
+                    <dd className="text-ink mt-1 flex items-center gap-2 text-sm font-medium">
+                      <Clock className="text-muted size-4" aria-hidden="true" />
                       {estimate.min}–{estimate.max} {loc === 'bn' ? 'দিন' : 'days'}
                     </dd>
-                    <dd className="mt-1 text-xs text-muted">
+                    <dd className="text-muted mt-1 text-xs">
                       {t('timeReviewed')}: {format.dateTime(new Date(estimate.reviewedAt), 'short')}
                     </dd>
                   </div>
                 ) : null}
               </dl>
 
-              <Button asChild block size="lg" className="mt-5" variant={comingSoon ? 'secondary' : 'primary'}>
+              <Button
+                asChild
+                block
+                size="lg"
+                className="mt-5"
+                variant={comingSoon ? 'secondary' : 'primary'}
+              >
                 <Link href={comingSoon ? '/contact' : `/start?service=${service.slug}`}>
                   {comingSoon ? t('notifyMe') : t('cta')}
                   <ArrowRight className="size-4" aria-hidden="true" />
                 </Link>
               </Button>
 
-              <p className="mt-3 text-xs leading-relaxed text-muted">
+              <p className="text-muted mt-3 text-xs leading-relaxed">
                 {tCommon('processingTimeNote')}
               </p>
             </Card>
@@ -230,8 +250,8 @@ export default async function ServiceDetailPage({
 
             {service.whoFor ? (
               <section>
-                <h2 className="text-xl font-semibold text-ink">{t('whoFor')}</h2>
-                <p className="mt-3 max-w-prose text-sm leading-relaxed text-muted">
+                <h2 className="text-ink text-xl font-semibold">{t('whoFor')}</h2>
+                <p className="text-muted mt-3 max-w-prose text-sm leading-relaxed">
                   {pick(service.whoFor, loc)}
                 </p>
               </section>
@@ -241,7 +261,7 @@ export default async function ServiceDetailPage({
               <section className="grid gap-8 sm:grid-cols-2">
                 {included.length > 0 ? (
                   <div>
-                    <h2 className="text-xl font-semibold text-ink">{t('included')}</h2>
+                    <h2 className="text-ink text-xl font-semibold">{t('included')}</h2>
                     <div className="mt-3">
                       <BulletList items={included} tone="included" />
                     </div>
@@ -249,7 +269,7 @@ export default async function ServiceDetailPage({
                 ) : null}
                 {notIncluded.length > 0 ? (
                   <div>
-                    <h2 className="text-xl font-semibold text-ink">{t('notIncluded')}</h2>
+                    <h2 className="text-ink text-xl font-semibold">{t('notIncluded')}</h2>
                     <div className="mt-3">
                       <BulletList items={notIncluded} tone="excluded" />
                     </div>
@@ -260,8 +280,8 @@ export default async function ServiceDetailPage({
 
             {service.eligibility ? (
               <section>
-                <h2 className="text-xl font-semibold text-ink">{t('eligibility')}</h2>
-                <p className="mt-3 max-w-prose text-sm leading-relaxed text-muted">
+                <h2 className="text-ink text-xl font-semibold">{t('eligibility')}</h2>
+                <p className="text-muted mt-3 max-w-prose text-sm leading-relaxed">
                   {pick(service.eligibility, loc)}
                 </p>
                 <Alert tone="warning" className="mt-4">
@@ -272,15 +292,15 @@ export default async function ServiceDetailPage({
 
             {service.requirements.length > 0 ? (
               <section>
-                <h2 className="text-xl font-semibold text-ink">{t('requiredDocuments')}</h2>
+                <h2 className="text-ink text-xl font-semibold">{t('requiredDocuments')}</h2>
                 <ul className="mt-3 flex flex-col gap-2.5">
                   {service.requirements.map((requirement) => (
                     <li key={requirement.code} className="flex items-start gap-2.5 text-sm">
-                      <Check className="mt-0.5 size-4 shrink-0 text-accent" aria-hidden="true" />
+                      <Check className="text-accent mt-0.5 size-4 shrink-0" aria-hidden="true" />
                       <span className="text-ink">
                         {pick(requirement.label, loc)}
                         {!requirement.isMandatory ? (
-                          <span className="ms-2 text-muted">({tCommon('optional')})</span>
+                          <span className="text-muted ms-2">({tCommon('optional')})</span>
                         ) : null}
                       </span>
                     </li>
@@ -291,19 +311,19 @@ export default async function ServiceDetailPage({
 
             {service.milestones.length > 0 ? (
               <section>
-                <h2 className="text-xl font-semibold text-ink">{t('milestones')}</h2>
-                <ol className="mt-4 flex flex-col gap-4 border-s border-border ps-5">
+                <h2 className="text-ink text-xl font-semibold">{t('milestones')}</h2>
+                <ol className="border-border mt-4 flex flex-col gap-4 border-s ps-5">
                   {service.milestones.map((milestone, index) => (
                     <li key={milestone.code} className="relative">
                       <span
-                        className="absolute -start-[1.6rem] top-1 flex size-4 items-center justify-center rounded-full border-2 border-surface bg-primary"
+                        className="border-surface bg-primary absolute -start-[1.6rem] top-1 flex size-4 items-center justify-center rounded-full border-2"
                         aria-hidden="true"
                       />
-                      <p className="text-sm font-medium text-ink">
+                      <p className="text-ink text-sm font-medium">
                         {index + 1}. {pick(milestone.label, loc)}
                       </p>
                       {milestone.typicalDays ? (
-                        <p className="mt-0.5 text-xs text-muted">
+                        <p className="text-muted mt-0.5 text-xs">
                           {tCommon('estimated')}: {milestone.typicalDays}{' '}
                           {loc === 'bn' ? 'দিন' : 'days'}
                         </p>
@@ -315,7 +335,7 @@ export default async function ServiceDetailPage({
             ) : null}
 
             <section>
-              <h2 className="text-xl font-semibold text-ink">{t('fees')}</h2>
+              <h2 className="text-ink text-xl font-semibold">{t('fees')}</h2>
               <div className="mt-4">
                 <FeeTable service={service} locale={loc} />
               </div>
@@ -323,7 +343,7 @@ export default async function ServiceDetailPage({
 
             {faqs.length > 0 ? (
               <section>
-                <h2 className="text-xl font-semibold text-ink">{t('faq')}</h2>
+                <h2 className="text-ink text-xl font-semibold">{t('faq')}</h2>
                 <div className="mt-4">
                   <FaqList faqs={faqs} locale={loc} />
                 </div>
@@ -334,12 +354,12 @@ export default async function ServiceDetailPage({
           <aside className="flex h-fit flex-col gap-6 lg:sticky lg:top-24">
             {service.authorityName ? (
               <Card className="p-5">
-                <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">
-                  <Landmark className="size-4 text-muted" aria-hidden="true" />
+                <h2 className="text-ink flex items-center gap-2 text-sm font-semibold">
+                  <Landmark className="text-muted size-4" aria-hidden="true" />
                   {t('authority')}
                 </h2>
-                <p className="mt-2 text-sm text-ink">{pick(service.authorityName, loc)}</p>
-                <p className="mt-2 text-xs leading-relaxed text-muted">{t('authorityNote')}</p>
+                <p className="text-ink mt-2 text-sm">{pick(service.authorityName, loc)}</p>
+                <p className="text-muted mt-2 text-xs leading-relaxed">{t('authorityNote')}</p>
               </Card>
             ) : null}
             <IndependenceDisclosure />

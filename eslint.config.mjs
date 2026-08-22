@@ -1,13 +1,12 @@
-import { dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { FlatCompat } from '@eslint/eslintrc';
+import nextCoreWebVitals from 'eslint-config-next/core-web-vitals';
+import nextTypescript from 'eslint-config-next/typescript';
 import prettier from 'eslint-config-prettier';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({ baseDirectory: __dirname });
-
+/**
+ * eslint-config-next v16 ships flat config directly, so there is no
+ * FlatCompat/eslintrc bridge here — going through the compat layer produces a
+ * circular-structure crash with this version.
+ */
 const config = [
   {
     ignores: [
@@ -18,19 +17,18 @@ const config = [
       'test-results/**',
       'next-env.d.ts',
       'src/types/database.ts',
+      'src/content/catalog-snapshot.ts',
+      'src/content/rules-snapshot.ts',
     ],
   },
-  ...compat.extends('next/core-web-vitals', 'next/typescript'),
+  ...nextCoreWebVitals,
+  ...nextTypescript,
   prettier,
   {
     rules: {
       '@typescript-eslint/no-unused-vars': [
         'error',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' },
-      ],
-      '@typescript-eslint/consistent-type-imports': [
-        'error',
-        { prefer: 'type-imports', fixStyle: 'inline-type-imports' },
       ],
       'no-restricted-imports': [
         'error',
@@ -48,7 +46,15 @@ const config = [
     },
   },
   {
-    files: ['src/i18n/**', 'src/lib/logger.ts', 'scripts/**', 'tests/**', '*.config.*'],
+    // These modules legitimately log and legitimately import non-localised APIs.
+    files: [
+      'src/i18n/**',
+      'src/lib/logger.ts',
+      'scripts/**',
+      'tests/**',
+      '*.config.*',
+      'src/app/global-error.tsx',
+    ],
     rules: { 'no-restricted-imports': 'off', 'no-console': 'off' },
   },
 ];

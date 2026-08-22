@@ -101,7 +101,11 @@ export const FOOTER_LEGAL_LINKS = [
 ] as const;
 
 /** Public routes included in the sitemap, with their change priority. */
-export const SITEMAP_ROUTES: ReadonlyArray<{ path: string; priority: number; changeFrequency: 'daily' | 'weekly' | 'monthly' | 'yearly' }> = [
+export const SITEMAP_ROUTES: ReadonlyArray<{
+  path: string;
+  priority: number;
+  changeFrequency: 'daily' | 'weekly' | 'monthly' | 'yearly';
+}> = [
   { path: '/', priority: 1, changeFrequency: 'weekly' },
   { path: '/start', priority: 0.9, changeFrequency: 'monthly' },
   { path: '/services', priority: 0.9, changeFrequency: 'weekly' },

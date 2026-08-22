@@ -80,20 +80,25 @@ function toSummary(row: CaseRow, now: Date): CaseSummary {
  * not filter by organization, because doing so in the client would be a second,
  * weaker copy of the rule that already exists in the database.
  */
-export const listCases = cache(async (options?: { includeClosed?: boolean }): Promise<CaseSummary[]> => {
-  const supabase = await createClient();
-  let query = supabase.from('cases').select(CASE_SELECT).order('updated_at', { ascending: false });
+export const listCases = cache(
+  async (options?: { includeClosed?: boolean }): Promise<CaseSummary[]> => {
+    const supabase = await createClient();
+    let query = supabase
+      .from('cases')
+      .select(CASE_SELECT)
+      .order('updated_at', { ascending: false });
 
-  if (!options?.includeClosed) {
-    query = query.not('status', 'in', '("closed","cancelled")');
-  }
+    if (!options?.includeClosed) {
+      query = query.not('status', 'in', '("closed","cancelled")');
+    }
 
-  const { data, error } = await query;
-  if (error || !data) return [];
+    const { data, error } = await query;
+    if (error || !data) return [];
 
-  const now = new Date();
-  return (data as unknown as CaseRow[]).map((row) => toSummary(row, now));
-});
+    const now = new Date();
+    return (data as unknown as CaseRow[]).map((row) => toSummary(row, now));
+  },
+);
 
 export const getCaseSummary = cache(async (caseId: string): Promise<CaseSummary | null> => {
   const supabase = await createClient();
@@ -128,7 +133,11 @@ export type CaseDetail = {
     dueOn: string | null;
     isMandatory: boolean;
   }>;
-  partner: { organizationName: string; status: Enums<'assignment_status'>; authorized: boolean } | null;
+  partner: {
+    organizationName: string;
+    status: Enums<'assignment_status'>;
+    authorized: boolean;
+  } | null;
   submissions: Array<{
     id: string;
     authorityName: string;
@@ -154,7 +163,10 @@ export async function getCaseDetail(caseId: string): Promise<CaseDetail | null> 
   const supabase = await createClient();
 
   const [services, milestones, requests, assignment, submissions, history] = await Promise.all([
-    supabase.from('case_services').select('service_id, name_snapshot, is_primary').eq('case_id', caseId),
+    supabase
+      .from('case_services')
+      .select('service_id, name_snapshot, is_primary')
+      .eq('case_id', caseId),
     supabase
       .from('case_milestones')
       .select('id, code, label_en, label_bn, owner_kind, status, due_on, completed_at')
@@ -167,7 +179,9 @@ export async function getCaseDetail(caseId: string): Promise<CaseDetail | null> 
       .order('created_at'),
     supabase
       .from('case_partner_assignments')
-      .select('status, customer_authorized_at, organizations!case_partner_assignments_partner_org_id_fkey(name)')
+      .select(
+        'status, customer_authorized_at, organizations!case_partner_assignments_partner_org_id_fkey(name)',
+      )
       .eq('case_id', caseId)
       .in('status', ['offered', 'accepted'])
       .maybeSingle(),

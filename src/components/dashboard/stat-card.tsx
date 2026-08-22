@@ -17,12 +17,16 @@ export function StatCard({
   return (
     <Card className="p-4 md:p-5">
       <div className="flex items-start justify-between gap-3">
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted">{label}</p>
+        <p className="text-muted text-xs font-semibold tracking-wide uppercase">{label}</p>
         {icon ? (
           <span
             className={cn(
               'shrink-0',
-              tone === 'warning' ? 'text-warning' : tone === 'success' ? 'text-success' : 'text-muted',
+              tone === 'warning'
+                ? 'text-warning'
+                : tone === 'success'
+                  ? 'text-success'
+                  : 'text-muted',
             )}
             aria-hidden="true"
           >
@@ -30,8 +34,8 @@ export function StatCard({
           </span>
         ) : null}
       </div>
-      <p className="mt-2 text-2xl font-semibold text-ink">{value}</p>
-      {hint ? <p className="mt-1 text-sm text-muted">{hint}</p> : null}
+      <p className="text-ink mt-2 text-2xl font-semibold">{value}</p>
+      {hint ? <p className="text-muted mt-1 text-sm">{hint}</p> : null}
     </Card>
   );
 }

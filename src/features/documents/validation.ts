@@ -87,7 +87,10 @@ export function validateUpload(params: {
   const declared = params.declaredMimeType.split(';')[0]?.trim().toLowerCase() ?? '';
   const declaredNormalized = declared === 'image/jpg' ? 'image/jpeg' : declared;
   if (declaredNormalized && declaredNormalized !== detected) {
-    return { ok: false, failure: { code: 'type_mismatch', declared: declaredNormalized, detected } };
+    return {
+      ok: false,
+      failure: { code: 'type_mismatch', declared: declaredNormalized, detected },
+    };
   }
 
   return {

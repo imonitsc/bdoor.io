@@ -10,11 +10,7 @@ import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
-export default async function CompaniesPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function CompaniesPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
   await requireCustomerOrganization();
@@ -59,9 +55,9 @@ export default async function CompaniesPage({
               <Card as="article" className="p-5">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <h2 className="text-base font-semibold text-ink">{company.legal_name}</h2>
+                    <h2 className="text-ink text-base font-semibold">{company.legal_name}</h2>
                     {company.trading_name ? (
-                      <p className="text-sm text-muted">{company.trading_name}</p>
+                      <p className="text-muted text-sm">{company.trading_name}</p>
                     ) : null}
                   </div>
                   <Badge tone={company.status === 'incorporated' ? 'success' : 'neutral'}>
@@ -71,18 +67,18 @@ export default async function CompaniesPage({
 
                 <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
                   <div>
-                    <dt className="text-xs text-muted">{tCommon('status')}</dt>
+                    <dt className="text-muted text-xs">{tCommon('status')}</dt>
                     <dd className="text-ink">{company.structure.replace(/_/g, ' ')}</dd>
                   </div>
                   {company.registration_no ? (
                     <div>
-                      <dt className="text-xs text-muted">{tCommon('created')}</dt>
-                      <dd className="font-mono text-ink">{company.registration_no}</dd>
+                      <dt className="text-muted text-xs">{tCommon('created')}</dt>
+                      <dd className="text-ink font-mono">{company.registration_no}</dd>
                     </div>
                   ) : null}
                   {company.incorporation_date ? (
                     <div>
-                      <dt className="text-xs text-muted">{tCommon('created')}</dt>
+                      <dt className="text-muted text-xs">{tCommon('created')}</dt>
                       <dd className="text-ink">
                         {format.dateTime(new Date(company.incorporation_date), 'short')}
                       </dd>

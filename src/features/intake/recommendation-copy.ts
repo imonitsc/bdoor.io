@@ -38,7 +38,11 @@ export const STRUCTURE_LABELS: Record<string, Bilingual> = {
   liaison_office: { en: 'Liaison office', bn: 'লিয়াজোঁ অফিস' },
 };
 
-export function localized(map: Record<string, Bilingual>, key: string, locale: string): string | null {
+export function localized(
+  map: Record<string, Bilingual>,
+  key: string,
+  locale: string,
+): string | null {
   const entry = map[key];
   if (!entry) return null;
   return locale === 'bn' ? entry.bn : entry.en;

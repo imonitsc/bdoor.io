@@ -11,7 +11,7 @@ export function AccordionItem({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>) {
-  return <AccordionPrimitive.Item className={cn('border-b border-border', className)} {...props} />;
+  return <AccordionPrimitive.Item className={cn('border-border border-b', className)} {...props} />;
 }
 
 export function AccordionTrigger({
@@ -23,8 +23,8 @@ export function AccordionTrigger({
     <AccordionPrimitive.Header className="flex">
       <AccordionPrimitive.Trigger
         className={cn(
-          'group flex flex-1 items-start justify-between gap-4 py-4 text-start text-base font-medium text-ink',
-          'transition-colors hover:text-primary',
+          'group text-ink flex flex-1 items-start justify-between gap-4 py-4 text-start text-base font-medium',
+          'hover:text-primary transition-colors',
           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]',
           className,
         )}
@@ -32,7 +32,7 @@ export function AccordionTrigger({
       >
         {children}
         <ChevronDown
-          className="mt-1 size-5 shrink-0 text-muted transition-transform duration-200 group-data-[state=open]:rotate-180"
+          className="text-muted mt-1 size-5 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180"
           aria-hidden="true"
         />
       </AccordionPrimitive.Trigger>
@@ -47,7 +47,9 @@ export function AccordionContent({
 }: React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>) {
   return (
     <AccordionPrimitive.Content className="overflow-hidden" {...props}>
-      <div className={cn('pb-5 pe-8 text-sm leading-relaxed text-muted', className)}>{children}</div>
+      <div className={cn('text-muted pe-8 pb-5 text-sm leading-relaxed', className)}>
+        {children}
+      </div>
     </AccordionPrimitive.Content>
   );
 }

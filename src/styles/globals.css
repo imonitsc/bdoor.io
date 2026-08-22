@@ -26,7 +26,8 @@
   --bd-offwhite: #f7f8f5;
   --bd-white: #ffffff;
   --bd-ink: #111827;
-  --bd-muted: #64748b;
+  /* slate-600, not slate-500: 500 lands at 4.4:1 on the canvas and fails AA. */
+  --bd-muted: #475569;
   --bd-border: #e5e7eb;
   --bd-border-strong: #d3d8e0;
 
@@ -136,8 +137,10 @@
   --shadow-md: var(--shadow-md);
   --shadow-lg: var(--shadow-lg);
 
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-bengali: var(--font-noto-bengali), var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-sans:
+    var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-bengali:
+    var(--font-noto-bengali), var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
 
   /* 8px rhythm helpers used by section spacing */

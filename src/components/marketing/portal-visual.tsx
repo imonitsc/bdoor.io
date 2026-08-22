@@ -62,7 +62,15 @@ export function PortalVisual({ className }: { className?: string }) {
           strokeOpacity="0.7"
           strokeWidth="2"
         />
-        <line x1="30" y1="400" x2="370" y2="400" stroke="#4C5E85" strokeOpacity="0.5" strokeWidth="2" />
+        <line
+          x1="30"
+          y1="400"
+          x2="370"
+          y2="400"
+          stroke="#4C5E85"
+          strokeOpacity="0.5"
+          strokeWidth="2"
+        />
 
         {/* Handle — the small teal dot that also appears in the logo. */}
         <circle cx="176" cy="300" r="4.5" fill="#19B89A" />

@@ -2,7 +2,13 @@ import 'server-only';
 
 import { redirect } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
-import { customerMemberships, partnerMemberships, requireSession, type OrganizationMembership, type SessionContext } from './session';
+import {
+  customerMemberships,
+  partnerMemberships,
+  requireSession,
+  type OrganizationMembership,
+  type SessionContext,
+} from './session';
 
 /**
  * Guard for customer workspace pages.

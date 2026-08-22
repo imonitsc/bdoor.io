@@ -150,7 +150,10 @@ export function needsCustomerAction(status: CaseStatus): boolean {
   );
 }
 
-export const STATUS_TONE: Record<CaseStatus, 'neutral' | 'info' | 'warning' | 'success' | 'danger'> = {
+export const STATUS_TONE: Record<
+  CaseStatus,
+  'neutral' | 'info' | 'warning' | 'success' | 'danger'
+> = {
   draft: 'neutral',
   awaiting_kyc: 'warning',
   kyc_review: 'info',

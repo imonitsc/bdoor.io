@@ -34,7 +34,9 @@ export function BDoorLogo({
 }) {
   return (
     <span className={cn('inline-flex items-center gap-2.5', className)}>
-      <BDoorSymbol className={cn('size-7', inverse ? 'text-[color:var(--bd-cobalt-200)]' : 'text-primary')} />
+      <BDoorSymbol
+        className={cn('size-7', inverse ? 'text-[color:var(--bd-cobalt-200)]' : 'text-primary')}
+      />
       <span
         className={cn(
           'text-[1.3rem] font-semibold tracking-[-0.02em]',

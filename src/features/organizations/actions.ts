@@ -221,8 +221,11 @@ export async function revokeInvitation(_previous: OrgState, formData: FormData):
  * the token — expiry, status, and that the email matches — is checked here
  * before any membership is created.
  */
-export async function acceptInvitation(token: string): Promise<
-  { ok: true; organizationId: string } | { ok: false; reason: 'invalid' | 'expired' | 'wrong_email' | 'unavailable' }
+export async function acceptInvitation(
+  token: string,
+): Promise<
+  | { ok: true; organizationId: string }
+  | { ok: false; reason: 'invalid' | 'expired' | 'wrong_email' | 'unavailable' }
 > {
   const session = await requireSession();
   if (!hasServiceRole()) return { ok: false, reason: 'unavailable' };
@@ -237,7 +240,10 @@ export async function acceptInvitation(token: string): Promise<
   if (!invitation || invitation.status !== 'pending') return { ok: false, reason: 'invalid' };
 
   if (new Date(invitation.expires_at).getTime() < Date.now()) {
-    await admin.from('organization_invitations').update({ status: 'expired' }).eq('id', invitation.id);
+    await admin
+      .from('organization_invitations')
+      .update({ status: 'expired' })
+      .eq('id', invitation.id);
     return { ok: false, reason: 'expired' };
   }
 
@@ -279,7 +285,10 @@ export async function acceptInvitation(token: string): Promise<
 export async function removeMember(_previous: OrgState, formData: FormData): Promise<OrgState> {
   const organizationId = String(formData.get('organizationId') ?? '');
   const userId = String(formData.get('userId') ?? '');
-  const { session } = await requireOrganization(organizationId, ['customer_owner', 'partner_owner']);
+  const { session } = await requireOrganization(organizationId, [
+    'customer_owner',
+    'partner_owner',
+  ]);
 
   if (userId === session.userId) return { status: 'error', message: 'cannotRemoveSelf' };
 

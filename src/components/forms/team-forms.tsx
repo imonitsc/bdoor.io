@@ -7,7 +7,12 @@ import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Field, FieldControl, FieldLabel } from '@/components/ui/field';
 import { Input, NativeSelect } from '@/components/ui/input';
-import { inviteMember, removeMember, revokeInvitation, type OrgState } from '@/features/organizations/actions';
+import {
+  inviteMember,
+  removeMember,
+  revokeInvitation,
+  type OrgState,
+} from '@/features/organizations/actions';
 
 const INITIAL: OrgState = { status: 'idle' };
 
@@ -116,7 +121,7 @@ export function RemoveMemberButton({
         <span className="sr-only"> — {name}</span>
       </Button>
       {state.status === 'error' && state.message ? (
-        <span className="text-xs font-medium text-danger" role="alert">
+        <span className="text-danger text-xs font-medium" role="alert">
           {tErrors(state.message)}
         </span>
       ) : null}

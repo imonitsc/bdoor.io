@@ -57,15 +57,15 @@ export default async function ContactPage({
 
           <aside className="flex h-fit flex-col gap-6">
             <Card className="p-5">
-              <h2 className="text-sm font-semibold text-ink">{t('otherWays')}</h2>
+              <h2 className="text-ink text-sm font-semibold">{t('otherWays')}</h2>
               <a
                 href={`mailto:${SITE.contactEmail}`}
-                className="mt-3 inline-flex items-center gap-2 rounded text-sm text-primary hover:text-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+                className="text-primary hover:text-primary-hover mt-3 inline-flex items-center gap-2 rounded text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
               >
                 <Mail className="size-4" aria-hidden="true" />
                 {SITE.contactEmail}
               </a>
-              <p className="mt-4 flex items-start gap-2 text-sm text-muted">
+              <p className="text-muted mt-4 flex items-start gap-2 text-sm">
                 <Clock className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
                 {t('responseTime')}
               </p>

@@ -7,17 +7,33 @@
 import { execFileSync } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 
-const args = ['-h', process.env.PGHOST ?? '/tmp', '-p', process.env.PGPORT ?? '55432',
-  '-U', process.env.PGUSER ?? 'postgres', '-d', process.env.PGDATABASE ?? 'bdoor_test', '-tAqc'];
+const args = [
+  '-h',
+  process.env.PGHOST ?? '/tmp',
+  '-p',
+  process.env.PGPORT ?? '55432',
+  '-U',
+  process.env.PGUSER ?? 'postgres',
+  '-d',
+  process.env.PGDATABASE ?? 'bdoor_test',
+  '-tAqc',
+];
 
 const rules = JSON.parse(
-  execFileSync('psql', [...args, `
+  execFileSync(
+    'psql',
+    [
+      ...args,
+      `
     select coalesce(json_agg(json_build_object(
       'key', key, 'description', description,
       'conditions', conditions, 'outcome', outcome, 'priority', priority
     ) order by priority, key), '[]'::json)
     from public.recommendation_rules where is_active;
-  `], { encoding: 'utf8' }).trim(),
+  `,
+    ],
+    { encoding: 'utf8' },
+  ).trim(),
 );
 
 writeFileSync(

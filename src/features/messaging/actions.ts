@@ -21,7 +21,10 @@ const bodySchema = z.string().trim().min(1, 'empty').max(20_000, 'tooLong');
  * flag is only honoured for staff — a customer cannot post a note that hides
  * itself from their own team, and cannot forge one that reads as staff.
  */
-export async function sendMessage(_previous: MessageState, formData: FormData): Promise<MessageState> {
+export async function sendMessage(
+  _previous: MessageState,
+  formData: FormData,
+): Promise<MessageState> {
   const session = await requireSession();
 
   try {
@@ -35,7 +38,10 @@ export async function sendMessage(_previous: MessageState, formData: FormData): 
   const parsed = bodySchema.safeParse(formData.get('body'));
 
   if (!threadId || !parsed.success) {
-    return { status: 'error', message: parsed.success ? 'generic' : parsed.error.issues[0]!.message };
+    return {
+      status: 'error',
+      message: parsed.success ? 'generic' : parsed.error.issues[0]!.message,
+    };
   }
 
   const staff = isStaff(session);
@@ -45,7 +51,11 @@ export async function sendMessage(_previous: MessageState, formData: FormData): 
   const { error } = await supabase.from('messages').insert({
     thread_id: threadId,
     author_id: session.userId,
-    author_kind: staff ? 'staff' : session.memberships.some((m) => m.kind === 'partner') ? 'partner' : 'customer',
+    author_kind: staff
+      ? 'staff'
+      : session.memberships.some((m) => m.kind === 'partner')
+        ? 'partner'
+        : 'customer',
     body: parsed.data,
     is_internal_note: staff && wantsInternal,
   });

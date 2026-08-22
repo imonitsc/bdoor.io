@@ -29,15 +29,15 @@ export function HeroAdvisor() {
 
   return (
     <form
-      className="flex flex-col gap-4 rounded-[var(--radius-panel)] border border-border bg-surface p-5 shadow-md md:p-6"
+      className="border-border bg-surface flex flex-col gap-4 rounded-[var(--radius-panel)] border p-5 shadow-md md:p-6"
       onSubmit={(event) => {
         event.preventDefault();
         router.push(`/start?intent=${encodeURIComponent(value)}`);
       }}
     >
       <div>
-        <h2 className="text-base font-semibold text-ink">{t('title')}</h2>
-        <p className="mt-1 text-sm text-muted">{t('help')}</p>
+        <h2 className="text-ink text-base font-semibold">{t('title')}</h2>
+        <p className="text-muted mt-1 text-sm">{t('help')}</p>
       </div>
 
       <RadioGroup

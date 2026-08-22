@@ -17,13 +17,13 @@ export default function NotFound() {
   return (
     <div className="container-page flex min-h-[60vh] flex-col items-center justify-center gap-5 py-20 text-center">
       <span
-        className="flex size-12 items-center justify-center rounded-full bg-surface-sunken text-muted"
+        className="bg-surface-sunken text-muted flex size-12 items-center justify-center rounded-full"
         aria-hidden="true"
       >
         <Compass className="size-6" />
       </span>
-      <h1 className="text-3xl leading-tight text-ink md:text-4xl">{t('notFoundTitle')}</h1>
-      <p className="max-w-md text-base leading-relaxed text-muted">{t('notFoundBody')}</p>
+      <h1 className="text-ink text-3xl leading-tight md:text-4xl">{t('notFoundTitle')}</h1>
+      <p className="text-muted max-w-md text-base leading-relaxed">{t('notFoundBody')}</p>
       <div className="flex flex-col gap-3 sm:flex-row">
         <Button asChild size="lg">
           <Link href={MARKETING_ROUTES.home}>{t('notFoundHome')}</Link>

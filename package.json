@@ -15,10 +15,10 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:unit": "vitest run tests/unit",
-    "test:integration": "vitest run tests/integration",
+    "test": "vitest --config vitest.config.mts run",
+    "test:watch": "vitest --config vitest.config.mts",
+    "test:unit": "vitest --config vitest.config.mts run tests/unit",
+    "test:integration": "vitest --config vitest.config.mts run tests/integration",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "db:types": "supabase gen types typescript --local > src/types/database.ts",
@@ -54,7 +54,6 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
-    "@eslint/eslintrc": "3.3.1",
     "@playwright/test": "1.62.1",
     "@tailwindcss/postcss": "4.3.3",
     "@types/node": "22.20.0",
@@ -67,6 +66,8 @@
     "prettier-plugin-tailwindcss": "0.6.14",
     "tailwindcss": "4.3.3",
     "typescript": "5.9.3",
-    "vitest": "4.1.11"
+    "vitest": "4.1.11",
+    "pg": "8.23.0",
+    "@types/pg": "8.15.5"
   }
 }

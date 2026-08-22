@@ -18,9 +18,7 @@ export function IndependenceDisclosure({
   const t = useTranslations('brand');
 
   if (variant === 'inline') {
-    return (
-      <p className={cn('text-xs leading-relaxed text-muted', className)}>{t('disclosure')}</p>
-    );
+    return <p className={cn('text-muted text-xs leading-relaxed', className)}>{t('disclosure')}</p>;
   }
 
   return (
@@ -34,7 +32,10 @@ export function IndependenceDisclosure({
       )}
     >
       <Info
-        className={cn('mt-0.5 size-4 shrink-0', variant === 'inverse' ? 'text-muted-inverse' : 'text-muted')}
+        className={cn(
+          'mt-0.5 size-4 shrink-0',
+          variant === 'inverse' ? 'text-muted-inverse' : 'text-muted',
+        )}
         aria-hidden="true"
       />
       <p

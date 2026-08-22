@@ -96,7 +96,10 @@ export async function acceptQuote(
  * The amount comes from the invoice row, never from the form: a client that
  * posts its own amount is ignored.
  */
-export async function startCheckout(_previous: BillingState, formData: FormData): Promise<BillingState> {
+export async function startCheckout(
+  _previous: BillingState,
+  formData: FormData,
+): Promise<BillingState> {
   const session = await requireSession();
   const invoiceId = String(formData.get('invoiceId') ?? '');
   if (!invoiceId) return { status: 'error', message: 'generic' };

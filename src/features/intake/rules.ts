@@ -175,7 +175,10 @@ export function hardManualReviewReasons(answers: PartialAnswers): string[] {
   if (answers.regulated_activity === true) {
     reasons.push('regulated_sector');
   }
-  if (typeof answers.foreign_ownership_percent === 'number' && answers.foreign_ownership_percent > 0) {
+  if (
+    typeof answers.foreign_ownership_percent === 'number' &&
+    answers.foreign_ownership_percent > 0
+  ) {
     reasons.push('foreign_ownership');
   }
   if (answers.structure === 'branch_office' || answers.structure === 'liaison_office') {

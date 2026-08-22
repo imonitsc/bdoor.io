@@ -522,7 +522,7 @@
       "noServices": "We could not match a service confidently. A case manager will review your answers."
     },
     "questions": {
-      "founderLocation": {
+      "founder_location": {
         "label": "Where are you based right now?",
         "help": "This changes which documents you need and whether foreign-investment rules apply.",
         "why": "Founder location determines whether the incorporation is treated as local or foreign-invested, which changes the documents, the bank process and the approvals involved.",
@@ -562,36 +562,36 @@
           "unsure": "I'm not sure"
         }
       },
-      "ownerCount": {
+      "owner_count": {
         "label": "How many owners will there be, including you?",
         "why": "Some structures have minimum and maximum owner counts, and the count changes the documents we collect."
       },
-      "directorCount": {
+      "director_count": {
         "label": "How many directors will there be?",
         "why": "Company law sets minimum director numbers, and each director needs identity records."
       },
-      "foreignOwners": {
+      "foreign_owners": {
         "label": "Will any owner be a foreign national or a foreign company?",
         "why": "Foreign ownership triggers investment registration, remittance documentation and additional verification."
       },
-      "entityOwner": {
+      "entity_owner": {
         "label": "Will any owner be a company, trust or fund rather than a person?",
         "why": "We must identify the natural people who ultimately own or control a corporate shareholder. This is a legal requirement, not a formality."
       },
-      "foreignOwnershipPercent": {
+      "foreign_ownership_percent": {
         "label": "Roughly what percentage will be foreign-owned?",
         "why": "Some sectors cap foreign ownership. The percentage also affects investment-registration steps."
       },
-      "remitCapital": {
+      "remit_capital": {
         "label": "Will investment capital be sent into Bangladesh from abroad?",
         "why": "Inward remittance needs a specific bank process and an encashment certificate. Getting the order wrong causes real delays.",
         "note": "Investment or share capital is never paid to BDoor. It goes to a bank account in the company's name through the proper channel."
       },
-      "founderWillWork": {
+      "founder_will_work": {
         "label": "Will you live or work in Bangladesh yourself?",
         "why": "Working or residing in Bangladesh needs a visa and, usually, a work permit. Owning a company does not give you either."
       },
-      "importExport": {
+      "import_export": {
         "label": "Will the business import or export goods?",
         "why": "Importing needs an IRC and exporting needs an ERC. Both depend on having a bank account and a trade licence first.",
         "options": {
@@ -601,20 +601,20 @@
           "both": "Both"
         }
       },
-      "hireEmployees": {
+      "hire_employees": {
         "label": "Will you hire employees in Bangladesh?",
         "why": "Employment brings payroll, tax deduction and, above certain sizes, labour registrations."
       },
-      "regulatedActivity": {
+      "regulated_activity": {
         "label": "Is your activity in a regulated sector?",
         "help": "For example travel, recruitment, food, pharmaceuticals, telecom, finance, education or construction.",
         "why": "Regulated sectors need approval from a specific authority before or after incorporation, and eligibility must be checked first."
       },
-      "needAddress": {
+      "need_address": {
         "label": "Do you need help with a registered business address?",
         "why": "A registrable address is required. If you do not have one yet, we need to plan for it before the trade licence stage."
       },
-      "startWindow": {
+      "start_window": {
         "label": "When would you like to start?",
         "why": "Timing changes what we prioritise and whether documents can be prepared in parallel.",
         "options": {
@@ -624,11 +624,11 @@
           "exploring": "Just exploring"
         }
       },
-      "existingBusiness": {
+      "existing_business": {
         "label": "Does this business already exist?",
         "why": "Existing companies need different documents — we work from your current registrations rather than starting fresh."
       },
-      "existingRegistrations": {
+      "existing_registrations": {
         "label": "Which registrations do you already have?",
         "why": "Knowing what exists avoids duplicate applications and tells us what needs renewal.",
         "options": {
@@ -975,6 +975,18 @@
       "when": "When",
       "correlationId": "Correlation ID",
       "immutableNote": "Audit records are append-only and cannot be edited or deleted from this interface."
+    },
+    "errors": {
+      "generic": "We could not complete that. Please try again.",
+      "notFound": "That record is not available.",
+      "invalidTransition": "That status change is not allowed from the current state.",
+      "notPermitted": "Your role cannot make that change.",
+      "reasonRequired": "Give a reason of at least five characters.",
+      "tooLong": "That is longer than we can store.",
+      "labelRequired": "Enter a label.",
+      "scopeRequired": "Describe the scope before assigning a partner.",
+      "alreadyAssigned": "This case already has a live partner assignment.",
+      "saved": "Saved."
     }
   },
   "caseStatus": {
@@ -1106,6 +1118,19 @@
       "nameTooShort": "Enter your name.",
       "saved": "Saved.",
       "dataRequestReceived": "Request received. We will respond within the statutory period and tell you if any records must be retained."
+    }
+  },
+  "partners": {
+    "errors": {
+      "generic": "We could not complete that. Please try again.",
+      "notFound": "That assignment is not available to you.",
+      "alreadyAnswered": "This assignment has already been answered.",
+      "conflictCheckRequired": "Confirm the conflict check before accepting.",
+      "reasonRequired": "Please give a reason for declining.",
+      "tooLong": "That is longer than we can store.",
+      "accepted": "Assignment accepted.",
+      "declined": "Assignment declined.",
+      "saved": "Saved."
     }
   }
 }

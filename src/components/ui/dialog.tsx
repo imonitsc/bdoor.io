@@ -17,11 +17,11 @@ export function DialogContent({
 }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & { closeLabel?: string }) {
   return (
     <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-[color-mix(in_srgb,var(--bd-midnight)_55%,transparent)] data-[state=open]:animate-in data-[state=open]:fade-in" />
+      <DialogPrimitive.Overlay className="data-[state=open]:animate-in data-[state=open]:fade-in fixed inset-0 z-50 bg-[color-mix(in_srgb,var(--bd-midnight)_55%,transparent)]" />
       <DialogPrimitive.Content
         className={cn(
-          'fixed left-1/2 top-1/2 z-50 w-[calc(100vw-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2',
-          'max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-[var(--radius-panel)] border border-border',
+          'fixed top-1/2 left-1/2 z-50 w-[calc(100vw-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2',
+          'border-border max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-[var(--radius-panel)] border',
           'bg-surface p-6 shadow-lg',
           className,
         )}
@@ -29,7 +29,7 @@ export function DialogContent({
       >
         {children}
         <DialogPrimitive.Close
-          className="absolute end-4 top-4 inline-flex size-9 items-center justify-center rounded-[var(--radius-control)] text-muted transition-colors hover:bg-surface-sunken hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+          className="text-muted hover:bg-surface-sunken hover:text-ink absolute end-4 top-4 inline-flex size-9 items-center justify-center rounded-[var(--radius-control)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
           aria-label={closeLabel}
         >
           <X className="size-4" aria-hidden="true" />
@@ -48,7 +48,7 @@ export function DialogTitle({
   ...props
 }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>) {
   return (
-    <DialogPrimitive.Title className={cn('text-lg font-semibold text-ink', className)} {...props} />
+    <DialogPrimitive.Title className={cn('text-ink text-lg font-semibold', className)} {...props} />
   );
 }
 
@@ -58,7 +58,7 @@ export function DialogDescription({
 }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>) {
   return (
     <DialogPrimitive.Description
-      className={cn('text-sm leading-relaxed text-muted', className)}
+      className={cn('text-muted text-sm leading-relaxed', className)}
       {...props}
     />
   );

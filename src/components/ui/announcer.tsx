@@ -4,9 +4,9 @@ import * as React from 'react';
 
 type Announcement = { message: string; assertive: boolean; id: number };
 
-const AnnouncerContext = React.createContext<((message: string, assertive?: boolean) => void) | null>(
-  null,
-);
+const AnnouncerContext = React.createContext<
+  ((message: string, assertive?: boolean) => void) | null
+>(null);
 
 /**
  * A single pair of live regions for the whole app. Upload progress, validation

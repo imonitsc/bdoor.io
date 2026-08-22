@@ -8,7 +8,13 @@ import { Progress } from '@/components/ui/progress';
 import { CaseStatusBadge } from './status-badge';
 import type { CaseSummary } from '@/features/cases/queries';
 
-export function CaseCard({ item, basePath = '/app/applications' }: { item: CaseSummary; basePath?: string }) {
+export function CaseCard({
+  item,
+  basePath = '/app/applications',
+}: {
+  item: CaseSummary;
+  basePath?: string;
+}) {
   const t = useTranslations('workspace');
   const format = useFormatter();
 
@@ -16,8 +22,8 @@ export function CaseCard({ item, basePath = '/app/applications' }: { item: CaseS
     <Card as="article" className="group relative p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="font-mono text-xs text-muted">{item.reference}</p>
-          <h3 className="mt-1 text-base font-semibold text-ink">
+          <p className="text-muted font-mono text-xs">{item.reference}</p>
+          <h3 className="text-ink mt-1 text-base font-semibold">
             <Link
               href={`${basePath}/${item.id}`}
               className="rounded before:absolute before:inset-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
@@ -37,27 +43,23 @@ export function CaseCard({ item, basePath = '/app/applications' }: { item: CaseS
               total: item.progress.total,
             })}
           </span>
-          <span className="font-medium text-ink">{item.progress.percent}%</span>
+          <span className="text-ink font-medium">{item.progress.percent}%</span>
         </div>
-        <Progress
-          className="mt-2"
-          value={item.progress.percent}
-          label={t('case.timeline')}
-        />
+        <Progress className="mt-2" value={item.progress.percent} label={t('case.timeline')} />
       </div>
 
       <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
         <div>
-          <dt className="text-xs text-muted">{t('case.openedOn')}</dt>
+          <dt className="text-muted text-xs">{t('case.openedOn')}</dt>
           <dd className="text-ink">{format.dateTime(new Date(item.openedAt), 'short')}</dd>
         </div>
         {item.estimate.available ? (
           <div>
-            <dt className="text-xs text-muted">{t('case.estimatedCompletion')}</dt>
-            <dd className="flex items-center gap-1.5 text-ink">
+            <dt className="text-muted text-xs">{t('case.estimatedCompletion')}</dt>
+            <dd className="text-ink flex items-center gap-1.5">
               {item.estimate.paused ? (
                 <>
-                  <PauseCircle className="size-3.5 text-warning" aria-hidden="true" />
+                  <PauseCircle className="text-warning size-3.5" aria-hidden="true" />
                   <span>
                     {t('case.estimatePaused', {
                       reason: t(`case.waitingReasons.${item.estimate.pausedReason}`),
@@ -72,8 +74,8 @@ export function CaseCard({ item, basePath = '/app/applications' }: { item: CaseS
         ) : null}
         {item.openActions > 0 ? (
           <div>
-            <dt className="text-xs text-muted">{t('dashboard.actionsNeeded')}</dt>
-            <dd className="flex items-center gap-1.5 font-medium text-warning">
+            <dt className="text-muted text-xs">{t('dashboard.actionsNeeded')}</dt>
+            <dd className="text-warning flex items-center gap-1.5 font-medium">
               <AlertCircle className="size-3.5" aria-hidden="true" />
               {item.openActions}
             </dd>
@@ -81,9 +83,12 @@ export function CaseCard({ item, basePath = '/app/applications' }: { item: CaseS
         ) : null}
       </dl>
 
-      <p className="mt-4 flex items-center gap-1.5 text-sm font-medium text-primary">
+      <p className="text-primary mt-4 flex items-center gap-1.5 text-sm font-medium">
         {t('case.overview')}
-        <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+        <ArrowRight
+          className="size-4 transition-transform group-hover:translate-x-0.5"
+          aria-hidden="true"
+        />
       </p>
     </Card>
   );

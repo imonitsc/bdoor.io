@@ -56,16 +56,16 @@ function Hero() {
   const t = useTranslations('home.hero');
 
   return (
-    <section className="relative overflow-hidden bg-surface-inverse text-ink-inverse">
+    <section className="bg-surface-inverse text-ink-inverse relative overflow-hidden">
       <div className="container-page grid gap-12 py-16 md:py-20 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16 lg:py-24">
         <div className="flex flex-col justify-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--bd-teal-500)]">
+          <p className="text-xs font-semibold tracking-[0.14em] text-[color:var(--bd-teal-500)] uppercase">
             {t('eyebrow')}
           </p>
-          <h1 className="mt-4 max-w-2xl text-4xl leading-[1.1] text-ink-inverse md:text-5xl lg:text-[3.4rem]">
+          <h1 className="text-ink-inverse mt-4 max-w-2xl text-4xl leading-[1.1] md:text-5xl lg:text-[3.4rem]">
             {t('headline')}
           </h1>
-          <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted-inverse">{t('support')}</p>
+          <p className="text-muted-inverse mt-5 max-w-xl text-lg leading-relaxed">{t('support')}</p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button asChild size="lg" variant="inverse">
@@ -78,13 +78,13 @@ function Hero() {
               asChild
               size="lg"
               variant="ghost"
-              className="border border-border-inverse text-ink-inverse hover:bg-surface-inverse-soft"
+              className="border-border-inverse text-ink-inverse hover:bg-surface-inverse-soft border"
             >
               <Link href={MARKETING_ROUTES.services}>{t('secondaryCta')}</Link>
             </Button>
           </div>
 
-          <p className="mt-8 text-sm text-muted-inverse">{t('trustLine')}</p>
+          <p className="text-muted-inverse mt-8 text-sm">{t('trustLine')}</p>
 
           <PortalVisual className="pointer-events-none mt-10 hidden max-w-sm opacity-90 lg:block" />
         </div>
@@ -109,13 +109,13 @@ function HowItWorks() {
           {steps.map((step, index) => (
             <li key={step} className="flex flex-col gap-3">
               <span
-                className="flex size-9 items-center justify-center rounded-full bg-primary-soft text-sm font-semibold text-info"
+                className="bg-primary-soft text-info flex size-9 items-center justify-center rounded-full text-sm font-semibold"
                 aria-hidden="true"
               >
                 {index + 1}
               </span>
-              <h3 className="text-base font-semibold text-ink">{t(`steps.${step}.title`)}</h3>
-              <p className="text-sm leading-relaxed text-muted">{t(`steps.${step}.body`)}</p>
+              <h3 className="text-ink text-base font-semibold">{t(`steps.${step}.title`)}</h3>
+              <p className="text-muted text-sm leading-relaxed">{t(`steps.${step}.body`)}</p>
             </li>
           ))}
         </ol>
@@ -145,12 +145,12 @@ async function Categories({ locale }: { locale: Locale }) {
                   className="group relative h-full p-5 transition-shadow hover:shadow-md md:p-6"
                 >
                   <span
-                    className="flex size-10 items-center justify-center rounded-[12px] bg-accent-soft text-accent-strong"
+                    className="bg-accent-soft text-accent-strong flex size-10 items-center justify-center rounded-[12px]"
                     aria-hidden="true"
                   >
                     <Icon className="size-5" />
                   </span>
-                  <h3 className="mt-4 text-base font-semibold text-ink">
+                  <h3 className="text-ink mt-4 text-base font-semibold">
                     <Link
                       href={`/services?category=${category.slug}`}
                       className="rounded before:absolute before:inset-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
@@ -158,10 +158,10 @@ async function Categories({ locale }: { locale: Locale }) {
                       {pick(category.name, locale)}
                     </Link>
                   </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted">
+                  <p className="text-muted mt-2 text-sm leading-relaxed">
                     {pick(category.summary, locale)}
                   </p>
-                  <p className="mt-4 flex items-center gap-1.5 text-sm font-medium text-primary">
+                  <p className="text-primary mt-4 flex items-center gap-1.5 text-sm font-medium">
                     {tCommon('viewAll')}
                     <ArrowRight
                       className="size-4 transition-transform group-hover:translate-x-0.5"
@@ -199,10 +199,10 @@ function ForeignFounders() {
             {points.map((point) => (
               <li key={point} className="flex gap-3">
                 <span
-                  className="mt-2 size-1.5 shrink-0 rounded-full bg-accent"
+                  className="bg-accent mt-2 size-1.5 shrink-0 rounded-full"
                   aria-hidden="true"
                 />
-                <p className="text-sm leading-relaxed text-ink">{t(`points.${point}`)}</p>
+                <p className="text-ink text-sm leading-relaxed">{t(`points.${point}`)}</p>
               </li>
             ))}
           </ul>
@@ -251,11 +251,11 @@ function Pricing() {
           </Button>
         </div>
         <Card className="p-5 md:p-6">
-          <ul className="divide-y divide-border">
+          <ul className="divide-border divide-y">
             {categories.map((category) => (
               <li key={category} className="flex items-center justify-between gap-4 py-3.5">
-                <span className="text-sm font-medium text-ink">{tFees(category)}</span>
-                <span className="text-sm text-muted">
+                <span className="text-ink text-sm font-medium">{tFees(category)}</span>
+                <span className="text-muted text-sm">
                   {category === 'platform_service_fee' ? 'BDoor' : '—'}
                 </span>
               </li>
@@ -318,8 +318,8 @@ function FinalCta() {
   return (
     <Section tone="sunken">
       <div className="container-page flex flex-col items-center gap-6 text-center">
-        <h2 className="max-w-2xl text-3xl leading-tight text-ink md:text-4xl">{t('title')}</h2>
-        <p className="max-w-xl text-base leading-relaxed text-muted">{t('body')}</p>
+        <h2 className="text-ink max-w-2xl text-3xl leading-tight md:text-4xl">{t('title')}</h2>
+        <p className="text-muted max-w-xl text-base leading-relaxed">{t('body')}</p>
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button asChild size="lg">
             <Link href={MARKETING_ROUTES.start}>

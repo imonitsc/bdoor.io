@@ -68,7 +68,7 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
 
       <Section className="py-12 md:py-16">
         <div className="container-page">
-          <p className="max-w-2xl text-base leading-relaxed text-muted">{t('intro')}</p>
+          <p className="text-muted max-w-2xl text-base leading-relaxed">{t('intro')}</p>
 
           <div className="mt-10 grid gap-6 lg:grid-cols-3">
             <Card>
@@ -77,16 +77,16 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
                 <CardDescription>{t('standardBody')}</CardDescription>
               </CardHeader>
               <CardContent>
-                <ul className="divide-y divide-border">
+                <ul className="divide-border divide-y">
                   {withPublishedFee.map((service) => (
                     <li key={service.id} className="flex items-baseline justify-between gap-4 py-3">
                       <Link
                         href={`/services/${service.slug}`}
-                        className="rounded text-sm text-ink underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+                        className="text-ink rounded text-sm underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
                       >
                         {pick(service.name, loc)}
                       </Link>
-                      <span className="whitespace-nowrap text-sm font-medium text-ink">
+                      <span className="text-ink text-sm font-medium whitespace-nowrap">
                         {format.number(service.startingFeeBdt!, 'bdt')}
                       </span>
                     </li>
@@ -101,16 +101,16 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
                 <CardDescription>{t('quoteBody')}</CardDescription>
               </CardHeader>
               <CardContent>
-                <ul className="divide-y divide-border">
+                <ul className="divide-border divide-y">
                   {quotedOnly.map((service) => (
                     <li key={service.id} className="flex items-baseline justify-between gap-4 py-3">
                       <Link
                         href={`/services/${service.slug}`}
-                        className="rounded text-sm text-ink underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+                        className="text-ink rounded text-sm underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
                       >
                         {pick(service.name, loc)}
                       </Link>
-                      <span className="whitespace-nowrap text-sm text-muted">
+                      <span className="text-muted text-sm whitespace-nowrap">
                         {t('noPublishedFee')}
                       </span>
                     </li>
@@ -140,14 +140,14 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
       <Section tone="surface" className="py-12 md:py-16">
         <div className="container-page grid gap-10 lg:grid-cols-2 lg:gap-16">
           <div>
-            <h2 className="text-xl font-semibold text-ink">{t('inclusionsTitle')}</h2>
+            <h2 className="text-ink text-xl font-semibold">{t('inclusionsTitle')}</h2>
             <ul className="mt-5 flex flex-col gap-3">
               {inclusions.map((row) => (
                 <li key={row.key} className="flex items-start gap-2.5 text-sm">
                   {row.included ? (
-                    <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
+                    <Check className="text-success mt-0.5 size-4 shrink-0" aria-hidden="true" />
                   ) : (
-                    <X className="mt-0.5 size-4 shrink-0 text-muted" aria-hidden="true" />
+                    <X className="text-muted mt-0.5 size-4 shrink-0" aria-hidden="true" />
                   )}
                   <span className="text-ink">{t(row.key)}</span>
                 </li>
@@ -159,8 +159,8 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
           </div>
 
           <div>
-            <h2 className="text-xl font-semibold text-ink">{tServices('fees')}</h2>
-            <ul className="mt-5 divide-y divide-border border-y border-border">
+            <h2 className="text-ink text-xl font-semibold">{tServices('fees')}</h2>
+            <ul className="divide-border border-border mt-5 divide-y border-y">
               {(
                 [
                   'platform_service_fee',
@@ -172,7 +172,7 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
                 ] as const
               ).map((category) => (
                 <li key={category} className="flex items-center justify-between gap-4 py-3.5">
-                  <span className="text-sm font-medium text-ink">{tFees(category)}</span>
+                  <span className="text-ink text-sm font-medium">{tFees(category)}</span>
                   <Badge tone={category === 'platform_service_fee' ? 'info' : 'neutral'}>
                     {category === 'platform_service_fee'
                       ? 'BDoor'
@@ -192,7 +192,7 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
 
       <Section className="py-12 md:py-16">
         <div className="container-page flex flex-col items-center gap-5 text-center">
-          <h2 className="text-2xl font-semibold text-ink">{t('cta')}</h2>
+          <h2 className="text-ink text-2xl font-semibold">{t('cta')}</h2>
           <Button asChild size="lg">
             <Link href={MARKETING_ROUTES.start}>
               {t('cta')}

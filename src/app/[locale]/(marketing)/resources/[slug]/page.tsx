@@ -72,18 +72,18 @@ export default async function ResourcePage({
       <div className="container-page">
         <Link
           href="/resources"
-          className="inline-flex items-center gap-1.5 rounded text-sm font-medium text-primary hover:text-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+          className="text-primary hover:text-primary-hover inline-flex items-center gap-1.5 rounded text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
         >
           <ArrowLeft className="size-4" aria-hidden="true" />
           {t('backToResources')}
         </Link>
 
         <article className="mt-6">
-          <h1 className="max-w-3xl text-3xl leading-tight text-ink md:text-4xl">
+          <h1 className="text-ink max-w-3xl text-3xl leading-tight md:text-4xl">
             {pick(resource.title, loc)}
           </h1>
 
-          <p className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted">
+          <p className="text-muted mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
             {resource.readingMinutes ? (
               <span>{t('readingTime', { minutes: resource.readingMinutes })}</span>
             ) : null}
@@ -103,7 +103,7 @@ export default async function ResourcePage({
           ) : null}
 
           <Markdown
-            className="prose-bdoor mt-8 text-ink"
+            className="prose-bdoor text-ink mt-8"
             content={pick(resource.body, loc) ?? ''}
           />
         </article>

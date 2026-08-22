@@ -67,17 +67,17 @@ export default async function CaseDetailPage({
       <PageHeading
         breadcrumb={
           <nav aria-label={tCommon('breadcrumb')}>
-            <ol className="flex items-center gap-2 text-sm text-muted">
+            <ol className="text-muted flex items-center gap-2 text-sm">
               <li>
                 <Link
                   href={APP_ROUTES.applications}
-                  className="rounded hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+                  className="hover:text-ink rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
                 >
                   {tNav('applications')}
                 </Link>
               </li>
               <li aria-hidden="true">/</li>
-              <li className="font-mono text-ink" aria-current="page">
+              <li className="text-ink font-mono" aria-current="page">
                 {summary.reference}
               </li>
             </ol>
@@ -96,56 +96,56 @@ export default async function CaseDetailPage({
 
       <div className="grid gap-4 md:grid-cols-3">
         <Card className="p-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted">{t('timeline')}</p>
-          <p className="mt-2 text-2xl font-semibold text-ink">{summary.progress.percent}%</p>
+          <p className="text-muted text-xs font-semibold tracking-wide uppercase">
+            {t('timeline')}
+          </p>
+          <p className="text-ink mt-2 text-2xl font-semibold">{summary.progress.percent}%</p>
           <Progress className="mt-3" value={summary.progress.percent} label={t('timeline')} />
         </Card>
 
         <Card className="p-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+          <p className="text-muted text-xs font-semibold tracking-wide uppercase">
             {t('estimatedCompletion')}
           </p>
           {summary.estimate.available ? (
             summary.estimate.paused ? (
-              <p className="mt-2 flex items-start gap-2 text-sm text-warning">
+              <p className="text-warning mt-2 flex items-start gap-2 text-sm">
                 <PauseCircle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
                 {t('estimatePaused', {
                   reason: t(`waitingReasons.${summary.estimate.pausedReason}`),
                 })}
               </p>
             ) : (
-              <p className="mt-2 flex items-center gap-2 text-sm text-ink">
-                <Clock className="size-4 text-muted" aria-hidden="true" />
+              <p className="text-ink mt-2 flex items-center gap-2 text-sm">
+                <Clock className="text-muted size-4" aria-hidden="true" />
                 {format.dateTime(summary.estimate.earliestCompletion, 'short')} –{' '}
                 {format.dateTime(summary.estimate.latestCompletion, 'short')}
               </p>
             )
           ) : (
-            <p className="mt-2 text-sm text-muted">{tCommon('notSet')}</p>
+            <p className="text-muted mt-2 text-sm">{tCommon('notSet')}</p>
           )}
-          <p className="mt-2 text-xs leading-relaxed text-muted">{t('estimateNote')}</p>
+          <p className="text-muted mt-2 text-xs leading-relaxed">{t('estimateNote')}</p>
         </Card>
 
         <Card className="p-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+          <p className="text-muted text-xs font-semibold tracking-wide uppercase">
             {t('assignedPartner')}
           </p>
           {detail.partner ? (
             <>
-              <p className="mt-2 flex items-center gap-2 text-sm text-ink">
-                <ShieldCheck className="size-4 text-accent" aria-hidden="true" />
+              <p className="text-ink mt-2 flex items-center gap-2 text-sm">
+                <ShieldCheck className="text-accent size-4" aria-hidden="true" />
                 {detail.partner.organizationName}
               </p>
               <p className="mt-2">
                 <Badge tone={detail.partner.authorized ? 'success' : 'warning'}>
-                  {detail.partner.authorized
-                    ? tDocuments('whoSeesThis')
-                    : tPartner('pending')}
+                  {detail.partner.authorized ? tDocuments('whoSeesThis') : tPartner('pending')}
                 </Badge>
               </p>
             </>
           ) : (
-            <p className="mt-2 text-sm text-muted">{t('noPartner')}</p>
+            <p className="text-muted mt-2 text-sm">{t('noPartner')}</p>
           )}
         </Card>
       </div>
@@ -172,24 +172,28 @@ export default async function CaseDetailPage({
           {detail.milestones.length === 0 ? (
             <EmptyState title={t('noMilestones')} />
           ) : (
-            <ol className="flex flex-col gap-5 border-s border-border ps-6">
+            <ol className="border-border flex flex-col gap-5 border-s ps-6">
               {detail.milestones.map((milestone) => {
                 const Icon = MILESTONE_ICON[milestone.status];
                 const done = milestone.status === 'complete';
                 return (
                   <li key={milestone.id} className="relative">
                     <span
-                      className={`absolute -start-[2.1rem] top-0 flex size-6 items-center justify-center rounded-full border-2 border-canvas ${
+                      className={`border-canvas absolute -start-[2.1rem] top-0 flex size-6 items-center justify-center rounded-full border-2 ${
                         done ? 'bg-success text-white' : 'bg-surface-sunken text-muted'
                       }`}
                       aria-hidden="true"
                     >
                       <Icon className="size-3.5" />
                     </span>
-                    <p className={done ? 'text-sm text-muted line-through' : 'text-sm font-medium text-ink'}>
+                    <p
+                      className={
+                        done ? 'text-muted text-sm line-through' : 'text-ink text-sm font-medium'
+                      }
+                    >
                       {label(milestone.labelEn, milestone.labelBn)}
                     </p>
-                    <p className="mt-0.5 flex flex-wrap gap-x-3 text-xs text-muted">
+                    <p className="text-muted mt-0.5 flex flex-wrap gap-x-3 text-xs">
                       <span>
                         {tRoles(
                           milestone.ownerKind === 'bdoor'
@@ -203,7 +207,8 @@ export default async function CaseDetailPage({
                       </span>
                       {milestone.dueOn ? (
                         <span>
-                          {tCommon('dueDate')}: {format.dateTime(new Date(milestone.dueOn), 'short')}
+                          {tCommon('dueDate')}:{' '}
+                          {format.dateTime(new Date(milestone.dueOn), 'short')}
                         </span>
                       ) : null}
                       {milestone.completedAt ? (
@@ -221,13 +226,16 @@ export default async function CaseDetailPage({
           {detail.documentRequests.length === 0 ? (
             <EmptyState title={tDocuments('noDocuments')} />
           ) : (
-            <ul className="divide-y divide-border border-y border-border">
+            <ul className="divide-border border-border divide-y border-y">
               {detail.documentRequests.map((request) => (
-                <li key={request.id} className="flex flex-wrap items-center justify-between gap-3 py-3.5">
+                <li
+                  key={request.id}
+                  className="flex flex-wrap items-center justify-between gap-3 py-3.5"
+                >
                   <div className="min-w-0">
-                    <p className="text-sm text-ink">{label(request.labelEn, request.labelBn)}</p>
+                    <p className="text-ink text-sm">{label(request.labelEn, request.labelBn)}</p>
                     {request.dueOn ? (
-                      <p className="text-xs text-muted">
+                      <p className="text-muted text-xs">
                         {tCommon('dueDate')}: {format.dateTime(new Date(request.dueOn), 'short')}
                       </p>
                     ) : null}
@@ -236,7 +244,7 @@ export default async function CaseDetailPage({
                     <DocumentStatusBadge status={request.status} />
                     <Link
                       href={`${APP_ROUTES.documents}?case=${summary.id}&request=${request.id}`}
-                      className="rounded text-sm font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+                      className="text-primary rounded text-sm font-medium underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
                     >
                       {tDocuments('uploadCta')}
                     </Link>
@@ -255,17 +263,17 @@ export default async function CaseDetailPage({
               {detail.submissions.map((submission) => (
                 <li key={submission.id}>
                   <Card className="p-4">
-                    <p className="text-sm font-medium text-ink">{submission.authorityName}</p>
-                    <p className="mt-1 text-sm text-muted">{submission.submissionType}</p>
+                    <p className="text-ink text-sm font-medium">{submission.authorityName}</p>
+                    <p className="text-muted mt-1 text-sm">{submission.submissionType}</p>
                     <dl className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm">
                       {submission.referenceNo ? (
                         <div>
-                          <dt className="text-xs text-muted">{t('submissionRef')}</dt>
-                          <dd className="font-mono text-ink">{submission.referenceNo}</dd>
+                          <dt className="text-muted text-xs">{t('submissionRef')}</dt>
+                          <dd className="text-ink font-mono">{submission.referenceNo}</dd>
                         </div>
                       ) : null}
                       <div>
-                        <dt className="text-xs text-muted">{tCommon('created')}</dt>
+                        <dt className="text-muted text-xs">{tCommon('created')}</dt>
                         <dd className="text-ink">
                           {format.dateTime(new Date(submission.submittedOn), 'short')}
                         </dd>
@@ -287,7 +295,7 @@ export default async function CaseDetailPage({
           ) : (
             <ol className="flex flex-col gap-4">
               {detail.history.map((entry) => (
-                <li key={entry.id} className="border-s-2 border-border ps-4">
+                <li key={entry.id} className="border-border border-s-2 ps-4">
                   <p className="flex flex-wrap items-center gap-2 text-sm">
                     <CaseStatusBadge status={entry.toStatus} />
                     <span className="text-muted">
@@ -295,7 +303,7 @@ export default async function CaseDetailPage({
                     </span>
                   </p>
                   {entry.publicNote ? (
-                    <p className="mt-1.5 text-sm leading-relaxed text-ink">{entry.publicNote}</p>
+                    <p className="text-ink mt-1.5 text-sm leading-relaxed">{entry.publicNote}</p>
                   ) : null}
                 </li>
               ))}
@@ -308,7 +316,7 @@ export default async function CaseDetailPage({
         <Card className="p-5">
           <CardHeader className="p-0">
             <CardTitle as="h2" className="flex items-center gap-2">
-              <Building2 className="size-4 text-muted" aria-hidden="true" />
+              <Building2 className="text-muted size-4" aria-hidden="true" />
               {t('service')}
             </CardTitle>
           </CardHeader>

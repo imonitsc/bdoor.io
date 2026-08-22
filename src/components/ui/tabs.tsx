@@ -13,7 +13,7 @@ export function TabsList({
   return (
     <TabsPrimitive.List
       className={cn(
-        'scroll-x flex w-full gap-1 border-b border-border pb-px',
+        'scroll-x border-border flex w-full gap-1 border-b pb-px',
         '[scrollbar-width:thin]',
         className,
       )}
@@ -29,7 +29,7 @@ export function TabsTrigger({
   return (
     <TabsPrimitive.Trigger
       className={cn(
-        'relative whitespace-nowrap px-3 py-2.5 text-sm font-medium text-muted transition-colors',
+        'text-muted relative px-3 py-2.5 text-sm font-medium whitespace-nowrap transition-colors',
         'hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]',
         'data-[state=active]:text-ink',
         'after:absolute after:inset-x-2 after:-bottom-px after:h-0.5 after:rounded-full after:bg-transparent',

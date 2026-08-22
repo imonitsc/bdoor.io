@@ -21,7 +21,6 @@ export function ProfileForm({
   email: string;
   preferredLocale: 'en' | 'bn';
 }) {
-  const t = useTranslations('workspace.settings');
   const tAuth = useTranslations('auth');
   const tCommon = useTranslations('common');
   const tErrors = useTranslations('settings.errors');
@@ -38,7 +37,13 @@ export function ProfileForm({
       <Field>
         <FieldLabel required>{tAuth('fullName')}</FieldLabel>
         <FieldControl hasDescription={false}>
-          <Input name="fullName" defaultValue={fullName} required maxLength={120} autoComplete="name" />
+          <Input
+            name="fullName"
+            defaultValue={fullName}
+            required
+            maxLength={120}
+            autoComplete="name"
+          />
         </FieldControl>
       </Field>
 

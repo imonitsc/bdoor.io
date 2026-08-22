@@ -79,27 +79,27 @@ export default async function PartnersPage({ params }: { params: Promise<{ local
       <Section className="py-12 md:py-16">
         <div className="container-page grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:gap-16">
           <div>
-            <h2 className="text-xl font-semibold text-ink">{t('howTitle')}</h2>
-            <p className="mt-3 max-w-prose text-sm leading-relaxed text-muted">{tHome('body')}</p>
+            <h2 className="text-ink text-xl font-semibold">{t('howTitle')}</h2>
+            <p className="text-muted mt-3 max-w-prose text-sm leading-relaxed">{tHome('body')}</p>
 
             <div className="mt-8 grid gap-8 sm:grid-cols-2">
               <div>
-                <h3 className="text-sm font-semibold text-ink">{t('canTitle')}</h3>
+                <h3 className="text-ink text-sm font-semibold">{t('canTitle')}</h3>
                 <ul className="mt-3 flex flex-col gap-2.5">
                   {CAN.map((key) => (
                     <li key={key} className="flex items-start gap-2.5 text-sm">
-                      <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
+                      <Check className="text-success mt-0.5 size-4 shrink-0" aria-hidden="true" />
                       <span className="text-ink">{t(`can.${key}`)}</span>
                     </li>
                   ))}
                 </ul>
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-ink">{t('cannotTitle')}</h3>
+                <h3 className="text-ink text-sm font-semibold">{t('cannotTitle')}</h3>
                 <ul className="mt-3 flex flex-col gap-2.5">
                   {CANNOT.map((key) => (
                     <li key={key} className="flex items-start gap-2.5 text-sm">
-                      <X className="mt-0.5 size-4 shrink-0 text-danger" aria-hidden="true" />
+                      <X className="text-danger mt-0.5 size-4 shrink-0" aria-hidden="true" />
                       <span className="text-ink">{t(`cannot.${key}`)}</span>
                     </li>
                   ))}
@@ -112,8 +112,8 @@ export default async function PartnersPage({ params }: { params: Promise<{ local
 
           <aside className="flex h-fit flex-col gap-6">
             <Card className="p-5 md:p-6">
-              <h2 className="text-base font-semibold text-ink">{t('applyTitle')}</h2>
-              <p className="mt-2 text-sm leading-relaxed text-muted">{t('applyBody')}</p>
+              <h2 className="text-ink text-base font-semibold">{t('applyTitle')}</h2>
+              <p className="text-muted mt-2 text-sm leading-relaxed">{t('applyBody')}</p>
               <Button asChild className="mt-4" block>
                 <Link href={`${MARKETING_ROUTES.contact}?topic=partner`}>
                   {t('applyCta')}
@@ -123,8 +123,8 @@ export default async function PartnersPage({ params }: { params: Promise<{ local
             </Card>
 
             <div>
-              <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">
-                <ShieldCheck className="size-4 text-accent" aria-hidden="true" />
+              <h2 className="text-ink flex items-center gap-2 text-sm font-semibold">
+                <ShieldCheck className="text-accent size-4" aria-hidden="true" />
                 {t('directoryTitle')}
               </h2>
               {partners.length === 0 ? (
@@ -134,7 +134,7 @@ export default async function PartnersPage({ params }: { params: Promise<{ local
                   {partners.map((partner) => (
                     <li
                       key={partner.id}
-                      className="rounded-[var(--radius-control)] border border-border bg-surface px-4 py-3 text-sm text-ink"
+                      className="border-border bg-surface text-ink rounded-[var(--radius-control)] border px-4 py-3 text-sm"
                     >
                       {partner.name}
                     </li>

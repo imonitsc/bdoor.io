@@ -29,8 +29,19 @@ export type ProviderPaymentStatus =
   | 'refunded';
 
 export type WebhookVerification =
-  | { valid: true; eventId: string; eventType: string; sessionId: string | null; status: ProviderPaymentStatus; amountMinor: number | null; raw: unknown }
-  | { valid: false; reason: 'missing_signature' | 'bad_signature' | 'malformed_payload' | 'not_configured' };
+  | {
+      valid: true;
+      eventId: string;
+      eventType: string;
+      sessionId: string | null;
+      status: ProviderPaymentStatus;
+      amountMinor: number | null;
+      raw: unknown;
+    }
+  | {
+      valid: false;
+      reason: 'missing_signature' | 'bad_signature' | 'malformed_payload' | 'not_configured';
+    };
 
 export type RefundRequest = {
   paymentId: string;

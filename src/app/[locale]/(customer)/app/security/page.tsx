@@ -92,9 +92,9 @@ export default async function SecurityPage({
         </CardHeader>
         <CardContent>
           {(auditRows ?? []).length === 0 ? (
-            <p className="text-sm text-muted">{t('noSessions')}</p>
+            <p className="text-muted text-sm">{t('noSessions')}</p>
           ) : (
-            <ul className="divide-y divide-border">
+            <ul className="divide-border divide-y">
               {(auditRows ?? []).map((row) => (
                 <li key={row.id} className="flex items-center justify-between gap-4 py-3 text-sm">
                   <span className="text-ink">{row.action}</span>
@@ -106,7 +106,7 @@ export default async function SecurityPage({
             </ul>
           )}
           {settings?.last_password_change ? (
-            <p className="mt-4 text-xs text-muted">
+            <p className="text-muted mt-4 text-xs">
               {t('changePassword')}:{' '}
               {format.dateTime(new Date(settings.last_password_change), 'long')}
             </p>

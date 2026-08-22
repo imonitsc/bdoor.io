@@ -36,7 +36,9 @@ export default function OpengraphImage() {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-          <span style={{ fontSize: 22, color: '#3FD6BA', letterSpacing: 2, textTransform: 'uppercase' }}>
+          <span
+            style={{ fontSize: 22, color: '#3FD6BA', letterSpacing: 2, textTransform: 'uppercase' }}
+          >
             Your door to business in Bangladesh
           </span>
           <span style={{ fontSize: 62, lineHeight: 1.1, fontWeight: 650, maxWidth: 900 }}>

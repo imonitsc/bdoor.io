@@ -110,28 +110,43 @@ export function serverEnv(): ServerEnv {
     );
   }
 
-  // Production guard rails: fail fast rather than silently running a mock in prod.
-  if (isProduction) {
-    const problems: string[] = [];
-    if (!parsed.data.SUPABASE_SECRET_KEY) problems.push('SUPABASE_SECRET_KEY');
-    if (parsed.data.PAYMENT_PROVIDER !== 'mock' && !parsed.data.PAYMENT_WEBHOOK_SECRET) {
-      problems.push('PAYMENT_WEBHOOK_SECRET (required when PAYMENT_PROVIDER is live)');
-    }
-    if (parsed.data.EMAIL_PROVIDER !== 'mock' && !parsed.data.EMAIL_FROM) {
-      problems.push('EMAIL_FROM (required when EMAIL_PROVIDER is live)');
-    }
-    if (parsed.data.AI_PROVIDER !== 'disabled' && !parsed.data.AI_API_KEY) {
-      problems.push('AI_API_KEY (required when AI_PROVIDER is enabled)');
-    }
-    if (problems.length > 0) {
-      throw new Error(
-        `Missing production environment variables:\n${problems.map((p) => `  - ${p}`).join('\n')}`,
-      );
-    }
-  }
-
   cachedServerEnv = parsed.data;
   return cachedServerEnv;
+}
+
+/**
+ * Production completeness check.
+ *
+ * This is a DEPLOYMENT concern, not a per-request one, so it runs once from
+ * `instrumentation.ts` at server start. Throwing it on every request would turn
+ * one missing variable into a 500 on every page, including pages that do not
+ * need the variable at all — which hides the real problem behind noise.
+ *
+ * Returns the list of problems rather than throwing, so the caller decides
+ * whether to refuse to boot or merely warn.
+ */
+export function productionEnvProblems(): string[] {
+  if (!isProduction) return [];
+
+  const env = serverEnv();
+  const problems: string[] = [];
+
+  if (!env.SUPABASE_SECRET_KEY) {
+    problems.push(
+      'SUPABASE_SECRET_KEY — required for webhooks, invitations and the compliance schema',
+    );
+  }
+  if (env.PAYMENT_PROVIDER !== 'mock' && !env.PAYMENT_WEBHOOK_SECRET) {
+    problems.push('PAYMENT_WEBHOOK_SECRET — required when PAYMENT_PROVIDER is not "mock"');
+  }
+  if (env.EMAIL_PROVIDER !== 'mock' && !env.EMAIL_FROM) {
+    problems.push('EMAIL_FROM — required when EMAIL_PROVIDER is not "mock"');
+  }
+  if (env.AI_PROVIDER !== 'disabled' && !env.AI_API_KEY) {
+    problems.push('AI_API_KEY — required when AI_PROVIDER is not "disabled"');
+  }
+
+  return problems;
 }
 
 export const isProductionRuntime = isProduction;

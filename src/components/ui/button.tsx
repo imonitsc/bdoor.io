@@ -14,12 +14,15 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: 'bg-primary text-on-primary hover:bg-primary-hover active:bg-primary-active shadow-xs',
+        primary:
+          'bg-primary text-on-primary hover:bg-primary-hover active:bg-primary-active shadow-xs',
         secondary:
           'bg-surface text-ink border border-border-strong hover:bg-surface-sunken active:bg-surface-sunken shadow-xs',
         ghost: 'bg-transparent text-ink hover:bg-surface-sunken',
-        subtle: 'bg-primary-soft text-info hover:bg-[color-mix(in_srgb,var(--color-primary-soft)_80%,var(--color-primary)_20%)]',
-        danger: 'bg-danger text-white hover:bg-[color-mix(in_srgb,var(--color-danger)_85%,black)] shadow-xs',
+        subtle:
+          'bg-primary-soft text-info hover:bg-[color-mix(in_srgb,var(--color-primary-soft)_80%,var(--color-primary)_20%)]',
+        danger:
+          'bg-danger text-white hover:bg-[color-mix(in_srgb,var(--color-danger)_85%,black)] shadow-xs',
         inverse:
           'bg-surface text-ink hover:bg-[color-mix(in_srgb,white_90%,var(--color-primary))] shadow-sm',
         link: 'bg-transparent text-primary underline underline-offset-4 hover:text-primary-hover',

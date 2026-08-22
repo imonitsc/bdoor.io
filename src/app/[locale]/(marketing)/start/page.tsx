@@ -44,8 +44,8 @@ export default async function StartPage({ params }: { params: Promise<{ locale: 
     <Section className="py-10 md:py-14">
       <div className="container-page">
         <div className="mx-auto max-w-3xl">
-          <h1 className="text-3xl leading-tight text-ink md:text-4xl">{t('title')}</h1>
-          <p className="mt-3 text-base leading-relaxed text-muted">{t('description')}</p>
+          <h1 className="text-ink text-3xl leading-tight md:text-4xl">{t('title')}</h1>
+          <p className="text-muted mt-3 text-base leading-relaxed">{t('description')}</p>
 
           <Card className="mt-8 p-5 md:p-8">
             <Questionnaire initial={initial} />

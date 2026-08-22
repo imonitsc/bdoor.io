@@ -52,7 +52,7 @@ export function SectionHeading({
       {eyebrow ? (
         <p
           className={cn(
-            'text-xs font-semibold uppercase tracking-[0.12em]',
+            'text-xs font-semibold tracking-[0.12em] uppercase',
             inverse ? 'text-[color:var(--bd-teal-500)]' : 'text-accent-strong',
           )}
         >
@@ -68,7 +68,9 @@ export function SectionHeading({
         {title}
       </Heading>
       {body ? (
-        <div className={cn('text-base leading-relaxed', inverse ? 'text-muted-inverse' : 'text-muted')}>
+        <div
+          className={cn('text-base leading-relaxed', inverse ? 'text-muted-inverse' : 'text-muted')}
+        >
           {body}
         </div>
       ) : null}

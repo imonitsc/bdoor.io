@@ -23,7 +23,11 @@ export type GuideSummary = {
 };
 
 const PREREQUISITES: Record<string, string[]> = {
-  'import-registration-certificate': ['trade-licence', 'etin-and-tax-setup', 'bin-vat-registration'],
+  'import-registration-certificate': [
+    'trade-licence',
+    'etin-and-tax-setup',
+    'bin-vat-registration',
+  ],
   'bin-vat-registration': ['etin-and-tax-setup'],
   'etin-and-tax-setup': [],
   'trade-licence': [],

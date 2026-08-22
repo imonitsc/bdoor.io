@@ -458,7 +458,10 @@ export const LEGAL_DISCLAIMER: LegalDocument = {
     },
     {
       id: 'no-affiliation',
-      heading: { en: 'No affiliation with any authority', bn: 'কোনো কর্তৃপক্ষের সঙ্গে সংযুক্তি নেই' },
+      heading: {
+        en: 'No affiliation with any authority',
+        bn: 'কোনো কর্তৃপক্ষের সঙ্গে সংযুক্তি নেই',
+      },
       body: {
         en: `BDoor is not affiliated with, endorsed by, or acting on behalf of RJSC, BIDA, NBR, CCI&E, any city corporation, any ministry or any other authority. Where we name an authority it is to tell you who decides your application, nothing more.`,
         bn: `BDoor RJSC, BIDA, NBR, CCI&E, কোনো সিটি কর্পোরেশন, কোনো মন্ত্রণালয় বা অন্য কোনো কর্তৃপক্ষের সঙ্গে সংযুক্ত নয়, তাদের অনুমোদনপ্রাপ্ত নয়, এবং তাদের পক্ষে কাজ করে না। আমরা যেখানে কোনো কর্তৃপক্ষের নাম উল্লেখ করি, তা কেবল আপনার আবেদনের সিদ্ধান্ত কে নেয় সেটি জানাতে — এর বেশি কিছু নয়।`,

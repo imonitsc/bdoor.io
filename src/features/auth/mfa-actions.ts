@@ -78,12 +78,15 @@ export async function verifyMfaEnrollment(
   try {
     await enforceRateLimit('auth.mfa_verify', await key());
   } catch (error) {
-    if (error instanceof RateLimitError) return { ...previous, status: 'error', message: 'rateLimited' };
+    if (error instanceof RateLimitError)
+      return { ...previous, status: 'error', message: 'rateLimited' };
     throw error;
   }
 
   const supabase = await createClient();
-  const { data: challenge, error: challengeError } = await supabase.auth.mfa.challenge({ factorId });
+  const { data: challenge, error: challengeError } = await supabase.auth.mfa.challenge({
+    factorId,
+  });
   if (challengeError || !challenge) {
     return { ...previous, status: 'error', message: 'generic' };
   }
@@ -156,7 +159,10 @@ export async function removeMfaFactor(_previous: MfaState, formData: FormData): 
 
   // A role that requires MFA cannot remove its only factor.
   if (userId) {
-    const { data: roles } = await supabase.from('platform_roles').select('role').eq('user_id', userId);
+    const { data: roles } = await supabase
+      .from('platform_roles')
+      .select('role')
+      .eq('user_id', userId);
     if ((roles ?? []).length > 0) {
       return { status: 'error', message: 'mfaRequiredForRole' };
     }

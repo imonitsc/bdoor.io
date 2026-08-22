@@ -24,14 +24,14 @@ export function FaqList({
   if (items.length === 0) return null;
 
   return (
-    <Accordion type="single" collapsible className="w-full border-t border-border">
+    <Accordion type="single" collapsible className="border-border w-full border-t">
       {items.map((faq) => (
         <AccordionItem key={faq.id} value={faq.id}>
           <AccordionTrigger>{pick(faq.question, locale)}</AccordionTrigger>
           <AccordionContent>
             <p>{pick(faq.answer, locale)}</p>
             {faq.isComplianceSensitive && faq.lastReviewedAt ? (
-              <p className="mt-3 text-xs text-muted">
+              <p className="text-muted mt-3 text-xs">
                 {t('lastReviewed', {
                   date: format.dateTime(new Date(faq.lastReviewedAt), 'short'),
                 })}

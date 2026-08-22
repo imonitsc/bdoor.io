@@ -95,7 +95,9 @@ export function pick<T>(value: { en: T; bn: T } | null | undefined, locale: Loca
 }
 
 /** A time estimate that has not been reviewed is never shown. */
-export function displayableEstimate(service: Service): { min: number; max: number; reviewedAt: string } | null {
+export function displayableEstimate(
+  service: Service,
+): { min: number; max: number; reviewedAt: string } | null {
   if (
     service.estimatedDaysMin === null ||
     service.estimatedDaysMax === null ||
@@ -113,6 +115,7 @@ export function displayableEstimate(service: Service): { min: number; max: numbe
 /** A government fee is only shown when an admin entered a verified, sourced figure. */
 export function displayableFee(component: ServiceFeeComponent): number | null {
   if (component.amountBdt === null) return null;
-  if (component.category === 'government_fee_estimate' && component.reviewedAt === null) return null;
+  if (component.category === 'government_fee_estimate' && component.reviewedAt === null)
+    return null;
   return component.amountBdt;
 }

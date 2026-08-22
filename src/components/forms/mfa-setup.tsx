@@ -45,7 +45,7 @@ export function MfaSetup({
   if (enrolled && removeState.status !== 'success') {
     return (
       <div className="flex flex-col gap-3">
-        <p className="flex items-center gap-2 text-sm text-ink">
+        <p className="text-ink flex items-center gap-2 text-sm">
           <Badge tone="success" icon={<ShieldCheck className="size-3" />}>
             {t('enabled')}
           </Badge>
@@ -56,7 +56,7 @@ export function MfaSetup({
           </Alert>
         ) : null}
         {required ? (
-          <p className="text-sm text-muted">{t('requiredForRole')}</p>
+          <p className="text-muted text-sm">{t('requiredForRole')}</p>
         ) : factorId ? (
           <form action={removeAction}>
             <input type="hidden" name="factorId" value={factorId} />
@@ -83,7 +83,7 @@ export function MfaSetup({
       <form action={verifyAction} className="flex flex-col gap-4">
         <input type="hidden" name="factorId" value={active.enrollment.factorId} />
 
-        <p className="text-sm leading-relaxed text-muted">{t('scanInstruction')}</p>
+        <p className="text-muted text-sm leading-relaxed">{t('scanInstruction')}</p>
 
         {/* eslint-disable-next-line @next/next/no-img-element -- data URL from the auth provider, not a remote asset */}
         <img
@@ -91,12 +91,12 @@ export function MfaSetup({
           alt={t('scanInstruction')}
           width={200}
           height={200}
-          className="rounded-[var(--radius-card)] border border-border bg-white p-2"
+          className="border-border rounded-[var(--radius-card)] border bg-white p-2"
         />
 
         <details className="text-sm">
-          <summary className="cursor-pointer text-primary">{t('manualKey')}</summary>
-          <code className="mt-2 block break-all rounded-[var(--radius-control)] bg-surface-sunken p-3 font-mono text-xs text-ink">
+          <summary className="text-primary cursor-pointer">{t('manualKey')}</summary>
+          <code className="bg-surface-sunken text-ink mt-2 block rounded-[var(--radius-control)] p-3 font-mono text-xs break-all">
             {active.enrollment.secret}
           </code>
         </details>
@@ -132,7 +132,7 @@ export function MfaSetup({
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-sm leading-relaxed text-muted">{t('subtitle')}</p>
+      <p className="text-muted text-sm leading-relaxed">{t('subtitle')}</p>
       {required ? <Alert tone="warning">{t('requiredForRole')}</Alert> : null}
       {state.status === 'error' && state.message ? (
         <Alert tone="danger" live="assertive">

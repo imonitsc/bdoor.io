@@ -56,12 +56,15 @@ export async function clearDraftKey(): Promise<void> {
   store.delete(DRAFT_COOKIE);
 }
 
-function rowToSession(row: {
-  id: string;
-  locale: string;
-  user_id: string | null;
-  completed_at: string | null;
-}, answers: PartialAnswers): DraftSession {
+function rowToSession(
+  row: {
+    id: string;
+    locale: string;
+    user_id: string | null;
+    completed_at: string | null;
+  },
+  answers: PartialAnswers,
+): DraftSession {
   return {
     id: row.id,
     answers,
@@ -177,10 +180,7 @@ export async function saveAnswer(
       .in('question_key', removed);
   }
 
-  await admin
-    .from('questionnaire_sessions')
-    .update({ current_step: key })
-    .eq('id', sessionId);
+  await admin.from('questionnaire_sessions').update({ current_step: key }).eq('id', sessionId);
 
   return pruned;
 }

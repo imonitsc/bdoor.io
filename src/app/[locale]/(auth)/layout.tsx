@@ -43,13 +43,13 @@ export default async function AuthLayout({
         </footer>
       </div>
 
-      <aside className="relative hidden overflow-hidden bg-surface-inverse lg:flex lg:flex-col lg:justify-center lg:px-12">
+      <aside className="bg-surface-inverse relative hidden overflow-hidden lg:flex lg:flex-col lg:justify-center lg:px-12">
         <PortalVisual className="pointer-events-none absolute -end-16 top-1/2 w-[28rem] -translate-y-1/2 opacity-70" />
         <div className="relative max-w-sm">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--bd-teal-500)]">
+          <p className="text-xs font-semibold tracking-[0.14em] text-[color:var(--bd-teal-500)] uppercase">
             BDoor
           </p>
-          <p className="mt-4 text-2xl leading-snug text-ink-inverse">
+          <p className="text-ink-inverse mt-4 text-2xl leading-snug">
             Company formation, licences, tax setup and compliance — in one secure workspace.
           </p>
         </div>

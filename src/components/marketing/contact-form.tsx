@@ -102,12 +102,12 @@ export function ContactForm({ defaultTopic }: { defaultTopic?: string }) {
 
       <div className="flex items-start gap-3">
         <Checkbox id={consentId} name="consent" required />
-        <label htmlFor={consentId} className="text-sm leading-relaxed text-ink">
+        <label htmlFor={consentId} className="text-ink text-sm leading-relaxed">
           {t('consentLabel')}
         </label>
       </div>
       {state.fieldErrors?.consent ? (
-        <p className="text-sm font-medium text-danger">{tErrors(state.fieldErrors.consent)}</p>
+        <p className="text-danger text-sm font-medium">{tErrors(state.fieldErrors.consent)}</p>
       ) : null}
 
       <Button type="submit" size="lg" disabled={pending} className="w-fit">

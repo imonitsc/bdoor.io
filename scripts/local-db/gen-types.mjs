@@ -16,14 +16,12 @@ const DB = process.env.PGDATABASE ?? 'bdoor_test';
 const HOST = process.env.PGHOST ?? '/tmp';
 const PORT = process.env.PGPORT ?? '55432';
 const USER = process.env.PGUSER ?? 'postgres';
-const SCHEMAS = ['public'];
 
 function query(sql) {
-  const out = execFileSync(
-    'psql',
-    ['-h', HOST, '-p', PORT, '-U', USER, '-d', DB, '-tAqc', sql],
-    { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 },
-  );
+  const out = execFileSync('psql', ['-h', HOST, '-p', PORT, '-U', USER, '-d', DB, '-tAqc', sql], {
+    encoding: 'utf8',
+    maxBuffer: 64 * 1024 * 1024,
+  });
   return out.trim() ? JSON.parse(out) : [];
 }
 
@@ -108,12 +106,21 @@ for (const col of columns) {
   byTable.get(col.table_name).cols.push(col);
 }
 
-const tableNames = [...byTable.entries()].filter(([, v]) => v.kind === 'r').map(([k]) => k).sort();
-const viewNames = [...byTable.entries()].filter(([, v]) => v.kind === 'v').map(([k]) => k).sort();
+const tableNames = [...byTable.entries()]
+  .filter(([, v]) => v.kind === 'r')
+  .map(([k]) => k)
+  .sort();
+const viewNames = [...byTable.entries()]
+  .filter(([, v]) => v.kind === 'v')
+  .map(([k]) => k)
+  .sort();
 
 function renderRelation(name, { cols }, { insertable }) {
   const row = cols
-    .map((c) => `          ${JSON.stringify(c.column_name)}: ${tsType(c)}${c.not_null ? '' : ' | null'}`)
+    .map(
+      (c) =>
+        `          ${JSON.stringify(c.column_name)}: ${tsType(c)}${c.not_null ? '' : ' | null'}`,
+    )
     .join('\n');
 
   if (!insertable) {
@@ -128,7 +135,10 @@ function renderRelation(name, { cols }, { insertable }) {
     .join('\n');
 
   const update = cols
-    .map((c) => `          ${JSON.stringify(c.column_name)}?: ${tsType(c)}${c.not_null ? '' : ' | null'}`)
+    .map(
+      (c) =>
+        `          ${JSON.stringify(c.column_name)}?: ${tsType(c)}${c.not_null ? '' : ' | null'}`,
+    )
     .join('\n');
 
   return `      ${JSON.stringify(name)}: {\n        Row: {\n${row}\n        }\n        Insert: {\n${insert}\n        }\n        Update: {\n${update}\n        }\n        Relationships: []\n      }`;
@@ -142,7 +152,9 @@ const viewsBlock = viewNames.length
   : '';
 
 const enumsBlock = enums
-  .map((e) => `      ${JSON.stringify(e.name)}: ${e.labels.map((l) => JSON.stringify(l)).join(' | ')}`)
+  .map(
+    (e) => `      ${JSON.stringify(e.name)}: ${e.labels.map((l) => JSON.stringify(l)).join(' | ')}`,
+  )
   .join('\n');
 
 const out = `// AUTO-GENERATED — DO NOT EDIT BY HAND.
@@ -182,4 +194,6 @@ export type Enums<T extends keyof PublicSchema['Enums']> = PublicSchema['Enums']
 `;
 
 writeFileSync(new URL('../../src/types/database.ts', import.meta.url), out);
-console.log(`Generated ${tableNames.length} tables, ${viewNames.length} views, ${enums.length} enums.`);
+console.log(
+  `Generated ${tableNames.length} tables, ${viewNames.length} views, ${enums.length} enums.`,
+);

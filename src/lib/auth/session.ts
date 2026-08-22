@@ -68,7 +68,12 @@ export const getSession = cache(async (): Promise<SessionContext | null> => {
   type MembershipRow = {
     organization_id: string;
     role: OrganizationRole;
-    organizations: { name: string; slug: string; kind: 'customer' | 'partner'; is_active: boolean } | null;
+    organizations: {
+      name: string;
+      slug: string;
+      kind: 'customer' | 'partner';
+      is_active: boolean;
+    } | null;
   };
 
   const memberships: OrganizationMembership[] = ((membershipResult.data ?? []) as MembershipRow[])

@@ -11,7 +11,8 @@ const alertVariants = cva('flex gap-3 rounded-[var(--radius-card)] border p-4 te
         'border-[color-mix(in_srgb,var(--color-success)_22%,transparent)] bg-success-soft text-ink',
       warning:
         'border-[color-mix(in_srgb,var(--color-warning)_28%,transparent)] bg-warning-soft text-ink',
-      danger: 'border-[color-mix(in_srgb,var(--color-danger)_22%,transparent)] bg-danger-soft text-ink',
+      danger:
+        'border-[color-mix(in_srgb,var(--color-danger)_22%,transparent)] bg-danger-soft text-ink',
       neutral: 'border-border bg-surface-sunken text-ink',
       restricted: 'border-border-strong bg-surface-sunken text-ink',
     },
@@ -46,7 +47,15 @@ export interface AlertProps
   icon?: React.ReactNode;
 }
 
-export function Alert({ className, tone = 'info', title, children, live, icon, ...props }: AlertProps) {
+export function Alert({
+  className,
+  tone = 'info',
+  title,
+  children,
+  live,
+  icon,
+  ...props
+}: AlertProps) {
   const key = tone ?? 'info';
   const Icon = toneIcon[key];
   return (
@@ -60,8 +69,8 @@ export function Alert({ className, tone = 'info', title, children, live, icon, .
         {icon ?? <Icon className="size-5" />}
       </span>
       <div className="min-w-0 flex-1 space-y-1">
-        {title ? <p className="font-semibold text-ink">{title}</p> : null}
-        {children ? <div className="leading-relaxed text-ink/85">{children}</div> : null}
+        {title ? <p className="text-ink font-semibold">{title}</p> : null}
+        {children ? <div className="text-ink/85 leading-relaxed">{children}</div> : null}
       </div>
     </div>
   );

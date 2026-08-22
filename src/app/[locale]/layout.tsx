@@ -109,7 +109,7 @@ export default async function LocaleLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${notoBengali.variable}`}
       suppressHydrationWarning
     >
-      <body className="min-h-dvh bg-canvas text-ink antialiased">
+      <body className="bg-canvas text-ink min-h-dvh antialiased">
         <NextIntlClientProvider messages={messages}>
           <AnnouncerProvider>{children}</AnnouncerProvider>
         </NextIntlClientProvider>

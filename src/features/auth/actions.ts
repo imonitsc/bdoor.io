@@ -11,12 +11,7 @@ import { recordAudit } from '@/lib/audit';
 import { logger } from '@/lib/logger';
 import { claimDraftForUser } from '@/features/intake/session';
 import { absoluteUrl } from '@/lib/site';
-import {
-  resetRequestSchema,
-  signInSchema,
-  signUpSchema,
-  updatePasswordSchema,
-} from './schema';
+import { resetRequestSchema, signInSchema, signUpSchema, updatePasswordSchema } from './schema';
 
 export type AuthState = {
   status: 'idle' | 'error' | 'success';
@@ -130,17 +125,15 @@ export async function signUp(_previous: AuthState, formData: FormData): Promise<
   }
 
   if (data.user) {
-    await supabase
-      .from('profiles')
-      .upsert(
-        {
-          id: data.user.id,
-          full_name: parsed.data.fullName,
-          email: parsed.data.email,
-          preferred_locale: locale === 'bn' ? 'bn' : 'en',
-        },
-        { onConflict: 'id' },
-      );
+    await supabase.from('profiles').upsert(
+      {
+        id: data.user.id,
+        full_name: parsed.data.fullName,
+        email: parsed.data.email,
+        preferred_locale: locale === 'bn' ? 'bn' : 'en',
+      },
+      { onConflict: 'id' },
+    );
     await claimDraftForUser(data.user.id);
   }
 
@@ -173,10 +166,7 @@ export async function requestPasswordReset(
   return { status: 'success', message: 'resetSent' };
 }
 
-export async function updatePassword(
-  _previous: AuthState,
-  formData: FormData,
-): Promise<AuthState> {
+export async function updatePassword(_previous: AuthState, formData: FormData): Promise<AuthState> {
   const parsed = updatePasswordSchema.safeParse({
     password: formData.get('password'),
     confirmPassword: formData.get('confirmPassword'),

@@ -67,8 +67,8 @@ export function SignInForm({ next }: { next?: string }) {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-semibold text-ink">{t('signInTitle')}</h1>
-        <p className="mt-1.5 text-sm text-muted">{t('signInSubtitle')}</p>
+        <h1 className="text-ink text-2xl font-semibold">{t('signInTitle')}</h1>
+        <p className="text-muted mt-1.5 text-sm">{t('signInSubtitle')}</p>
       </div>
 
       <form action={action} className="flex flex-col gap-4" noValidate>
@@ -98,7 +98,7 @@ export function SignInForm({ next }: { next?: string }) {
       <div className="flex flex-col gap-2 text-sm">
         <Link
           href="/forgot-password"
-          className="rounded text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+          className="text-primary rounded underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
         >
           {t('forgotPassword')}
         </Link>
@@ -106,7 +106,7 @@ export function SignInForm({ next }: { next?: string }) {
           {t('noAccount')}{' '}
           <Link
             href={MARKETING_ROUTES.signup}
-            className="rounded text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+            className="text-primary hover:text-primary-hover rounded underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
           >
             {t('signUpCta')}
           </Link>
@@ -138,8 +138,8 @@ export function SignUpForm() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-semibold text-ink">{t('signUpTitle')}</h1>
-        <p className="mt-1.5 text-sm text-muted">{t('signUpSubtitle')}</p>
+        <h1 className="text-ink text-2xl font-semibold">{t('signUpTitle')}</h1>
+        <p className="text-muted mt-1.5 text-sm">{t('signUpSubtitle')}</p>
       </div>
 
       <form action={action} className="flex flex-col gap-4" noValidate>
@@ -163,7 +163,13 @@ export function SignUpForm() {
           <FieldLabel required>{t('password')}</FieldLabel>
           <FieldDescription>{t('passwordHint')}</FieldDescription>
           <FieldControl>
-            <Input name="password" type="password" autoComplete="new-password" required minLength={12} />
+            <Input
+              name="password"
+              type="password"
+              autoComplete="new-password"
+              required
+              minLength={12}
+            />
           </FieldControl>
         </Field>
 
@@ -176,19 +182,27 @@ export function SignUpForm() {
 
         <div className="flex items-start gap-3">
           <Checkbox id={termsId} name="acceptTerms" required />
-          <label htmlFor={termsId} className="text-sm leading-relaxed text-ink">
+          <label htmlFor={termsId} className="text-ink text-sm leading-relaxed">
             {t('termsNotice')}{' '}
-            <Link href={MARKETING_ROUTES.terms} className="text-primary underline underline-offset-4">
+            <Link
+              href={MARKETING_ROUTES.terms}
+              className="text-primary underline underline-offset-4"
+            >
               {tLegal('terms')}
             </Link>
             {' · '}
-            <Link href={MARKETING_ROUTES.privacy} className="text-primary underline underline-offset-4">
+            <Link
+              href={MARKETING_ROUTES.privacy}
+              className="text-primary underline underline-offset-4"
+            >
               {tLegal('privacy')}
             </Link>
           </label>
         </div>
         {state.fieldErrors?.acceptTerms ? (
-          <p className="text-sm font-medium text-danger">{tErrors(state.fieldErrors.acceptTerms)}</p>
+          <p className="text-danger text-sm font-medium">
+            {tErrors(state.fieldErrors.acceptTerms)}
+          </p>
         ) : null}
 
         <Button type="submit" size="lg" block disabled={pending}>
@@ -197,11 +211,11 @@ export function SignUpForm() {
         </Button>
       </form>
 
-      <p className="text-sm text-muted">
+      <p className="text-muted text-sm">
         {t('haveAccount')}{' '}
         <Link
           href={MARKETING_ROUTES.login}
-          className="rounded text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+          className="text-primary hover:text-primary-hover rounded underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
         >
           {t('signInCta')}
         </Link>
@@ -227,8 +241,8 @@ export function ForgotPasswordForm() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-semibold text-ink">{t('resetTitle')}</h1>
-        <p className="mt-1.5 text-sm text-muted">{t('resetSubtitle')}</p>
+        <h1 className="text-ink text-2xl font-semibold">{t('resetTitle')}</h1>
+        <p className="text-muted mt-1.5 text-sm">{t('resetSubtitle')}</p>
       </div>
 
       <form action={action} className="flex flex-col gap-4" noValidate>
@@ -247,7 +261,7 @@ export function ForgotPasswordForm() {
 
       <Link
         href={MARKETING_ROUTES.login}
-        className="rounded text-sm text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+        className="text-primary rounded text-sm underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
       >
         {t('signInCta')}
       </Link>
@@ -267,7 +281,7 @@ export function ResetPasswordForm() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-semibold text-ink">{t('updatePasswordTitle')}</h1>
+        <h1 className="text-ink text-2xl font-semibold">{t('updatePasswordTitle')}</h1>
       </div>
 
       <form action={action} className="flex flex-col gap-4" noValidate>
@@ -277,7 +291,14 @@ export function ResetPasswordForm() {
           <FieldLabel required>{t('password')}</FieldLabel>
           <FieldDescription>{t('passwordHint')}</FieldDescription>
           <FieldControl>
-            <Input name="password" type="password" autoComplete="new-password" required minLength={12} autoFocus />
+            <Input
+              name="password"
+              type="password"
+              autoComplete="new-password"
+              required
+              minLength={12}
+              autoFocus
+            />
           </FieldControl>
         </Field>
 

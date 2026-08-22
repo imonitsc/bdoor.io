@@ -28,6 +28,15 @@ do $$ begin
 end $$;
 
 grant usage on schema public to anon, authenticated, service_role;
+
+-- Supabase grants table privileges to anon/authenticated automatically, and RLS
+-- is what actually restricts rows. Without these grants the policies never get
+-- a chance to run: PostgreSQL refuses at the GRANT layer first, and the tests
+-- would "pass" for the wrong reason.
+alter default privileges in schema public
+  grant select, insert, update, delete on tables to anon, authenticated;
+alter default privileges in schema public grant usage, select on sequences to anon, authenticated;
+alter default privileges in schema public grant execute on functions to anon, authenticated;
 alter default privileges in schema public grant all on tables to service_role;
 alter default privileges in schema public grant all on sequences to service_role;
 alter default privileges in schema public grant all on functions to service_role;
@@ -107,3 +116,8 @@ as $$
 $$;
 
 grant execute on function storage.foldername(text) to anon, authenticated, service_role;
+
+-- Supabase grants these too; without them the storage policies never run.
+grant select on storage.buckets to anon, authenticated;
+grant select, insert, update, delete on storage.objects to anon, authenticated;
+grant all on storage.buckets, storage.objects to service_role;

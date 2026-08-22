@@ -67,7 +67,9 @@ export default async function DocumentsPage({
   };
 
   const documents: DocumentRow[] = ((documentsResult.data ?? []) as unknown as Raw[]).map((row) => {
-    const latest = [...(row.document_versions ?? [])].sort((a, b) => b.version_no - a.version_no)[0];
+    const latest = [...(row.document_versions ?? [])].sort(
+      (a, b) => b.version_no - a.version_no,
+    )[0];
     return {
       id: row.id,
       title: row.title,
@@ -87,12 +89,16 @@ export default async function DocumentsPage({
       header: t('categoryLabel'),
       cell: (row) => (
         <div className="min-w-0">
-          <p className="truncate font-medium text-ink">{row.title}</p>
-          <p className="text-xs text-muted">{row.category}</p>
+          <p className="text-ink truncate font-medium">{row.title}</p>
+          <p className="text-muted text-xs">{row.category}</p>
         </div>
       ),
     },
-    { key: 'status', header: tCommon('status'), cell: (row) => <DocumentStatusBadge status={row.status} /> },
+    {
+      key: 'status',
+      header: tCommon('status'),
+      cell: (row) => <DocumentStatusBadge status={row.status} />,
+    },
     {
       key: 'scan',
       header: t('scanPending'),
@@ -125,18 +131,21 @@ export default async function DocumentsPage({
             <CardDescription>{t('whoSeesThisBody')}</CardDescription>
           </CardHeader>
           <CardContent>
-            <ul className="divide-y divide-border">
+            <ul className="divide-border divide-y">
               {requests.map((request) => (
-                <li key={request.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
+                <li
+                  key={request.id}
+                  className="flex flex-wrap items-center justify-between gap-3 py-3"
+                >
                   <div className="min-w-0">
-                    <p className="text-sm text-ink">
+                    <p className="text-ink text-sm">
                       {label(request.label_en, request.label_bn)}
                       {!request.is_mandatory ? (
-                        <span className="ms-2 text-xs text-muted">({tCommon('optional')})</span>
+                        <span className="text-muted ms-2 text-xs">({tCommon('optional')})</span>
                       ) : null}
                     </p>
                     {request.due_on ? (
-                      <p className="text-xs text-muted">
+                      <p className="text-muted text-xs">
                         {tCommon('dueDate')}: {format.dateTime(new Date(request.due_on), 'short')}
                       </p>
                     ) : null}
@@ -163,7 +172,7 @@ export default async function DocumentsPage({
       </Card>
 
       <section>
-        <h2 className="text-lg font-semibold text-ink">{t('uploaded')}</h2>
+        <h2 className="text-ink text-lg font-semibold">{t('uploaded')}</h2>
         <div className="mt-4">
           <DataList
             rows={documents}

@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { ArrowLeft, ArrowRight, HelpCircle, Info, Save } from 'lucide-react';
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Checkbox, ChoiceCard, RadioGroup, RadioItem } from '@/components/ui/choice';
+import { ChoiceCard, RadioGroup, RadioItem } from '@/components/ui/choice';
 import { Field, FieldControl, FieldDescription, FieldLabel } from '@/components/ui/field';
 import { Input, NativeSelect, Textarea } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
@@ -30,13 +30,13 @@ function WhyWeAsk({ text }: { text: string }) {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="inline-flex items-center gap-1.5 rounded text-sm font-medium text-primary hover:text-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+        className="text-primary hover:text-primary-hover inline-flex items-center gap-1.5 rounded text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
       >
         <HelpCircle className="size-4" aria-hidden="true" />
         {t('whyWeAsk')}
       </button>
       {open ? (
-        <p className="mt-2 rounded-[var(--radius-control)] border border-border bg-surface-sunken p-3 text-sm leading-relaxed text-muted">
+        <p className="border-border bg-surface-sunken text-muted mt-2 rounded-[var(--radius-control)] border p-3 text-sm leading-relaxed">
           {text}
         </p>
       ) : null}
@@ -59,21 +59,15 @@ function QuestionInput({
   const key = question.key;
   const error = fieldError ? tValidation(fieldError) : undefined;
 
-  const help = (() => {
-    try {
-      return t(`${key}.help`);
-    } catch {
-      return undefined;
-    }
-  })();
+  const help = question.hasHelp ? t(`${key}.help`) : undefined;
 
   switch (question.kind) {
     case 'boolean':
       return (
         <Field error={error}>
           <fieldset>
-            <legend className="text-lg font-semibold text-ink">{t(`${key}.label`)}</legend>
-            {help ? <p className="mt-1.5 text-sm text-muted">{help}</p> : null}
+            <legend className="text-ink text-lg font-semibold">{t(`${key}.label`)}</legend>
+            {help ? <p className="text-muted mt-1.5 text-sm">{help}</p> : null}
             <div className="mt-4 flex flex-col gap-2">
               {[true, false].map((option) => (
                 <ChoiceCard
@@ -104,8 +98,8 @@ function QuestionInput({
       return (
         <Field error={error}>
           <fieldset>
-            <legend className="text-lg font-semibold text-ink">{t(`${key}.label`)}</legend>
-            {help ? <p className="mt-1.5 text-sm text-muted">{help}</p> : null}
+            <legend className="text-ink text-lg font-semibold">{t(`${key}.label`)}</legend>
+            {help ? <p className="text-muted mt-1.5 text-sm">{help}</p> : null}
             <RadioGroup
               name="value"
               defaultValue={typeof value === 'string' ? value : undefined}
@@ -131,8 +125,8 @@ function QuestionInput({
       return (
         <Field error={error}>
           <fieldset>
-            <legend className="text-lg font-semibold text-ink">{t(`${key}.label`)}</legend>
-            {help ? <p className="mt-1.5 text-sm text-muted">{help}</p> : null}
+            <legend className="text-ink text-lg font-semibold">{t(`${key}.label`)}</legend>
+            {help ? <p className="text-muted mt-1.5 text-sm">{help}</p> : null}
             <div className="mt-4 flex flex-col gap-2">
               {(question.options ?? []).map((option) => (
                 <ChoiceCard
@@ -287,14 +281,14 @@ export function Questionnaire({ initial }: { initial: IntakeState }) {
 
       <div>
         <div className="flex items-baseline justify-between gap-4">
-          <p className="text-sm font-medium text-muted">
+          <p className="text-muted text-sm font-medium">
             {t('progressLabel', {
               current: Math.min(index + 1, questions.length),
               total: questions.length,
             })}
           </p>
           {question ? (
-            <p className="text-xs uppercase tracking-wide text-muted">
+            <p className="text-muted text-xs tracking-wide uppercase">
               {t(`sections.${question.section}`)}
             </p>
           ) : null}
@@ -309,10 +303,14 @@ export function Questionnaire({ initial }: { initial: IntakeState }) {
 
       <div ref={headingRef} tabIndex={-1} className="outline-none">
         {atReview ? (
-          <ReviewStep answers={state.answers} questions={questions} formAction={formAction} pending={saving} />
+          <ReviewStep
+            answers={state.answers}
+            questions={questions}
+            formAction={formAction}
+            pending={saving}
+          />
         ) : (
           <form action={formAction} className="flex flex-col gap-6" noValidate>
-            <input type="hidden" name="intent" value="answer" />
             <input type="hidden" name="questionKey" value={question.key} />
             <input type="hidden" name="kind" value={question.kind} />
 
@@ -334,8 +332,8 @@ export function Questionnaire({ initial }: { initial: IntakeState }) {
               </Alert>
             ) : null}
 
-            <div className="flex flex-wrap items-center gap-3 border-t border-border pt-5">
-              <Button type="submit" size="lg" disabled={saving}>
+            <div className="border-border flex flex-wrap items-center gap-3 border-t pt-5">
+              <Button type="submit" name="intent" value="answer" size="lg" disabled={saving}>
                 {saving ? tCommon('saving') : tCommon('continue')}
                 <ArrowRight className="size-4" aria-hidden="true" />
               </Button>
@@ -361,7 +359,7 @@ export function Questionnaire({ initial }: { initial: IntakeState }) {
                 </Button>
               ) : null}
               <input type="hidden" name="index" value={index - 1} />
-              <span className="ms-auto inline-flex items-center gap-1.5 text-sm text-muted">
+              <span className="text-muted ms-auto inline-flex items-center gap-1.5 text-sm">
                 <Save className="size-4" aria-hidden="true" />
                 {t('saveAndExit')}
               </span>
@@ -404,17 +402,17 @@ function ReviewStep({
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h2 className="text-2xl font-semibold text-ink">{t('reviewTitle')}</h2>
-        <p className="mt-2 text-sm leading-relaxed text-muted">{t('reviewBody')}</p>
+        <h2 className="text-ink text-2xl font-semibold">{t('reviewTitle')}</h2>
+        <p className="text-muted mt-2 text-sm leading-relaxed">{t('reviewBody')}</p>
       </div>
 
-      <dl className="divide-y divide-border border-y border-border">
+      <dl className="divide-border border-border divide-y border-y">
         {questions.map((question, i) => (
           <div key={question.key} className="flex flex-wrap items-baseline gap-x-4 gap-y-1 py-3.5">
-            <dt className="min-w-56 flex-1 text-sm text-muted">
+            <dt className="text-muted min-w-56 flex-1 text-sm">
               {tQuestions(`${question.key}.label`)}
             </dt>
-            <dd className="flex items-center gap-3 text-sm font-medium text-ink">
+            <dd className="text-ink flex items-center gap-3 text-sm font-medium">
               <span>{display(question)}</span>
               <form action={formAction}>
                 <input type="hidden" name="intent" value="back" />

@@ -11,11 +11,7 @@ import { daysUntil } from '@/features/cases/deadlines';
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
-export default async function CompliancePage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function CompliancePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
   await requireCustomerOrganization();
@@ -42,7 +38,9 @@ export default async function CompliancePage({
     { key: 'overdue', items: obligations.filter((o) => o.status === 'overdue') },
     {
       key: 'upcoming',
-      items: obligations.filter((o) => o.status === 'due' || o.status === 'upcoming' || o.status === 'in_progress'),
+      items: obligations.filter(
+        (o) => o.status === 'due' || o.status === 'upcoming' || o.status === 'in_progress',
+      ),
     },
     { key: 'completed', items: obligations.filter((o) => o.status === 'completed') },
   ] as const;
@@ -62,17 +60,20 @@ export default async function CompliancePage({
                 <CardTitle as="h2">{t(group.key)}</CardTitle>
               </CardHeader>
               <CardContent>
-                <ul className="divide-y divide-border">
+                <ul className="divide-border divide-y">
                   {group.items.map((obligation) => {
                     const days = daysUntil(new Date(obligation.due_on), now);
                     return (
-                      <li key={obligation.id} className="flex flex-wrap items-start justify-between gap-3 py-4">
+                      <li
+                        key={obligation.id}
+                        className="flex flex-wrap items-start justify-between gap-3 py-4"
+                      >
                         <div className="min-w-0">
-                          <p className="text-sm font-medium text-ink">
+                          <p className="text-ink text-sm font-medium">
                             {label(obligation.label_en, obligation.label_bn)}
                           </p>
                           {obligation.authority_name ? (
-                            <p className="mt-0.5 text-xs text-muted">{obligation.authority_name}</p>
+                            <p className="text-muted mt-0.5 text-xs">{obligation.authority_name}</p>
                           ) : null}
                           <p className="mt-2 flex flex-wrap gap-1.5">
                             <Badge tone="neutral">
@@ -83,22 +84,23 @@ export default async function CompliancePage({
                             </Badge>
                             {obligation.required_documents.length > 0 ? (
                               <Badge tone="neutral">
-                                {obligation.required_documents.length} {tCommon('required').toLowerCase()}
+                                {obligation.required_documents.length}{' '}
+                                {tCommon('required').toLowerCase()}
                               </Badge>
                             ) : null}
                           </p>
                         </div>
                         <div className="text-end">
-                          <p className="text-sm font-medium text-ink">
+                          <p className="text-ink text-sm font-medium">
                             {format.dateTime(new Date(obligation.due_on), 'long')}
                           </p>
                           <p
                             className={
                               days < 0
-                                ? 'mt-0.5 text-xs font-medium text-danger'
+                                ? 'text-danger mt-0.5 text-xs font-medium'
                                 : days <= 14
-                                  ? 'mt-0.5 text-xs font-medium text-warning'
-                                  : 'mt-0.5 text-xs text-muted'
+                                  ? 'text-warning mt-0.5 text-xs font-medium'
+                                  : 'text-muted mt-0.5 text-xs'
                             }
                           >
                             {days < 0

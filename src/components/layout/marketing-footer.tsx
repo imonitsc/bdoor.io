@@ -21,13 +21,15 @@ function FooterColumn({
 }) {
   return (
     <div>
-      <h2 className="text-xs font-semibold uppercase tracking-[0.1em] text-muted-inverse">{heading}</h2>
+      <h2 className="text-muted-inverse text-xs font-semibold tracking-[0.1em] uppercase">
+        {heading}
+      </h2>
       <ul className="mt-4 flex flex-col gap-2.5">
         {links.map((link) => (
           <li key={link.href}>
             <Link
               href={link.href}
-              className="inline-block rounded text-sm text-[color:var(--bd-offwhite)]/85 transition-colors hover:text-ink-inverse focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--bd-cobalt-200)]"
+              className="hover:text-ink-inverse inline-block rounded text-sm text-[color:var(--bd-offwhite)]/85 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--bd-cobalt-200)]"
             >
               {link.label}
             </Link>
@@ -53,7 +55,7 @@ export function MarketingFooter() {
             >
               <BDoorLogo inverse />
             </Link>
-            <p className="max-w-xs text-sm leading-relaxed text-muted-inverse">
+            <p className="text-muted-inverse max-w-xs text-sm leading-relaxed">
               {t('brand.promise')}
             </p>
             <div className="mt-1">
@@ -75,17 +77,17 @@ export function MarketingFooter() {
               links={FOOTER_LEGAL_LINKS.map((l) => ({ href: l.href, label: t(l.labelKey) }))}
             />
             <div>
-              <h2 className="text-xs font-semibold uppercase tracking-[0.1em] text-muted-inverse">
+              <h2 className="text-muted-inverse text-xs font-semibold tracking-[0.1em] uppercase">
                 {t('footer.contactHeading')}
               </h2>
               <a
                 href={`mailto:${SITE.contactEmail}`}
-                className="mt-4 inline-flex items-center gap-2 rounded text-sm text-[color:var(--bd-offwhite)]/85 transition-colors hover:text-ink-inverse focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--bd-cobalt-200)]"
+                className="hover:text-ink-inverse mt-4 inline-flex items-center gap-2 rounded text-sm text-[color:var(--bd-offwhite)]/85 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--bd-cobalt-200)]"
               >
                 <Mail className="size-4" aria-hidden="true" />
                 {SITE.contactEmail}
               </a>
-              <p className="mt-2 text-xs leading-relaxed text-muted-inverse">
+              <p className="text-muted-inverse mt-2 text-xs leading-relaxed">
                 {t('footer.supportNote')}
               </p>
             </div>
@@ -96,7 +98,7 @@ export function MarketingFooter() {
           <IndependenceDisclosure variant="inverse" />
         </div>
 
-        <p className="mt-8 text-xs text-muted-inverse">
+        <p className="text-muted-inverse mt-8 text-xs">
           © {year} {t('brand.name')}. {t('footer.rights')}
         </p>
       </div>

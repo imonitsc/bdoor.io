@@ -9,11 +9,7 @@ import { customerMemberships, requireSession } from '@/lib/auth/session';
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
-export default async function OnboardingPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function OnboardingPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
 

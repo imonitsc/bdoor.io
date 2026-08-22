@@ -3,7 +3,11 @@ import { getFormatter, getTranslations, setRequestLocale } from 'next-intl/serve
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PageHeading } from '@/components/dashboard/page-heading';
-import { InviteForm, RemoveMemberButton, RevokeInvitationButton } from '@/components/forms/team-forms';
+import {
+  InviteForm,
+  RemoveMemberButton,
+  RevokeInvitationButton,
+} from '@/components/forms/team-forms';
 import { requireCustomerOrganization } from '@/lib/auth/require-organization';
 import { createClient } from '@/lib/supabase/server';
 
@@ -36,7 +40,15 @@ export default async function TeamPage({ params }: { params: Promise<{ locale: s
           .eq('organization_id', active.organizationId)
           .eq('status', 'pending')
           .order('created_at', { ascending: false })
-      : Promise.resolve({ data: [] as Array<{ id: string; email: string; role: string; expires_at: string; status: string }> }),
+      : Promise.resolve({
+          data: [] as Array<{
+            id: string;
+            email: string;
+            role: string;
+            expires_at: string;
+            status: string;
+          }>,
+        }),
   ]);
 
   type MemberRow = {
@@ -76,17 +88,22 @@ export default async function TeamPage({ params }: { params: Promise<{ locale: s
           <CardTitle as="h2">{t('members')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <ul className="divide-y divide-border">
+          <ul className="divide-border divide-y">
             {members.map((member) => (
-              <li key={member.id} className="flex flex-wrap items-center justify-between gap-3 py-3.5">
+              <li
+                key={member.id}
+                className="flex flex-wrap items-center justify-between gap-3 py-3.5"
+              >
                 <div className="min-w-0">
-                  <p className="flex items-center gap-2 text-sm font-medium text-ink">
-                    {member.profiles?.full_name || member.profiles?.email || member.user_id.slice(0, 8)}
+                  <p className="text-ink flex items-center gap-2 text-sm font-medium">
+                    {member.profiles?.full_name ||
+                      member.profiles?.email ||
+                      member.user_id.slice(0, 8)}
                     {member.user_id === session.userId ? (
                       <Badge tone="neutral">{t('youBadge')}</Badge>
                     ) : null}
                   </p>
-                  <p className="text-xs text-muted">{member.profiles?.email ?? ''}</p>
+                  <p className="text-muted text-xs">{member.profiles?.email ?? ''}</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <Badge tone="info">{tRoles(member.role)}</Badge>
@@ -110,12 +127,15 @@ export default async function TeamPage({ params }: { params: Promise<{ locale: s
             <CardTitle as="h2">{t('invitations')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="divide-y divide-border">
+            <ul className="divide-border divide-y">
               {invitations.map((invitation) => (
-                <li key={invitation.id} className="flex flex-wrap items-center justify-between gap-3 py-3.5">
+                <li
+                  key={invitation.id}
+                  className="flex flex-wrap items-center justify-between gap-3 py-3.5"
+                >
                   <div className="min-w-0">
-                    <p className="truncate text-sm text-ink">{invitation.email}</p>
-                    <p className="text-xs text-muted">
+                    <p className="text-ink truncate text-sm">{invitation.email}</p>
+                    <p className="text-muted text-xs">
                       {t('expiresOn', {
                         date: format.dateTime(new Date(invitation.expires_at), 'short'),
                       })}

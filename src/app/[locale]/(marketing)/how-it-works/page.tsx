@@ -45,11 +45,7 @@ const RESPONSIBILITIES = [
   { stage: 'compliance', bdoor: true, partner: false, authority: false, customer: true },
 ] as const;
 
-export default async function HowItWorksPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function HowItWorksPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
 
@@ -67,19 +63,21 @@ export default async function HowItWorksPage({
 
       <Section className="py-12 md:py-16">
         <div className="container-page">
-          <h2 className="text-xl font-semibold text-ink">{t('timeline.title')}</h2>
+          <h2 className="text-ink text-xl font-semibold">{t('timeline.title')}</h2>
           <ol className="mt-8 grid gap-8 md:grid-cols-2">
             {steps.map((step, index) => (
               <li key={step} className="flex gap-4">
                 <span
-                  className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary-soft text-sm font-semibold text-info"
+                  className="bg-primary-soft text-info flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
                   aria-hidden="true"
                 >
                   {index + 1}
                 </span>
                 <div>
-                  <h3 className="text-base font-semibold text-ink">{tSteps(`${step}.title`)}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted">{tSteps(`${step}.body`)}</p>
+                  <h3 className="text-ink text-base font-semibold">{tSteps(`${step}.title`)}</h3>
+                  <p className="text-muted mt-2 text-sm leading-relaxed">
+                    {tSteps(`${step}.body`)}
+                  </p>
                 </div>
               </li>
             ))}
@@ -89,27 +87,34 @@ export default async function HowItWorksPage({
 
       <Section tone="surface" className="py-12 md:py-16">
         <div className="container-page">
-          <h2 className="text-xl font-semibold text-ink">{t('responsibilities.title')}</h2>
+          <h2 className="text-ink text-xl font-semibold">{t('responsibilities.title')}</h2>
 
           <div className="scroll-x mt-6">
             <table className="w-full min-w-[40rem] border-collapse text-sm">
               <caption className="sr-only">{t('responsibilities.title')}</caption>
               <thead>
-                <tr className="border-b border-border">
-                  <th scope="col" className="px-3 py-2.5 text-start text-xs font-semibold uppercase tracking-wide text-muted">
+                <tr className="border-border border-b">
+                  <th
+                    scope="col"
+                    className="text-muted px-3 py-2.5 text-start text-xs font-semibold tracking-wide uppercase"
+                  >
                     {t('timeline.title')}
                   </th>
                   {(['bdoor', 'partner', 'authority', 'customer'] as const).map((role) => (
-                    <th key={role} scope="col" className="px-3 py-2.5 text-start text-xs font-semibold uppercase tracking-wide text-muted">
+                    <th
+                      key={role}
+                      scope="col"
+                      className="text-muted px-3 py-2.5 text-start text-xs font-semibold tracking-wide uppercase"
+                    >
                       {t(`responsibilities.${role}`)}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-border divide-y">
                 {RESPONSIBILITIES.map((row) => (
                   <tr key={row.stage}>
-                    <th scope="row" className="px-3 py-3 text-start font-medium text-ink">
+                    <th scope="row" className="text-ink px-3 py-3 text-start font-medium">
                       {t(`stages.${row.stage}`)}
                     </th>
                     {(['bdoor', 'partner', 'authority', 'customer'] as const).map((role) => (
@@ -138,7 +143,7 @@ export default async function HowItWorksPage({
       <Section className="py-12 md:py-16">
         <div className="container-page grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
           <div>
-            <h2 className="text-xl font-semibold text-ink">{t('faqTitle')}</h2>
+            <h2 className="text-ink text-xl font-semibold">{t('faqTitle')}</h2>
             <Button asChild className="mt-6">
               <Link href={MARKETING_ROUTES.start}>
                 {t('cta')}

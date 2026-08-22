@@ -24,10 +24,7 @@ export default async function BillingPage({
   setRequestLocale(locale);
   await requireCustomerOrganization();
 
-  const [t, format] = await Promise.all([
-    getTranslations('workspace.billing'),
-    getFormatter(),
-  ]);
+  const [t, format] = await Promise.all([getTranslations('workspace.billing'), getFormatter()]);
 
   const supabase = await createClient();
 
@@ -79,42 +76,44 @@ export default async function BillingPage({
   const invoices = invoicesResult.data ?? [];
   const now = new Date();
 
-  const quotes: QuoteView[] = ((versionsResult.data ?? []) as unknown as VersionRow[]).map((row) => {
-    const invoice = invoices.find((i) => i.quote_version_id === row.id) ?? null;
-    return {
-      quoteVersionId: row.id,
-      versionNo: row.version_no,
-      currency: row.currency,
-      subtotalMinor: row.subtotal_minor,
-      taxMinor: row.tax_minor,
-      totalMinor: row.total_minor,
-      validUntil: row.valid_until,
-      acceptedAt: row.accepted_at,
-      expired: !row.accepted_at && quoteIsExpired(row.valid_until, now),
-      items: [...(row.quote_items ?? [])]
-        .sort((a, b) => a.sort_order - b.sort_order)
-        .map((item) => ({
-          id: item.id,
-          category: item.category,
-          description: locale === 'bn' ? item.description_bn : item.description_en,
-          quantity: item.quantity,
-          unitAmountMinor: item.unit_amount_minor,
-          currency: item.currency,
-          isEstimate: item.is_estimate,
-          isRefundable: item.is_refundable,
-          payeeName: item.payee_name,
-        })),
-      invoice: invoice
-        ? {
-            id: invoice.id,
-            number: invoice.number,
-            totalMinor: invoice.total_minor,
-            paidMinor: invoice.paid_minor,
-            status: invoice.status,
-          }
-        : null,
-    };
-  });
+  const quotes: QuoteView[] = ((versionsResult.data ?? []) as unknown as VersionRow[]).map(
+    (row) => {
+      const invoice = invoices.find((i) => i.quote_version_id === row.id) ?? null;
+      return {
+        quoteVersionId: row.id,
+        versionNo: row.version_no,
+        currency: row.currency,
+        subtotalMinor: row.subtotal_minor,
+        taxMinor: row.tax_minor,
+        totalMinor: row.total_minor,
+        validUntil: row.valid_until,
+        acceptedAt: row.accepted_at,
+        expired: !row.accepted_at && quoteIsExpired(row.valid_until, now),
+        items: [...(row.quote_items ?? [])]
+          .sort((a, b) => a.sort_order - b.sort_order)
+          .map((item) => ({
+            id: item.id,
+            category: item.category,
+            description: locale === 'bn' ? item.description_bn : item.description_en,
+            quantity: item.quantity,
+            unitAmountMinor: item.unit_amount_minor,
+            currency: item.currency,
+            isEstimate: item.is_estimate,
+            isRefundable: item.is_refundable,
+            payeeName: item.payee_name,
+          })),
+        invoice: invoice
+          ? {
+              id: invoice.id,
+              number: invoice.number,
+              totalMinor: invoice.total_minor,
+              paidMinor: invoice.paid_minor,
+              status: invoice.status,
+            }
+          : null,
+      };
+    },
+  );
 
   const receipts = receiptsResult.data ?? [];
   const sandbox = paymentsAreSandbox();
@@ -155,16 +154,19 @@ export default async function BillingPage({
             <CardTitle as="h2">{t('receipts')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="divide-y divide-border">
+            <ul className="divide-border divide-y">
               {receipts.map((receipt) => (
-                <li key={receipt.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
-                  <span className="flex min-w-0 items-center gap-2 text-sm text-ink">
-                    <Receipt className="size-4 shrink-0 text-muted" aria-hidden="true" />
+                <li
+                  key={receipt.id}
+                  className="flex flex-wrap items-center justify-between gap-3 py-3"
+                >
+                  <span className="text-ink flex min-w-0 items-center gap-2 text-sm">
+                    <Receipt className="text-muted size-4 shrink-0" aria-hidden="true" />
                     <span className="truncate">{receipt.number ?? receipt.kind}</span>
                   </span>
-                  <span className="flex items-center gap-4 text-sm text-muted">
+                  <span className="text-muted flex items-center gap-4 text-sm">
                     {receipt.amount_minor !== null ? (
-                      <span className="font-medium text-ink">
+                      <span className="text-ink font-medium">
                         {format.number(
                           receipt.amount_minor / 100,
                           receipt.currency === 'USD' ? 'usd' : 'bdt',

@@ -8,11 +8,7 @@ import { requireCustomerOrganization } from '@/lib/auth/require-organization';
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
-export default async function SettingsPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function SettingsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
 

@@ -18,7 +18,7 @@ export function TooltipContent({
       <TooltipPrimitive.Content
         sideOffset={sideOffset}
         className={cn(
-          'z-50 max-w-xs rounded-[10px] bg-surface-inverse px-3 py-2 text-xs leading-relaxed text-ink-inverse shadow-lg',
+          'bg-surface-inverse text-ink-inverse z-50 max-w-xs rounded-[10px] px-3 py-2 text-xs leading-relaxed shadow-lg',
           className,
         )}
         {...props}

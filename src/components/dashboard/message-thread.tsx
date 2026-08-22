@@ -55,7 +55,7 @@ export function MessageThread({
 
   return (
     <section className="flex flex-col gap-4">
-      <h2 className="text-base font-semibold text-ink">{subject}</h2>
+      <h2 className="text-ink text-base font-semibold">{subject}</h2>
 
       <ol className="flex flex-col gap-3">
         {messages.map((message) => {
@@ -72,14 +72,18 @@ export function MessageThread({
                     : 'border-border bg-surface',
               )}
             >
-              <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
-                <span className="font-medium text-ink">{message.authorName ?? message.authorKind}</span>
+              <p className="text-muted flex flex-wrap items-center gap-2 text-xs">
+                <span className="text-ink font-medium">
+                  {message.authorName ?? message.authorKind}
+                </span>
                 <time dateTime={message.createdAt}>
                   {format.dateTime(new Date(message.createdAt), 'withTime')}
                 </time>
                 {message.isInternal ? <Badge tone="warning">{t('internalOnly')}</Badge> : null}
               </p>
-              <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-ink">{message.body}</p>
+              <p className="text-ink mt-2 text-sm leading-relaxed whitespace-pre-wrap">
+                {message.body}
+              </p>
             </li>
           );
         })}
@@ -97,12 +101,18 @@ export function MessageThread({
         <Field>
           <FieldLabel className="sr-only">{t('compose')}</FieldLabel>
           <FieldControl hasDescription={false}>
-            <Textarea name="body" rows={3} placeholder={t('placeholder')} required maxLength={20000} />
+            <Textarea
+              name="body"
+              rows={3}
+              placeholder={t('placeholder')}
+              required
+              maxLength={20000}
+            />
           </FieldControl>
         </Field>
 
         {canPostInternal ? (
-          <label className="flex items-center gap-2.5 text-sm text-ink">
+          <label className="text-ink flex items-center gap-2.5 text-sm">
             <Checkbox name="internal" />
             {t('internalOnly')}
           </label>

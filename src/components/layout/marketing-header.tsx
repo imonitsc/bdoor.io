@@ -15,13 +15,18 @@ export function MarketingHeader() {
   const t = useTranslations();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [drawerPath, setDrawerPath] = useState(pathname);
   const isSignedIn = useIsSignedIn();
 
-  // Close the drawer on navigation and lock the body scroll while it is open.
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
+  // Close the drawer when the route changes. Adjusting state during render is
+  // the pattern React recommends for "reset when an input changes"; doing it in
+  // an effect would render the stale open drawer first and then close it.
+  if (drawerPath !== pathname) {
+    setDrawerPath(pathname);
+    if (open) setOpen(false);
+  }
 
+  // Lock the body scroll while the drawer is open.
   useEffect(() => {
     if (!open) return;
     const previous = document.body.style.overflow;
@@ -37,7 +42,14 @@ export function MarketingHeader() {
   }, [open]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-surface/90 backdrop-blur-sm">
+    <header className="border-border sticky top-0 z-40 border-b">
+      {/*
+        The frosted backdrop lives on its own layer rather than on <header>.
+        `backdrop-filter` makes an element the containing block for its
+        `position: fixed` descendants, which collapsed the mobile drawer below
+        to the height of the header bar.
+      */}
+      <div aria-hidden="true" className="bg-surface/90 absolute inset-0 -z-10 backdrop-blur-sm" />
       <div className="container-page flex h-16 items-center justify-between gap-4 md:h-[4.5rem]">
         <Link
           href={MARKETING_ROUTES.home}
@@ -106,7 +118,7 @@ export function MarketingHeader() {
       {open ? (
         <div
           id="mobile-navigation"
-          className="fixed inset-x-0 bottom-0 top-16 z-40 overflow-y-auto border-t border-border bg-surface lg:hidden"
+          className="border-border bg-surface fixed inset-x-0 top-16 bottom-0 z-40 overflow-y-auto border-t md:top-[4.5rem] lg:hidden"
         >
           <nav aria-label={t('nav.mainNavigation')} className="container-page py-6">
             <ul className="flex flex-col gap-1">
@@ -114,22 +126,22 @@ export function MarketingHeader() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="flex min-h-[3rem] items-center rounded-[var(--radius-control)] px-3 text-base font-medium text-ink hover:bg-surface-sunken focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+                    className="text-ink hover:bg-surface-sunken flex min-h-[3rem] items-center rounded-[var(--radius-control)] px-3 text-base font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
                   >
                     {t(link.labelKey)}
                   </Link>
                 </li>
               ))}
-              <li className="mt-2 border-t border-border pt-3">
+              <li className="border-border mt-2 border-t pt-3">
                 <Link
                   href={isSignedIn ? '/app' : MARKETING_ROUTES.login}
-                  className="flex min-h-[3rem] items-center rounded-[var(--radius-control)] px-3 text-base font-medium text-ink hover:bg-surface-sunken focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+                  className="text-ink hover:bg-surface-sunken flex min-h-[3rem] items-center rounded-[var(--radius-control)] px-3 text-base font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
                 >
                   {isSignedIn ? t('nav.workspace') : t('common.signIn')}
                 </Link>
               </li>
             </ul>
-            <div className="mt-4 border-t border-border pt-4">
+            <div className="border-border mt-4 border-t pt-4">
               <LocaleSwitcher />
             </div>
           </nav>

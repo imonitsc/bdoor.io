@@ -63,12 +63,12 @@ export function FieldLabel({
   return (
     <LabelPrimitive.Root
       htmlFor={id}
-      className={cn('text-sm font-medium text-ink', className)}
+      className={cn('text-ink text-sm font-medium', className)}
       {...props}
     >
       {children}
       {required ? (
-        <span className="ms-1 text-danger" aria-hidden="true">
+        <span className="text-danger ms-1" aria-hidden="true">
           *
         </span>
       ) : null}
@@ -76,17 +76,24 @@ export function FieldLabel({
   );
 }
 
-export function FieldDescription({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
+export function FieldDescription({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLParagraphElement>) {
   const { descriptionId } = useField();
-  return <p id={descriptionId} className={cn('text-sm text-muted', className)} {...props} />;
+  return <p id={descriptionId} className={cn('text-muted text-sm', className)} {...props} />;
 }
 
-export function FieldError({ className, children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
+export function FieldError({
+  className,
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLParagraphElement>) {
   const { errorId } = useField();
   return (
     <p
       id={errorId}
-      className={cn('flex items-start gap-1.5 text-sm font-medium text-danger', className)}
+      className={cn('text-danger flex items-start gap-1.5 text-sm font-medium', className)}
       {...props}
     >
       <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />

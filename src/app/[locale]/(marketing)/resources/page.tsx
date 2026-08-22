@@ -53,8 +53,11 @@ export default async function ResourcesPage({ params }: { params: Promise<{ loca
             <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {resources.map((resource) => (
                 <li key={resource.slug}>
-                  <Card as="article" className="group relative h-full p-5 transition-shadow hover:shadow-md md:p-6">
-                    <h2 className="text-base font-semibold text-ink">
+                  <Card
+                    as="article"
+                    className="group relative h-full p-5 transition-shadow hover:shadow-md md:p-6"
+                  >
+                    <h2 className="text-ink text-base font-semibold">
                       <Link
                         href={`/resources/${resource.slug}`}
                         className="rounded before:absolute before:inset-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
@@ -63,11 +66,11 @@ export default async function ResourcesPage({ params }: { params: Promise<{ loca
                       </Link>
                     </h2>
                     {resource.excerpt ? (
-                      <p className="mt-2 text-sm leading-relaxed text-muted">
+                      <p className="text-muted mt-2 text-sm leading-relaxed">
                         {pick(resource.excerpt, loc)}
                       </p>
                     ) : null}
-                    <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
+                    <p className="text-muted mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
                       {resource.readingMinutes ? (
                         <span>{t('readingTime', { minutes: resource.readingMinutes })}</span>
                       ) : null}
@@ -79,7 +82,7 @@ export default async function ResourcesPage({ params }: { params: Promise<{ loca
                         </span>
                       ) : null}
                     </p>
-                    <p className="mt-3 flex items-center gap-1.5 text-sm font-medium text-primary">
+                    <p className="text-primary mt-3 flex items-center gap-1.5 text-sm font-medium">
                       {t('title')}
                       <ArrowRight
                         className="size-4 transition-transform group-hover:translate-x-0.5"

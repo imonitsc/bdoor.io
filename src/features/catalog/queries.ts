@@ -293,7 +293,9 @@ export const getResources = cache(async (): Promise<CatalogResult<ResourcePage[]
         slug: row.slug,
         kind: row.kind as ResourcePage['kind'],
         title: { en: row.title_en, bn: row.title_bn },
-        excerpt: row.excerpt_en ? { en: row.excerpt_en, bn: row.excerpt_bn ?? row.excerpt_en } : null,
+        excerpt: row.excerpt_en
+          ? { en: row.excerpt_en, bn: row.excerpt_bn ?? row.excerpt_en }
+          : null,
         body: { en: row.body_en, bn: row.body_bn },
         lastReviewedAt: row.last_reviewed_at,
         nextReviewDue: row.next_review_due,

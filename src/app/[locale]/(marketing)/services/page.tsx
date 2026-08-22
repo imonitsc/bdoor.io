@@ -53,10 +53,10 @@ export default async function ServicesPage({
 
   return (
     <>
-      <Section tone="surface" className="border-b border-border py-12 md:py-16">
+      <Section tone="surface" className="border-border border-b py-12 md:py-16">
         <div className="container-page">
-          <h1 className="text-3xl leading-tight text-ink md:text-4xl">{t('indexTitle')}</h1>
-          <p className="mt-3 max-w-2xl text-base leading-relaxed text-muted">
+          <h1 className="text-ink text-3xl leading-tight md:text-4xl">{t('indexTitle')}</h1>
+          <p className="text-muted mt-3 max-w-2xl text-base leading-relaxed">
             {t('indexDescription')}
           </p>
         </div>
@@ -71,7 +71,7 @@ export default async function ServicesPage({
                   href="/services"
                   aria-current={!activeCategory ? 'true' : undefined}
                   className={cn(
-                    'inline-flex h-10 items-center whitespace-nowrap rounded-full border px-4 text-sm font-medium transition-colors',
+                    'inline-flex h-10 items-center rounded-full border px-4 text-sm font-medium whitespace-nowrap transition-colors',
                     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]',
                     !activeCategory
                       ? 'border-primary bg-primary text-on-primary'
@@ -89,7 +89,7 @@ export default async function ServicesPage({
                       href={`/services?category=${c.slug}`}
                       aria-current={active ? 'true' : undefined}
                       className={cn(
-                        'inline-flex h-10 items-center whitespace-nowrap rounded-full border px-4 text-sm font-medium transition-colors',
+                        'inline-flex h-10 items-center rounded-full border px-4 text-sm font-medium whitespace-nowrap transition-colors',
                         'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]',
                         active
                           ? 'border-primary bg-primary text-on-primary'
@@ -104,7 +104,7 @@ export default async function ServicesPage({
             </ul>
           </nav>
 
-          <p className="mt-6 text-sm text-muted" aria-live="polite">
+          <p className="text-muted mt-6 text-sm" aria-live="polite">
             {visible.length} {t('indexTitle').toLowerCase()}
           </p>
 

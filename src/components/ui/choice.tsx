@@ -13,7 +13,7 @@ export function Checkbox({
   return (
     <CheckboxPrimitive.Root
       className={cn(
-        'peer size-5 shrink-0 rounded-[6px] border border-border-strong bg-surface',
+        'peer border-border-strong bg-surface size-5 shrink-0 rounded-[6px] border',
         'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]',
         'data-[state=checked]:border-primary data-[state=checked]:bg-primary',
         'disabled:cursor-not-allowed disabled:opacity-55',
@@ -21,7 +21,7 @@ export function Checkbox({
       )}
       {...props}
     >
-      <CheckboxPrimitive.Indicator className="flex items-center justify-center text-on-primary">
+      <CheckboxPrimitive.Indicator className="text-on-primary flex items-center justify-center">
         <Check className="size-3.5" strokeWidth={3} aria-hidden="true" />
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>
@@ -37,7 +37,7 @@ export function RadioItem({
   return (
     <RadioGroupPrimitive.Item
       className={cn(
-        'size-5 shrink-0 rounded-full border border-border-strong bg-surface',
+        'border-border-strong bg-surface size-5 shrink-0 rounded-full border',
         'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]',
         'data-[state=checked]:border-primary',
         'disabled:cursor-not-allowed disabled:opacity-55',
@@ -46,7 +46,7 @@ export function RadioItem({
       {...props}
     >
       <RadioGroupPrimitive.Indicator className="flex size-full items-center justify-center">
-        <span className="size-2.5 rounded-full bg-primary" />
+        <span className="bg-primary size-2.5 rounded-full" />
       </RadioGroupPrimitive.Indicator>
     </RadioGroupPrimitive.Item>
   );
@@ -76,17 +76,17 @@ export function ChoiceCard({
       htmlFor={htmlFor}
       className={cn(
         'flex min-h-[3.25rem] cursor-pointer items-start gap-3 rounded-[var(--radius-control)]',
-        'border bg-surface p-3.5 transition-colors',
+        'bg-surface border p-3.5 transition-colors',
         'hover:border-border-strong hover:bg-surface-sunken',
         'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-[var(--color-focus)]',
-        selected ? 'border-primary bg-primary-soft ring-1 ring-primary' : 'border-border',
+        selected ? 'border-primary bg-primary-soft ring-primary ring-1' : 'border-border',
         className,
       )}
     >
       <span className="mt-0.5">{control}</span>
       <span className="flex min-w-0 flex-col gap-0.5">
-        <span className="text-sm font-medium text-ink">{children}</span>
-        {description ? <span className="text-sm text-muted">{description}</span> : null}
+        <span className="text-ink text-sm font-medium">{children}</span>
+        {description ? <span className="text-muted text-sm">{description}</span> : null}
       </span>
     </label>
   );

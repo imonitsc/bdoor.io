@@ -30,15 +30,15 @@ export default function ErrorBoundary({
   return (
     <div className="container-page flex min-h-[60vh] flex-col items-center justify-center gap-5 py-20 text-center">
       <span
-        className="flex size-12 items-center justify-center rounded-full bg-danger-soft text-danger"
+        className="bg-danger-soft text-danger flex size-12 items-center justify-center rounded-full"
         aria-hidden="true"
       >
         <AlertTriangle className="size-6" />
       </span>
-      <h1 className="text-3xl leading-tight text-ink md:text-4xl">{t('genericTitle')}</h1>
-      <p className="max-w-md text-base leading-relaxed text-muted">{t('genericBody')}</p>
+      <h1 className="text-ink text-3xl leading-tight md:text-4xl">{t('genericTitle')}</h1>
+      <p className="text-muted max-w-md text-base leading-relaxed">{t('genericBody')}</p>
       {error.digest ? (
-        <p className="rounded-[var(--radius-control)] bg-surface-sunken px-3 py-1.5 font-mono text-xs text-muted">
+        <p className="bg-surface-sunken text-muted rounded-[var(--radius-control)] px-3 py-1.5 font-mono text-xs">
           {t('reference')}: {error.digest}
         </p>
       ) : null}

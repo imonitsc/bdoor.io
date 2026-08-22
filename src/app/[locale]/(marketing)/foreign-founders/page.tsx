@@ -61,7 +61,8 @@ export default async function ForeignFoundersPage({
   ]);
 
   const relevant = services.filter(
-    (s) => s.categorySlug === 'foreign-founders' || s.slug === 'private-limited-company-incorporation',
+    (s) =>
+      s.categorySlug === 'foreign-founders' || s.slug === 'private-limited-company-incorporation',
   );
 
   return (
@@ -78,20 +79,20 @@ export default async function ForeignFoundersPage({
       <Section className="py-12 md:py-16">
         <div className="container-page grid gap-10 lg:grid-cols-[1.3fr_0.7fr] lg:gap-16">
           <div>
-            <h2 className="text-xl font-semibold text-ink">{t('stepsTitle')}</h2>
-            <p className="mt-2 max-w-prose text-sm leading-relaxed text-muted">{t('stepsBody')}</p>
+            <h2 className="text-ink text-xl font-semibold">{t('stepsTitle')}</h2>
+            <p className="text-muted mt-2 max-w-prose text-sm leading-relaxed">{t('stepsBody')}</p>
 
-            <ol className="mt-8 flex flex-col gap-6 border-s border-border ps-6">
+            <ol className="border-border mt-8 flex flex-col gap-6 border-s ps-6">
               {SEQUENCE.map((step, index) => (
                 <li key={step} className="relative">
                   <span
-                    className="absolute -start-[1.85rem] top-0.5 flex size-5 items-center justify-center rounded-full border-2 border-canvas bg-primary text-[0.6rem] font-bold text-on-primary"
+                    className="border-canvas bg-primary text-on-primary absolute -start-[1.85rem] top-0.5 flex size-5 items-center justify-center rounded-full border-2 text-[0.6rem] font-bold"
                     aria-hidden="true"
                   >
                     {index + 1}
                   </span>
-                  <h3 className="text-sm font-semibold text-ink">{t(`sequence.${step}.title`)}</h3>
-                  <p className="mt-1 max-w-prose text-sm leading-relaxed text-muted">
+                  <h3 className="text-ink text-sm font-semibold">{t(`sequence.${step}.title`)}</h3>
+                  <p className="text-muted mt-1 max-w-prose text-sm leading-relaxed">
                     {t(`sequence.${step}.body`)}
                   </p>
                 </li>
@@ -105,17 +106,19 @@ export default async function ForeignFoundersPage({
 
           <aside className="flex h-fit flex-col gap-6">
             <Card className="p-5">
-              <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">
-                <Banknote className="size-4 text-accent" aria-hidden="true" />
+              <h2 className="text-ink flex items-center gap-2 text-sm font-semibold">
+                <Banknote className="text-accent size-4" aria-hidden="true" />
                 {t('capitalTitle')}
               </h2>
-              <p className="mt-2 text-sm leading-relaxed text-muted">{t('capitalBody')}</p>
+              <p className="text-muted mt-2 text-sm leading-relaxed">{t('capitalBody')}</p>
             </Card>
 
             {guide ? (
               <Card className="p-5">
-                <h2 className="text-sm font-semibold text-ink">{pick(guide.title, loc)}</h2>
-                <p className="mt-2 text-sm leading-relaxed text-muted">{pick(guide.excerpt, loc)}</p>
+                <h2 className="text-ink text-sm font-semibold">{pick(guide.title, loc)}</h2>
+                <p className="text-muted mt-2 text-sm leading-relaxed">
+                  {pick(guide.excerpt, loc)}
+                </p>
                 <Button asChild variant="link" className="mt-3">
                   <Link href={`/resources/${guide.slug}`}>
                     {tCommon('learnMore')}
@@ -131,7 +134,7 @@ export default async function ForeignFoundersPage({
       {relevant.length > 0 ? (
         <Section tone="surface" className="py-12 md:py-16">
           <div className="container-page">
-            <h2 className="text-xl font-semibold text-ink">{t('servicesTitle')}</h2>
+            <h2 className="text-ink text-xl font-semibold">{t('servicesTitle')}</h2>
             <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {relevant.map((service) => (
                 <li key={service.id}>

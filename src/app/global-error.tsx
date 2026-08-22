@@ -31,6 +31,9 @@ export default function GlobalError({ error }: { error: Error & { digest?: strin
               Reference: {error.digest}
             </p>
           ) : null}
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages --
+              This boundary replaces the root layout, so neither next/link nor
+              the locale-aware Link has a provider to render inside. */}
           <a
             href="/en"
             style={{

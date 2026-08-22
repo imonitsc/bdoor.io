@@ -43,12 +43,12 @@ export function DataList<T>({
         <table className="w-full border-collapse text-sm">
           <caption className="sr-only">{caption}</caption>
           <thead>
-            <tr className="border-b border-border">
+            <tr className="border-border border-b">
               {columns.map((col) => (
                 <th
                   key={col.key}
                   scope="col"
-                  className="px-3 py-2.5 text-start text-xs font-semibold uppercase tracking-wide text-muted"
+                  className="text-muted px-3 py-2.5 text-start text-xs font-semibold tracking-wide uppercase"
                 >
                   {col.header}
                 </th>
@@ -60,11 +60,14 @@ export function DataList<T>({
               ) : null}
             </tr>
           </thead>
-          <tbody className="divide-y divide-border">
+          <tbody className="divide-border divide-y">
             {rows.map((row) => (
-              <tr key={getRowKey(row)} className="align-top transition-colors hover:bg-surface-sunken">
+              <tr
+                key={getRowKey(row)}
+                className="hover:bg-surface-sunken align-top transition-colors"
+              >
                 {columns.map((col) => (
-                  <td key={col.key} className={cn('px-3 py-3 text-ink', col.className)}>
+                  <td key={col.key} className={cn('text-ink px-3 py-3', col.className)}>
                     {col.cell(row)}
                   </td>
                 ))}
@@ -80,17 +83,17 @@ export function DataList<T>({
         {rows.map((row) => (
           <li
             key={getRowKey(row)}
-            className="rounded-[var(--radius-card)] border border-border bg-surface p-4 shadow-xs"
+            className="border-border bg-surface rounded-[var(--radius-card)] border p-4 shadow-xs"
           >
             <dl className="flex flex-col gap-2.5">
               {columns
                 .filter((col) => !col.hideOnCard)
                 .map((col) => (
                   <div key={col.key} className="flex flex-col gap-0.5">
-                    <dt className="text-xs font-semibold uppercase tracking-wide text-muted">
+                    <dt className="text-muted text-xs font-semibold tracking-wide uppercase">
                       {col.header}
                     </dt>
-                    <dd className="text-sm text-ink">{col.cell(row)}</dd>
+                    <dd className="text-ink text-sm">{col.cell(row)}</dd>
                   </div>
                 ))}
             </dl>

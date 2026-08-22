@@ -27,47 +27,48 @@ import { APP_ROUTES, MARKETING_ROUTES } from '@/lib/navigation';
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
-export default async function DashboardPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function DashboardPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [{ session, active }, t, tCommon, tCompliance, tDocuments, tCase, format] = await Promise.all([
-    requireCustomerOrganization(),
-    getTranslations('workspace.dashboard'),
-    getTranslations('common'),
-    getTranslations('workspace.compliance'),
-    getTranslations('workspace.documents'),
-    getTranslations('workspace.case'),
-    getFormatter(),
-  ]);
+  const [{ session, active }, t, tCommon, tCompliance, tDocuments, tCase, format] =
+    await Promise.all([
+      requireCustomerOrganization(),
+      getTranslations('workspace.dashboard'),
+      getTranslations('common'),
+      getTranslations('workspace.compliance'),
+      getTranslations('workspace.documents'),
+      getTranslations('workspace.case'),
+      getFormatter(),
+    ]);
 
   const supabase = await createClient();
 
-  const [cases, requestsResult, obligationsResult, receiptsResult, unreadResult] = await Promise.all([
-    listCases(),
-    supabase
-      .from('document_requests')
-      .select('id, label_en, label_bn, status, due_on, case_id')
-      .in('status', ['requested', 'replacement_requested'])
-      .order('due_on', { nullsFirst: false })
-      .limit(6),
-    supabase
-      .from('compliance_obligations')
-      .select('id, label_en, label_bn, due_on, status, authority_name')
-      .in('status', ['upcoming', 'due', 'overdue'])
-      .order('due_on')
-      .limit(5),
-    supabase
-      .from('receipts')
-      .select('id, kind, number, issued_on, amount_minor, currency')
-      .order('issued_on', { ascending: false })
-      .limit(4),
-    supabase.from('notifications').select('id', { count: 'exact', head: true }).is('read_at', null),
-  ]);
+  const [cases, requestsResult, obligationsResult, receiptsResult, unreadResult] =
+    await Promise.all([
+      listCases(),
+      supabase
+        .from('document_requests')
+        .select('id, label_en, label_bn, status, due_on, case_id')
+        .in('status', ['requested', 'replacement_requested'])
+        .order('due_on', { nullsFirst: false })
+        .limit(6),
+      supabase
+        .from('compliance_obligations')
+        .select('id, label_en, label_bn, due_on, status, authority_name')
+        .in('status', ['upcoming', 'due', 'overdue'])
+        .order('due_on')
+        .limit(5),
+      supabase
+        .from('receipts')
+        .select('id, kind, number, issued_on, amount_minor, currency')
+        .order('issued_on', { ascending: false })
+        .limit(4),
+      supabase
+        .from('notifications')
+        .select('id', { count: 'exact', head: true })
+        .is('read_at', null),
+    ]);
 
   const requests = requestsResult.data ?? [];
   const obligations = obligationsResult.data ?? [];
@@ -111,9 +112,7 @@ export default async function DashboardPage({
           value={obligations.length}
           icon={<CalendarClock className="size-4" />}
           hint={
-            obligations[0]
-              ? format.dateTime(new Date(obligations[0].due_on), 'short')
-              : undefined
+            obligations[0] ? format.dateTime(new Date(obligations[0].due_on), 'short') : undefined
           }
         />
         <StatCard
@@ -147,7 +146,7 @@ export default async function DashboardPage({
 
       <section>
         <div className="flex items-center justify-between gap-4">
-          <h2 className="text-lg font-semibold text-ink">{t('activeApplications')}</h2>
+          <h2 className="text-ink text-lg font-semibold">{t('activeApplications')}</h2>
           <Button asChild variant="link" size="inline">
             <Link href={APP_ROUTES.applications}>
               {tCommon('viewAll')}
@@ -185,30 +184,31 @@ export default async function DashboardPage({
           </CardHeader>
           <CardContent>
             {obligations.length === 0 ? (
-              <p className="text-sm text-muted">
-                {tCompliance('noObligations')}
-              </p>
+              <p className="text-muted text-sm">{tCompliance('noObligations')}</p>
             ) : (
-              <ul className="divide-y divide-border">
+              <ul className="divide-border divide-y">
                 {obligations.map((obligation) => {
                   const days = daysUntil(new Date(obligation.due_on), now);
                   return (
-                    <li key={obligation.id} className="flex items-baseline justify-between gap-4 py-3">
+                    <li
+                      key={obligation.id}
+                      className="flex items-baseline justify-between gap-4 py-3"
+                    >
                       <div className="min-w-0">
-                        <p className="truncate text-sm text-ink">
+                        <p className="text-ink truncate text-sm">
                           {label(obligation.label_en, obligation.label_bn)}
                         </p>
                         {obligation.authority_name ? (
-                          <p className="truncate text-xs text-muted">{obligation.authority_name}</p>
+                          <p className="text-muted truncate text-xs">{obligation.authority_name}</p>
                         ) : null}
                       </div>
                       <span
                         className={
                           days < 0
-                            ? 'shrink-0 text-sm font-medium text-danger'
+                            ? 'text-danger shrink-0 text-sm font-medium'
                             : days <= 14
-                              ? 'shrink-0 text-sm font-medium text-warning'
-                              : 'shrink-0 text-sm text-muted'
+                              ? 'text-warning shrink-0 text-sm font-medium'
+                              : 'text-muted shrink-0 text-sm'
                         }
                       >
                         {format.dateTime(new Date(obligation.due_on), 'short')}
@@ -227,25 +227,23 @@ export default async function DashboardPage({
           </CardHeader>
           <CardContent>
             {receipts.length === 0 && requests.length === 0 ? (
-              <p className="text-sm text-muted">
-                {tDocuments('noDocuments')}
-              </p>
+              <p className="text-muted text-sm">{tDocuments('noDocuments')}</p>
             ) : (
-              <ul className="divide-y divide-border">
+              <ul className="divide-border divide-y">
                 {receipts.map((receipt) => (
                   <li key={receipt.id} className="flex items-center justify-between gap-4 py-3">
-                    <span className="flex min-w-0 items-center gap-2 text-sm text-ink">
-                      <Receipt className="size-4 shrink-0 text-muted" aria-hidden="true" />
+                    <span className="text-ink flex min-w-0 items-center gap-2 text-sm">
+                      <Receipt className="text-muted size-4 shrink-0" aria-hidden="true" />
                       <span className="truncate">{receipt.number ?? receipt.kind}</span>
                     </span>
-                    <span className="shrink-0 text-sm text-muted">
+                    <span className="text-muted shrink-0 text-sm">
                       {format.dateTime(new Date(receipt.issued_on), 'short')}
                     </span>
                   </li>
                 ))}
                 {requests.slice(0, 3).map((request) => (
                   <li key={request.id} className="flex items-center justify-between gap-4 py-3">
-                    <span className="truncate text-sm text-ink">
+                    <span className="text-ink truncate text-sm">
                       {label(request.label_en, request.label_bn)}
                     </span>
                     <DocumentStatusBadge status={request.status} />
@@ -258,9 +256,7 @@ export default async function DashboardPage({
       </div>
 
       {nextMilestoneCase?.estimate.available ? (
-        <p className="text-sm text-muted">
-          {tCase('estimateNote')}
-        </p>
+        <p className="text-muted text-sm">{tCase('estimateNote')}</p>
       ) : null}
     </div>
   );

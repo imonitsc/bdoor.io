@@ -29,19 +29,27 @@ export function UploadForm({
   const tErrors = useTranslations('documents.errors');
   const announce = useAnnounce();
   const [state, action, pending] = useActionState(uploadDocument, INITIAL);
-  const [fileName, setFileName] = useState<string | null>(null);
+  const [selected, setSelected] = useState<{ name: string; documentId: string | null } | null>(
+    null,
+  );
   const [dragging, setDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // A successful upload clears the picker. The file input is remounted via its
+  // `key` rather than reset through the ref, because touching a ref during
+  // render is not allowed — and the key is honest about what is happening.
+  if (state.status === 'success' && selected && selected.documentId !== state.documentId) {
+    setSelected(null);
+  }
+
+  const fileName = selected?.name ?? null;
+
   useEffect(() => {
     if (state.status === 'success') {
-      announce(t('uploadSuccess', { name: fileName ?? '' }));
-      setFileName(null);
-      if (inputRef.current) inputRef.current.value = '';
+      announce(t('uploadSuccess', { name: '' }));
     } else if (state.status === 'error' && state.message) {
       announce(tErrors(state.message), true);
     }
-    // `fileName` intentionally excluded: announcing should follow the action result.
   }, [state, announce, t, tErrors]);
 
   return (
@@ -57,7 +65,7 @@ export function UploadForm({
       ) : null}
       {state.status === 'success' ? (
         <Alert tone="success" live="polite">
-          {t('uploadSuccess', { name: fileName ?? '' })}
+          {t('uploadSuccess', { name: '' })}
         </Alert>
       ) : null}
 
@@ -75,7 +83,7 @@ export function UploadForm({
             const transfer = new DataTransfer();
             transfer.items.add(dropped);
             inputRef.current.files = transfer.files;
-            setFileName(dropped.name);
+            setSelected({ name: dropped.name, documentId: state.documentId ?? null });
           }
         }}
         className={cn(
@@ -83,10 +91,10 @@ export function UploadForm({
           dragging ? 'border-primary bg-primary-soft' : 'border-border-strong bg-surface',
         )}
       >
-        <FileUp className="size-6 text-muted" aria-hidden="true" />
+        <FileUp className="text-muted size-6" aria-hidden="true" />
         <div>
-          <p className="text-sm font-medium text-ink">{t('dropzone')}</p>
-          <p className="mt-1 text-xs text-muted">{t('dropzoneHint', { maxMb })}</p>
+          <p className="text-ink text-sm font-medium">{t('dropzone')}</p>
+          <p className="text-muted mt-1 text-xs">{t('dropzoneHint', { maxMb })}</p>
         </div>
 
         <Field>
@@ -94,19 +102,25 @@ export function UploadForm({
           <FieldDescription className="sr-only">{t('dropzoneHint', { maxMb })}</FieldDescription>
           <FieldControl>
             <Input
+              key={state.documentId ?? 'idle'}
               ref={inputRef}
               type="file"
               name="file"
               required
               accept={ALLOWED_MIME_TYPES.join(',')}
-              onChange={(e) => setFileName(e.currentTarget.files?.[0]?.name ?? null)}
-              className="h-auto cursor-pointer border-0 bg-transparent p-0 text-sm file:me-3 file:rounded-[var(--radius-control)] file:border-0 file:bg-surface-sunken file:px-3 file:py-2 file:text-sm file:font-medium file:text-ink"
+              onChange={(e) => {
+                const chosen = e.currentTarget.files?.[0];
+                setSelected(
+                  chosen ? { name: chosen.name, documentId: state.documentId ?? null } : null,
+                );
+              }}
+              className="file:bg-surface-sunken file:text-ink h-auto cursor-pointer border-0 bg-transparent p-0 text-sm file:me-3 file:rounded-[var(--radius-control)] file:border-0 file:px-3 file:py-2 file:text-sm file:font-medium"
             />
           </FieldControl>
         </Field>
 
         {fileName ? (
-          <p className="text-sm text-ink" aria-live="polite">
+          <p className="text-ink text-sm" aria-live="polite">
             {fileName}
           </p>
         ) : null}

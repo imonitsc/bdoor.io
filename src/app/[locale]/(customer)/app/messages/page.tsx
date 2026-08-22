@@ -10,11 +10,7 @@ import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
-export default async function MessagesPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function MessagesPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
   const { session } = await requireCustomerOrganization();
@@ -71,9 +67,7 @@ export default async function MessagesPage({
                 <MessageThread
                   threadId={thread.id}
                   subject={
-                    thread.cases
-                      ? t('threadFor', { case: thread.cases.reference })
-                      : thread.subject
+                    thread.cases ? t('threadFor', { case: thread.cases.reference }) : thread.subject
                   }
                   messages={messages}
                   currentUserId={session.userId}
