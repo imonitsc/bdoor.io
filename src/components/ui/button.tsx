@@ -1,0 +1,66 @@
+import * as React from 'react';
+import { Slot } from '@radix-ui/react-slot';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '@/lib/utils/cn';
+
+const buttonVariants = cva(
+  [
+    'inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium',
+    'rounded-[var(--radius-control)] transition-colors duration-150',
+    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]',
+    'disabled:pointer-events-none disabled:opacity-55',
+    '[&_svg]:pointer-events-none [&_svg]:shrink-0',
+  ].join(' '),
+  {
+    variants: {
+      variant: {
+        primary: 'bg-primary text-on-primary hover:bg-primary-hover active:bg-primary-active shadow-xs',
+        secondary:
+          'bg-surface text-ink border border-border-strong hover:bg-surface-sunken active:bg-surface-sunken shadow-xs',
+        ghost: 'bg-transparent text-ink hover:bg-surface-sunken',
+        subtle: 'bg-primary-soft text-info hover:bg-[color-mix(in_srgb,var(--color-primary-soft)_80%,var(--color-primary)_20%)]',
+        danger: 'bg-danger text-white hover:bg-[color-mix(in_srgb,var(--color-danger)_85%,black)] shadow-xs',
+        inverse:
+          'bg-surface text-ink hover:bg-[color-mix(in_srgb,white_90%,var(--color-primary))] shadow-sm',
+        link: 'bg-transparent text-primary underline underline-offset-4 hover:text-primary-hover',
+      },
+      size: {
+        // Minimum 44px tall targets on the sizes used for real actions.
+        sm: 'h-9 px-3 text-sm [&_svg]:size-4',
+        md: 'h-11 px-4 text-sm [&_svg]:size-4',
+        lg: 'h-12 px-6 text-base [&_svg]:size-5',
+        icon: 'size-11 [&_svg]:size-5',
+        inline: 'h-auto p-0 text-inherit',
+      },
+      block: { true: 'w-full', false: '' },
+    },
+    defaultVariants: { variant: 'primary', size: 'md', block: false },
+  },
+);
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean;
+}
+
+export function Button({
+  className,
+  variant,
+  size,
+  block,
+  asChild = false,
+  type,
+  ...props
+}: ButtonProps) {
+  const Comp = asChild ? Slot : 'button';
+  return (
+    <Comp
+      className={cn(buttonVariants({ variant, size, block }), className)}
+      {...(asChild ? {} : { type: type ?? 'button' })}
+      {...props}
+    />
+  );
+}
+
+export { buttonVariants };

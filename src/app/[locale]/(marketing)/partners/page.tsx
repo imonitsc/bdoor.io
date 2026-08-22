@@ -1,0 +1,150 @@
+import type { Metadata } from 'next';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { ArrowRight, Check, ShieldCheck, X } from 'lucide-react';
+import { Link } from '@/i18n/navigation';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { EmptyState } from '@/components/ui/empty-state';
+import { Section } from '@/components/ui/section';
+import { PageHeader } from '@/components/marketing/page-header';
+import { IndependenceDisclosure } from '@/components/layout/disclosure';
+import { createPublicClient } from '@/lib/supabase/public';
+import { logger } from '@/lib/logger';
+import { MARKETING_ROUTES } from '@/lib/navigation';
+import { localizedUrl } from '@/lib/site';
+import type { Locale } from '@/features/catalog/types';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'partnersPage' });
+  return {
+    title: t('title'),
+    description: t('description'),
+    alternates: {
+      canonical: localizedUrl(locale as Locale, '/partners'),
+      languages: {
+        en: localizedUrl('en', '/partners'),
+        'bn-BD': localizedUrl('bn', '/partners'),
+      },
+    },
+  };
+}
+
+const CAN = ['assigned', 'documents', 'tasks', 'upload', 'message', 'notes'] as const;
+const CANNOT = ['browse', 'finance', 'selfVerify', 'aml', 'export', 'audit'] as const;
+
+/**
+ * The public directory lists only organizations that have actually completed
+ * verification, read through the `verified_partners_public` view. If none have,
+ * we say so rather than inventing logos.
+ */
+async function verifiedPartners(): Promise<Array<{ id: string; name: string }>> {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) return [];
+  try {
+    const supabase = createPublicClient();
+    const { data, error } = await supabase
+      .from('verified_partners_public')
+      .select('id, name')
+      .order('name');
+    if (error) {
+      logger.warn('partners.directory_failed', { message: error.message });
+      return [];
+    }
+    return (data ?? []).filter(
+      (row): row is { id: string; name: string } => Boolean(row.id) && Boolean(row.name),
+    );
+  } catch {
+    return [];
+  }
+}
+
+export default async function PartnersPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
+  const [t, tHome, partners] = await Promise.all([
+    getTranslations('partnersPage'),
+    getTranslations('home.partners'),
+    verifiedPartners(),
+  ]);
+
+  return (
+    <>
+      <PageHeader title={t('title')} description={t('description')} />
+
+      <Section className="py-12 md:py-16">
+        <div className="container-page grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:gap-16">
+          <div>
+            <h2 className="text-xl font-semibold text-ink">{t('howTitle')}</h2>
+            <p className="mt-3 max-w-prose text-sm leading-relaxed text-muted">{tHome('body')}</p>
+
+            <div className="mt-8 grid gap-8 sm:grid-cols-2">
+              <div>
+                <h3 className="text-sm font-semibold text-ink">{t('canTitle')}</h3>
+                <ul className="mt-3 flex flex-col gap-2.5">
+                  {CAN.map((key) => (
+                    <li key={key} className="flex items-start gap-2.5 text-sm">
+                      <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
+                      <span className="text-ink">{t(`can.${key}`)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-ink">{t('cannotTitle')}</h3>
+                <ul className="mt-3 flex flex-col gap-2.5">
+                  {CANNOT.map((key) => (
+                    <li key={key} className="flex items-start gap-2.5 text-sm">
+                      <X className="mt-0.5 size-4 shrink-0 text-danger" aria-hidden="true" />
+                      <span className="text-ink">{t(`cannot.${key}`)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <IndependenceDisclosure className="mt-8" />
+          </div>
+
+          <aside className="flex h-fit flex-col gap-6">
+            <Card className="p-5 md:p-6">
+              <h2 className="text-base font-semibold text-ink">{t('applyTitle')}</h2>
+              <p className="mt-2 text-sm leading-relaxed text-muted">{t('applyBody')}</p>
+              <Button asChild className="mt-4" block>
+                <Link href={`${MARKETING_ROUTES.contact}?topic=partner`}>
+                  {t('applyCta')}
+                  <ArrowRight className="size-4" aria-hidden="true" />
+                </Link>
+              </Button>
+            </Card>
+
+            <div>
+              <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">
+                <ShieldCheck className="size-4 text-accent" aria-hidden="true" />
+                {t('directoryTitle')}
+              </h2>
+              {partners.length === 0 ? (
+                <EmptyState className="mt-3" title={t('directoryEmpty')} />
+              ) : (
+                <ul className="mt-3 flex flex-col gap-2">
+                  {partners.map((partner) => (
+                    <li
+                      key={partner.id}
+                      className="rounded-[var(--radius-control)] border border-border bg-surface px-4 py-3 text-sm text-ink"
+                    >
+                      {partner.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </aside>
+        </div>
+      </Section>
+    </>
+  );
+}

@@ -1,0 +1,1012 @@
+{
+  "brand": {
+    "name": "BDoor",
+    "tagline": "Your door to business in Bangladesh",
+    "promise": "Start and run your business in Bangladesh—from anywhere.",
+    "disclosure": "BDoor is an independent business setup and administrative-support platform. BDoor is not a government authority or law firm. Legal services, where required, are provided under a separate engagement by independent advocates or partner law firms. Government approval and processing times are not guaranteed."
+  },
+  "common": {
+    "continue": "Continue",
+    "back": "Back",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saveDraft": "Save draft",
+    "submit": "Submit",
+    "close": "Close",
+    "edit": "Edit",
+    "delete": "Delete",
+    "archive": "Archive",
+    "download": "Download",
+    "upload": "Upload",
+    "view": "View",
+    "viewAll": "View all",
+    "search": "Search",
+    "filter": "Filter",
+    "clearFilters": "Clear filters",
+    "loading": "Loading…",
+    "saving": "Saving…",
+    "retry": "Try again",
+    "required": "Required",
+    "optional": "Optional",
+    "yes": "Yes",
+    "no": "No",
+    "notSure": "I'm not sure",
+    "learnMore": "Learn more",
+    "getStarted": "Get started",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "signUp": "Create account",
+    "none": "None",
+    "notSet": "Not set",
+    "estimated": "Estimated",
+    "updated": "Updated",
+    "created": "Created",
+    "dueDate": "Due date",
+    "status": "Status",
+    "actions": "Actions",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "copy": "Copy",
+    "copied": "Copied",
+    "language": "Language",
+    "skipToContent": "Skip to main content",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "breadcrumb": "Breadcrumb",
+    "page": "Page",
+    "of": "of",
+    "results": "results",
+    "noResults": "No results found.",
+    "comingSoon": "Coming soon",
+    "reviewNote": "Eligibility and requirements will be confirmed after review.",
+    "processingTimeNote": "Estimated processing time after complete documents and successful review."
+  },
+  "nav": {
+    "start": "Start a business",
+    "services": "Services",
+    "foreignFounders": "Foreign founders",
+    "pricing": "Pricing",
+    "howItWorks": "How it works",
+    "resources": "Resources",
+    "partners": "Partners",
+    "about": "About",
+    "contact": "Contact",
+    "primaryCta": "Get started",
+    "mainNavigation": "Main navigation",
+    "workspace": "Workspace",
+    "adminArea": "Admin",
+    "partnerArea": "Partner"
+  },
+  "footer": {
+    "servicesHeading": "Services",
+    "companyHeading": "Company",
+    "legalHeading": "Legal",
+    "contactHeading": "Contact",
+    "rights": "All rights reserved.",
+    "languageLabel": "Choose language",
+    "email": "hello@bdoor.io",
+    "supportNote": "We reply to every message within two business days.",
+    "links": {
+      "formation": "Company formation",
+      "licences": "Trade licences",
+      "importExport": "Import and export",
+      "tax": "Tax and VAT",
+      "compliance": "Annual compliance"
+    }
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "Your door to business in Bangladesh",
+      "headline": "Start and run your business in Bangladesh—from anywhere.",
+      "support": "BDoor brings company formation, licences, tax setup, compliance and official documents into one secure workspace.",
+      "primaryCta": "Start your business",
+      "secondaryCta": "Explore services",
+      "trustLine": "Independent platform · Partner professionals · Transparent fees"
+    },
+    "advisor": {
+      "title": "What do you want to do in Bangladesh?",
+      "help": "Pick the closest option. You can change it later — nothing is final until you confirm.",
+      "continue": "Continue",
+      "options": {
+        "localCompany": "Start a local company",
+        "foreignFounder": "Start as a foreign founder",
+        "importExport": "Import or export",
+        "travelAgency": "Open a travel agency",
+        "existingCompany": "Manage an existing company"
+      }
+    },
+    "howItWorks": {
+      "eyebrow": "How it works",
+      "title": "Four steps, one workspace.",
+      "steps": {
+        "one": {
+          "title": "Tell us about your business",
+          "body": "Answer a short guided questionnaire about your activity, owners and plans. We use it to work out which registrations actually apply to you."
+        },
+        "two": {
+          "title": "Complete review and upload documents",
+          "body": "You get a clear checklist of required documents and identity information. Everything is uploaded to a private vault, never email."
+        },
+        "three": {
+          "title": "Pay and track every milestone",
+          "body": "Your quote separates our fee from government fees, partner fees and third-party costs. Pay the permitted amounts and watch each milestone move."
+        },
+        "four": {
+          "title": "Receive documents and manage compliance",
+          "body": "Approved certificates land in your vault. Renewals, filings and tax dates become reminders instead of surprises."
+        }
+      }
+    },
+    "categories": {
+      "eyebrow": "What we help with",
+      "title": "Six areas that cover most founders.",
+      "body": "Every service page explains what is included, what is not, and which authority decides the outcome."
+    },
+    "foreignFounders": {
+      "eyebrow": "Foreign founders",
+      "title": "Enter Bangladesh with a clear path.",
+      "body": "BDoor coordinates structure review, incorporation, investment registration, capital-remittance documentation and visa or work-permit support through appropriate professionals. We tell you which steps require a partner advocate and which we handle directly.",
+      "important": "Company incorporation does not itself grant residency or work authorisation. Those are separate applications decided by the relevant authorities.",
+      "cta": "Explore foreign-founder services",
+      "points": {
+        "one": "Sector and ownership eligibility reviewed by a partner before you commit.",
+        "two": "Guidance on the temporary bank account and capital-remittance paperwork banks expect.",
+        "three": "Investment registration and visa or work-permit assistance handled as separate, clearly-priced steps."
+      }
+    },
+    "preview": {
+      "eyebrow": "Your workspace",
+      "title": "One place to see exactly where things stand.",
+      "body": "This is the real customer workspace, shown here in read-only preview with sample data.",
+      "sample": {
+        "kyc": "Identity checks complete",
+        "review": "Partner eligibility review complete",
+        "name": "Name clearance in progress",
+        "address": "Upload proof of registered address",
+        "photo": "Replace the photograph — too low resolution",
+        "message": "One unread message from your case team",
+        "paid": "Paid",
+        "renewal": "Trade licence renewal"
+      },
+      "sampleNotice": "Sample data"
+    },
+    "pricing": {
+      "eyebrow": "Transparent pricing",
+      "title": "You always see what each taka pays for.",
+      "body": "Every quote is itemised so you can tell our work apart from official charges. Government fees are shown as estimates until an official receipt exists.",
+      "cta": "Get a personalised quote"
+    },
+    "partners": {
+      "eyebrow": "Partner model",
+      "title": "We coordinate. Verified professionals do the regulated work.",
+      "body": "BDoor manages your case, your documents and your deadlines. Where a matter requires legal or specialist authority — drafting, representation, regulated filings — a verified partner advocate or firm is engaged separately and identified to you before any document is shared.",
+      "cta": "How partnering works"
+    },
+    "faq": {
+      "eyebrow": "Questions",
+      "title": "Straight answers before you start.",
+      "cta": "See all questions"
+    },
+    "finalCta": {
+      "title": "Open the door to your Bangladesh business.",
+      "body": "Start the questionnaire. It takes about five minutes and you can save and come back.",
+      "primary": "Start your business",
+      "secondary": "Talk to us first"
+    }
+  },
+  "howItWorksPage": {
+    "title": "How BDoor works",
+    "description": "From your first question to your annual filings — what happens, who does it, and what it costs.",
+    "responsibilities": {
+      "title": "Who does what",
+      "bdoor": "BDoor",
+      "partner": "Partner professional",
+      "authority": "Government authority",
+      "customer": "You"
+    },
+    "timeline": {
+      "title": "What each stage looks like"
+    },
+    "faqTitle": "Questions people ask at this stage",
+    "cta": "Start the questionnaire",
+    "stages": {
+      "intake": "Understanding your business",
+      "kyc": "Identity and ownership checks",
+      "eligibility": "Eligibility and legal review",
+      "quote": "Quote and engagement",
+      "drafting": "Drafting and signing",
+      "submission": "Submission to the authority",
+      "decision": "The decision",
+      "compliance": "Ongoing compliance"
+    }
+  },
+  "services": {
+    "indexTitle": "Services",
+    "indexDescription": "Company formation, licences, registrations, tax setup and ongoing compliance in Bangladesh.",
+    "filterLabel": "Filter by category",
+    "allCategories": "All services",
+    "startingFrom": "Service fee from",
+    "estimatedTime": "Estimated time",
+    "timeReviewed": "Time estimate reviewed",
+    "cta": "Start this service",
+    "viewService": "View service",
+    "whoFor": "Who it is for",
+    "included": "What is included",
+    "notIncluded": "What is not included",
+    "eligibility": "Eligibility notes",
+    "requiredDocuments": "Required documents",
+    "milestones": "Process milestones",
+    "fees": "How fees work",
+    "authority": "Responsible authority",
+    "authorityNote": "BDoor is not affiliated with this authority and does not act on its behalf.",
+    "faq": "Common questions",
+    "emptyState": "No services match these filters yet.",
+    "comingSoonNote": "This service is not open for new cases yet. Tell us you are interested and we will contact you when it opens.",
+    "notifyMe": "Tell us you are interested",
+    "feeCategories": {
+      "platform_service_fee": "BDoor service fee",
+      "government_fee_estimate": "Government fee (estimate)",
+      "partner_professional_fee": "Partner professional fee",
+      "third_party_cost": "Third-party cost",
+      "tax": "Tax",
+      "payment_processing_fee": "Payment processing",
+      "discount": "Discount"
+    }
+  },
+  "pricingPage": {
+    "title": "Pricing",
+    "description": "What BDoor charges, what the government charges, and what is decided case by case.",
+    "intro": "We do not force every service into a fixed package, because official fees genuinely vary by capital, location and sector. Here is how we handle that.",
+    "standardTitle": "Standardised BDoor work",
+    "standardBody": "Where our work is predictable, we publish a starting service fee. It covers preparation, review, submission handling and case management.",
+    "quoteTitle": "Personalised quotes",
+    "quoteBody": "Foreign ownership, regulated sectors, complex structures and multi-licence projects get an itemised quote after review. You see the breakdown before you accept anything.",
+    "subscriptionTitle": "Ongoing compliance",
+    "subscriptionBody": "Annual filings, renewals and tax coordination can be handled as a recurring engagement. Pricing is being finalised and is not yet open for sign-up.",
+    "inclusionsTitle": "What is included in a displayed price",
+    "vatIncluded": "VAT/tax included",
+    "vatExcluded": "VAT/tax excluded",
+    "govIncluded": "Government fees included",
+    "govExcluded": "Government fees excluded",
+    "partnerExcluded": "Partner professional fees quoted separately",
+    "thirdPartyExcluded": "Third-party costs (notarisation, translation, courier) charged at cost",
+    "noPublishedFee": "Quoted after review",
+    "cta": "Get a personalised quote"
+  },
+  "foreignFoundersPage": {
+    "title": "Foreign founders",
+    "description": "Ownership review, incorporation, investment registration, capital remittance and visa support — coordinated in one place.",
+    "stepsTitle": "The order the steps have to happen in",
+    "stepsBody": "Most delays come from doing the right things in the wrong order. This is the sequence banks and authorities expect.",
+    "notTitle": "What this does not give you",
+    "capitalTitle": "Where your investment capital goes",
+    "capitalBody": "Investment and share capital is remitted to a bank account in the company’s name through the proper channel, and the bank issues an encashment certificate. It is never paid to BDoor, and BDoor never holds it.",
+    "servicesTitle": "Services for foreign founders",
+    "cta": "Start with an eligibility review",
+    "sequence": {
+      "eligibility": {
+        "title": "Eligibility review",
+        "body": "Can this activity be foreign-owned, and to what extent? A partner advocate establishes this before you spend anything."
+      },
+      "name": {
+        "title": "Name clearance",
+        "body": "Reserve the proposed company name with the registrar."
+      },
+      "account": {
+        "title": "Temporary bank account",
+        "body": "Opened in the proposed company’s name so capital can be received before the company legally exists."
+      },
+      "remittance": {
+        "title": "Inward remittance",
+        "body": "Capital is sent from abroad into that account and the bank issues an encashment certificate."
+      },
+      "incorporation": {
+        "title": "Incorporation",
+        "body": "Filed with the encashment certificate as evidence that the capital arrived."
+      },
+      "registrations": {
+        "title": "Post-incorporation registrations",
+        "body": "Trade licence, e-TIN, BIN/VAT, and any sector licence your activity needs."
+      },
+      "investment": {
+        "title": "Investment registration",
+        "body": "Where applicable, registered with the investment authority."
+      }
+    }
+  },
+  "partnersPage": {
+    "title": "Partners",
+    "description": "How verified advocates and specialist firms work with BDoor.",
+    "applyTitle": "Work with us",
+    "applyBody": "If you are a licensed advocate, chartered accountant or specialist consultancy in Bangladesh, tell us about your practice. Every partner is verified before receiving a case.",
+    "applyCta": "Register interest",
+    "howTitle": "How a partner joins a case",
+    "canTitle": "What a partner can do",
+    "cannotTitle": "What a partner cannot do",
+    "directoryTitle": "Verified partners",
+    "directoryEmpty": "No partner organisation has completed verification yet. We will list them here once they have.",
+    "can": {
+      "assigned": "See only the cases assigned to their organisation.",
+      "documents": "Receive case documents once the customer has authorised that specific sharing.",
+      "tasks": "Update their own tasks and the milestones they own.",
+      "upload": "Upload drafts, applications, official receipts and certificates.",
+      "message": "Message the customer through a controlled, logged case thread.",
+      "notes": "Add confidential notes visible only to authorised BDoor and partner staff."
+    },
+    "cannot": {
+      "browse": "Browse BDoor customers they are not assigned to.",
+      "finance": "Change financial records outside their own scope.",
+      "selfVerify": "Approve their own organisation’s verification.",
+      "aml": "View internal AML analysis unless specifically authorised.",
+      "export": "Bulk-export personal data.",
+      "audit": "Edit or delete audit history."
+    }
+  },
+  "resources": {
+    "title": "Resources",
+    "description": "Plain-language guides to registration, licences and compliance in Bangladesh.",
+    "readingTime": "{minutes} min read",
+    "lastReviewed": "Last reviewed {date}",
+    "reviewPending": "This guide is awaiting its next scheduled review.",
+    "backToResources": "All resources",
+    "empty": "No guides published yet."
+  },
+  "about": {
+    "title": "About BDoor",
+    "description": "Why we built a Bangladesh-focused company operating system, and how we work.",
+    "missionTitle": "Why we built this",
+    "howTitle": "How we work",
+    "limitsTitle": "What we are not",
+    "mission1": "Starting a business in Bangladesh is not hard because the rules are secret. It is hard because they are scattered: different authorities, different offices, different forms, and no single place that tells you what actually applies to you and in what order.",
+    "mission2": "BDoor exists to be that place. One workspace where you explain what you want to build, get a clear list of what it needs, upload your documents once, see a quote that separates our fee from everyone else’s, and watch each step move.",
+    "how1": "We start by asking. The guided questionnaire branches on your answers, so a local founder with one shop is not asked about capital remittance, and a foreign investor is not left to guess about sector eligibility. From those answers we produce a preliminary recommendation using rules our operations team can inspect and change — not a black box.",
+    "how2": "Then a person takes over. A case manager scopes the work, requests exactly the documents that are needed, and where the matter requires legal or specialist authority, engages a verified partner advocate under a separate agreement with you. Every status change, document view and fee is recorded.",
+    "limits1": "We are not a government authority and we have no influence over any decision an authority makes. We do not present ourselves as a law firm, and we do not give legal advice. Where legal work is required it is done by independent advocates or partner firms under their own engagement with you, and we tell you who they are before anything is shared.",
+    "limits2": "We do not guarantee approval, a visa, a bank account, or a completion date. We give you an estimate, we tell you what it assumes, and we tell you when it changes. Investment and share capital never passes through BDoor.",
+    "cta": "Start your business"
+  },
+  "contact": {
+    "title": "Contact",
+    "description": "Ask a question before you start. We answer within two business days.",
+    "nameLabel": "Your name",
+    "emailLabel": "Email address",
+    "phoneLabel": "Phone (optional)",
+    "topicLabel": "What is this about?",
+    "messageLabel": "Your message",
+    "consentLabel": "I agree that BDoor may use these details to reply to me, as described in the Privacy Policy.",
+    "submit": "Send message",
+    "successTitle": "Message received",
+    "successBody": "Thank you. We have your message and will reply to the address you gave us.",
+    "topics": {
+      "general": "General question",
+      "startBusiness": "Starting a business",
+      "foreign": "Foreign ownership",
+      "compliance": "Existing company compliance",
+      "partner": "Partner enquiry",
+      "other": "Something else"
+    },
+    "otherWays": "Other ways to reach us",
+    "responseTime": "We reply within two business days.",
+    "errors": {
+      "generic": "We could not send your message. Please try again.",
+      "rateLimited": "That is a lot of messages in a short time. Please wait a few minutes and try again.",
+      "unavailable": "Our message service is temporarily unavailable. Please email us directly at hello@bdoor.io.",
+      "nameTooShort": "Please enter your name.",
+      "invalidEmail": "Please enter a valid email address.",
+      "messageTooShort": "Please tell us a little more.",
+      "tooLong": "That is longer than we can accept.",
+      "consentRequired": "Please agree before sending.",
+      "spam": "We could not send your message.",
+      "form": "Please check the form."
+    }
+  },
+  "legal": {
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "refund": "Refund Policy",
+    "amlKyc": "AML/KYC Policy",
+    "disclaimer": "Legal Disclaimer",
+    "cookies": "Cookie Policy",
+    "draftBanner": "Draft awaiting professional review",
+    "draftBannerBody": "This document is a working draft prepared to support the platform. It has not yet been reviewed and approved by qualified Bangladesh counsel and must not be relied on as final terms.",
+    "lastUpdated": "Last updated {date}",
+    "tableOfContents": "On this page"
+  },
+  "auth": {
+    "signInTitle": "Sign in",
+    "signInSubtitle": "Continue to your BDoor workspace.",
+    "signUpTitle": "Create your BDoor account",
+    "signUpSubtitle": "You can start the questionnaire first and create an account when you are ready.",
+    "email": "Email address",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "fullName": "Full name",
+    "forgotPassword": "Forgot your password?",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "signInCta": "Sign in",
+    "signUpCta": "Create account",
+    "orContinueWith": "Or continue with",
+    "google": "Continue with Google",
+    "resetTitle": "Reset your password",
+    "resetSubtitle": "Enter your email address and we will send a reset link if an account exists.",
+    "resetCta": "Send reset link",
+    "resetSent": "If an account exists for that address, a reset link is on its way. Check your inbox and spam folder.",
+    "updatePasswordTitle": "Choose a new password",
+    "updatePasswordCta": "Update password",
+    "verifyTitle": "Confirm your email",
+    "verifyBody": "We sent a confirmation link to {email}. Open it to activate your account.",
+    "verifyResend": "Resend confirmation",
+    "termsNotice": "By creating an account you accept the Terms of Service and confirm you have read the Privacy Policy.",
+    "mfa": {
+      "title": "Two-factor authentication",
+      "subtitle": "Add a second step so a stolen password is not enough to reach your documents.",
+      "enrollCta": "Set up authenticator app",
+      "scanInstruction": "Scan this QR code with your authenticator app, then enter the six-digit code it shows.",
+      "manualKey": "Can't scan? Enter this key manually",
+      "codeLabel": "Six-digit code",
+      "verifyCta": "Verify and enable",
+      "challengeTitle": "Enter your authentication code",
+      "challengeBody": "Open your authenticator app and enter the current six-digit code.",
+      "challengeCta": "Verify",
+      "enabled": "Two-factor authentication is on.",
+      "disabled": "Two-factor authentication is off.",
+      "removeCta": "Remove authenticator",
+      "requiredForRole": "Your role requires two-factor authentication before you can continue.",
+      "factorName": "Authenticator app"
+    },
+    "errors": {
+      "invalidCredentials": "That email and password combination did not work.",
+      "generic": "We could not complete that request. Please try again.",
+      "rateLimited": "Too many attempts. Please wait a moment and try again.",
+      "emailNotConfirmed": "Please confirm your email address first.",
+      "weakPassword": "Choose a longer password with a mix of characters.",
+      "passwordMismatch": "The two passwords do not match.",
+      "invalidCode": "That code was not accepted. Check the time on your device and try again."
+    }
+  },
+  "onboarding": {
+    "title": "Set up your organisation",
+    "subtitle": "Cases, documents and billing live inside an organisation. You can invite colleagues afterwards.",
+    "orgNameLabel": "Organisation name",
+    "orgNameHelp": "Use your intended company name or your own name if you have not decided yet.",
+    "countryLabel": "Country of residence",
+    "phoneLabel": "Phone number",
+    "createCta": "Create organisation",
+    "joinTitle": "You have been invited",
+    "joinBody": "{organisation} invited you to join as {role}.",
+    "acceptCta": "Accept invitation",
+    "declineCta": "Decline"
+  },
+  "start": {
+    "title": "Start your business",
+    "description": "A short guided questionnaire. We only ask what applies to you, and you can save and resume.",
+    "progressLabel": "Step {current} of {total}",
+    "sectionLabel": "Section",
+    "whyWeAsk": "Why we ask",
+    "saveAndExit": "Save and exit",
+    "resumeNotice": "We restored your saved answers.",
+    "anonymousNotice": "Your answers are held in this browser until you create an account.",
+    "reviewTitle": "Review your answers",
+    "reviewBody": "Check anything that looks wrong before we prepare your preliminary recommendation.",
+    "generateCta": "See my preliminary recommendation",
+    "recommendation": {
+      "title": "Your preliminary recommendation",
+      "preliminaryBadge": "Preliminary — subject to review",
+      "disclaimer": "This is a preliminary, software-generated suggestion based on your answers. It is not legal advice and it is not a decision by any authority. A BDoor case manager, and a partner advocate where required, will confirm what actually applies to you.",
+      "structureTitle": "Suggested structure",
+      "servicesTitle": "Services that are likely to apply",
+      "assumptionsTitle": "Assumptions we made",
+      "questionsTitle": "Questions that need partner review",
+      "manualReviewTitle": "This case needs manual review",
+      "manualReviewBody": "Based on your answers, a person needs to look at this before we can quote. Create an account and we will pick it up.",
+      "nextStepsTitle": "What happens next",
+      "createAccountCta": "Create an account to continue",
+      "continueCta": "Continue in your workspace",
+      "noServices": "We could not match a service confidently. A case manager will review your answers."
+    },
+    "questions": {
+      "founderLocation": {
+        "label": "Where are you based right now?",
+        "help": "This changes which documents you need and whether foreign-investment rules apply.",
+        "why": "Founder location determines whether the incorporation is treated as local or foreign-invested, which changes the documents, the bank process and the approvals involved.",
+        "options": {
+          "bangladesh": "In Bangladesh",
+          "outside": "Outside Bangladesh"
+        }
+      },
+      "nationality": {
+        "label": "What is your nationality?",
+        "why": "Nationality affects sector eligibility, ownership limits and the identity documents we must collect under AML rules."
+      },
+      "residence": {
+        "label": "Which country do you currently live in?",
+        "why": "Residence affects tax registration, address evidence and how your identity documents are verified."
+      },
+      "activity": {
+        "label": "What will the business actually do?",
+        "help": "One or two sentences is enough. For example: “Import cotton fabric and sell to local garment factories.”",
+        "why": "The activity decides which licences apply and whether the sector is regulated or restricted."
+      },
+      "location": {
+        "label": "Where in Bangladesh will the business operate?",
+        "help": "Choose the city or district of your main place of business.",
+        "why": "Trade licences are issued by the local city corporation or municipality, so the fee and process depend on location."
+      },
+      "structure": {
+        "label": "Which structure do you have in mind?",
+        "why": "We use this as a starting point only. If it does not fit your ownership or activity, we will tell you.",
+        "options": {
+          "private_limited": "Private limited company",
+          "one_person": "One-person company",
+          "partnership": "Partnership",
+          "sole_proprietorship": "Sole proprietorship",
+          "branch_office": "Branch office of a foreign company",
+          "liaison_office": "Liaison or representative office",
+          "unsure": "I'm not sure"
+        }
+      },
+      "ownerCount": {
+        "label": "How many owners will there be, including you?",
+        "why": "Some structures have minimum and maximum owner counts, and the count changes the documents we collect."
+      },
+      "directorCount": {
+        "label": "How many directors will there be?",
+        "why": "Company law sets minimum director numbers, and each director needs identity records."
+      },
+      "foreignOwners": {
+        "label": "Will any owner be a foreign national or a foreign company?",
+        "why": "Foreign ownership triggers investment registration, remittance documentation and additional verification."
+      },
+      "entityOwner": {
+        "label": "Will any owner be a company, trust or fund rather than a person?",
+        "why": "We must identify the natural people who ultimately own or control a corporate shareholder. This is a legal requirement, not a formality."
+      },
+      "foreignOwnershipPercent": {
+        "label": "Roughly what percentage will be foreign-owned?",
+        "why": "Some sectors cap foreign ownership. The percentage also affects investment-registration steps."
+      },
+      "remitCapital": {
+        "label": "Will investment capital be sent into Bangladesh from abroad?",
+        "why": "Inward remittance needs a specific bank process and an encashment certificate. Getting the order wrong causes real delays.",
+        "note": "Investment or share capital is never paid to BDoor. It goes to a bank account in the company's name through the proper channel."
+      },
+      "founderWillWork": {
+        "label": "Will you live or work in Bangladesh yourself?",
+        "why": "Working or residing in Bangladesh needs a visa and, usually, a work permit. Owning a company does not give you either."
+      },
+      "importExport": {
+        "label": "Will the business import or export goods?",
+        "why": "Importing needs an IRC and exporting needs an ERC. Both depend on having a bank account and a trade licence first.",
+        "options": {
+          "none": "Neither",
+          "import": "Import",
+          "export": "Export",
+          "both": "Both"
+        }
+      },
+      "hireEmployees": {
+        "label": "Will you hire employees in Bangladesh?",
+        "why": "Employment brings payroll, tax deduction and, above certain sizes, labour registrations."
+      },
+      "regulatedActivity": {
+        "label": "Is your activity in a regulated sector?",
+        "help": "For example travel, recruitment, food, pharmaceuticals, telecom, finance, education or construction.",
+        "why": "Regulated sectors need approval from a specific authority before or after incorporation, and eligibility must be checked first."
+      },
+      "needAddress": {
+        "label": "Do you need help with a registered business address?",
+        "why": "A registrable address is required. If you do not have one yet, we need to plan for it before the trade licence stage."
+      },
+      "startWindow": {
+        "label": "When would you like to start?",
+        "why": "Timing changes what we prioritise and whether documents can be prepared in parallel.",
+        "options": {
+          "immediately": "As soon as possible",
+          "one_to_three": "In 1–3 months",
+          "three_to_six": "In 3–6 months",
+          "exploring": "Just exploring"
+        }
+      },
+      "existingBusiness": {
+        "label": "Does this business already exist?",
+        "why": "Existing companies need different documents — we work from your current registrations rather than starting fresh."
+      },
+      "existingRegistrations": {
+        "label": "Which registrations do you already have?",
+        "why": "Knowing what exists avoids duplicate applications and tells us what needs renewal.",
+        "options": {
+          "rjsc": "RJSC incorporation",
+          "trade_license": "Trade licence",
+          "etin": "e-TIN",
+          "bin_vat": "BIN/VAT registration",
+          "irc": "Import Registration Certificate",
+          "erc": "Export Registration Certificate",
+          "bida": "BIDA registration"
+        }
+      }
+    },
+    "validation": {
+      "requiredChoice": "Choose one option to continue.",
+      "requiredText": "Please fill this in.",
+      "tooShort": "Please give us a little more detail.",
+      "tooLong": "That is longer than we can store. Please shorten it.",
+      "invalidNumber": "Enter a whole number.",
+      "percentRange": "Enter a value between 0 and 100.",
+      "minOwners": "There must be at least one owner."
+    }
+  },
+  "workspace": {
+    "nav": {
+      "dashboard": "Dashboard",
+      "applications": "Applications",
+      "companies": "Companies",
+      "documents": "Documents",
+      "billing": "Billing",
+      "compliance": "Compliance",
+      "messages": "Messages",
+      "notifications": "Notifications",
+      "team": "Team",
+      "settings": "Settings",
+      "security": "Security",
+      "startNew": "Start something new"
+    },
+    "dashboard": {
+      "greeting": "Welcome back, {name}",
+      "orgContext": "Working in {organisation}",
+      "activeApplications": "Active applications",
+      "actionsNeeded": "Needs your attention",
+      "noActions": "Nothing needs your attention right now.",
+      "nextMilestone": "Next milestone",
+      "documentRequests": "Outstanding document requests",
+      "quoteStatus": "Quotes and payments",
+      "upcomingCompliance": "Upcoming compliance",
+      "recentDocuments": "Recent documents",
+      "unreadMessages": "Unread messages",
+      "emptyApplications": "You have no applications yet.",
+      "startFirst": "Start your first application",
+      "milestonesComplete": "{done} of {total} milestones complete"
+    },
+    "case": {
+      "overview": "Overview",
+      "timeline": "Milestones",
+      "actions": "Required actions",
+      "documents": "Documents",
+      "quote": "Quote and payments",
+      "messages": "Messages",
+      "submissions": "Submissions and receipts",
+      "people": "People and owners",
+      "activity": "Activity",
+      "reference": "Reference",
+      "service": "Service",
+      "assignedTeam": "Case team",
+      "assignedPartner": "Assigned partner",
+      "noPartner": "No partner assigned yet",
+      "openedOn": "Opened",
+      "estimatedCompletion": "Estimated completion",
+      "estimatePaused": "Estimate paused — waiting on {reason}",
+      "estimateNote": "Estimates assume complete documents and a successful review. They are not guarantees.",
+      "waitingReasons": {
+        "customer": "your documents or answers",
+        "partner": "partner clarification",
+        "authority": "an authority response",
+        "payment": "payment"
+      },
+      "noMilestones": "Milestones will appear once your case is scoped.",
+      "noActions": "No open actions.",
+      "noSubmissions": "No authority submission has been recorded yet.",
+      "submissionRef": "Authority reference",
+      "receiptAttached": "Official receipt attached",
+      "receiptPending": "Official receipt not yet issued"
+    },
+    "documents": {
+      "title": "Documents",
+      "requested": "Requested from you",
+      "uploaded": "Uploaded",
+      "issued": "Issued to you",
+      "uploadCta": "Upload file",
+      "dropzone": "Drag a file here, or choose one",
+      "dropzoneHint": "PDF, JPG or PNG. Up to {maxMb} MB.",
+      "chooseFile": "Choose file",
+      "uploading": "Uploading {name}…",
+      "uploadSuccess": "{name} uploaded and queued for review.",
+      "uploadFailed": "We could not upload {name}.",
+      "replace": "Upload a replacement",
+      "versionHistory": "Version history",
+      "version": "Version {number}",
+      "downloadNote": "Download links expire after a few minutes and are logged.",
+      "scanPending": "Security scan pending",
+      "scanClean": "Security scan passed",
+      "scanQuarantined": "Quarantined by security scan",
+      "noDocuments": "No documents here yet.",
+      "categoryLabel": "Document type",
+      "relatedTo": "Related to",
+      "expiresOn": "Expires on",
+      "whoSeesThis": "Who can see this",
+      "whoSeesThisBody": "Your organisation's members, your assigned BDoor case team, and — only when you have authorised it — the partner working on this case."
+    },
+    "billing": {
+      "title": "Billing",
+      "quotes": "Quotes",
+      "invoices": "Invoices",
+      "payments": "Payments",
+      "receipts": "Receipts",
+      "quoteVersion": "Version {number}",
+      "validUntil": "Valid until {date}",
+      "expired": "This quote has expired. Ask your case team for a new version.",
+      "acceptQuote": "Accept this quote",
+      "acceptedOn": "Accepted {date}",
+      "payNow": "Pay now",
+      "amountDue": "Amount due",
+      "total": "Total",
+      "subtotal": "Subtotal",
+      "refundable": "Refundable",
+      "nonRefundable": "Non-refundable",
+      "payableTo": "Payable to",
+      "governmentNote": "Government fees are estimates until the authority issues a receipt. Any unused advance is returned to you.",
+      "separateEngagementNote": "Partner professional fees are invoiced under a separate engagement with that firm.",
+      "capitalNote": "Share capital and investment funds are never paid to BDoor. They go directly to a bank account in the company's name.",
+      "noQuotes": "No quote has been prepared yet.",
+      "sandboxBanner": "Payments are running in sandbox mode. No real money moves.",
+      "paymentSuccess": "Payment recorded. Your case team has been notified.",
+      "paymentFailed": "That payment did not complete. Nothing has been charged.",
+      "paymentPending": "Payment is being confirmed."
+    },
+    "compliance": {
+      "title": "Compliance",
+      "calendarView": "Calendar",
+      "listView": "List",
+      "upcoming": "Upcoming",
+      "overdue": "Overdue",
+      "completed": "Completed",
+      "noObligations": "No compliance obligations yet. These appear once a company or licence is approved.",
+      "dueIn": "Due in {days} days",
+      "overdueBy": "Overdue by {days} days",
+      "responsible": "Responsible",
+      "evidence": "Completion evidence",
+      "markComplete": "Mark complete",
+      "startRenewal": "Start renewal"
+    },
+    "messages": {
+      "title": "Messages",
+      "noThreads": "No messages yet.",
+      "threadFor": "About {case}",
+      "compose": "Write a message",
+      "placeholder": "Type your message…",
+      "send": "Send",
+      "attach": "Attach a document",
+      "internalOnly": "Internal note — not visible to the customer",
+      "unread": "Unread",
+      "markRead": "Mark as read",
+      "participants": "In this thread"
+    },
+    "team": {
+      "title": "Team",
+      "members": "Members",
+      "invitations": "Pending invitations",
+      "inviteCta": "Invite someone",
+      "inviteEmail": "Email address",
+      "inviteRole": "Role",
+      "inviteSend": "Send invitation",
+      "inviteSent": "Invitation sent.",
+      "revoke": "Revoke",
+      "resend": "Resend",
+      "expiresOn": "Expires {date}",
+      "removeMember": "Remove from organisation",
+      "youBadge": "You"
+    },
+    "settings": {
+      "title": "Settings",
+      "profile": "Profile",
+      "organisation": "Organisation",
+      "notifications": "Notification preferences",
+      "language": "Language and region",
+      "dataRequests": "Your data",
+      "exportData": "Request a copy of your data",
+      "deleteData": "Request deletion",
+      "retentionNote": "Some records must be kept for a legally required period even after you ask us to delete them. We will tell you which ones and why."
+    },
+    "security": {
+      "title": "Security",
+      "password": "Password",
+      "changePassword": "Change password",
+      "mfa": "Two-factor authentication",
+      "sessions": "Active sessions",
+      "signOutOthers": "Sign out of all other sessions",
+      "signOutAll": "Sign out everywhere",
+      "sessionsNote": "Signing out everywhere ends every session, including this one.",
+      "auditTitle": "Recent security activity",
+      "noSessions": "No other active sessions."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "markAllRead": "Mark all as read",
+      "empty": "You are all caught up.",
+      "preferencesTitle": "How we contact you",
+      "channelEmail": "Email",
+      "channelInApp": "In app"
+    }
+  },
+  "partnerWorkspace": {
+    "nav": {
+      "dashboard": "Dashboard",
+      "cases": "Assigned cases",
+      "tasks": "Tasks",
+      "documents": "Documents",
+      "team": "Team",
+      "organization": "Organisation",
+      "security": "Security"
+    },
+    "assignment": {
+      "pending": "Assignment offered",
+      "accept": "Accept assignment",
+      "decline": "Decline",
+      "declineReason": "Reason for declining",
+      "conflictCheck": "Conflict and eligibility check",
+      "conflictConfirm": "I have run a conflict check and can act on this matter.",
+      "acceptedOn": "Accepted {date}",
+      "declinedOn": "Declined {date}",
+      "scopeNote": "You can only see the customer information needed for this matter."
+    },
+    "notes": {
+      "title": "Partner notes",
+      "help": "Visible to authorised BDoor staff and your organisation only. Not visible to the customer.",
+      "add": "Add note"
+    },
+    "empty": "No cases are assigned to your organisation yet."
+  },
+  "admin": {
+    "nav": {
+      "dashboard": "Dashboard",
+      "leads": "Leads",
+      "cases": "Cases",
+      "kyc": "KYC and risk",
+      "partners": "Partners",
+      "services": "Services",
+      "pricing": "Pricing",
+      "documents": "Documents",
+      "compliance": "Compliance",
+      "finance": "Finance",
+      "content": "Content",
+      "users": "Users",
+      "audit": "Audit log",
+      "settings": "Settings"
+    },
+    "queues": {
+      "title": "Work queues",
+      "newLeads": "New leads to review",
+      "kycDecisions": "KYC awaiting decision",
+      "quotesToPrepare": "Quotes to prepare or approve",
+      "customerOverdue": "Customer actions overdue",
+      "partnerOverdue": "Partner tasks overdue",
+      "authorityQueries": "Authority queries to answer",
+      "paymentsToReconcile": "Payments to reconcile",
+      "complianceDue": "Compliance due in 30 days",
+      "failedJobs": "Failed notifications and webhooks",
+      "empty": "This queue is clear."
+    },
+    "cases": {
+      "assign": "Assign case manager",
+      "assignPartner": "Assign partner",
+      "changeStatus": "Change status",
+      "statusReason": "Reason for this change",
+      "publicNote": "Note visible to the customer",
+      "internalNote": "Internal note",
+      "requestDocument": "Request a document",
+      "recordSubmission": "Record an authority submission",
+      "closeCase": "Close case",
+      "cancelCase": "Cancel case",
+      "invalidTransition": "You cannot move a case from {from} to {to}.",
+      "confirmTitle": "Confirm this change",
+      "confirmBody": "This is recorded in the audit log with your name and the reason you give."
+    },
+    "kyc": {
+      "title": "KYC and risk",
+      "identity": "Identity verification",
+      "address": "Address verification",
+      "beneficialOwner": "Beneficial owner verification",
+      "pep": "PEP screening",
+      "sanctions": "Sanctions screening",
+      "sourceOfFunds": "Source of funds",
+      "riskRating": "Risk rating",
+      "decision": "Compliance decision",
+      "decisionBy": "Decided by {name} on {date}",
+      "approve": "Approve",
+      "reject": "Reject",
+      "escalate": "Escalate",
+      "requestMore": "Request more information",
+      "decisionReason": "Reason (recorded, restricted access)",
+      "mockProviderWarning": "Screening is running against a mock provider. No real screening has taken place and these results must not be relied on.",
+      "restrictedNotice": "Restricted. Do not disclose the existence or content of these notes to the customer or to unauthorised partner staff."
+    },
+    "services": {
+      "title": "Services",
+      "newService": "New service",
+      "publishState": "Publication state",
+      "reviewOverdue": "Review overdue",
+      "lastReviewed": "Reviewed {date} by {name}",
+      "sourceReference": "Internal source reference",
+      "sourceHelp": "Where this fee, time estimate or requirement came from. Internal only — never shown publicly.",
+      "englishFields": "English",
+      "banglaFields": "Bangla",
+      "feeComponents": "Fee components",
+      "milestoneTemplates": "Milestone template",
+      "requirements": "Required documents"
+    },
+    "finance": {
+      "title": "Finance",
+      "reconcile": "Reconcile manually",
+      "reconcileNote": "Manual reconciliation is logged with your name and reason.",
+      "advances": "Government fee advances",
+      "disbursements": "Government disbursements",
+      "unusedBalance": "Unused balance",
+      "refund": "Record refund",
+      "attachReceipt": "Attach official receipt"
+    },
+    "audit": {
+      "title": "Audit log",
+      "actor": "Actor",
+      "action": "Action",
+      "target": "Target",
+      "scope": "Scope",
+      "when": "When",
+      "correlationId": "Correlation ID",
+      "immutableNote": "Audit records are append-only and cannot be edited or deleted from this interface."
+    }
+  },
+  "caseStatus": {
+    "draft": "Draft",
+    "awaiting_kyc": "Awaiting KYC",
+    "kyc_review": "KYC under review",
+    "quote_ready": "Quote ready",
+    "awaiting_acceptance": "Awaiting your acceptance",
+    "awaiting_payment": "Awaiting payment",
+    "documents_required": "Documents required",
+    "partner_review": "With partner",
+    "ready_to_submit": "Ready to submit",
+    "submitted": "Submitted to authority",
+    "authority_query": "Authority query",
+    "customer_action_required": "Action needed from you",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "closed": "Closed",
+    "cancelled": "Cancelled"
+  },
+  "documentStatus": {
+    "requested": "Requested",
+    "uploaded": "Uploaded",
+    "under_review": "Under review",
+    "accepted": "Accepted",
+    "replacement_requested": "Replacement requested",
+    "expired": "Expired",
+    "archived": "Archived"
+  },
+  "errors": {
+    "notFoundTitle": "We could not find that page",
+    "notFoundBody": "The link may be old, or the page may have moved. Here are some places to go instead.",
+    "notFoundHome": "Go to the homepage",
+    "notFoundServices": "Browse services",
+    "genericTitle": "Something went wrong",
+    "genericBody": "We hit an unexpected problem. Nothing you entered has been lost. Please try again, and quote this reference if you contact us.",
+    "reference": "Reference",
+    "deniedTitle": "You do not have access to this",
+    "deniedBody": "Your account does not have permission to view this page. If you think that is wrong, ask an owner of your organisation or contact us.",
+    "deniedBack": "Back to your workspace",
+    "offlineTitle": "You appear to be offline",
+    "offlineBody": "Check your connection and try again. Anything you had typed is still here.",
+    "formTitle": "Please check the form",
+    "formBody": "{count, plural, one {There is # problem to fix.} other {There are # problems to fix.}}"
+  },
+  "a11y": {
+    "uploadProgress": "Upload progress",
+    "statusChanged": "Status changed to {status}",
+    "documentUploaded": "Document uploaded",
+    "formErrors": "The form has errors",
+    "loadingRegion": "Loading content",
+    "newNotification": "New notification",
+    "sortAscending": "Sort ascending",
+    "sortDescending": "Sort descending",
+    "currentPage": "Current page",
+    "externalLink": "Opens in a new tab"
+  }
+}
