@@ -64,10 +64,10 @@ function formatIssues(error: z.ZodError): string {
  */
 function readClientEnv(): ClientEnv {
   const parsed = clientSchema.safeParse({
-    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || undefined,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
-    NEXT_PUBLIC_ANALYTICS_ENABLED: process.env.NEXT_PUBLIC_ANALYTICS_ENABLED,
+    NEXT_PUBLIC_ANALYTICS_ENABLED: process.env.NEXT_PUBLIC_ANALYTICS_ENABLED || undefined,
   });
 
   if (!parsed.success) {
@@ -85,11 +85,24 @@ export function clientEnv(): ClientEnv {
   return cachedClientEnv;
 }
 
+/**
+ * A `.env` file written from `.env.example` leaves optional variables present
+ * but empty. An empty string is "not configured", not "configured as nothing",
+ * so it is normalised away before validation.
+ */
+function withoutEmptyStrings(source: NodeJS.ProcessEnv): Record<string, string | undefined> {
+  const out: Record<string, string | undefined> = {};
+  for (const [key, value] of Object.entries(source)) {
+    out[key] = value === '' ? undefined : value;
+  }
+  return out;
+}
+
 let cachedServerEnv: ServerEnv | undefined;
 export function serverEnv(): ServerEnv {
   if (cachedServerEnv) return cachedServerEnv;
 
-  const parsed = serverSchema.safeParse(process.env);
+  const parsed = serverSchema.safeParse(withoutEmptyStrings(process.env));
   if (!parsed.success) {
     throw new Error(
       `Invalid server environment configuration:\n${formatIssues(parsed.error)}\n` +

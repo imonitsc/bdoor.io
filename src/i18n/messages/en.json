@@ -462,8 +462,24 @@
       "emailNotConfirmed": "Please confirm your email address first.",
       "weakPassword": "Choose a longer password with a mix of characters.",
       "passwordMismatch": "The two passwords do not match.",
-      "invalidCode": "That code was not accepted. Check the time on your device and try again."
-    }
+      "invalidCode": "That code was not accepted. Check the time on your device and try again.",
+      "passwordTooShort": "Use at least 12 characters.",
+      "passwordTooLong": "That password is too long.",
+      "passwordTooObvious": "That is too easy to guess. Try a short phrase instead.",
+      "passwordRequired": "Enter your password.",
+      "invalidEmail": "Enter a valid email address.",
+      "nameTooShort": "Enter your name.",
+      "termsRequired": "Please accept the terms to continue.",
+      "checkEmail": "Check your email to confirm your address.",
+      "resetSent": "If an account exists, a reset link is on its way.",
+      "sessionsRevoked": "Other sessions have been signed out.",
+      "mfaEnabled": "Two-factor authentication is now on.",
+      "mfaRemoved": "Authenticator removed.",
+      "mfaVerified": "Code accepted.",
+      "mfaRequiredForRole": "Your role requires two-factor authentication, so it cannot be removed.",
+      "linkExpired": "That link has expired or has already been used. Request a new one."
+    },
+    "passwordHint": "At least 12 characters. Length matters more than symbols — a short phrase you can remember works well."
   },
   "onboarding": {
     "title": "Set up your organisation",
@@ -634,6 +650,13 @@
       "invalidNumber": "Enter a whole number.",
       "percentRange": "Enter a value between 0 and 100.",
       "minOwners": "There must be at least one owner."
+    },
+    "sections": {
+      "about_you": "About you",
+      "the_business": "The business",
+      "ownership": "Ownership",
+      "operations": "Operations",
+      "timing": "Timing"
     }
   },
   "workspace": {
@@ -1008,5 +1031,81 @@
     "sortDescending": "Sort descending",
     "currentPage": "Current page",
     "externalLink": "Opens in a new tab"
+  },
+  "organizations": {
+    "errors": {
+      "generic": "We could not complete that. Please try again.",
+      "orgNameTooShort": "Enter a name with at least two characters.",
+      "invalidEmail": "Enter a valid email address.",
+      "rateLimited": "Too many invitations in a short time. Please wait and try again.",
+      "alreadyInvited": "That address already has a pending invitation.",
+      "roleNotAllowed": "That role is not available in this organisation.",
+      "inviteSent": "Invitation sent.",
+      "inviteRevoked": "Invitation revoked.",
+      "memberRemoved": "Member removed.",
+      "cannotRemoveSelf": "You cannot remove yourself. Ask another owner to do it.",
+      "lastOwner": "An organisation must always have at least one owner."
+    },
+    "invitation": {
+      "invalid": "That invitation link is not valid.",
+      "expired": "That invitation has expired. Ask for a new one.",
+      "wrongEmail": "This invitation was sent to a different email address. Sign in with that address to accept it.",
+      "unavailable": "We could not process the invitation right now. Please try again shortly.",
+      "accepted": "You have joined the organisation."
+    }
+  },
+  "documents": {
+    "errors": {
+      "generic": "We could not complete that. Please try again.",
+      "noFile": "Choose a file to upload.",
+      "rateLimited": "Too many uploads in a short time. Please wait a moment.",
+      "notFound": "That document is not available to you.",
+      "quarantined": "This file was flagged by our security scan and cannot be opened. Your case team has been notified.",
+      "uploaded": "Uploaded.",
+      "upload": {
+        "empty": "That file appears to be empty.",
+        "too_large": "That file is larger than we accept.",
+        "unsupported_type": "We accept PDF, JPG, PNG and WebP files only.",
+        "type_mismatch": "That file is not the type its name suggests. Please upload the original file.",
+        "name_too_long": "That file name is too long. Please rename it and try again."
+      }
+    }
+  },
+  "billing": {
+    "errors": {
+      "generic": "We could not complete that. Please try again.",
+      "notFound": "That quote is no longer available.",
+      "expired": "That quote has expired. Ask your case team for a new version.",
+      "alreadyAccepted": "This quote has already been accepted.",
+      "alreadyPaid": "This invoice is already paid in full.",
+      "quoteAccepted": "Quote accepted. You can now pay the amount due."
+    }
+  },
+  "messaging": {
+    "errors": {
+      "generic": "We could not send that message. Please try again.",
+      "empty": "Write a message before sending.",
+      "tooLong": "That message is too long.",
+      "rateLimited": "Too many messages in a short time. Please wait a moment."
+    }
+  },
+  "roles": {
+    "customer_owner": "Owner",
+    "customer_member": "Member",
+    "partner_owner": "Partner owner",
+    "partner_staff": "Partner staff",
+    "case_manager": "Case manager",
+    "compliance_officer": "Compliance officer",
+    "finance": "Finance",
+    "admin": "Administrator",
+    "super_admin": "Super administrator"
+  },
+  "settings": {
+    "errors": {
+      "generic": "We could not save that. Please try again.",
+      "nameTooShort": "Enter your name.",
+      "saved": "Saved.",
+      "dataRequestReceived": "Request received. We will respond within the statutory period and tell you if any records must be retained."
+    }
   }
 }

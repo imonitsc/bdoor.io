@@ -1,0 +1,41 @@
+import { NextResponse, type NextRequest } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/logger';
+
+/**
+ * Email confirmation and password-recovery callback.
+ *
+ * Supabase sends the user here with a one-time token hash. We exchange it for a
+ * session and then redirect to an internal path only — `next` is validated so
+ * this endpoint can never be used as an open redirect.
+ */
+function safeNext(raw: string | null, fallback: string): string {
+  if (!raw) return fallback;
+  // Must be a site-relative path. Reject protocol-relative "//evil.com".
+  if (!raw.startsWith('/') || raw.startsWith('//')) return fallback;
+  return raw;
+}
+
+export async function GET(request: NextRequest) {
+  const { searchParams } = request.nextUrl;
+  const tokenHash = searchParams.get('token_hash');
+  const type = searchParams.get('type');
+  const next = safeNext(searchParams.get('next'), '/en/app');
+
+  if (!tokenHash || !type) {
+    return NextResponse.redirect(new URL('/en/login?error=invalid_link', request.url));
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.verifyOtp({
+    type: type as 'email' | 'recovery' | 'invite' | 'email_change',
+    token_hash: tokenHash,
+  });
+
+  if (error) {
+    logger.warn('auth.confirm_failed', { code: error.code, type });
+    return NextResponse.redirect(new URL('/en/login?error=expired_link', request.url));
+  }
+
+  return NextResponse.redirect(new URL(next, request.url));
+}
