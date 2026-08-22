@@ -7,7 +7,7 @@
 --
 -- The auth.users rows below are created with an id and email only, so they
 -- exist for foreign keys and RLS testing. They cannot sign in until a password
--- is set — run `pnpm exec tsx scripts/seed-auth-users.ts` against a project
+-- is set — run `node scripts/seed-auth-users.mjs` against a project
 -- with SUPABASE_SECRET_KEY to create real, signable accounts with the same ids.
 -- =============================================================================
 
