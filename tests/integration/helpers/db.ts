@@ -57,6 +57,11 @@ export async function connect(): Promise<Client> {
   return client;
 }
 
+/** Closes a client that may never have been assigned (e.g. connect failed). */
+export async function disconnect(client: Client | undefined): Promise<void> {
+  await client?.end();
+}
+
 /** Runs `fn` with the session acting as `userId` under the `authenticated` role. */
 export async function asUser<T>(
   client: Client,

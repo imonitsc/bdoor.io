@@ -5,6 +5,7 @@ import {
   ORGS,
   USERS,
   connect,
+  disconnect,
   ensureStranger,
   expectRejected,
   selectAs,
@@ -44,7 +45,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await client.end();
+  await disconnect(client);
 });
 
 describe('partner scoping', () => {

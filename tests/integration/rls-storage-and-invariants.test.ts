@@ -1,6 +1,6 @@
 import type { Client } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { CASES, ORGS, USERS, connect, expectRejected } from './helpers/db';
+import { CASES, ORGS, USERS, connect, disconnect, expectRejected } from './helpers/db';
 import { ALLOWED_TRANSITIONS, CASE_STATUSES } from '@/features/cases/state-machine';
 
 let client: Client;
@@ -10,7 +10,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await client.end();
+  await disconnect(client);
 });
 
 /** Mirrors app.canonical_document_path(). */
