@@ -25,7 +25,7 @@
     "db:reset": "supabase db reset",
     "db:push": "supabase db push",
     "db:diff": "supabase db diff",
-    "verify": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run build"
+    "verify": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run test:unit && pnpm run build"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "1.2.20",

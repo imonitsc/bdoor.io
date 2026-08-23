@@ -5,6 +5,7 @@ import {
   ORGS,
   USERS,
   connect,
+  disconnect,
   ensureStranger,
   expectRejected,
   selectAs,
@@ -25,7 +26,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await client.end();
+  await disconnect(client);
 });
 
 describe('customer A cannot reach customer B', () => {
