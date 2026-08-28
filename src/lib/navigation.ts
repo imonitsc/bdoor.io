@@ -7,6 +7,9 @@ export const MARKETING_ROUTES = {
   home: '/',
   start: '/start',
   services: '/services',
+  industries: '/industries',
+  international: '/international',
+  authorities: '/authorities',
   foreignFounders: '/foreign-founders',
   pricing: '/pricing',
   howItWorks: '/how-it-works',
@@ -70,9 +73,11 @@ export const ADMIN_ROUTES = {
 export const HEADER_LINKS = [
   { href: MARKETING_ROUTES.start, labelKey: 'nav.start' },
   { href: MARKETING_ROUTES.services, labelKey: 'nav.services' },
-  { href: MARKETING_ROUTES.foreignFounders, labelKey: 'nav.foreignFounders' },
+  { href: MARKETING_ROUTES.industries, labelKey: 'nav.industries' },
+  { href: MARKETING_ROUTES.international, labelKey: 'nav.international' },
   { href: MARKETING_ROUTES.pricing, labelKey: 'nav.pricing' },
   { href: MARKETING_ROUTES.resources, labelKey: 'nav.resources' },
+  { href: MARKETING_ROUTES.partners, labelKey: 'nav.partners' },
 ] as const;
 
 export const FOOTER_SERVICE_LINKS = [
@@ -82,6 +87,14 @@ export const FOOTER_SERVICE_LINKS = [
   { href: '/services?category=tax-vat', labelKey: 'footer.links.tax' },
   { href: MARKETING_ROUTES.foreignFounders, labelKey: 'nav.foreignFounders' },
   { href: '/services?category=compliance', labelKey: 'footer.links.compliance' },
+  { href: MARKETING_ROUTES.international, labelKey: 'footer.links.international' },
+] as const;
+
+export const FOOTER_INDUSTRY_LINKS = [
+  { href: '/industries/technology', labelKey: 'footer.links.technology' },
+  { href: '/industries/ecommerce', labelKey: 'footer.links.ecommerce' },
+  { href: '/industries/import-export', labelKey: 'footer.links.importExportIndustry' },
+  { href: '/industries/manufacturing', labelKey: 'footer.links.manufacturing' },
 ] as const;
 
 export const FOOTER_COMPANY_LINKS = [
@@ -109,6 +122,9 @@ export const SITEMAP_ROUTES: ReadonlyArray<{
   { path: '/', priority: 1, changeFrequency: 'weekly' },
   { path: '/start', priority: 0.9, changeFrequency: 'monthly' },
   { path: '/services', priority: 0.9, changeFrequency: 'weekly' },
+  { path: '/industries', priority: 0.8, changeFrequency: 'monthly' },
+  { path: '/international', priority: 0.7, changeFrequency: 'monthly' },
+  { path: '/authorities', priority: 0.6, changeFrequency: 'monthly' },
   { path: '/foreign-founders', priority: 0.8, changeFrequency: 'monthly' },
   { path: '/pricing', priority: 0.8, changeFrequency: 'monthly' },
   { path: '/how-it-works', priority: 0.7, changeFrequency: 'monthly' },

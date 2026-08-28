@@ -18,7 +18,7 @@ test.describe('marketing site', () => {
     await page.goto('/en');
 
     await expect(page.getByRole('heading', { level: 1 })).toContainText(
-      'Start and run your business in Bangladesh',
+      'Everything your business needs in Bangladesh',
     );
     await expect(page.getByText('Independent platform')).toBeVisible();
     await expect(

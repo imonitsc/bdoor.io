@@ -2,7 +2,7 @@
   "brand": {
     "name": "BDoor",
     "tagline": "Your door to business in Bangladesh",
-    "promise": "Start and run your business in Bangladesh—from anywhere.",
+    "promise": "Everything your business needs in Bangladesh. One door.",
     "disclosure": "BDoor is an independent business setup and administrative-support platform. BDoor is not a government authority or law firm. Legal services, where required, are provided under a separate engagement by independent advocates or partner law firms. Government approval and processing times are not guaranteed."
   },
   "common": {
@@ -64,6 +64,8 @@
   "nav": {
     "start": "Start a business",
     "services": "Services",
+    "industries": "Industries",
+    "international": "International",
     "foreignFounders": "Foreign founders",
     "pricing": "Pricing",
     "howItWorks": "How it works",
@@ -71,7 +73,8 @@
     "partners": "Partners",
     "about": "About",
     "contact": "Contact",
-    "primaryCta": "Get started",
+    "primaryCta": "Start now",
+    "talkToSpecialist": "Talk to a specialist",
     "mainNavigation": "Main navigation",
     "workspace": "Workspace",
     "adminArea": "Admin",
@@ -91,17 +94,24 @@
       "licences": "Trade licences",
       "importExport": "Import and export",
       "tax": "Tax and VAT",
-      "compliance": "Annual compliance"
-    }
+      "compliance": "Annual compliance",
+      "international": "International routes",
+      "technology": "Technology",
+      "ecommerce": "E-commerce",
+      "importExportIndustry": "Import and export",
+      "manufacturing": "Manufacturing"
+    },
+    "industriesHeading": "Industries",
+    "socialHeading": "Follow bdoor"
   },
   "home": {
     "hero": {
       "eyebrow": "Your door to business in Bangladesh",
-      "headline": "Start and run your business in Bangladesh—from anywhere.",
-      "support": "BDoor brings company formation, licences, tax setup, compliance and official documents into one secure workspace.",
-      "primaryCta": "Start your business",
-      "secondaryCta": "Explore services",
-      "trustLine": "Independent platform · Partner professionals · Transparent fees"
+      "headline": "Everything your business needs in Bangladesh. One door.",
+      "support": "Form your company, obtain licences, coordinate tax and manage compliance through one secure workspace.",
+      "primaryCta": "Find what you need",
+      "secondaryCta": "Talk to a specialist",
+      "trustLine": "Independent platform · Verified professionals · Transparent fees"
     },
     "advisor": {
       "title": "What do you want to do in Bangladesh?",
@@ -117,25 +127,72 @@
     },
     "howItWorks": {
       "eyebrow": "How it works",
-      "title": "Four steps, one workspace.",
+      "title": "Seven steps, one workspace.",
       "steps": {
         "one": {
-          "title": "Tell us about your business",
-          "body": "Answer a short guided questionnaire about your activity, owners and plans. We use it to work out which registrations actually apply to you."
+          "title": "Complete the assessment",
+          "body": "Answer a guided questionnaire about your activity, owners and plans. We use it to work out which registrations actually apply to you."
         },
         "two": {
-          "title": "Complete review and upload documents",
-          "body": "You get a clear checklist of required documents and identity information. Everything is uploaded to a private vault, never email."
+          "title": "Verify identity and business facts",
+          "body": "You complete KYC/KYB checks and confirm the facts we need before any filing work begins."
         },
         "three": {
-          "title": "Pay and track every milestone",
-          "body": "Your quote separates our fee from government fees, partner fees and third-party costs. Pay the permitted amounts and watch each milestone move."
+          "title": "Receive an itemised quotation",
+          "body": "Your quote separates our fee from government fees, partner fees and third-party costs — nothing hidden behind a dash."
         },
         "four": {
-          "title": "Receive documents and manage compliance",
+          "title": "Approve and pay",
+          "body": "Pay the permitted amounts through a secure checkout. Government fees are never routed through bdoor unless explicitly stated."
+        },
+        "five": {
+          "title": "Upload required documents",
+          "body": "Everything goes to a private vault with a clear checklist — never email."
+        },
+        "six": {
+          "title": "Track preparation and authority milestones",
+          "body": "See who owns each step — you, bdoor, a partner or the authority — and what is blocking progress."
+        },
+        "seven": {
+          "title": "Receive records and compliance reminders",
           "body": "Approved certificates land in your vault. Renewals, filings and tax dates become reminders instead of surprises."
         }
       }
+    },
+    "serviceFinder": {
+      "eyebrow": "Service discovery",
+      "title": "Find what you need",
+      "body": "Start with your goal. We map it to services in our catalogue — or a consultation when something is not yet available.",
+      "cta": "Continue",
+      "intents": {
+        "startCompany": "Start a company",
+        "getLicence": "Get a licence",
+        "registerTax": "Register tax/VAT",
+        "importExport": "Import or export",
+        "manageExisting": "Manage an existing company",
+        "hireForeign": "Hire foreign staff",
+        "protectBrand": "Protect a brand",
+        "governmentProcurement": "Prepare for government procurement",
+        "annualCompliance": "Maintain annual compliance",
+        "expandInternational": "Expand internationally"
+      },
+      "status": {
+        "available": "Available",
+        "pilot": "Pilot",
+        "coming_soon": "Coming soon",
+        "consultation": "Consultation"
+      }
+    },
+    "international": {
+      "eyebrow": "Bangladesh and beyond",
+      "title": "Bangladesh first. International when ready.",
+      "body": "Start and manage companies in Bangladesh, the USA, UK, UAE and Singapore through verified country specialists — not generic offshore registration.",
+      "cta": "Explore international routes"
+    },
+    "compliance": {
+      "eyebrow": "Continuing compliance",
+      "title": "Stay ahead of renewals and filings.",
+      "body": "Annual returns, licence renewals, tax dates and partner coordination — organised in one calendar with reminders you can act on."
     },
     "categories": {
       "eyebrow": "What we help with",
@@ -341,6 +398,35 @@
       "export": "Bulk-export personal data.",
       "audit": "Edit or delete audit history."
     }
+  },
+  "international": {
+    "title": "International",
+    "description": "Start and manage companies in Bangladesh, the USA, UK, UAE and Singapore through verified country specialists.",
+    "intro": "Bangladesh is our flagship market. International routes open only when a verified provider and operating process are ready — we do not present a country as available before then.",
+    "status": {
+      "available": "Available",
+      "comingSoon": "Coming soon"
+    },
+    "exploreBangladesh": "Explore Bangladesh services",
+    "notifyNote": "Register interest through contact — we will not advertise this route until it is operationally ready."
+  },
+  "industries": {
+    "title": "Industries",
+    "description": "Sector-specific routes for entity choice, licences, authorities and compliance in Bangladesh.",
+    "intro": "Each industry page explains likely entity types, licences, authorities and linked services. This is operational guidance, not legal advice.",
+    "learnMore": "Learn more",
+    "reviewNote": "Industry guides are reviewed on a schedule. Dates appear on each page when published.",
+    "draftNoticeTitle": "Guide in preparation",
+    "draftNoticeBody": "This industry route is being reviewed before publication. Book a consultation if you need help now.",
+    "detailPlaceholder": "Detailed licensing routes, authority dependencies and linked services will appear here after review."
+  },
+  "authorities": {
+    "title": "Authority directory",
+    "description": "Independent informational profiles for authorities and systems relevant to business registration in Bangladesh.",
+    "disclaimerTitle": "Independent platform",
+    "disclaimerBody": "bdoor is not affiliated with any government authority. Profiles link to official sources where verified. Government decisions remain with the responsible authority.",
+    "officialSite": "Official website",
+    "reviewNote": "Profiles show a last-verified date when published. Unverified profiles remain internal."
   },
   "resources": {
     "title": "Resources",
