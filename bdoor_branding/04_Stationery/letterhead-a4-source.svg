@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="210mm" height="297mm" viewBox="0 0 2480 3508">
+  <rect width="2480" height="3508" fill="#FFFFFF"/>
+  <g transform="translate(150 120) scale(0.9)">
+    <path fill="#FF2630" d="M14 17h60l13 22H14c-4 0-7-3-7-7v-8c0-4 3-7 7-7Z"/>
+    <path fill="#164EEB" d="M14 59h65l-10 18h34l15 24c4 7 4 14-1 21l-10 14c-5 7-12 10-21 10H14c-4 0-7-3-7-7V66c0-4 3-7 7-7Z"/>
+    <path fill="#FFBE2E" d="M75 59h36L97 84H62c-4 0-6-4-4-7l13-16c1-1 2-2 4-2Z"/>
+    <path fill="#13B8AE" d="M92 17h12c6 0 11 3 14 8l18 30c3 5 3 11 0 16l-14 24c-3 5-8 8-14 8H82l18-35-19-33c-5-9 1-18 11-18Z"/>
+  </g>
+  <text x="310" y="252" fill="#081633" font-family="Nimbus Sans,Arial,sans-serif" font-size="126" font-weight="600" letter-spacing="-5">bdoor</text>
+  <text x="152" y="342" fill="#667085" font-family="Nimbus Sans,Arial,sans-serif" font-size="34">Your door to business in Bangladesh.</text>
+  <line x1="152" y1="405" x2="2328" y2="405" stroke="#DCE3EA" stroke-width="5"/>
+  <line x1="152" y1="3270" x2="2328" y2="3270" stroke="#DCE3EA" stroke-width="5"/>
+  <text x="152" y="3350" fill="#667085" font-family="Nimbus Sans,Arial,sans-serif" font-size="30">bdoor.io   |   hello@bdoor.io   |   [Registered office address]</text>
+  <rect x="152" y="3415" width="544" height="12" rx="6" fill="#FF2630"/>
+  <rect x="696" y="3415" width="544" height="12" fill="#164EEB"/>
+  <rect x="1240" y="3415" width="544" height="12" fill="#13B8AE"/>
+  <rect x="1784" y="3415" width="544" height="12" rx="6" fill="#FFBE2E"/>
+</svg>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1640" height="624" viewBox="0 0 1640 624">
+  <rect width="1640" height="624" fill="#081633"/>
+  <path fill="#10254C" d="M1100 0h540v624H920c190-158 250-366 180-624Z"/>
+  <g transform="translate(120 120) scale(1.55)">
+    <path fill="#FF2630" d="M14 17h60l13 22H14c-4 0-7-3-7-7v-8c0-4 3-7 7-7Z"/>
+    <path fill="#164EEB" d="M14 59h65l-10 18h34l15 24c4 7 4 14-1 21l-10 14c-5 7-12 10-21 10H14c-4 0-7-3-7-7V66c0-4 3-7 7-7Z"/>
+    <path fill="#FFBE2E" d="M75 59h36L97 84H62c-4 0-6-4-4-7l13-16c1-1 2-2 4-2Z"/>
+    <path fill="#13B8AE" d="M92 17h12c6 0 11 3 14 8l18 30c3 5 3 11 0 16l-14 24c-3 5-8 8-14 8H82l18-35-19-33c-5-9 1-18 11-18Z"/>
+  </g>
+  <text x="390" y="340" fill="#FFFFFF" font-family="Nimbus Sans,Arial,sans-serif" font-size="160" font-weight="600" letter-spacing="-7">bdoor</text>
+  <text x="1000" y="245" fill="#FFFFFF" font-family="Nimbus Sans,Arial,sans-serif" font-size="45" font-weight="700">Your door to business</text>
+  <text x="1000" y="302" fill="#FFFFFF" font-family="Nimbus Sans,Arial,sans-serif" font-size="45" font-weight="700">in Bangladesh.</text>
+  <text x="1002" y="365" fill="#AFC0D8" font-family="Nimbus Sans,Arial,sans-serif" font-size="27">Start. Operate. Stay compliant.</text>
+  <rect x="1000" y="420" width="125" height="9" rx="4" fill="#FF2630"/>
+  <rect x="1125" y="420" width="125" height="9" fill="#164EEB"/>
+  <rect x="1250" y="420" width="125" height="9" fill="#13B8AE"/>
+  <rect x="1375" y="420" width="125" height="9" rx="4" fill="#FFBE2E"/>
+</svg>

@@ -46,10 +46,12 @@
   --bd-offwhite: #f2f5f8;
   --bd-white: #ffffff;
   --bd-ink: #081633;
-  /* slate-600, not slate-500: 500 lands at 4.4:1 on the canvas and fails AA. */
-  --bd-muted: #475569;
-  --bd-border: #e5e7eb;
-  --bd-border-strong: #d3d8e0;
+  /* From bdoor_branding/06_Design_Tokens/bdoor-colors.css. Checked before
+     adopting: #667085 is 4.97:1 on white and 4.55:1 on Cloud, so it clears AA
+     on both surfaces the product uses. */
+  --bd-muted: #667085;
+  --bd-border: #dce3ea;
+  --bd-border-strong: #c3ccd6;
 
   /* Semantic status — all checked against WCAG 2.2 AA on their own surface */
   --bd-success-50: #e9f7ef;
@@ -99,9 +101,11 @@
   --color-focus: var(--bd-cobalt-600);
 
   /* Radii — 14–20px on containers, tighter on controls */
-  --radius-control: 10px;
-  --radius-card: 16px;
+  /* The package's radius scale: 8 / 14 / 20, pill 999. */
+  --radius-control: 8px;
+  --radius-card: 14px;
   --radius-panel: 20px;
+  --radius-pill: 999px;
 
   /* Elevation: soft, low-contrast. Never a hard drop shadow. */
   --shadow-xs: 0 1px 2px rgb(16 24 40 / 0.05);

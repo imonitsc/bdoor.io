@@ -10,7 +10,25 @@ the brief or from earlier reports.
 
 ---
 
-## 1. Launch blocker: the branding package is not here
+## 1. ~~Launch blocker: the branding package is not here~~ — RESOLVED
+
+**Update, same day.** The package was supplied and is now committed at
+`bdoor_branding/`. The blocker below is cleared; the record of what it blocked
+is kept because it explains why the design foundation was built from the brief's
+inline values first.
+
+The official `06_Design_Tokens/bdoor-tokens.json` confirms all seven hexes
+exactly as already implemented, and the same typefaces. It carries **no**
+text-safe variants, so the derived companions in §2 fill a real gap rather than
+duplicating something official — they still want brand sign-off.
+
+The package's own neutrals were adopted after checking them: `--bdoor-muted`
+`#667085` is 4.97:1 on white and 4.55:1 on Cloud, so it clears AA on both
+surfaces and replaces the darker substitute that was there.
+
+---
+
+## 1a. The original finding
 
 `bdoor_branding/` does not exist in the repository, and the session upload
 contains only the three brief documents. Every file §5 names as authoritative is
