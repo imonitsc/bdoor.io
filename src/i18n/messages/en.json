@@ -453,7 +453,10 @@
       "disabled": "Two-factor authentication is off.",
       "removeCta": "Remove authenticator",
       "requiredForRole": "Your role requires two-factor authentication before you can continue.",
-      "factorName": "Authenticator app"
+      "factorName": "Authenticator app",
+      "challengeSubtitle": "Open your authenticator app and enter the six-digit code for BDoor.",
+      "challengeNoFactor": "You do not have a second factor set up yet. Set one up to continue.",
+      "challengeEnrolCta": "Set up two-factor authentication"
     },
     "errors": {
       "invalidCredentials": "That email and password combination did not work.",

@@ -30,9 +30,10 @@ export default async function PartnerLayout({
   if (partnerMemberships(session).length === 0) redirect(`/${locale}/app`);
 
   // Partner staff handle other people's documents, so MFA is not optional.
-  if (session.mfaRequired && !session.mfaSatisfied) {
-    redirect(`/${locale}/app/security?mfa=required`);
+  if (session.mfaStep === 'challenge') {
+    redirect(`/${locale}/mfa/challenge?next=/${locale}/partner`);
   }
+  if (session.mfaStep === 'enroll') redirect(`/${locale}/app/security?mfa=required`);
 
   const t = await getTranslations('partnerWorkspace.nav');
   const nav = await getTranslations('nav');

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Alert } from '@/components/ui/alert';
 import { SignInForm } from '@/components/forms/auth-forms';
+import { safeNextPath } from '@/lib/auth/safe-next';
 
 export async function generateMetadata({
   params,
@@ -26,10 +27,10 @@ export default async function LoginPage({
 
   // Only site-relative paths are ever passed through, so the sign-in redirect
   // cannot be turned into an open redirect.
-  const next =
-    query.next && query.next.startsWith('/') && !query.next.startsWith('//')
-      ? query.next
-      : undefined;
+  // The empty string is the sentinel for "not usable"; the form omits the
+  // field entirely rather than posting a redirect target it should not have.
+  const validatedNext = safeNextPath(query.next, '');
+  const next = validatedNext === '' ? undefined : validatedNext;
 
   return (
     <div className="flex flex-col gap-5">

@@ -41,7 +41,13 @@ export default async function AdminLayout({
   const session = await getSession();
   if (!session) redirect(`/${locale}/login?next=/${locale}/admin`);
   if (session.platformRoles.length === 0) redirect(`/${locale}/app`);
-  if (!session.mfaSatisfied) redirect(`/${locale}/app/security?mfa=required`);
+  // Two different outstanding steps, two different destinations. Sending an
+  // enrolled user to the enrolment page leaves them with no code box and no way
+  // to reach aal2 at all.
+  if (session.mfaStep === 'challenge') {
+    redirect(`/${locale}/mfa/challenge?next=/${locale}/admin`);
+  }
+  if (session.mfaStep === 'enroll') redirect(`/${locale}/app/security?mfa=required`);
 
   const t = await getTranslations('admin.nav');
   const nav = await getTranslations('nav');

@@ -1,26 +1,20 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { safeNextPath } from '@/lib/auth/safe-next';
 
 /**
  * Email confirmation and password-recovery callback.
  *
  * Supabase sends the user here with a one-time token hash. We exchange it for a
- * session and then redirect to an internal path only — `next` is validated so
- * this endpoint can never be used as an open redirect.
+ * session and then redirect to an internal path only — `next` is validated by
+ * `safeNextPath` so this endpoint can never be used as an open redirect.
  */
-function safeNext(raw: string | null, fallback: string): string {
-  if (!raw) return fallback;
-  // Must be a site-relative path. Reject protocol-relative "//evil.com".
-  if (!raw.startsWith('/') || raw.startsWith('//')) return fallback;
-  return raw;
-}
-
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const tokenHash = searchParams.get('token_hash');
   const type = searchParams.get('type');
-  const next = safeNext(searchParams.get('next'), '/en/app');
+  const next = safeNextPath(searchParams.get('next'), '/en/app');
 
   if (!tokenHash || !type) {
     return NextResponse.redirect(new URL('/en/login?error=invalid_link', request.url));
