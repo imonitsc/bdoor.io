@@ -4,15 +4,15 @@ Public regulatory or marketing claims require an evidence-register record before
 
 Schema (YAML/JSON under `content/evidence-register/` and DB table `evidence_claims`):
 
-- claim ID  
-- claim text  
-- source type  
-- official source URL  
-- source publication/update date  
-- date last verified  
-- reviewer  
-- status: `draft` | `verified` | `expired` | `withdrawn`  
-- countries/services where the claim may appear  
+- claim ID
+- claim text
+- source type
+- official source URL
+- source publication/update date
+- date last verified
+- reviewer
+- status: `draft` | `verified` | `expired` | `withdrawn`
+- countries/services where the claim may appear
 
 **Unverified claims must not render publicly.** UI helpers filter to `verified` with non-expired `lastVerifiedAt`.
 

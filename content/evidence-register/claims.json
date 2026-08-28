@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "claims": [
+    {
+      "id": "POS-001",
+      "claimText": "bdoor is an independent business setup, administrative-support and professional-coordination platform. Government decisions remain with the responsible authorities.",
+      "sourceType": "product_positioning",
+      "officialSourceUrl": null,
+      "sourcePublishedAt": null,
+      "lastVerifiedAt": "2026-08-28",
+      "reviewer": "engineering",
+      "status": "verified",
+      "countries": ["BD"],
+      "services": [],
+      "mayRenderPublicly": true,
+      "notes": "Standing disclosure; mirrored in i18n brand.disclosure. Not a government affiliation claim."
+    },
+    {
+      "id": "FEE-GOV-EXAMPLE",
+      "claimText": "Placeholder — do not publish. Government fee claims require statutory source URL and review date.",
+      "sourceType": "government_fee",
+      "officialSourceUrl": null,
+      "sourcePublishedAt": null,
+      "lastVerifiedAt": null,
+      "reviewer": null,
+      "status": "draft",
+      "countries": ["BD"],
+      "services": [],
+      "mayRenderPublicly": false,
+      "notes": "Template row for owner/counsel fee verification (O-09)."
+    }
+  ]
+}

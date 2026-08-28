@@ -10,17 +10,17 @@ Browser (untrusted) → Next.js server → Supabase Data API (RLS) → private `
 
 ## Top threats and controls
 
-| Threat | Control |
-| ------ | ------- |
-| Cross-tenant data read/write | RLS ownership/membership/assignment predicates + Server Action capability checks |
-| Privilege escalation via metadata | Roles in protected tables only |
-| Session cookie forgery | `getClaims()` signature verification |
-| Document URL leakage | Private buckets; short-lived signed URLs after authz |
-| Webhook spoofing / replay | HMAC verify; provider event id idempotency; server-computed amounts |
-| Mock screening treated as real | UI labels; launch gate; never onboard on mock |
-| Preview writes to production DB | **Open risk** — separate staging project (O-17) |
-| Secret exfiltration | No `NEXT_PUBLIC_` secrets; audit redaction |
-| XSS / injection | CSP planned; React escaping; Zod validation |
+| Threat                            | Control                                                                          |
+| --------------------------------- | -------------------------------------------------------------------------------- |
+| Cross-tenant data read/write      | RLS ownership/membership/assignment predicates + Server Action capability checks |
+| Privilege escalation via metadata | Roles in protected tables only                                                   |
+| Session cookie forgery            | `getClaims()` signature verification                                             |
+| Document URL leakage              | Private buckets; short-lived signed URLs after authz                             |
+| Webhook spoofing / replay         | HMAC verify; provider event id idempotency; server-computed amounts              |
+| Mock screening treated as real    | UI labels; launch gate; never onboard on mock                                    |
+| Preview writes to production DB   | **Open risk** — separate staging project (O-17)                                  |
+| Secret exfiltration               | No `NEXT_PUBLIC_` secrets; audit redaction                                       |
+| XSS / injection                   | CSP planned; React escaping; Zod validation                                      |
 
 ## Residual risks (tracked)
 

@@ -2,14 +2,14 @@
 
 ## Buckets
 
-| Bucket | Public? |
-| ------ | ------- |
-| identity-documents | private |
-| case-documents | private |
-| official-records | private |
-| message-attachments | private |
-| partner-credentials | private |
-| public-marketing | public (marketing assets only) |
+| Bucket              | Public?                        |
+| ------------------- | ------------------------------ |
+| identity-documents  | private                        |
+| case-documents      | private                        |
+| official-records    | private                        |
+| message-attachments | private                        |
+| partner-credentials | private                        |
+| public-marketing    | public (marketing assets only) |
 
 ## Rules
 

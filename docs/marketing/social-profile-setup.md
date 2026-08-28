@@ -10,17 +10,17 @@ Cursor cannot create external accounts without authorised credentials. This docu
 
 ## Channel categories
 
-| Channel | Recommended category | Notes |
-| ------- | -------------------- | ----- |
-| Facebook | Business Service | Not Government Organization |
-| LinkedIn | Technology, Information and Internet | |
-| Instagram | Business Service | |
-| WhatsApp Business | Business Services | Needs verified number (O-03) |
-| YouTube | Education | |
-| TikTok | Business Service | |
-| X | Professional Services | |
-| Threads | Entrepreneur/business education | |
-| Google Business Profile | Business Management Consultant | Only with genuine staffed office |
+| Channel                 | Recommended category                 | Notes                            |
+| ----------------------- | ------------------------------------ | -------------------------------- |
+| Facebook                | Business Service                     | Not Government Organization      |
+| LinkedIn                | Technology, Information and Internet |                                  |
+| Instagram               | Business Service                     |                                  |
+| WhatsApp Business       | Business Services                    | Needs verified number (O-03)     |
+| YouTube                 | Education                            |                                  |
+| TikTok                  | Business Service                     |                                  |
+| X                       | Professional Services                |                                  |
+| Threads                 | Entrepreneur/business education      |                                  |
+| Google Business Profile | Business Management Consultant       | Only with genuine staffed office |
 
 Do **not** select Law Firm, Accounting Firm, Tax Preparation Service or Government Organization unless bdoor itself is legally entitled.
 

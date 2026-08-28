@@ -3,14 +3,14 @@
 Machine-readable companion: treat each gate `status` as `open` | `in_progress` | `passed` | `blocked`.  
 **Commercial launch is forbidden while any P0 gate is open or blocked.**
 
-| Gate | Owner | Status | Evidence | Blocking consequence |
-| ---- | ----- | ------ | -------- | -------------------- |
-| **A — Legal** | Qualified BD counsel + director | blocked | Draft policies in `src/content/legal/documents.ts`; banners asserted in e2e | Cannot remove draft banners; cannot take paying customers on live payments |
-| **B — Identity and trust** | Director | blocked | No verified entity, address, phone, leadership bios | Public trust strip and structured Organisation identity remain minimal |
-| **C — Partners** | Ops + compliance | blocked | No publicly advertised verified partner | Partner page stays enquiry-only; no partner logo wall |
-| **D — Security** | Engineering + security reviewer | in_progress | RLS suites; CI; remaining: live malware, CSP, Turnstile, preview DB isolation, Redis rate limit | No production customer KYC at scale |
-| **E — Operations** | Ops lead | in_progress | Admin queues exist; SLAs/procedures need rehearsal | No SLAs published; escalate via runbook |
-| **F — Production release** | Director | open | Requires explicit approval of exact Vercel preview artifact | No merge-to-prod / promote without written approval |
+| Gate                       | Owner                           | Status      | Evidence                                                                                        | Blocking consequence                                                       |
+| -------------------------- | ------------------------------- | ----------- | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| **A — Legal**              | Qualified BD counsel + director | blocked     | Draft policies in `src/content/legal/documents.ts`; banners asserted in e2e                     | Cannot remove draft banners; cannot take paying customers on live payments |
+| **B — Identity and trust** | Director                        | blocked     | No verified entity, address, phone, leadership bios                                             | Public trust strip and structured Organisation identity remain minimal     |
+| **C — Partners**           | Ops + compliance                | blocked     | No publicly advertised verified partner                                                         | Partner page stays enquiry-only; no partner logo wall                      |
+| **D — Security**           | Engineering + security reviewer | in_progress | RLS suites; CI; remaining: live malware, CSP, Turnstile, preview DB isolation, Redis rate limit | No production customer KYC at scale                                        |
+| **E — Operations**         | Ops lead                        | in_progress | Admin queues exist; SLAs/procedures need rehearsal                                              | No SLAs published; escalate via runbook                                    |
+| **F — Production release** | Director                        | open        | Requires explicit approval of exact Vercel preview artifact                                     | No merge-to-prod / promote without written approval                        |
 
 ## Gate A detail
 
