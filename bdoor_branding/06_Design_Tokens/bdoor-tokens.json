@@ -1,0 +1,33 @@
+{
+  "brand": "bdoor",
+  "tagline": "Your door to business in Bangladesh.",
+  "colors": {
+    "cobalt": { "hex": "#164EEB", "rgb": "22, 78, 235", "role": "Primary brand and action" },
+    "vermilion": {
+      "hex": "#FF2630",
+      "rgb": "255, 38, 48",
+      "role": "Energy and important highlights"
+    },
+    "turquoise": {
+      "hex": "#13B8AE",
+      "rgb": "19, 184, 174",
+      "role": "Progress, guidance and success"
+    },
+    "marigold": { "hex": "#FFBE2E", "rgb": "255, 190, 46", "role": "Warm accent and attention" },
+    "midnight": {
+      "hex": "#081633",
+      "rgb": "8, 22, 51",
+      "role": "Wordmark, headings and dark surfaces"
+    },
+    "cloud": { "hex": "#F2F5F8", "rgb": "242, 245, 248", "role": "Soft page background" },
+    "white": { "hex": "#FFFFFF", "rgb": "255, 255, 255", "role": "Primary surface" }
+  },
+  "typography": {
+    "latin": "Manrope",
+    "bengali": "Noto Sans Bengali",
+    "fallback": "Arial, sans-serif",
+    "logoNote": "Use the supplied outlined wordmark; do not recreate it by typing."
+  },
+  "radius": { "small": "8px", "medium": "14px", "large": "20px", "pill": "999px" },
+  "spacingBase": "8px"
+}

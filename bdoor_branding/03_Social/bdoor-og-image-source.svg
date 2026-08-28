@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#081633"/>
+  <circle cx="1065" cy="90" r="230" fill="#10254C"/>
+  <circle cx="1120" cy="610" r="330" fill="#0C1E43"/>
+  <g transform="translate(78 83) scale(1.14)">
+    <path fill="#FF2630" d="M14 17h60l13 22H14c-4 0-7-3-7-7v-8c0-4 3-7 7-7Z"/>
+    <path fill="#164EEB" d="M14 59h65l-10 18h34l15 24c4 7 4 14-1 21l-10 14c-5 7-12 10-21 10H14c-4 0-7-3-7-7V66c0-4 3-7 7-7Z"/>
+    <path fill="#FFBE2E" d="M75 59h36L97 84H62c-4 0-6-4-4-7l13-16c1-1 2-2 4-2Z"/>
+    <path fill="#13B8AE" d="M92 17h12c6 0 11 3 14 8l18 30c3 5 3 11 0 16l-14 24c-3 5-8 8-14 8H82l18-35-19-33c-5-9 1-18 11-18Z"/>
+  </g>
+  <text x="265" y="220" fill="#FFFFFF" font-family="Nimbus Sans,Arial,sans-serif" font-size="118" font-weight="600" letter-spacing="-5">bdoor</text>
+  <text x="82" y="360" fill="#FFFFFF" font-family="Nimbus Sans,Arial,sans-serif" font-size="52" font-weight="700">Your door to business</text>
+  <text x="82" y="425" fill="#FFFFFF" font-family="Nimbus Sans,Arial,sans-serif" font-size="52" font-weight="700">in Bangladesh.</text>
+  <text x="84" y="505" fill="#AFC0D8" font-family="Nimbus Sans,Arial,sans-serif" font-size="27">Formation, licences, compliance and documents - one secure workspace.</text>
+  <rect x="82" y="560" width="190" height="8" rx="4" fill="#FF2630"/>
+  <rect x="272" y="560" width="190" height="8" fill="#164EEB"/>
+  <rect x="462" y="560" width="190" height="8" fill="#13B8AE"/>
+  <rect x="652" y="560" width="190" height="8" rx="4" fill="#FFBE2E"/>
+</svg>
