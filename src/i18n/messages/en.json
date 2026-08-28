@@ -110,8 +110,14 @@
       "headline": "Everything your business needs in Bangladesh. One door.",
       "support": "Form your company, obtain licences, coordinate tax and manage compliance through one secure workspace.",
       "primaryCta": "Find what you need",
-      "secondaryCta": "Talk to a specialist",
-      "trustLine": "Independent platform · Verified professionals · Transparent fees"
+      "secondaryCta": "See how bdoor works",
+      "imageAlt": "Bangladeshi entrepreneur managing a new business through bdoor"
+    },
+    "trust": {
+      "pricing": "Itemised pricing",
+      "bilingual": "English and Bangla",
+      "workspace": "Secure workspace",
+      "coordination": "Professional coordination"
     },
     "advisor": {
       "title": "What do you want to do in Bangladesh?",

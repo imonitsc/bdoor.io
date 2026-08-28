@@ -14,17 +14,101 @@ test.describe('marketing site', () => {
     await expect(page).toHaveURL(/\/(en|bn)$/);
   });
 
-  test('shows the hero, the trust line and the independence disclosure', async ({ page }) => {
+  test('shows the hero, the trust indicators and the independence disclosure', async ({ page }) => {
     await page.goto('/en');
 
     await expect(page.getByRole('heading', { level: 1 })).toContainText(
       'Everything your business needs in Bangladesh',
     );
-    await expect(page.getByText('Independent platform')).toBeVisible();
+    await expect(page.getByText('Itemised pricing')).toBeVisible();
+    await expect(page.getByText('Professional coordination')).toBeVisible();
     await expect(
       page.getByText('BDoor is not a government authority or law firm', { exact: false }),
     ).toBeVisible();
   });
+
+  /**
+   * The founder photograph is the hero. These pin the parts that a refactor
+   * loses silently: that it goes through the image optimizer at all, that it
+   * is eager rather than lazy (it is the LCP element), and that it is fitted
+   * with `contain` — which is what keeps the face, hands, laptop and cards
+   * whole instead of cropping them.
+   */
+  test('serves the hero founder image through the optimizer, eagerly', async ({ page }) => {
+    await page.goto('/en');
+
+    const hero = page.getByRole('img', {
+      name: 'Bangladeshi entrepreneur managing a new business through bdoor',
+    });
+    await expect(hero).toBeVisible();
+
+    await expect(hero).toHaveCSS('object-fit', 'contain');
+
+    // The element having the right markup is not the same as the file being
+    // there: with the PNG absent the optimizer answers 400, every other
+    // assertion here still passes and the hero ships an empty box. Decoded
+    // dimensions are the only thing that distinguishes the two.
+    const decoded = await hero.evaluate((node) => ({
+      width: (node as HTMLImageElement).naturalWidth,
+      complete: (node as HTMLImageElement).complete,
+    }));
+    expect(decoded.complete, 'the hero image never finished loading').toBe(true);
+    expect(
+      decoded.width,
+      'the hero image decoded to nothing — is the PNG committed?',
+    ).toBeGreaterThan(0);
+
+    const src = await hero.getAttribute('src');
+    expect(src).toContain('/_next/image');
+    expect(src).toContain('bdoor-home-hero-founder.png');
+
+    // Responsive: a srcset the browser can choose from, and the sizes hint
+    // that stops it picking the 3840w variant for a 390px phone.
+    expect(await hero.getAttribute('srcset')).toContain('640w');
+    expect(await hero.getAttribute('sizes')).toContain('92vw');
+
+    // `priority` in this version of next/image is a preload link rather than
+    // loading="eager"/fetchpriority="high" on the element, so that is what is
+    // asserted. What must never appear is lazy loading on the LCP element.
+    expect(await hero.getAttribute('loading')).not.toBe('lazy');
+    await expect(
+      page.locator('link[rel="preload"][as="image"][imagesrcset*="bdoor-home-hero-founder"]'),
+    ).toHaveCount(1);
+  });
+
+  for (const viewport of [
+    { name: 'iPhone 14', width: 390, height: 844 },
+    { name: 'small Android', width: 360, height: 800 },
+  ]) {
+    test(`the homepage never scrolls sideways on a ${viewport.name}`, async ({ page }) => {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.goto('/en');
+
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      );
+      expect(overflow).toBeLessThanOrEqual(0);
+    });
+
+    test(`the hero CTAs come before the founder image on a ${viewport.name}`, async ({ page }) => {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.goto('/en');
+
+      const cta = page.getByRole('link', { name: 'Find what you need' }).first();
+      const box = await cta.boundingBox();
+      const image = await page
+        .getByRole('img', {
+          name: 'Bangladeshi entrepreneur managing a new business through bdoor',
+        })
+        .boundingBox();
+
+      expect(box).not.toBeNull();
+      expect(image).not.toBeNull();
+      expect(box!.y).toBeLessThan(image!.y);
+      // 44px minimum touch target.
+      expect(box!.height).toBeGreaterThanOrEqual(44);
+    });
+  }
 
   test('never promises approval', async ({ page }) => {
     await page.goto('/en');

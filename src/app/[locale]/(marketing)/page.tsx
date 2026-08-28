@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import {
   ArrowRight,
   Building2,
+  Check,
   CalendarCheck,
   FileBadge,
   Globe,
@@ -16,7 +17,7 @@ import { Card } from '@/components/ui/card';
 import { Section, SectionHeading } from '@/components/ui/section';
 import { Alert } from '@/components/ui/alert';
 import { ServiceFinder } from '@/components/marketing/service-finder';
-import { PortalVisual } from '@/components/marketing/portal-visual';
+import { HeroFounder } from '@/components/marketing/hero-founder';
 import { HeroAdvisor } from '@/components/marketing/hero-advisor';
 import { WorkspacePreview } from '@/components/marketing/workspace-preview';
 import { FaqList } from '@/components/marketing/faq-list';
@@ -58,8 +59,13 @@ function Hero() {
 
   return (
     <section className="bg-surface-inverse text-ink-inverse relative overflow-hidden">
-      <div className="container-page grid gap-12 py-16 md:py-20 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16 lg:py-24">
-        <div className="flex flex-col justify-center">
+      <div className="container-page grid items-center gap-10 py-16 md:py-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-14 lg:py-24">
+        {/*
+          z-10 on the copy, not a scrim over the photograph. The two columns do
+          not overlap at any breakpoint, so the headline never sits on top of
+          the image and no navy wash is needed to keep it readable.
+        */}
+        <div className="relative z-10 flex flex-col justify-center">
           <p className="text-xs font-semibold tracking-[0.14em] text-[color:var(--bd-turquoise-500)] uppercase">
             {t('eyebrow')}
           </p>
@@ -81,18 +87,45 @@ function Hero() {
               variant="ghost"
               className="border-border-inverse text-ink-inverse hover:bg-surface-inverse-soft border"
             >
-              <Link href={MARKETING_ROUTES.contact}>{t('secondaryCta')}</Link>
+              <Link href={MARKETING_ROUTES.howItWorks}>{t('secondaryCta')}</Link>
             </Button>
           </div>
-
-          <p className="text-muted-inverse mt-8 text-sm">{t('trustLine')}</p>
-
-          <PortalVisual className="pointer-events-none mt-10 hidden max-w-sm opacity-90 lg:block" />
         </div>
 
-        <div className="lg:pt-4">
-          <HeroAdvisor />
-        </div>
+        {/*
+          Pulled down by exactly the section's bottom padding so the founder is
+          anchored on the hero floor rather than floating in a padded box. Only
+          at lg, where the grid is two columns; once it stacks the image is a
+          normal block below the buttons.
+        */}
+        <HeroFounder alt={t('imageAlt')} className="lg:-mb-24 lg:self-end" />
+      </div>
+    </section>
+  );
+}
+
+/**
+ * Four statements about how the product works. Each one is checkable against
+ * the product itself — no counts, no logos, no affiliation.
+ */
+function TrustIndicators() {
+  const t = useTranslations('home.trust');
+  const items = ['pricing', 'bilingual', 'workspace', 'coordination'] as const;
+
+  return (
+    <section className="bg-surface-inverse text-ink-inverse border-border-inverse border-t">
+      <div className="container-page">
+        <ul className="grid gap-x-8 gap-y-3 py-6 sm:grid-cols-2 lg:grid-cols-4">
+          {items.map((item) => (
+            <li key={item} className="flex items-center gap-2.5">
+              <Check
+                className="size-4 shrink-0 text-[color:var(--bd-turquoise-500)]"
+                aria-hidden="true"
+              />
+              <span className="text-ink-inverse text-sm">{t(item)}</span>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );
@@ -128,10 +161,26 @@ function HowItWorks() {
 function ServiceFinderSection() {
   const t = useTranslations('home.serviceFinder');
   return (
-    <Section>
-      <div className="container-page grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
-        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
-        <ServiceFinder />
+    <Section tone="sunken">
+      <div className="container-page">
+        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} align="center" />
+        <div className="mx-auto mt-10 max-w-3xl">
+          <ServiceFinder />
+        </div>
+      </div>
+    </Section>
+  );
+}
+
+/**
+ * The questionnaire shortcut that used to sit in the hero, where the founder
+ * image now goes. Same form, same intents, same /start hand-off.
+ */
+function AdvisorSection() {
+  return (
+    <Section tone="surface">
+      <div className="container-page mx-auto max-w-2xl">
+        <HeroAdvisor />
       </div>
     </Section>
   );
@@ -392,11 +441,13 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   return (
     <>
       <Hero />
+      <TrustIndicators />
       <ServiceFinderSection />
+      <Preview />
       <HowItWorks />
+      <AdvisorSection />
       <Categories locale={locale as Locale} />
       <ForeignFounders />
-      <Preview />
       <Pricing />
       <InternationalSection />
       <Partners />
