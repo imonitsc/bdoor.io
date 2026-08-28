@@ -64,6 +64,9 @@
   "nav": {
     "start": "Start a business",
     "services": "Services",
+    "industries": "Industries",
+    "international": "International",
+    "authorities": "Authorities",
     "foreignFounders": "Foreign founders",
     "pricing": "Pricing",
     "howItWorks": "How it works",
@@ -71,7 +74,8 @@
     "partners": "Partners",
     "about": "About",
     "contact": "Contact",
-    "primaryCta": "Get started",
+    "talkToSpecialist": "Talk to a specialist",
+    "primaryCta": "Start now",
     "mainNavigation": "Main navigation",
     "workspace": "Workspace",
     "adminArea": "Admin",
@@ -79,6 +83,8 @@
   },
   "footer": {
     "servicesHeading": "Services",
+    "internationalHeading": "International",
+    "industriesHeading": "Industries",
     "companyHeading": "Company",
     "legalHeading": "Legal",
     "contactHeading": "Contact",
@@ -91,16 +97,36 @@
       "licences": "Trade licences",
       "importExport": "Import and export",
       "tax": "Tax and VAT",
-      "compliance": "Annual compliance"
+      "compliance": "Annual compliance",
+      "bangladesh": "Bangladesh",
+      "unitedStates": "United States",
+      "unitedKingdom": "United Kingdom",
+      "uae": "United Arab Emirates",
+      "singapore": "Singapore",
+      "technology": "Technology and software",
+      "ecommerce": "E-commerce",
+      "importExportIndustry": "Import and export",
+      "professional": "Professional services"
+    },
+    "social": {
+      "facebook": "Facebook",
+      "linkedin": "LinkedIn",
+      "instagram": "Instagram",
+      "youtube": "YouTube",
+      "x": "X",
+      "tiktok": "TikTok",
+      "threads": "Threads",
+      "whatsapp": "WhatsApp",
+      "google_business": "Google Business Profile"
     }
   },
   "home": {
     "hero": {
       "eyebrow": "Your door to business in Bangladesh",
-      "headline": "Start and run your business in Bangladesh—from anywhere.",
-      "support": "BDoor brings company formation, licences, tax setup, compliance and official documents into one secure workspace.",
-      "primaryCta": "Start your business",
-      "secondaryCta": "Explore services",
+      "headline": "Everything your business needs in Bangladesh. One door.",
+      "support": "Form your company, obtain licences, coordinate tax and manage compliance through one secure workspace.",
+      "primaryCta": "Find what you need",
+      "secondaryCta": "Talk to a specialist",
       "trustLine": "Independent platform · Partner professionals · Transparent fees"
     },
     "advisor": {
@@ -117,30 +143,43 @@
     },
     "howItWorks": {
       "eyebrow": "How it works",
-      "title": "Four steps, one workspace.",
+      "title": "Seven steps, one workspace.",
+      "body": "Nothing here is approved on the spot. Each step has an owner, and the clock pauses while we wait on you, a partner or an authority.",
       "steps": {
         "one": {
-          "title": "Tell us about your business",
-          "body": "Answer a short guided questionnaire about your activity, owners and plans. We use it to work out which registrations actually apply to you."
+          "title": "Complete the assessment",
+          "body": "Answer a short guided questionnaire. The result is a preliminary recommendation, not legal or tax advice."
         },
         "two": {
-          "title": "Complete review and upload documents",
-          "body": "You get a clear checklist of required documents and identity information. Everything is uploaded to a private vault, never email."
+          "title": "Verify identity and business facts",
+          "body": "Upload identity and ownership documents to a private vault. Staff review them before any filing is prepared."
         },
         "three": {
-          "title": "Pay and track every milestone",
-          "body": "Your quote separates our fee from government fees, partner fees and third-party costs. Pay the permitted amounts and watch each milestone move."
+          "title": "Receive an itemised quotation",
+          "body": "You see the bdoor fee separately from government fees, partner fees and third-party costs."
         },
         "four": {
-          "title": "Receive documents and manage compliance",
-          "body": "Approved certificates land in your vault. Renewals, filings and tax dates become reminders instead of surprises."
+          "title": "Approve and pay",
+          "body": "A case is marked paid only after a verified payment event, not because a browser returned from a gateway."
+        },
+        "five": {
+          "title": "Upload required documents",
+          "body": "A checklist tells you what is still missing. Replacements are requested in the same vault, never by email."
+        },
+        "six": {
+          "title": "Track preparation and authority milestones",
+          "body": "Each milestone has an owner — you, bdoor, a partner or the authority that actually decides."
+        },
+        "seven": {
+          "title": "Receive records and compliance reminders",
+          "body": "Issued certificates land in the vault. Renewals and filings become dated reminders."
         }
       }
     },
     "categories": {
       "eyebrow": "What we help with",
-      "title": "Six areas that cover most founders.",
-      "body": "Every service page explains what is included, what is not, and which authority decides the outcome."
+      "title": "Bangladesh service categories.",
+      "body": "Every service page explains what is included, what is not, and which authority decides the outcome. Coming-soon rows have no published fee."
     },
     "foreignFounders": {
       "eyebrow": "Foreign founders",
@@ -173,8 +212,11 @@
     "pricing": {
       "eyebrow": "Transparent pricing",
       "title": "You always see what each taka pays for.",
-      "body": "Every quote is itemised so you can tell our work apart from official charges. Government fees are shown as estimates until an official receipt exists.",
-      "cta": "Get a personalised quote"
+      "body": "This example uses the published private limited company service. Government and third-party lines stay “Quoted after review” until a verified figure exists — the total is not a dash.",
+      "exampleLabel": "Example: private limited company incorporation. VAT is excluded unless a quote says otherwise.",
+      "total": "Total",
+      "vatNote": "VAT/tax treatment is stated on the quote. This example does not invent a government fee.",
+      "cta": "See all published fees"
     },
     "partners": {
       "eyebrow": "Partner model",
@@ -189,9 +231,38 @@
     },
     "finalCta": {
       "title": "Open the door to your Bangladesh business.",
-      "body": "Start the questionnaire. It takes about five minutes and you can save and come back.",
-      "primary": "Start your business",
-      "secondary": "Talk to us first"
+      "body": "Start the questionnaire or talk to a specialist. Nothing here is approved on the spot.",
+      "primary": "Start the assessment",
+      "secondary": "Talk to a specialist"
+    },
+    "trust": {
+      "eyebrow": "How this platform works",
+      "title": "Only facts we can show.",
+      "body": "No customer counts, partner logos or reviews until they are verified. What follows is how the product actually behaves."
+    },
+    "finder": {
+      "eyebrow": "Service finder",
+      "title": "Start from what you need.",
+      "body": "Each choice opens a real assessment, catalogue filter or coming-soon service — not a decorative card."
+    },
+    "industries": {
+      "eyebrow": "Industries",
+      "title": "Sector routes, without pretending they are licences.",
+      "body": "These pages explain likely next steps and link to the catalogue. They are not legal advice.",
+      "cta": "All industries"
+    },
+    "international": {
+      "eyebrow": "Bangladesh and beyond",
+      "title": "Bangladesh is the flagship. Other countries wait on a verified specialist.",
+      "body": "USA, UK, UAE and Singapore are listed so you can register interest. They are not open for new cases until a provider is contracted.",
+      "flagship": "Flagship"
+    },
+    "compliance": {
+      "eyebrow": "Continuing compliance",
+      "title": "Filings and renewals belong on a calendar, not in a forgotten email.",
+      "body": "Once a company exists, annual returns, licence renewals and tax dates become reminders in the workspace. A subscription package will open only after its price is approved.",
+      "note": "Time ranges on service pages are estimates, dated, and pause while we wait on you, a partner or an authority.",
+      "cta": "Compliance services"
     }
   },
   "howItWorksPage": {
@@ -220,10 +291,39 @@
       "compliance": "Ongoing compliance"
     }
   },
+  "industriesPage": {
+    "title": "Industries",
+    "description": "Likely entity, licence and tax next steps for common sectors — not legal advice, and not a licence in itself.",
+    "adviceNote": "This is not legal advice. What actually applies depends on your activity, ownership and location. The assessment produces a preliminary recommendation; a qualified professional reviews anything that needs one.",
+    "relatedServices": "Related service categories",
+    "cta": "Start the assessment"
+  },
+  "internationalPage": {
+    "title": "International routes",
+    "description": "Start and manage companies in Bangladesh, with USA, UK, UAE and Singapore listed only as specialist routes that are not yet open.",
+    "unavailableNote": "This country is not open for new cases until a verified country specialist is contracted. Registering interest is not an application.",
+    "availableNote": "Bangladesh is the flagship product. Formation, licences, tax coordination and compliance run through this workspace.",
+    "providerNote": "Fees, timeframes and eligibility for inactive countries are not published. We will not invent them.",
+    "startCta": "Start a Bangladesh assessment",
+    "interestCta": "Tell us you are interested",
+    "allCountries": "All countries"
+  },
+  "authoritiesPage": {
+    "title": "Authorities",
+    "description": "Independent informational profiles. bdoor is not affiliated with any authority and does not act on its behalf.",
+    "disclaimer": "bdoor is not affiliated with this authority, does not display its logo, and does not make its decisions.",
+    "officialSite": "Official website (verified)",
+    "urlPending": "The official website is not published here until it has been verified in the evidence register.",
+    "relatedServices": "Related service categories",
+    "allAuthorities": "All authorities"
+  },
   "services": {
     "indexTitle": "Services",
     "indexDescription": "Company formation, licences, registrations, tax setup and ongoing compliance in Bangladesh.",
     "filterLabel": "Filter by category",
+    "searchLabel": "Search services",
+    "searchPlaceholder": "Search by name or summary",
+    "searchSubmit": "Search",
     "allCategories": "All services",
     "startingFrom": "Service fee from",
     "estimatedTime": "Estimated time",
@@ -896,7 +996,8 @@
       "content": "Content",
       "users": "Users",
       "audit": "Audit log",
-      "settings": "Settings"
+      "settings": "Settings",
+      "launch": "Launch gates"
     },
     "queues": {
       "title": "Work queues",
@@ -910,6 +1011,20 @@
       "complianceDue": "Compliance due in 30 days",
       "failedJobs": "Failed notifications and webhooks",
       "empty": "This queue is clear."
+    },
+    "launch": {
+      "title": "Launch gates",
+      "description": "Commercial launch stays blocked while any P0 gate is open. This screen is internal; it does not publish anything.",
+      "openWarning": "At least one launch gate is still open. Do not describe this preview as production-ready.",
+      "gate": "Gate {id}",
+      "owner": "Owner",
+      "evidence": "Evidence",
+      "consequence": "If this stays open",
+      "status": {
+        "open": "Open",
+        "partial": "Partial",
+        "closed": "Closed"
+      }
     },
     "cases": {
       "assign": "Assign case manager",

@@ -18,7 +18,7 @@ test.describe('marketing site', () => {
     await page.goto('/en');
 
     await expect(page.getByRole('heading', { level: 1 })).toContainText(
-      'Start and run your business in Bangladesh',
+      'Everything your business needs in Bangladesh',
     );
     await expect(page.getByText('Independent platform')).toBeVisible();
     await expect(
@@ -102,6 +102,32 @@ test.describe('marketing site', () => {
     await page.goto('/en/services/travel-agency-registration');
     await expect(page.getByText('Coming soon').first()).toBeVisible();
     await expect(page.getByText('not open for new cases yet', { exact: false })).toBeVisible();
+  });
+
+  test('industry, international and authority pages stay informational', async ({ page }) => {
+    await page.goto('/en/industries/technology-software');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Technology and software');
+    await expect(page.getByText('not legal advice', { exact: false })).toBeVisible();
+
+    await page.goto('/en/international/united-states');
+    await expect(page.getByText('Coming soon').first()).toBeVisible();
+    await expect(page.getByText('not open for new cases', { exact: false })).toBeVisible();
+
+    await page.goto('/en/authorities/rjsc');
+    await expect(
+      page.getByText('bdoor is not affiliated with this authority', { exact: false }),
+    ).toBeVisible();
+    await expect(page.getByRole('link', { name: /Official website/ })).toHaveCount(0);
+  });
+
+  test('searches the service catalogue', async ({ page }) => {
+    await page.goto('/en/services');
+    await page.getByLabel('Search services').fill('private limited');
+    await page.getByRole('button', { name: 'Search' }).click();
+    await expect(page).toHaveURL(/q=/);
+    await expect(
+      page.getByRole('heading', { name: /Private limited company/i }).first(),
+    ).toBeVisible();
   });
 
   test('legal drafts say they are awaiting review', async ({ page }) => {
@@ -200,6 +226,9 @@ test.describe('privacy of the private areas', () => {
   test('lists only public pages in the sitemap', async ({ request }) => {
     const sitemap = await (await request.get('/sitemap.xml')).text();
     expect(sitemap).toContain('/en/services');
+    expect(sitemap).toContain('/en/industries');
+    expect(sitemap).toContain('/en/international');
+    expect(sitemap).toContain('/en/authorities');
     expect(sitemap).not.toContain('/app');
     expect(sitemap).not.toContain('/admin');
   });

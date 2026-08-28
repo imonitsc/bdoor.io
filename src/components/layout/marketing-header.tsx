@@ -93,6 +93,9 @@ export function MarketingHeader() {
               <Link href={MARKETING_ROUTES.login}>{t('common.signIn')}</Link>
             </Button>
           )}
+          <Button asChild variant="ghost" size="md" className="hidden 2xl:inline-flex">
+            <Link href={MARKETING_ROUTES.contact}>{t('nav.talkToSpecialist')}</Link>
+          </Button>
           <Button asChild size="md">
             <Link href={MARKETING_ROUTES.start}>{t('nav.primaryCta')}</Link>
           </Button>
@@ -133,6 +136,14 @@ export function MarketingHeader() {
                 </li>
               ))}
               <li className="border-border mt-2 border-t pt-3">
+                <Link
+                  href={MARKETING_ROUTES.contact}
+                  className="text-ink hover:bg-surface-sunken flex min-h-[3rem] items-center rounded-[var(--radius-control)] px-3 text-base font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+                >
+                  {t('nav.talkToSpecialist')}
+                </Link>
+              </li>
+              <li>
                 <Link
                   href={isSignedIn ? '/app' : MARKETING_ROUTES.login}
                   className="text-ink hover:bg-surface-sunken flex min-h-[3rem] items-center rounded-[var(--radius-control)] px-3 text-base font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"

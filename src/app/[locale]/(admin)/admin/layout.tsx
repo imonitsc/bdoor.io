@@ -8,6 +8,7 @@ import {
   Handshake,
   LayoutDashboard,
   Newspaper,
+  ClipboardList,
   ScrollText,
   Settings,
   ShieldAlert,
@@ -109,6 +110,11 @@ export default async function AdminLayout({
             href: ADMIN_ROUTES.settings,
             label: t('settings'),
             icon: <Settings className="size-4" />,
+          },
+          {
+            href: ADMIN_ROUTES.launch,
+            label: t('launch'),
+            icon: <ClipboardList className="size-4" />,
           },
         ]
       : []),

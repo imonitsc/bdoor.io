@@ -18,6 +18,8 @@ const PAGES = [
   { name: 'sign up', path: '/en/signup' },
   { name: 'contact', path: '/en/contact' },
   { name: 'terms', path: '/en/terms' },
+  { name: 'industries', path: '/en/industries' },
+  { name: 'international', path: '/en/international' },
 ];
 
 for (const target of PAGES) {

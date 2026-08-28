@@ -7,6 +7,9 @@ export const MARKETING_ROUTES = {
   home: '/',
   start: '/start',
   services: '/services',
+  industries: '/industries',
+  international: '/international',
+  authorities: '/authorities',
   foreignFounders: '/foreign-founders',
   pricing: '/pricing',
   howItWorks: '/how-it-works',
@@ -65,12 +68,14 @@ export const ADMIN_ROUTES = {
   users: '/admin/users',
   audit: '/admin/audit',
   settings: '/admin/settings',
+  launch: '/admin/launch',
 } as const;
 
 export const HEADER_LINKS = [
   { href: MARKETING_ROUTES.start, labelKey: 'nav.start' },
   { href: MARKETING_ROUTES.services, labelKey: 'nav.services' },
-  { href: MARKETING_ROUTES.foreignFounders, labelKey: 'nav.foreignFounders' },
+  { href: MARKETING_ROUTES.industries, labelKey: 'nav.industries' },
+  { href: MARKETING_ROUTES.international, labelKey: 'nav.international' },
   { href: MARKETING_ROUTES.pricing, labelKey: 'nav.pricing' },
   { href: MARKETING_ROUTES.resources, labelKey: 'nav.resources' },
 ] as const;
@@ -84,10 +89,26 @@ export const FOOTER_SERVICE_LINKS = [
   { href: '/services?category=compliance', labelKey: 'footer.links.compliance' },
 ] as const;
 
+export const FOOTER_INTERNATIONAL_LINKS = [
+  { href: '/international/bangladesh', labelKey: 'footer.links.bangladesh' },
+  { href: '/international/united-states', labelKey: 'footer.links.unitedStates' },
+  { href: '/international/united-kingdom', labelKey: 'footer.links.unitedKingdom' },
+  { href: '/international/united-arab-emirates', labelKey: 'footer.links.uae' },
+  { href: '/international/singapore', labelKey: 'footer.links.singapore' },
+] as const;
+
+export const FOOTER_INDUSTRY_LINKS = [
+  { href: '/industries/technology-software', labelKey: 'footer.links.technology' },
+  { href: '/industries/ecommerce', labelKey: 'footer.links.ecommerce' },
+  { href: '/industries/import-export', labelKey: 'footer.links.importExportIndustry' },
+  { href: '/industries/professional-services', labelKey: 'footer.links.professional' },
+] as const;
+
 export const FOOTER_COMPANY_LINKS = [
   { href: MARKETING_ROUTES.about, labelKey: 'nav.about' },
   { href: MARKETING_ROUTES.howItWorks, labelKey: 'nav.howItWorks' },
   { href: MARKETING_ROUTES.partners, labelKey: 'nav.partners' },
+  { href: MARKETING_ROUTES.authorities, labelKey: 'nav.authorities' },
   { href: MARKETING_ROUTES.contact, labelKey: 'nav.contact' },
 ] as const;
 
@@ -113,6 +134,9 @@ export const SITEMAP_ROUTES: ReadonlyArray<{
   { path: '/pricing', priority: 0.8, changeFrequency: 'monthly' },
   { path: '/how-it-works', priority: 0.7, changeFrequency: 'monthly' },
   { path: '/partners', priority: 0.6, changeFrequency: 'monthly' },
+  { path: '/industries', priority: 0.7, changeFrequency: 'monthly' },
+  { path: '/international', priority: 0.7, changeFrequency: 'monthly' },
+  { path: '/authorities', priority: 0.5, changeFrequency: 'monthly' },
   { path: '/resources', priority: 0.7, changeFrequency: 'weekly' },
   { path: '/about', priority: 0.5, changeFrequency: 'yearly' },
   { path: '/contact', priority: 0.5, changeFrequency: 'yearly' },

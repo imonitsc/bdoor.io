@@ -4,6 +4,8 @@ import { Search } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { Section } from '@/components/ui/section';
 import { EmptyState } from '@/components/ui/empty-state';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { ServiceCard } from '@/components/marketing/service-card';
 import { getCategories, getServices } from '@/features/catalog/queries';
 import { pick, type Locale } from '@/features/catalog/types';
@@ -35,9 +37,9 @@ export default async function ServicesPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ category?: string }>;
+  searchParams: Promise<{ category?: string; q?: string }>;
 }) {
-  const [{ locale }, { category }] = await Promise.all([params, searchParams]);
+  const [{ locale }, { category, q }] = await Promise.all([params, searchParams]);
   setRequestLocale(locale);
 
   const [t, { data: categories }, { data: services }] = await Promise.all([
@@ -46,10 +48,15 @@ export default async function ServicesPage({
     getServices(),
   ]);
 
+  const loc = locale as Locale;
   const activeCategory = categories.some((c) => c.slug === category) ? category : undefined;
-  const visible = activeCategory
-    ? services.filter((s) => s.categorySlug === activeCategory)
-    : services;
+  const query = q?.trim().toLowerCase() ?? '';
+  const visible = services.filter((s) => {
+    if (activeCategory && s.categorySlug !== activeCategory) return false;
+    if (!query) return true;
+    const haystack = `${pick(s.name, loc) ?? ''} ${pick(s.summary, loc) ?? ''}`.toLowerCase();
+    return haystack.includes(query);
+  });
 
   return (
     <>
@@ -103,6 +110,32 @@ export default async function ServicesPage({
               })}
             </ul>
           </nav>
+
+          <form
+            className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-end"
+            action={`/${locale}/services`}
+            method="get"
+            role="search"
+          >
+            {activeCategory ? <input type="hidden" name="category" value={activeCategory} /> : null}
+            <div className="flex-1">
+              <label htmlFor="service-search" className="text-ink sr-only">
+                {t('searchLabel')}
+              </label>
+              <Input
+                id="service-search"
+                name="q"
+                type="search"
+                defaultValue={q ?? ''}
+                placeholder={t('searchPlaceholder')}
+                autoComplete="off"
+              />
+            </div>
+            <Button type="submit" variant="secondary">
+              <Search className="size-4" aria-hidden="true" />
+              {t('searchSubmit')}
+            </Button>
+          </form>
 
           <p className="text-muted mt-6 text-sm" aria-live="polite">
             {visible.length} {t('indexTitle').toLowerCase()}
