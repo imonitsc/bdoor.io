@@ -68,9 +68,12 @@ export async function recordComplianceDecision(
   }
 
   // The customer-visible half is updated through the ordinary client so RLS
-  // still applies to it.
+  // still applies to it. The result is checked for a row, not only for an
+  // error: RLS filters an update the caller may not make down to zero rows and
+  // reports success, which would leave the decision recorded internally while
+  // the customer's status never moved.
   const supabase = await createClient();
-  await supabase
+  const { data: updated, error: statusError } = await supabase
     .from('kyc_cases')
     .update({
       overall_status:
@@ -81,7 +84,16 @@ export async function recordComplianceDecision(
             : 'manual_review',
       decided_at: new Date().toISOString(),
     })
-    .eq('id', parsed.data.kycCaseId);
+    .eq('id', parsed.data.kycCaseId)
+    .select('id');
+
+  if (statusError || (updated ?? []).length === 0) {
+    logger.error('kyc.status_not_applied', {
+      kycCaseId: parsed.data.kycCaseId,
+      code: statusError?.code ?? 'no_rows',
+    });
+    return { status: 'error', message: 'generic' };
+  }
 
   await recordAudit({
     action: 'kyc.decision',
