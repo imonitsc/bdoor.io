@@ -174,6 +174,22 @@ test.describe('privacy of the private areas', () => {
     }
   });
 
+  test('renders the supplied wordmark rather than typed text', async ({ page }) => {
+    await page.goto('/en');
+
+    // The brand guide forbids recreating the wordmark in a font, and this
+    // component used to do exactly that — it set the text "BDoor" in the UI
+    // typeface. The header must reference the outlined production SVG from
+    // bdoor_branding/01_Logos/SVG/.
+    const logo = page.locator('header img[src*="bdoor-primary-horizontal"]').first();
+    await expect(logo).toBeVisible();
+
+    // Width and height are always set, so the header reserves the box and the
+    // logo cannot shift the page as it loads.
+    await expect(logo).toHaveAttribute('width', /\d+/);
+    await expect(logo).toHaveAttribute('height', /\d+/);
+  });
+
   test('blocks the private areas in robots.txt', async ({ request }) => {
     const robots = await (await request.get('/robots.txt')).text();
     expect(robots).toContain('Disallow: /app/');

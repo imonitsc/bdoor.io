@@ -8,11 +8,15 @@ export default function manifest(): MetadataRoute.Manifest {
       'Company formation, licences, tax setup, compliance and official documents for Bangladesh, in one secure workspace.',
     start_url: '/en',
     display: 'standalone',
-    background_color: '#F7F8F5',
-    theme_color: '#0A1020',
+    // Cloud and Midnight, from bdoor_branding/06_Design_Tokens/bdoor-tokens.json.
+    background_color: '#F2F5F8',
+    theme_color: '#081633',
     icons: [
-      { src: '/icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
-      { src: '/apple-icon', sizes: '180x180', type: 'image/png' },
+      // PNGs, not the SVG: the convention serves icon.svg from a hashed URL
+      // that cannot be written here, and installable icons want raster anyway.
+      { src: '/brand/symbol-192.png', sizes: '192x192', type: 'image/png' },
+      { src: '/brand/symbol-512.png', sizes: '512x512', type: 'image/png' },
+      { src: '/apple-icon.png', sizes: '1024x1024', type: 'image/png' },
     ],
     lang: 'en',
   };

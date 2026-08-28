@@ -77,18 +77,23 @@ export async function generateMetadata({
       description: home('support'),
       url: localizedUrl(locale as Locale, '/'),
       locale: localeTags[locale as Locale],
-      images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: t('name') }],
+      // No explicit image: src/app/opengraph-image.png is a file-convention
+      // asset, so Next emits og:image, its dimensions and the absolute URL
+      // itself. Naming a path by hand pinned the old generated route
+      // (/opengraph-image), which stopped existing when the generated image was
+      // replaced by the supplied brand asset — a hardcoded URL cannot follow the
+      // content hash Next appends.
     },
     twitter: {
       card: 'summary_large_image',
       title: `${t('name')} — ${t('tagline')}`,
       description: home('support'),
-      images: ['/opengraph-image'],
+      // As above: the file convention supplies the Twitter image too.
     },
-    icons: {
-      icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
-      apple: [{ url: '/apple-icon' }],
-    },
+    // No `icons` block. Naming any icon by hand replaces the whole set, which
+    // silently dropped the apple-touch-icon. src/app/{icon.svg,favicon.ico,
+    // apple-icon.png} are file-convention assets and Next emits all three with
+    // the content hashes that let them be cached hard.
     manifest: '/manifest.webmanifest',
     robots: { index: true, follow: true },
   };
