@@ -82,9 +82,11 @@ Actually executed in this session:
 | Integration / RLS           | **60 passed**, stable across 5 consecutive rebuilt-database runs   |
 | `pnpm run build`            | pass                                                               |
 
-**Playwright: 41 of 41 passed**, including the axe accessibility specs and the
-full questionnaire journeys — run against a server started with _no_ Supabase
-environment variables, which is exactly the CI configuration.
+**Playwright: 41 of 41 passed** locally, including the axe accessibility specs
+and the full questionnaire journeys — run against a server started with _no_
+Supabase environment variables, which is exactly the CI configuration. Confirmed
+in CI afterwards: run 33180358769 completed the job in 1m40s with conclusion
+`success`, and every job in that workflow was green.
 
 The sandbox ships `chromium_headless_shell-1194` while this Playwright wants
 `1234`, so the run used `PLAYWRIGHT_CHROMIUM_PATH` to point at the available
