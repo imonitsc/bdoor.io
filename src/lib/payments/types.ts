@@ -21,12 +21,7 @@ export type CheckoutSession = {
 };
 
 export type ProviderPaymentStatus =
-  | 'pending'
-  | 'paid'
-  | 'failed'
-  | 'cancelled'
-  | 'partially_refunded'
-  | 'refunded';
+  'pending' | 'paid' | 'failed' | 'cancelled' | 'partially_refunded' | 'refunded';
 
 export type WebhookVerification =
   | {

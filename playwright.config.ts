@@ -55,6 +55,26 @@ export default defineConfig({
           // E2E runs without Supabase credentials; the app degrades gracefully
           // and the boot-time completeness check would otherwise refuse to start.
           STRICT_ENV: 'false',
+          // Synthetic, and deliberately unreachable. Nothing here talks to a
+          // real project, so the marketing pages still prove they render from
+          // the bundled catalogue snapshot without a working database — which
+          // is the point of running this way.
+          //
+          // What they add is a Supabase client that can be constructed at all.
+          // Without them, submitting a form threw at construction, so the auth
+          // journeys could not be exercised — which is how an illegal export in
+          // a 'use server' file reached production and broke signing up.
+          //
+          // This costs wall-clock: the proxy now runs the full session refresh
+          // on every request instead of returning early, and the suite goes
+          // from about 1.1 minutes to 3.7. Measured both ways, and measured
+          // again with a closed local port instead of an unresolvable host —
+          // the cost is the refresh path, not DNS, so the cheaper-looking URL
+          // buys nothing. Worth paying: without it no form can be submitted in
+          // this suite at all, and that blind spot is exactly what let a broken
+          // signup reach production.
+          NEXT_PUBLIC_SUPABASE_URL: 'http://127.0.0.1:9',
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_e2e_placeholder',
         },
       },
 });

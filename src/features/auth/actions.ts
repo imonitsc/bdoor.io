@@ -18,9 +18,12 @@ export type AuthState = {
   status: 'idle' | 'error' | 'success';
   message?: string;
   fieldErrors?: Record<string, string>;
+  /**
+   * The address a confirmation was sent to, echoed back so the "check your
+   * email" screen can name it. Only ever the address the caller just typed.
+   */
+  email?: string;
 };
-
-const IDLE: AuthState = { status: 'idle' };
 
 async function clientKey(email?: string): Promise<string> {
   const headerList = await headers();
@@ -122,7 +125,8 @@ export async function signUp(_previous: AuthState, formData: FormData): Promise<
     }
     logger.warn('auth.sign_up_failed', { code: error.code });
     // Do not distinguish "already registered": that leaks who has an account.
-    return { status: 'success', message: 'checkEmail' };
+    // The same screen and the same address come back either way.
+    return { status: 'success', message: 'checkEmail', email: parsed.data.email };
   }
 
   if (data.user) {
@@ -138,7 +142,7 @@ export async function signUp(_previous: AuthState, formData: FormData): Promise<
     await claimDraftForUser(data.user.id);
   }
 
-  return { status: 'success', message: 'checkEmail' };
+  return { status: 'success', message: 'checkEmail', email: parsed.data.email };
 }
 
 export async function requestPasswordReset(
@@ -236,5 +240,3 @@ export async function signOutOtherSessions(): Promise<AuthState> {
 
   return { status: 'success', message: 'sessionsRevoked' };
 }
-
-export { IDLE as initialAuthState };
