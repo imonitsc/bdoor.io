@@ -23,6 +23,8 @@ import { getCategories, getGlobalFaqs } from '@/features/catalog/queries';
 import { pick, type Locale } from '@/features/catalog/types';
 import { MARKETING_ROUTES } from '@/lib/navigation';
 import { localizedUrl } from '@/lib/site';
+import { publicCountries } from '@/content/countries';
+import { publicEvidenceClaims } from '@/content/evidence/register';
 
 export async function generateMetadata({
   params,
@@ -57,7 +59,15 @@ function Hero() {
 
   return (
     <section className="bg-surface-inverse text-ink-inverse relative overflow-hidden">
-      <div className="container-page grid gap-12 py-16 md:py-20 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16 lg:py-24">
+      <div
+        className="pointer-events-none absolute inset-0 opacity-40"
+        aria-hidden="true"
+        style={{
+          background:
+            'radial-gradient(ellipse 80% 60% at 10% 20%, rgba(22,78,235,0.35), transparent 55%), radial-gradient(ellipse 50% 40% at 90% 10%, rgba(19,184,174,0.2), transparent 50%)',
+        }}
+      />
+      <div className="container-page relative grid gap-12 py-16 md:py-20 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16 lg:py-24">
         <div className="flex flex-col justify-center">
           <p className="text-xs font-semibold tracking-[0.14em] text-[color:var(--bd-turquoise-500)] uppercase">
             {t('eyebrow')}
@@ -80,12 +90,11 @@ function Hero() {
               variant="ghost"
               className="border-border-inverse text-ink-inverse hover:bg-surface-inverse-soft border"
             >
-              <Link href={MARKETING_ROUTES.services}>{t('secondaryCta')}</Link>
+              <Link href={MARKETING_ROUTES.contact}>{t('secondaryCta')}</Link>
             </Button>
           </div>
 
           <p className="text-muted-inverse mt-8 text-sm">{t('trustLine')}</p>
-
           <PortalVisual className="pointer-events-none mt-10 hidden max-w-sm opacity-90 lg:block" />
         </div>
 
@@ -97,15 +106,37 @@ function Hero() {
   );
 }
 
+function VerifiedTrust() {
+  const claims = publicEvidenceClaims({ country: 'BD' });
+  if (claims.length === 0) return null;
+
+  return (
+    <Section tone="surface">
+      <div className="container-page">
+        <ul className="grid gap-4 md:grid-cols-1">
+          {claims.map((claim) => (
+            <li
+              key={claim.id}
+              className="border-border bg-surface text-ink rounded-[var(--radius-panel)] border px-5 py-4 text-sm leading-relaxed"
+            >
+              {claim.claimText}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </Section>
+  );
+}
+
 function HowItWorks() {
   const t = useTranslations('home.howItWorks');
-  const steps = ['one', 'two', 'three', 'four'] as const;
+  const steps = ['one', 'two', 'three', 'four', 'five', 'six', 'seven'] as const;
 
   return (
     <Section tone="surface">
       <div className="container-page">
         <SectionHeading eyebrow={t('eyebrow')} title={t('title')} />
-        <ol className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <ol className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {steps.map((step, index) => (
             <li key={step} className="flex flex-col gap-3">
               <span
@@ -213,6 +244,51 @@ function ForeignFounders() {
   );
 }
 
+function International({ locale }: { locale: Locale }) {
+  const t = useTranslations('home.international');
+  const tCommon = useTranslations('common');
+  const countries = publicCountries();
+
+  return (
+    <Section>
+      <div className="container-page">
+        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
+        <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {countries.map((country) => (
+            <li key={country.code}>
+              <Card className="flex h-full flex-col gap-3 p-5 md:p-6">
+                <div className="flex items-center justify-between gap-3">
+                  <h3 className="text-ink text-base font-semibold">{pick(country.name, locale)}</h3>
+                  {country.status !== 'active' ? (
+                    <span className="text-muted text-xs font-medium tracking-wide uppercase">
+                      {t('comingSoon')}
+                    </span>
+                  ) : (
+                    <span className="text-accent-strong text-xs font-medium tracking-wide uppercase">
+                      {tCommon('view')}
+                    </span>
+                  )}
+                </div>
+                <p className="text-muted text-sm leading-relaxed">
+                  {pick(country.summary, locale)}
+                </p>
+              </Card>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-8">
+          <Button asChild variant="secondary" size="lg">
+            <Link href={MARKETING_ROUTES.international}>
+              {t('cta')}
+              <ArrowRight className="size-4" aria-hidden="true" />
+            </Link>
+          </Button>
+        </div>
+      </div>
+    </Section>
+  );
+}
+
 function Preview() {
   const t = useTranslations('home.preview');
   return (
@@ -256,7 +332,7 @@ function Pricing() {
               <li key={category} className="flex items-center justify-between gap-4 py-3.5">
                 <span className="text-ink text-sm font-medium">{tFees(category)}</span>
                 <span className="text-muted text-sm">
-                  {category === 'platform_service_fee' ? 'BDoor' : '—'}
+                  {category === 'platform_service_fee' ? 'bdoor' : 'Quoted after review'}
                 </span>
               </li>
             ))}
@@ -343,9 +419,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   return (
     <>
       <Hero />
+      <VerifiedTrust />
       <HowItWorks />
       <Categories locale={locale as Locale} />
       <ForeignFounders />
+      <International locale={locale as Locale} />
       <Preview />
       <Pricing />
       <Partners />

@@ -8,18 +8,32 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioItem, ChoiceCard } from '@/components/ui/choice';
 
 /**
- * The business-setup advisor beside the hero.
+ * Service finder beside the hero.
  *
- * It is a real form, not a fake chat box: choosing an option and continuing
- * lands you on /start with that intent preselected, so the first questionnaire
- * step is already answered.
+ * Choosing an option continues into /start with intent preselected, or into a
+ * matching public route when the goal is not yet a questionnaire branch.
  */
 const OPTIONS = [
-  { value: 'local_company', labelKey: 'localCompany' },
-  { value: 'foreign_founder', labelKey: 'foreignFounder' },
-  { value: 'import_export', labelKey: 'importExport' },
-  { value: 'travel_agency', labelKey: 'travelAgency' },
-  { value: 'existing_company', labelKey: 'existingCompany' },
+  { value: 'local_company', labelKey: 'localCompany', href: '/start?intent=local_company' },
+  { value: 'foreign_founder', labelKey: 'foreignFounder', href: '/start?intent=foreign_founder' },
+  { value: 'get_licence', labelKey: 'getLicence', href: '/services?category=licences' },
+  { value: 'tax_vat', labelKey: 'taxVat', href: '/services?category=tax-vat' },
+  { value: 'import_export', labelKey: 'importExport', href: '/start?intent=import_export' },
+  {
+    value: 'existing_company',
+    labelKey: 'existingCompany',
+    href: '/start?intent=existing_company',
+  },
+  { value: 'hire_foreign', labelKey: 'hireForeign', href: '/foreign-founders' },
+  { value: 'protect_brand', labelKey: 'protectBrand', href: '/contact' },
+  { value: 'procurement', labelKey: 'procurement', href: '/contact' },
+  {
+    value: 'annual_compliance',
+    labelKey: 'annualCompliance',
+    href: '/services?category=compliance',
+  },
+  { value: 'expand_international', labelKey: 'expandInternational', href: '/international' },
+  { value: 'travel_agency', labelKey: 'travelAgency', href: '/start?intent=travel_agency' },
 ] as const;
 
 export function HeroAdvisor() {
@@ -32,7 +46,8 @@ export function HeroAdvisor() {
       className="border-border bg-surface flex flex-col gap-4 rounded-[var(--radius-panel)] border p-5 shadow-md md:p-6"
       onSubmit={(event) => {
         event.preventDefault();
-        router.push(`/start?intent=${encodeURIComponent(value)}`);
+        const option = OPTIONS.find((item) => item.value === value) ?? OPTIONS[0];
+        router.push(option.href);
       }}
     >
       <div>
@@ -44,7 +59,7 @@ export function HeroAdvisor() {
         value={value}
         onValueChange={setValue}
         aria-label={t('title')}
-        className="flex flex-col gap-2"
+        className="flex max-h-[28rem] flex-col gap-2 overflow-y-auto pr-1"
       >
         {OPTIONS.map((option) => (
           <ChoiceCard

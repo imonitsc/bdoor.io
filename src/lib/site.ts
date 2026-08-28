@@ -1,7 +1,7 @@
 import type { Locale } from '@/i18n/routing';
 
 export const SITE = {
-  name: 'BDoor',
+  name: 'bdoor',
   domain: 'bdoor.io',
   /**
    * The single legally-required disclosure. Rendered in the footer, on quotes,

@@ -4,7 +4,7 @@ import { CheckCircle2 } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { Card } from '@/components/ui/card';
 import { PageHeading } from '@/components/dashboard/page-heading';
-import { requireStaff } from '@/lib/auth/session';
+import { getSession } from '@/lib/auth/session';
 import { getQueueCounts } from '@/features/admin/queries';
 import { ADMIN_ROUTES } from '@/lib/navigation';
 import { cn } from '@/lib/utils/cn';
@@ -27,11 +27,14 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
   const { locale } = await params;
   setRequestLocale(locale);
 
+  // Layout already enforces staff + MFA. Avoid a parallel requireStaff() throw
+  // that can race the layout redirect into the generic error boundary.
   const [session, t, counts] = await Promise.all([
-    requireStaff(),
+    getSession(),
     getTranslations('admin.queues'),
     getQueueCounts(),
   ]);
+  if (!session) return null;
 
   const total = Object.values(counts).reduce((sum, value) => sum + value, 0);
 

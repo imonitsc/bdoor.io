@@ -3,6 +3,7 @@ import { Mail } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import {
   FOOTER_COMPANY_LINKS,
+  FOOTER_INDUSTRY_LINKS,
   FOOTER_LEGAL_LINKS,
   FOOTER_SERVICE_LINKS,
   MARKETING_ROUTES,
@@ -11,6 +12,7 @@ import { BDoorLogo } from './logo';
 import { LocaleSwitcher } from './locale-switcher';
 import { IndependenceDisclosure } from './disclosure';
 import { SITE } from '@/lib/site';
+import { activeSocialProfiles } from '@/content/social/profiles';
 
 function FooterColumn({
   heading,
@@ -43,11 +45,12 @@ function FooterColumn({
 export function MarketingFooter() {
   const t = useTranslations();
   const year = new Date().getFullYear();
+  const social = activeSocialProfiles();
 
   return (
     <footer className="bg-surface-inverse text-ink-inverse">
       <div className="container-page py-14 md:py-16">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr_1fr]">
           <div className="flex flex-col gap-4">
             <Link
               href={MARKETING_ROUTES.home}
@@ -66,6 +69,10 @@ export function MarketingFooter() {
           <FooterColumn
             heading={t('footer.servicesHeading')}
             links={FOOTER_SERVICE_LINKS.map((l) => ({ href: l.href, label: t(l.labelKey) }))}
+          />
+          <FooterColumn
+            heading={t('footer.industriesHeading')}
+            links={FOOTER_INDUSTRY_LINKS.map((l) => ({ href: l.href, label: t(l.labelKey) }))}
           />
           <FooterColumn
             heading={t('footer.companyHeading')}
@@ -91,6 +98,26 @@ export function MarketingFooter() {
                 {t('footer.supportNote')}
               </p>
             </div>
+            {social.length > 0 ? (
+              <div>
+                <h2 className="text-muted-inverse text-xs font-semibold tracking-[0.1em] uppercase">
+                  {t('footer.socialHeading')}
+                </h2>
+                <ul className="mt-4 flex flex-col gap-2.5">
+                  {social.map((profile) => (
+                    <li key={profile.network}>
+                      <a
+                        href={profile.publicUrl!}
+                        rel="me noopener noreferrer"
+                        className="hover:text-ink-inverse inline-block rounded text-sm text-[color:var(--bd-offwhite)]/85 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--bd-cobalt-200)]"
+                      >
+                        {profile.network}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
           </div>
         </div>
 

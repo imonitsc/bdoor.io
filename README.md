@@ -1,14 +1,14 @@
-# BDoor
+# bdoor
 
-**Your door to business in Bangladesh.** BDoor is a digital platform that helps
+**Your door to business in Bangladesh.** bdoor is a digital platform that helps
 Bangladeshi and foreign founders start and run a business in Bangladesh: a
 guided questionnaire that produces a preliminary recommendation, a secure
 customer workspace for documents and cases, a partner workspace for the
 advocates and agents who do the filing work, and an internal operations area
-for the BDoor team.
+for the bdoor team.
 
-> BDoor is an independent business setup and administrative-support platform.
-> BDoor is not a government authority or law firm. Legal services, where
+> bdoor is an independent business setup and administrative-support platform.
+> bdoor is not a government authority or law firm. Legal services, where
 > required, are provided under a separate engagement by independent advocates or
 > partner law firms. Government approval and processing times are not
 > guaranteed.
@@ -17,6 +17,10 @@ for the BDoor team.
 > every page from `src/i18n/messages/*.json` and asserted by
 > `tests/e2e/marketing.spec.ts`.
 
+Production upgrade planning lives under `docs/audit/`, `docs/launch/` (gates and
+owner actions), and related architecture/security docs. Do not promote a preview
+to production until Gate F in `docs/launch/launch-gates.md` is explicitly
+approved.
 ---
 
 ## Contents
@@ -104,7 +108,8 @@ scripts/
   invite-initial-super-admin.mjs   grant the first super_admin on a fresh project
 tests/
   unit/ integration/ e2e/
-docs/                    role matrix, case states, data retention, incident response, launch checklist
+docs/                    role matrix, case states, launch gates, audit, architecture, security
+content/evidence-register/  public-claim evidence gate (verified claims only may render)
 ```
 
 ### Three decisions worth knowing

@@ -18,11 +18,11 @@ test.describe('marketing site', () => {
     await page.goto('/en');
 
     await expect(page.getByRole('heading', { level: 1 })).toContainText(
-      'Start and run your business in Bangladesh',
+      'Everything your business needs in Bangladesh',
     );
     await expect(page.getByText('Independent platform')).toBeVisible();
     await expect(
-      page.getByText('BDoor is not a government authority or law firm', { exact: false }),
+      page.getByText('bdoor is not a government authority or law firm', { exact: false }),
     ).toBeVisible();
   });
 
@@ -87,9 +87,7 @@ test.describe('marketing site', () => {
     await expect(page.getByRole('heading', { name: 'What is included' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'What is not included' })).toBeVisible();
     await expect(page.getByText('Time estimate reviewed')).toBeVisible();
-    await expect(
-      page.getByText('BDoor is not affiliated with this authority', { exact: false }),
-    ).toBeVisible();
+    await expect(page.getByText(/bdoor is not affiliated with this authority/i)).toBeVisible();
   });
 
   test('does not publish a government fee without a verified figure', async ({ page }) => {

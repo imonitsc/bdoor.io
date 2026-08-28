@@ -40,7 +40,9 @@ export default async function AdminLayout({
 
   const session = await getSession();
   if (!session) redirect(`/${locale}/login?next=/${locale}/admin`);
-  if (session.platformRoles.length === 0) redirect(`/${locale}/app`);
+  // Explicit denial page rather than bouncing a customer into /app mid-error
+  // when a page's requireStaff() races the layout redirect.
+  if (session.platformRoles.length === 0) redirect(`/${locale}/access-denied`);
   // Two different outstanding steps, two different destinations. Sending an
   // enrolled user to the enrolment page leaves them with no code box and no way
   // to reach aal2 at all.

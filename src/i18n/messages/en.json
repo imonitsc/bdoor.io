@@ -1,9 +1,9 @@
 {
   "brand": {
-    "name": "BDoor",
-    "tagline": "Your door to business in Bangladesh",
-    "promise": "Start and run your business in Bangladesh—from anywhere.",
-    "disclosure": "BDoor is an independent business setup and administrative-support platform. BDoor is not a government authority or law firm. Legal services, where required, are provided under a separate engagement by independent advocates or partner law firms. Government approval and processing times are not guaranteed."
+    "name": "bdoor",
+    "tagline": "Your door to business in Bangladesh.",
+    "promise": "Everything your business needs in Bangladesh. One door.",
+    "disclosure": "bdoor is an independent business setup and administrative-support platform. bdoor is not a government authority or law firm. Legal services, where required, are provided under a separate engagement by independent advocates or partner law firms. Government approval and processing times are not guaranteed."
   },
   "common": {
     "continue": "Continue",
@@ -71,11 +71,15 @@
     "partners": "Partners",
     "about": "About",
     "contact": "Contact",
-    "primaryCta": "Get started",
+    "primaryCta": "Start now",
     "mainNavigation": "Main navigation",
     "workspace": "Workspace",
     "adminArea": "Admin",
-    "partnerArea": "Partner"
+    "partnerArea": "Partner",
+    "industries": "Industries",
+    "international": "International",
+    "authorities": "Authorities",
+    "talkToSpecialist": "Talk to a specialist"
   },
   "footer": {
     "servicesHeading": "Services",
@@ -91,49 +95,74 @@
       "licences": "Trade licences",
       "importExport": "Import and export",
       "tax": "Tax and VAT",
-      "compliance": "Annual compliance"
-    }
+      "compliance": "Annual compliance",
+      "international": "International routes"
+    },
+    "industriesHeading": "Industries",
+    "internationalHeading": "International",
+    "resourcesHeading": "Resources",
+    "socialHeading": "Social"
   },
   "home": {
     "hero": {
       "eyebrow": "Your door to business in Bangladesh",
-      "headline": "Start and run your business in Bangladesh—from anywhere.",
-      "support": "BDoor brings company formation, licences, tax setup, compliance and official documents into one secure workspace.",
-      "primaryCta": "Start your business",
-      "secondaryCta": "Explore services",
-      "trustLine": "Independent platform · Partner professionals · Transparent fees"
+      "headline": "Everything your business needs in Bangladesh. One door.",
+      "support": "Form your company, obtain licences, coordinate tax and manage compliance through one secure workspace.",
+      "primaryCta": "Find what you need",
+      "secondaryCta": "Talk to a specialist",
+      "trustLine": "Independent platform · Partner professionals · Transparent fees",
+      "internationalLine": "Start and manage companies in Bangladesh, the USA, UK, UAE and Singapore through verified country specialists — international routes open when providers are ready."
     },
     "advisor": {
-      "title": "What do you want to do in Bangladesh?",
+      "title": "What do you need help with?",
       "help": "Pick the closest option. You can change it later — nothing is final until you confirm.",
       "continue": "Continue",
       "options": {
-        "localCompany": "Start a local company",
+        "localCompany": "Start a company",
         "foreignFounder": "Start as a foreign founder",
+        "getLicence": "Get a licence",
+        "taxVat": "Register tax or VAT",
         "importExport": "Import or export",
-        "travelAgency": "Open a travel agency",
-        "existingCompany": "Manage an existing company"
+        "existingCompany": "Manage an existing company",
+        "hireForeign": "Hire foreign staff",
+        "protectBrand": "Protect a brand",
+        "procurement": "Prepare for government procurement",
+        "annualCompliance": "Maintain annual compliance",
+        "expandInternational": "Expand internationally",
+        "travelAgency": "Open a travel agency"
       }
     },
     "howItWorks": {
       "eyebrow": "How it works",
-      "title": "Four steps, one workspace.",
+      "title": "From assessment to compliance reminders.",
       "steps": {
         "one": {
-          "title": "Tell us about your business",
-          "body": "Answer a short guided questionnaire about your activity, owners and plans. We use it to work out which registrations actually apply to you."
+          "title": "Complete the assessment",
+          "body": "Answer guided questions about your activity, owners and plans. The recommendation is preliminary and subject to review."
         },
         "two": {
-          "title": "Complete review and upload documents",
-          "body": "You get a clear checklist of required documents and identity information. Everything is uploaded to a private vault, never email."
+          "title": "Verify identity and business facts",
+          "body": "Upload identity and company information to a private vault. Screening and checks follow the published process."
         },
         "three": {
-          "title": "Pay and track every milestone",
-          "body": "Your quote separates our fee from government fees, partner fees and third-party costs. Pay the permitted amounts and watch each milestone move."
+          "title": "Receive an itemised quotation",
+          "body": "See bdoor fees, government fees, partner fees and third-party costs separately — never a single opaque total."
         },
         "four": {
-          "title": "Receive documents and manage compliance",
-          "body": "Approved certificates land in your vault. Renewals, filings and tax dates become reminders instead of surprises."
+          "title": "Approve and pay",
+          "body": "Accept the quote, then pay through the secure checkout. A browser redirect alone never marks a case paid."
+        },
+        "five": {
+          "title": "Upload required documents",
+          "body": "Work through a clear checklist. Files stay private and are shared with partners only after your consent."
+        },
+        "six": {
+          "title": "Track preparation and authority milestones",
+          "body": "Follow each milestone, who owns it, and any authority queries without chasing email threads."
+        },
+        "seven": {
+          "title": "Receive records and compliance reminders",
+          "body": "Issued documents land in your vault. Renewals and filings become dated reminders."
         }
       }
     },
@@ -189,9 +218,21 @@
     },
     "finalCta": {
       "title": "Open the door to your Bangladesh business.",
-      "body": "Start the questionnaire. It takes about five minutes and you can save and come back.",
-      "primary": "Start your business",
-      "secondary": "Talk to us first"
+      "body": "Start the assessment or talk to a specialist. Government decisions stay with the authorities — we never claim a fixed approval outcome.",
+      "primary": "Find what you need",
+      "secondary": "Talk to a specialist"
+    },
+    "international": {
+      "eyebrow": "Bangladesh and beyond",
+      "title": "Bangladesh first. Other countries when ready.",
+      "body": "Bangladesh is the flagship product. USA, UK, UAE and Singapore appear as controlled secondary routes and stay labelled coming soon until providers and processes are verified.",
+      "cta": "See international routes",
+      "comingSoon": "Coming soon"
+    },
+    "serviceFinder": {
+      "eyebrow": "Service finder",
+      "title": "Start from what you need to do.",
+      "body": "Pick a goal. We will take you into the assessment or the matching service area — nothing is final until you confirm."
     }
   },
   "howItWorksPage": {
@@ -238,7 +279,7 @@
     "milestones": "Process milestones",
     "fees": "How fees work",
     "authority": "Responsible authority",
-    "authorityNote": "BDoor is not affiliated with this authority and does not act on its behalf.",
+    "authorityNote": "bdoor is not affiliated with this authority and does not act on its behalf.",
     "faq": "Common questions",
     "emptyState": "No services match these filters yet.",
     "comingSoonNote": "This service is not open for new cases yet. Tell us you are interested and we will contact you when it opens.",
@@ -1173,5 +1214,32 @@
       "declined": "Assignment declined.",
       "saved": "Saved."
     }
+  },
+  "industriesPage": {
+    "title": "Industries",
+    "description": "Sector overviews for Bangladesh business setup. These pages are informational and are not legal or tax advice.",
+    "comingSoon": "Detailed industry guides are being reviewed before publication.",
+    "disclaimer": "bdoor is not a government authority or law firm. Regulated advice is provided under separate engagements by qualified professionals."
+  },
+  "internationalPage": {
+    "title": "International routes",
+    "description": "Controlled secondary routes outside Bangladesh. A country is only marked available after provider and process verification.",
+    "flagshipNote": "Bangladesh remains the flagship product and receives the most product depth.",
+    "comingSoonBody": "This route is not yet available. Register interest through contact if you want to be notified when it opens.",
+    "cta": "Contact us"
+  },
+  "authoritiesPage": {
+    "title": "Authorities directory",
+    "description": "Independent informational profiles of authorities and systems that business setup in Bangladesh often touches.",
+    "disclaimer": "bdoor is not affiliated with these authorities. Official websites will appear only after verification. Government logos are not used without written permission.",
+    "comingSoon": "Profiles are being verified before publication.",
+    "unverifiedWebsite": "Official website pending verification"
+  },
+  "accessDenied": {
+    "title": "You do not have access to this",
+    "body": "Your account does not have permission to view this area. If you think that is wrong, ask an organisation owner or contact us.",
+    "back": "Back to your workspace",
+    "home": "Go to the homepage",
+    "signIn": "Sign in"
   }
 }

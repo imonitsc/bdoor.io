@@ -7,6 +7,9 @@ export const MARKETING_ROUTES = {
   home: '/',
   start: '/start',
   services: '/services',
+  industries: '/industries',
+  international: '/international',
+  authorities: '/authorities',
   foreignFounders: '/foreign-founders',
   pricing: '/pricing',
   howItWorks: '/how-it-works',
@@ -16,6 +19,7 @@ export const MARKETING_ROUTES = {
   contact: '/contact',
   login: '/login',
   signup: '/signup',
+  accessDenied: '/access-denied',
   privacy: '/privacy',
   terms: '/terms',
   refundPolicy: '/refund-policy',
@@ -70,9 +74,11 @@ export const ADMIN_ROUTES = {
 export const HEADER_LINKS = [
   { href: MARKETING_ROUTES.start, labelKey: 'nav.start' },
   { href: MARKETING_ROUTES.services, labelKey: 'nav.services' },
-  { href: MARKETING_ROUTES.foreignFounders, labelKey: 'nav.foreignFounders' },
+  { href: MARKETING_ROUTES.industries, labelKey: 'nav.industries' },
+  { href: MARKETING_ROUTES.international, labelKey: 'nav.international' },
   { href: MARKETING_ROUTES.pricing, labelKey: 'nav.pricing' },
   { href: MARKETING_ROUTES.resources, labelKey: 'nav.resources' },
+  { href: MARKETING_ROUTES.partners, labelKey: 'nav.partners' },
 ] as const;
 
 export const FOOTER_SERVICE_LINKS = [
@@ -84,10 +90,17 @@ export const FOOTER_SERVICE_LINKS = [
   { href: '/services?category=compliance', labelKey: 'footer.links.compliance' },
 ] as const;
 
+export const FOOTER_INDUSTRY_LINKS = [
+  { href: MARKETING_ROUTES.industries, labelKey: 'nav.industries' },
+  { href: MARKETING_ROUTES.international, labelKey: 'footer.links.international' },
+  { href: MARKETING_ROUTES.authorities, labelKey: 'nav.authorities' },
+] as const;
+
 export const FOOTER_COMPANY_LINKS = [
   { href: MARKETING_ROUTES.about, labelKey: 'nav.about' },
   { href: MARKETING_ROUTES.howItWorks, labelKey: 'nav.howItWorks' },
   { href: MARKETING_ROUTES.partners, labelKey: 'nav.partners' },
+  { href: MARKETING_ROUTES.resources, labelKey: 'nav.resources' },
   { href: MARKETING_ROUTES.contact, labelKey: 'nav.contact' },
 ] as const;
 
@@ -109,6 +122,9 @@ export const SITEMAP_ROUTES: ReadonlyArray<{
   { path: '/', priority: 1, changeFrequency: 'weekly' },
   { path: '/start', priority: 0.9, changeFrequency: 'monthly' },
   { path: '/services', priority: 0.9, changeFrequency: 'weekly' },
+  { path: '/industries', priority: 0.7, changeFrequency: 'monthly' },
+  { path: '/international', priority: 0.7, changeFrequency: 'monthly' },
+  { path: '/authorities', priority: 0.6, changeFrequency: 'monthly' },
   { path: '/foreign-founders', priority: 0.8, changeFrequency: 'monthly' },
   { path: '/pricing', priority: 0.8, changeFrequency: 'monthly' },
   { path: '/how-it-works', priority: 0.7, changeFrequency: 'monthly' },
