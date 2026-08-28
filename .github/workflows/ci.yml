@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [claude/new-session-0n73z6, main]
+    branches: [claude/new-session-0n73z6, main, 'cursor/**', 'feat/**']
   # Lets CI be re-run on demand. Without it the only ways to get a run onto a
   # commit GitHub did not queue one for are an empty commit or a force-push,
   # and neither should be needed to verify a head. (GitHub skipped the run for

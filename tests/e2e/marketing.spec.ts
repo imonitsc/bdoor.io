@@ -18,7 +18,7 @@ test.describe('marketing site', () => {
     await page.goto('/en');
 
     await expect(page.getByRole('heading', { level: 1 })).toContainText(
-      'Start and run your business in Bangladesh',
+      'Everything your business needs in Bangladesh',
     );
     await expect(page.getByText('Independent platform')).toBeVisible();
     await expect(
@@ -36,6 +36,7 @@ test.describe('marketing site', () => {
   });
 
   test('every header link resolves', async ({ page, baseURL }) => {
+    test.setTimeout(120_000);
     await page.goto('/en');
     const links = await page
       .locator('header nav a')
@@ -51,6 +52,9 @@ test.describe('marketing site', () => {
   });
 
   test('every footer link resolves', async ({ page, baseURL }) => {
+    // Footer grew with industries and international routes; each hit runs the
+    // auth proxy against a closed Supabase port in this suite (~3s each).
+    test.setTimeout(180_000);
     await page.goto('/en');
     const links = await page
       .locator('footer a[href^="/"]')
