@@ -1,0 +1,184 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [claude/new-session-0n73z6, main]
+
+# A second push to the same branch cancels the first: CI here builds the app
+# twice (build + Playwright), so overlapping runs are expensive and pointless.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # Node 22: the Supabase client libraries dropped Node 20 on 30 June 2026.
+  NODE_VERSION: '22'
+
+jobs:
+  # Checks 1-5 and 11: everything that needs no service container.
+  verify:
+    name: Format, lint, types, unit, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      - name: Format check
+        run: pnpm run format:check
+
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Type check
+        run: pnpm run typecheck
+
+      - name: Unit tests with coverage threshold
+        run: pnpm run test:coverage
+
+      - name: Production build
+        run: pnpm run build
+        env:
+          # Synthetic values only. CI never touches a real Supabase project.
+          NEXT_PUBLIC_SITE_URL: https://ci.invalid
+          NEXT_PUBLIC_SUPABASE_URL: https://ci.supabase.invalid
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder
+          STRICT_ENV: 'false'
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 7
+          if-no-files-found: ignore
+
+  # Checks 6-8: real Postgres, migrations applied from zero, RLS tests.
+  database:
+    name: Migrations and RLS
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      PGHOST: localhost
+      PGPORT: '5432'
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: bdoor_test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      - name: Install psql client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      # Rebuilds from the shim plus every migration in order, so a migration
+      # that only works against an already-migrated database fails here.
+      - name: Apply migrations from zero, with seed
+        run: scripts/local-db/apply.sh --seed
+
+      - name: RLS and database tests
+        run: pnpm run test:integration
+
+  # Checks 9-10: journeys plus the axe accessibility spec.
+  e2e:
+    name: Playwright and accessibility
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      # playwright.config.ts builds and starts the app itself.
+      - name: Run Playwright
+        run: pnpm run test:e2e
+        env:
+          NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3000
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+          if-no-files-found: ignore
+
+  # Check 12.
+  security:
+    name: Dependency scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      # Fails the job on a known high or critical advisory.
+      - name: Audit dependencies
+        run: pnpm audit --audit-level high
+
+  dependency-review:
+    name: Dependency review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
