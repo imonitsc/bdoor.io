@@ -1,0 +1,88 @@
+{
+  "claims": [
+    {
+      "id": "EVD-INDEPENDENCE",
+      "text": "bdoor is an independent business setup and administrative-support platform, not a government authority or law firm.",
+      "sourceType": "product_policy",
+      "officialSourceUrl": null,
+      "sourcePublishedAt": "2026-01-15",
+      "lastVerifiedAt": "2026-08-28",
+      "reviewer": "platform",
+      "status": "verified",
+      "countries": ["BD"],
+      "services": ["*"],
+      "public": true,
+      "note": "Positioning already rendered from brand.disclosure and asserted by tests/e2e/marketing.spec.ts. Not a government-fee or affiliation claim."
+    },
+    {
+      "id": "EVD-PRIVATE-STORAGE",
+      "text": "Identity and case documents are stored in private buckets and served through short-lived signed URLs after an authorisation check.",
+      "sourceType": "implementation",
+      "officialSourceUrl": null,
+      "sourcePublishedAt": "2026-01-01",
+      "lastVerifiedAt": "2026-08-28",
+      "reviewer": "engineering",
+      "status": "verified",
+      "countries": ["BD"],
+      "services": ["*"],
+      "public": true,
+      "note": "supabase/migrations/20260101001100_storage.sql and document actions."
+    },
+    {
+      "id": "EVD-STAFF-MFA",
+      "text": "Staff and partner roles must complete TOTP MFA before using their workspace.",
+      "sourceType": "implementation",
+      "officialSourceUrl": null,
+      "sourcePublishedAt": "2026-01-01",
+      "lastVerifiedAt": "2026-08-28",
+      "reviewer": "engineering",
+      "status": "verified",
+      "countries": ["BD"],
+      "services": ["*"],
+      "public": true,
+      "note": "MFA_REQUIRED_PLATFORM_ROLES and MFA_REQUIRED_ORGANIZATION_ROLES."
+    },
+    {
+      "id": "EVD-ITEMISED-QUOTES",
+      "text": "Quotes separate the bdoor service fee from government fees, partner fees and third-party costs.",
+      "sourceType": "implementation",
+      "officialSourceUrl": null,
+      "sourcePublishedAt": "2026-01-01",
+      "lastVerifiedAt": "2026-08-28",
+      "reviewer": "engineering",
+      "status": "verified",
+      "countries": ["BD"],
+      "services": ["*"],
+      "public": true,
+      "note": "quote_item_category and homepage/pricing UI."
+    },
+    {
+      "id": "EVD-CAPITAL-FLOW",
+      "text": "Foreign share capital is not paid to bdoor and is not held by bdoor.",
+      "sourceType": "product_policy",
+      "officialSourceUrl": null,
+      "sourcePublishedAt": "2026-01-15",
+      "lastVerifiedAt": "2026-08-28",
+      "reviewer": "platform",
+      "status": "verified",
+      "countries": ["BD"],
+      "services": ["foreign-ownership-eligibility-review"],
+      "public": true,
+      "note": "Stated on the foreign-founders page. Not a banking-licence claim."
+    },
+    {
+      "id": "EVD-OPERATOR-ENTITY",
+      "text": "Operator legal entity, registration number and office address.",
+      "sourceType": "owner",
+      "officialSourceUrl": null,
+      "sourcePublishedAt": null,
+      "lastVerifiedAt": null,
+      "reviewer": null,
+      "status": "draft",
+      "countries": ["BD"],
+      "services": ["*"],
+      "public": false,
+      "note": "Blocked on owner input O-01 / O-02. Must not render."
+    }
+  ]
+}

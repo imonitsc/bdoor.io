@@ -5,7 +5,9 @@ Bangladeshi and foreign founders start and run a business in Bangladesh: a
 guided questionnaire that produces a preliminary recommendation, a secure
 customer workspace for documents and cases, a partner workspace for the
 advocates and agents who do the filing work, and an internal operations area
-for the BDoor team.
+for the BDoor team. The public promise is: everything your business needs in
+Bangladesh, through one door. USA, UK, UAE and Singapore are listed as
+coming-soon specialist routes, not as open products.
 
 > BDoor is an independent business setup and administrative-support platform.
 > BDoor is not a government authority or law firm. Legal services, where
@@ -37,14 +39,18 @@ for the BDoor team.
 
 ## What is in here
 
-| Area                 | Route base          | Who                            |
-| -------------------- | ------------------- | ------------------------------ |
-| Marketing site       | `/[locale]`         | anyone, indexed                |
-| Guided questionnaire | `/[locale]/start`   | anyone, no account needed      |
-| Authentication       | `/[locale]/login` … | anyone                         |
-| Customer workspace   | `/[locale]/app`     | organisation members           |
-| Partner workspace    | `/[locale]/partner` | verified partner organisations |
-| Operations / admin   | `/[locale]/admin`   | BDoor staff, per capability    |
+| Area                 | Route base                | Who                                        |
+| -------------------- | ------------------------- | ------------------------------------------ |
+| Marketing site       | `/[locale]`               | anyone, indexed                            |
+| Guided questionnaire | `/[locale]/start`         | anyone, no account needed                  |
+| Service catalogue    | `/[locale]/services`      | anyone, indexed                            |
+| Industries           | `/[locale]/industries`    | anyone, indexed                            |
+| International routes | `/[locale]/international` | anyone; inactive countries are coming-soon |
+| Authorities          | `/[locale]/authorities`   | informational, unaffiliated                |
+| Authentication       | `/[locale]/login` …       | anyone                                     |
+| Customer workspace   | `/[locale]/app`           | organisation members                       |
+| Partner workspace    | `/[locale]/partner`       | verified partner organisations             |
+| Operations / admin   | `/[locale]/admin`         | BDoor staff, per capability                |
 
 Two locales ship: English (`en`) and Bangla (`bn`). Every public page exists in
 both, with `hreflang` alternates and a locale switcher in the header and footer.
@@ -96,7 +102,7 @@ src/
     payments/ email/ screening/ malware/ ai/     adapters
   i18n/                  routing, request config, messages/{en,bn}.json
 supabase/
-  migrations/            13 ordered SQL files
+  migrations/            ordered SQL files (additive; never rebuild production)
   seed.sql               entirely fictional development data
 scripts/
   local-db/              apply the schema to a plain Postgres, generate snapshots
@@ -104,7 +110,9 @@ scripts/
   invite-initial-super-admin.mjs   grant the first super_admin on a fresh project
 tests/
   unit/ integration/ e2e/
-docs/                    role matrix, case states, data retention, incident response, launch checklist
+content/
+  evidence-register/     claim IDs that may appear publicly only when verified
+docs/                    role matrix, case states, launch gates, owner-action register, architecture
 ```
 
 ### Three decisions worth knowing

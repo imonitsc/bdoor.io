@@ -7,6 +7,10 @@ left as drafts or mocks, and each one appears here.
 Nothing on this list can be ticked by an engineer alone. Where a line needs a
 lawyer, an accountant or a director, it says so.
 
+The production-upgrade gates and the owner inputs that must not be invented
+live in `docs/launch/launch-gates.md` and `docs/launch/owner-action-register.md`.
+Commercial launch stays blocked while any P0 gate is open.
+
 ---
 
 ## 1 · Legal review — blocking
