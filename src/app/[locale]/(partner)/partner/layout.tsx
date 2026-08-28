@@ -6,14 +6,15 @@ import {
   FileText,
   LayoutDashboard,
   ListChecks,
+  ShieldAlert,
   ShieldCheck,
   Users,
 } from 'lucide-react';
 import { AppShell, type NavItem } from '@/components/layout/app-shell';
 import { SkipLink } from '@/components/layout/skip-link';
 import { SignOutButton } from '@/components/dashboard/sign-out-button';
-import { getSession, partnerMemberships } from '@/lib/auth/session';
-import { PARTNER_ROUTES } from '@/lib/navigation';
+import { customerMemberships, getSession, partnerMemberships } from '@/lib/auth/session';
+import { ADMIN_ROUTES, APP_ROUTES, PARTNER_ROUTES } from '@/lib/navigation';
 
 export default async function PartnerLayout({
   children,
@@ -63,6 +64,21 @@ export default async function PartnerLayout({
       icon: <ShieldCheck className="size-4" />,
     },
   ];
+
+  if (session.platformRoles.length > 0) {
+    items.push({
+      href: ADMIN_ROUTES.dashboard,
+      label: nav('adminArea'),
+      icon: <ShieldAlert className="size-4" />,
+    });
+  }
+  if (customerMemberships(session).length > 0) {
+    items.push({
+      href: APP_ROUTES.dashboard,
+      label: nav('workspace'),
+      icon: <LayoutDashboard className="size-4" />,
+    });
+  }
 
   return (
     <>

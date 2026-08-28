@@ -8,16 +8,18 @@ import {
   FileText,
   LayoutDashboard,
   MessageSquare,
+  Handshake,
   Settings,
+  ShieldAlert,
   ShieldCheck,
   Users,
 } from 'lucide-react';
 import { AppShell, type NavItem } from '@/components/layout/app-shell';
 import { SkipLink } from '@/components/layout/skip-link';
 import { SignOutButton } from '@/components/dashboard/sign-out-button';
-import { getSession } from '@/lib/auth/session';
+import { getSession, partnerMemberships } from '@/lib/auth/session';
 import { createClient } from '@/lib/supabase/server';
-import { APP_ROUTES } from '@/lib/navigation';
+import { ADMIN_ROUTES, APP_ROUTES, PARTNER_ROUTES } from '@/lib/navigation';
 
 export default async function CustomerLayout({
   children,
@@ -73,6 +75,27 @@ export default async function CustomerLayout({
   ];
 
   const nav = await getTranslations('nav');
+
+  // A person can hold a platform role, a partner membership and a customer
+  // organisation at once — the two axes are independent. Nothing used to link
+  // the areas, so a staff account that landed here (the email confirmation
+  // sends everyone to /app/onboarding) had no way to reach /admin except by
+  // typing the URL, and the screen it landed on asked it to create a customer
+  // organisation it does not need.
+  if (session.platformRoles.length > 0) {
+    items.push({
+      href: ADMIN_ROUTES.dashboard,
+      label: nav('adminArea'),
+      icon: <ShieldAlert className="size-4" />,
+    });
+  }
+  if (partnerMemberships(session).length > 0) {
+    items.push({
+      href: PARTNER_ROUTES.dashboard,
+      label: nav('partnerArea'),
+      icon: <Handshake className="size-4" />,
+    });
+  }
 
   return (
     <>

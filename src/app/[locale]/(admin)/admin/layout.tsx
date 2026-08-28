@@ -18,8 +18,8 @@ import {
 import { AppShell, type NavItem } from '@/components/layout/app-shell';
 import { SkipLink } from '@/components/layout/skip-link';
 import { SignOutButton } from '@/components/dashboard/sign-out-button';
-import { getSession } from '@/lib/auth/session';
-import { ADMIN_ROUTES } from '@/lib/navigation';
+import { customerMemberships, getSession, partnerMemberships } from '@/lib/auth/session';
+import { ADMIN_ROUTES, APP_ROUTES, PARTNER_ROUTES } from '@/lib/navigation';
 
 /**
  * Staff area.
@@ -114,6 +114,23 @@ export default async function AdminLayout({
       : []),
     { href: ADMIN_ROUTES.documents, label: t('documents'), icon: <FileText className="size-4" /> },
   ];
+
+  // The axes are independent, so signpost the other areas this person holds
+  // rather than leaving them to guess at URLs.
+  if (customerMemberships(session).length > 0) {
+    items.push({
+      href: APP_ROUTES.dashboard,
+      label: nav('workspace'),
+      icon: <LayoutDashboard className="size-4" />,
+    });
+  }
+  if (partnerMemberships(session).length > 0) {
+    items.push({
+      href: PARTNER_ROUTES.dashboard,
+      label: nav('partnerArea'),
+      icon: <Handshake className="size-4" />,
+    });
+  }
 
   return (
     <>
