@@ -79,7 +79,7 @@ Actually executed in this session:
 | Unit tests                  | **111 passed** (103 existing + 8 new)                              |
 | Critical-logic coverage     | **89.3% statements, 92.8% lines, 74.0% branches, 87.7% functions** |
 | Migrations from zero + seed | pass — 13 migrations against PostgreSQL 16                         |
-| Integration / RLS           | **60 passed**                                                      |
+| Integration / RLS           | **60 passed**, stable across 5 consecutive rebuilt-database runs   |
 | `pnpm run build`            | pass                                                               |
 
 **Playwright: 41 of 41 passed**, including the axe accessibility specs and the

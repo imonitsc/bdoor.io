@@ -109,17 +109,27 @@ export async function expectRejected(
   });
 }
 
-/** Ensures the extra test user exists without touching the seed file. */
+/**
+ * Ensures the extra test user exists without touching the seed file.
+ *
+ * The conflict clauses name no arbiter on purpose. Two test files call this
+ * from `beforeAll`, vitest runs files in parallel, and they share one database
+ * — so these inserts genuinely race. `on conflict (id)` covers only the primary
+ * key, so when the concurrent insert trips `users_email_key` first the
+ * statement raises instead of doing nothing. Which index trips first is not
+ * deterministic, which is why that form passed twice in CI and then failed.
+ * Unqualified `on conflict do nothing` covers every unique constraint.
+ */
 export async function ensureStranger(client: Client): Promise<void> {
   await client.query(
     `insert into auth.users (id, email) values ($1, 'stranger@example.test')
-     on conflict (id) do nothing`,
+     on conflict do nothing`,
     [USERS.stranger],
   );
   await client.query(
     `insert into public.profiles (id, full_name, email)
      values ($1, 'Unrelated Person (sample)', 'stranger@example.test')
-     on conflict (id) do nothing`,
+     on conflict do nothing`,
     [USERS.stranger],
   );
 }
