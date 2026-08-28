@@ -7,12 +7,7 @@ export type LegalSection = {
 
 export type LegalDocument = {
   slug:
-    | 'terms'
-    | 'privacy'
-    | 'refund-policy'
-    | 'aml-kyc-policy'
-    | 'legal-disclaimer'
-    | 'cookie-policy';
+    'terms' | 'privacy' | 'refund-policy' | 'aml-kyc-policy' | 'legal-disclaimer' | 'cookie-policy';
   titleKey: string;
   /** Recorded against every acceptance, so we know which text a customer saw. */
   version: string;

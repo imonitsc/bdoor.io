@@ -6,7 +6,7 @@ import type { Database } from '@/types/database';
 function supabaseIsConfigured(): boolean {
   return Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() &&
-      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim(),
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim(),
   );
 }
 

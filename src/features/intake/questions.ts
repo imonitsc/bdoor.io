@@ -79,13 +79,7 @@ export type PartialAnswers = Partial<Answers>;
 export type QuestionKey = keyof Answers;
 
 export type QuestionKind =
-  | 'choice'
-  | 'boolean'
-  | 'text'
-  | 'textarea'
-  | 'number'
-  | 'country'
-  | 'multi';
+  'choice' | 'boolean' | 'text' | 'textarea' | 'number' | 'country' | 'multi';
 
 export type QuestionDefinition = {
   key: QuestionKey;

@@ -39,8 +39,7 @@ const toneColor = {
 } as const;
 
 export interface AlertProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'>,
-    VariantProps<typeof alertVariants> {
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'>, VariantProps<typeof alertVariants> {
   title?: React.ReactNode;
   /** Assertive for validation failures; polite (default) for everything else. */
   live?: 'off' | 'polite' | 'assertive';
