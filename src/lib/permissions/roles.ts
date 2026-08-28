@@ -216,3 +216,36 @@ export function requiresMfa(
     organizationRoles.some((r) => MFA_REQUIRED_ORGANIZATION_ROLES.includes(r))
   );
 }
+
+/** The assurance level of a session, as Supabase reports it. */
+export type AssuranceLevel = 'aal1' | 'aal2' | null;
+
+/** What the user must still do before an MFA-required workspace will let them in. */
+export type MfaStep = 'satisfied' | 'enroll' | 'challenge';
+
+/**
+ * Decides whether a second factor still stands between the user and the
+ * workspace, and if so which one of the two things they have to do.
+ *
+ * The distinction that matters is between `currentLevel` and `nextLevel`.
+ * `currentLevel` is the assurance level of the token in hand — 'aal2' only once
+ * a factor has actually been presented on this session. `nextLevel` is the
+ * highest level the account *could* reach, which Supabase raises to 'aal2' as
+ * soon as one verified factor exists. So `nextLevel` describes the account and
+ * `currentLevel` describes the request; only `currentLevel` is evidence.
+ *
+ * Reading `nextLevel` as though it were evidence inverts the control: an
+ * account that never enrolled has `nextLevel === 'aal1'` and would look like it
+ * had nothing outstanding, so the gate would admit precisely the accounts with
+ * no second factor and stop only the ones that had set it up.
+ */
+export function mfaStep(
+  required: boolean,
+  currentLevel: AssuranceLevel,
+  nextLevel: AssuranceLevel,
+): MfaStep {
+  if (currentLevel === 'aal2') return 'satisfied';
+  if (!required) return 'satisfied';
+  // A verified factor exists but was not presented on this session.
+  return nextLevel === 'aal2' ? 'challenge' : 'enroll';
+}

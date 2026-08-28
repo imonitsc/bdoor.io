@@ -3,10 +3,13 @@ import 'server-only';
 import { cache } from 'react';
 import { createClient } from '@/lib/supabase/server';
 import {
+  mfaStep,
   organizationCapabilities,
   platformCapabilities,
   requiresMfa,
+  type AssuranceLevel,
   type Capability,
+  type MfaStep,
   type OrganizationRole,
   type PlatformRole,
 } from '@/lib/permissions/roles';
@@ -30,6 +33,8 @@ export type SessionContext = {
   capabilities: Set<Capability>;
   mfaRequired: boolean;
   mfaSatisfied: boolean;
+  /** When MFA is outstanding, whether the user must enrol or only present a factor. */
+  mfaStep: MfaStep;
 };
 
 /**
@@ -93,6 +98,12 @@ export const getSession = cache(async (): Promise<SessionContext | null> => {
   ]);
 
   const aal = aalResult.data;
+  const mfaRequired = requiresMfa(platformRoles, orgRoles);
+  const step = mfaStep(
+    mfaRequired,
+    (aal?.currentLevel ?? null) as AssuranceLevel,
+    (aal?.nextLevel ?? null) as AssuranceLevel,
+  );
 
   return {
     userId,
@@ -102,9 +113,12 @@ export const getSession = cache(async (): Promise<SessionContext | null> => {
     platformRoles,
     memberships,
     capabilities,
-    mfaRequired: requiresMfa(platformRoles, orgRoles),
-    // aal2 means a second factor was actually presented this session.
-    mfaSatisfied: aal?.currentLevel === 'aal2' || aal?.nextLevel !== 'aal2',
+    mfaRequired,
+    // Only `currentLevel` is evidence that a factor was presented on this
+    // request. `nextLevel` describes what the account could reach, so reading
+    // it here would admit an account that never enrolled. See `mfaStep`.
+    mfaSatisfied: step === 'satisfied',
+    mfaStep: step,
   };
 });
 
