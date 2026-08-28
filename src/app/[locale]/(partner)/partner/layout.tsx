@@ -39,13 +39,29 @@ export default async function PartnerLayout({
   const nav = await getTranslations('nav');
 
   const items: NavItem[] = [
-    { href: PARTNER_ROUTES.dashboard, label: t('dashboard'), icon: LayoutDashboard },
-    { href: PARTNER_ROUTES.cases, label: t('cases'), icon: Briefcase },
-    { href: PARTNER_ROUTES.tasks, label: t('tasks'), icon: ListChecks },
-    { href: PARTNER_ROUTES.documents, label: t('documents'), icon: FileText },
-    { href: PARTNER_ROUTES.team, label: t('team'), icon: Users },
-    { href: PARTNER_ROUTES.organization, label: t('organization'), icon: Building2 },
-    { href: PARTNER_ROUTES.security, label: t('security'), icon: ShieldCheck },
+    {
+      href: PARTNER_ROUTES.dashboard,
+      label: t('dashboard'),
+      icon: <LayoutDashboard className="size-4" />,
+    },
+    { href: PARTNER_ROUTES.cases, label: t('cases'), icon: <Briefcase className="size-4" /> },
+    { href: PARTNER_ROUTES.tasks, label: t('tasks'), icon: <ListChecks className="size-4" /> },
+    {
+      href: PARTNER_ROUTES.documents,
+      label: t('documents'),
+      icon: <FileText className="size-4" />,
+    },
+    { href: PARTNER_ROUTES.team, label: t('team'), icon: <Users className="size-4" /> },
+    {
+      href: PARTNER_ROUTES.organization,
+      label: t('organization'),
+      icon: <Building2 className="size-4" />,
+    },
+    {
+      href: PARTNER_ROUTES.security,
+      label: t('security'),
+      icon: <ShieldCheck className="size-4" />,
+    },
   ];
 
   return (

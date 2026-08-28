@@ -1,8 +1,9 @@
 'use client';
 
+import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Menu, X, type LucideIcon } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { Link, usePathname } from '@/i18n/navigation';
 import { BDoorLogo } from './logo';
 import { LocaleSwitcher } from './locale-switcher';
@@ -12,7 +13,21 @@ import { cn } from '@/lib/utils/cn';
 export type NavItem = {
   href: string;
   label: string;
-  icon: LucideIcon;
+  /**
+   * An already-rendered icon element, not the component.
+   *
+   * This is a client component, and a lucide icon is a `forwardRef` object —
+   * `{$$typeof, render, displayName}` — which React cannot pass across the
+   * server/client boundary. Passing the component threw "Functions cannot be
+   * passed directly to Client Components" on every workspace page. Typing this
+   * as ReactNode is what stops it coming back: the compiler rejects a
+   * component here.
+   *
+   * Lucide strokes with `currentColor`, so the active/inactive colour is set on
+   * the wrapper below rather than on the icon itself — the active state is
+   * derived from the pathname and is only known on the client.
+   */
+  icon: React.ReactNode;
   badge?: number;
 };
 
@@ -70,7 +85,6 @@ export function AppShell({
   const nav = (
     <ul className="flex flex-col gap-0.5">
       {items.map((item) => {
-        const Icon = item.icon;
         const active = isActive(item.href);
         return (
           <li key={item.href}>
@@ -83,10 +97,12 @@ export function AppShell({
                 active ? 'bg-primary-soft text-info' : 'text-ink hover:bg-surface-sunken',
               )}
             >
-              <Icon
-                className={cn('size-4 shrink-0', active ? 'text-primary' : 'text-muted')}
+              <span
+                className={cn('inline-flex shrink-0', active ? 'text-primary' : 'text-muted')}
                 aria-hidden="true"
-              />
+              >
+                {item.icon}
+              </span>
               <span className="flex-1 truncate">{item.label}</span>
               {item.badge && item.badge > 0 ? (
                 <span className="bg-primary text-on-primary inline-flex min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-semibold">
