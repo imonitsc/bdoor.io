@@ -53,7 +53,7 @@ export function SectionHeading({
         <p
           className={cn(
             'text-xs font-semibold tracking-[0.12em] uppercase',
-            inverse ? 'text-[color:var(--bd-teal-500)]' : 'text-accent-strong',
+            inverse ? 'text-[color:var(--bd-turquoise-500)]' : 'text-accent-strong',
           )}
         >
           {eyebrow}
