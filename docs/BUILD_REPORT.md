@@ -76,15 +76,19 @@ Actually executed in this session:
 | `pnpm run format:check`     | pass                                                               |
 | `pnpm run lint`             | pass                                                               |
 | `pnpm run typecheck`        | pass                                                               |
-| Unit tests                  | **108 passed** (103 existing + 5 new)                              |
+| Unit tests                  | **111 passed** (103 existing + 8 new)                              |
 | Critical-logic coverage     | **89.3% statements, 92.8% lines, 74.0% branches, 87.7% functions** |
 | Migrations from zero + seed | pass — 13 migrations against PostgreSQL 16                         |
 | Integration / RLS           | **60 passed**                                                      |
 | `pnpm run build`            | pass                                                               |
 
-**Not executed in this session:** Playwright. It is wired into CI and the config
-builds and starts the app itself, but the suite was not run here, so no claim is
-made about it.
+**Playwright: 41 of 41 passed**, including the axe accessibility specs and the
+full questionnaire journeys — run against a server started with _no_ Supabase
+environment variables, which is exactly the CI configuration.
+
+The sandbox ships `chromium_headless_shell-1194` while this Playwright wants
+`1234`, so the run used `PLAYWRIGHT_CHROMIUM_PATH` to point at the available
+build. CI installs the matching browser itself and is unaffected.
 
 Coverage is measured on the seven pure-logic modules the unit suite targets, not
 on all of `src/`. Measuring Server Actions and React here would produce a number
