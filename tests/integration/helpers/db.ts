@@ -62,19 +62,59 @@ export async function disconnect(client: Client | undefined): Promise<void> {
   await client?.end();
 }
 
+/**
+ * Switches the *current transaction* to act as `userId`.
+ *
+ * Separate from `asUser` because a test that has to set something up as the
+ * database owner and then read it back as a user needs both identities inside
+ * one transaction — the setup must not be committed to a database other test
+ * files are using at the same time.
+ *
+ * `extraClaims` carries verified claims beyond the subject, e.g. `{ aal:
+ * 'aal2' }`. Supabase puts the assurance level in the JWT, so a test that
+ * exercises a step-up check has to be able to say which level the request
+ * arrived with.
+ */
+export async function setIdentity(
+  client: Client,
+  userId: string | null,
+  extraClaims: Record<string, unknown> = {},
+): Promise<void> {
+  await client.query(`set local role ${userId ? 'authenticated' : 'anon'}`);
+  await client.query('select set_config($1, $2, true)', [
+    'request.jwt.claims',
+    JSON.stringify({ sub: userId, role: userId ? 'authenticated' : 'anon', ...extraClaims }),
+  ]);
+}
+
 /** Runs `fn` with the session acting as `userId` under the `authenticated` role. */
 export async function asUser<T>(
   client: Client,
   userId: string | null,
   fn: (client: Client) => Promise<T>,
+  extraClaims: Record<string, unknown> = {},
 ): Promise<T> {
   await client.query('begin');
   try {
-    await client.query(`set local role ${userId ? 'authenticated' : 'anon'}`);
-    await client.query('select set_config($1, $2, true)', [
-      'request.jwt.claims',
-      JSON.stringify({ sub: userId, role: userId ? 'authenticated' : 'anon' }),
-    ]);
+    await setIdentity(client, userId, extraClaims);
+    return await fn(client);
+  } finally {
+    await client.query('rollback');
+  }
+}
+
+/**
+ * Runs `fn` inside a transaction that is always rolled back.
+ *
+ * Every integration test file shares one database and vitest runs them in
+ * parallel, so a test that writes must not commit.
+ */
+export async function inRolledBackTransaction<T>(
+  client: Client,
+  fn: (client: Client) => Promise<T>,
+): Promise<T> {
+  await client.query('begin');
+  try {
     return await fn(client);
   } finally {
     await client.query('rollback');

@@ -79,8 +79,22 @@ as $$
   );
 $$;
 
+-- Mirrors Supabase's auth.jwt(): the whole verified claim set. Needed by the
+-- assurance-level checks, which read `aal` rather than a single claim.
+create or replace function auth.jwt()
+returns jsonb
+language sql
+stable
+as $$
+  select coalesce(
+    nullif(current_setting('request.jwt.claims', true), '')::jsonb,
+    '{}'::jsonb
+  );
+$$;
+
 grant execute on function auth.uid() to anon, authenticated, service_role;
 grant execute on function auth.role() to anon, authenticated, service_role;
+grant execute on function auth.jwt() to anon, authenticated, service_role;
 
 create schema if not exists storage;
 grant usage on schema storage to anon, authenticated, service_role;

@@ -21,35 +21,44 @@ export const ORGANIZATION_ROLES: readonly OrganizationRole[] = [
 /**
  * Every capability the application checks. Adding a screen means adding a
  * capability here, not sprinkling role names through components.
+ *
+ * This is an array rather than a bare union so the set exists at runtime:
+ * `public.permission_catalog` seeds the same 27 keys, and
+ * `tests/integration/authorization-core.test.ts` fails if the two drift — the
+ * same guard `case_status_transitions` has against the case state machine. The
+ * `Capability` type is derived from it, so the list cannot fall behind the type.
  */
-export type Capability =
-  | 'case.read.own'
-  | 'case.create'
-  | 'case.manage'
-  | 'case.transition'
-  | 'case.assign_partner'
-  | 'document.upload'
-  | 'document.review'
-  | 'document.quarantine'
-  | 'kyc.read'
-  | 'kyc.decide'
-  | 'risk.read'
-  | 'risk.write'
-  | 'quote.read'
-  | 'quote.prepare'
-  | 'quote.approve'
-  | 'quote.accept'
-  | 'payment.read'
-  | 'payment.reconcile'
-  | 'refund.approve'
-  | 'partner.read_assigned'
-  | 'partner.respond_assignment'
-  | 'partner.verify'
-  | 'content.publish'
-  | 'service.manage'
-  | 'user.manage'
-  | 'audit.read'
-  | 'settings.manage';
+export const ALL_CAPABILITIES = [
+  'case.read.own',
+  'case.create',
+  'case.manage',
+  'case.transition',
+  'case.assign_partner',
+  'document.upload',
+  'document.review',
+  'document.quarantine',
+  'kyc.read',
+  'kyc.decide',
+  'risk.read',
+  'risk.write',
+  'quote.read',
+  'quote.prepare',
+  'quote.approve',
+  'quote.accept',
+  'payment.read',
+  'payment.reconcile',
+  'refund.approve',
+  'partner.read_assigned',
+  'partner.respond_assignment',
+  'partner.verify',
+  'content.publish',
+  'service.manage',
+  'user.manage',
+  'audit.read',
+  'settings.manage',
+] as const;
+
+export type Capability = (typeof ALL_CAPABILITIES)[number];
 
 const PLATFORM_CAPABILITIES: Record<PlatformRole, readonly Capability[]> = {
   case_manager: [
