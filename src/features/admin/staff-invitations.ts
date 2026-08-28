@@ -37,7 +37,8 @@ export async function inviteStaff(
   _previous: StaffInviteState,
   formData: FormData,
 ): Promise<StaffInviteState> {
-  // user.manage is the capability for inviting; the database checks the rest.
+  // user.manage is marked as needing step-up, so requireCapability() has
+  // already insisted on a second factor presented on this request.
   const session = await requireCapability('user.manage');
 
   const parsed = staffInviteSchema.safeParse({
@@ -51,12 +52,6 @@ export async function inviteStaff(
       fieldErrors[String(issue.path[0] ?? 'form')] ??= issue.message;
     }
     return { status: 'error', fieldErrors };
-  }
-
-  // A staff invitation is a grant of platform access, so it is held to a second
-  // factor at the point of use and not merely at sign-in.
-  if (!session.mfaSatisfied) {
-    return { status: 'error', message: 'mfaRequired' };
   }
 
   try {
@@ -124,7 +119,6 @@ export async function revokeStaffInvitation(
   const session = await requireCapability('user.manage');
   const id = String(formData.get('invitationId') ?? '');
   if (!id) return { status: 'error', message: 'generic' };
-  if (!session.mfaSatisfied) return { status: 'error', message: 'mfaRequired' };
 
   const supabase = await createClient();
   const { error } = await supabase

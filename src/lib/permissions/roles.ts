@@ -217,6 +217,35 @@ export function requiresMfa(
   );
 }
 
+/**
+ * Capabilities that need a second factor presented on *this* request, not just
+ * a factor enrolled on the account.
+ *
+ * These are the operations where the damage from a stolen session is worst: a
+ * compliance decision, a refund, a reconciliation, a quarantine, a change to
+ * who holds which role, and the platform settings themselves.
+ *
+ * `public.permission_catalog.requires_aal2` carries the same list, and
+ * `tests/integration/authorization-core.test.ts` fails if the two disagree.
+ * The set lives here as well so `requireCapability()` can decide without a
+ * round trip on every call.
+ */
+export const STEP_UP_CAPABILITIES: ReadonlySet<Capability> = new Set<Capability>([
+  'document.quarantine',
+  'kyc.decide',
+  'partner.verify',
+  'payment.reconcile',
+  'quote.approve',
+  'refund.approve',
+  'risk.write',
+  'settings.manage',
+  'user.manage',
+]);
+
+export function requiresStepUp(capability: Capability): boolean {
+  return STEP_UP_CAPABILITIES.has(capability);
+}
+
 /** The assurance level of a session, as Supabase reports it. */
 export type AssuranceLevel = 'aal1' | 'aal2' | null;
 

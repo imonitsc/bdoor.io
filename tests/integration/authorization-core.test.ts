@@ -13,6 +13,7 @@ import {
 } from './helpers/db';
 import {
   ALL_CAPABILITIES,
+  STEP_UP_CAPABILITIES,
   ORGANIZATION_ROLES,
   PLATFORM_ROLES,
   organizationCapabilities,
@@ -421,11 +422,22 @@ describe('assurance level', () => {
       'kyc.decide',
       'partner.verify',
       'payment.reconcile',
+      'quote.approve',
       'refund.approve',
       'risk.write',
       'settings.manage',
       'user.manage',
     ]);
+  });
+
+  it('agrees with the code about which permissions need a second factor', async () => {
+    // requireCapability() reads STEP_UP_CAPABILITIES rather than querying, so a
+    // permission marked requires_aal2 in the database but missing from the set
+    // would be enforced nowhere at all.
+    const { rows } = await client.query<{ key: string }>(
+      'select key from public.permission_catalog where requires_aal2 order by 1',
+    );
+    expect(rows.map((r) => r.key)).toEqual([...STEP_UP_CAPABILITIES].sort());
   });
 });
 

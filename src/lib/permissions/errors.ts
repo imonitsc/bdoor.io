@@ -14,6 +14,22 @@ export class AuthorizationError extends Error {
   }
 }
 
+/**
+ * The caller holds the capability but has not presented a second factor on this
+ * request. Distinct from AuthorizationError because the remedy is different:
+ * there is something the user can do about it, and the UI should say so rather
+ * than showing a flat refusal.
+ */
+export class StepUpRequiredError extends Error {
+  readonly capability: string;
+
+  constructor(capability: string) {
+    super('Second factor required');
+    this.name = 'StepUpRequiredError';
+    this.capability = capability;
+  }
+}
+
 export class AuthenticationError extends Error {
   constructor() {
     super('Not authenticated');

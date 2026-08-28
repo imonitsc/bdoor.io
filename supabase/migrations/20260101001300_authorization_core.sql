@@ -395,7 +395,7 @@ insert into public.permission_catalog (key, category, description, requires_aal2
   ('risk.write',                 'compliance', 'Record risk assessments and flags', true),
   ('quote.read',                 'commercial', 'Read quotes', false),
   ('quote.prepare',              'commercial', 'Draft and revise a quote', false),
-  ('quote.approve',              'commercial', 'Approve a quote for sending', false),
+  ('quote.approve',              'commercial', 'Approve a quote for sending', true),
   ('quote.accept',               'commercial', 'Accept a quote as the customer', false),
   ('payment.read',               'commercial', 'Read payments and invoices', false),
   ('payment.reconcile',          'commercial', 'Reconcile a payment against a gateway event', true),
