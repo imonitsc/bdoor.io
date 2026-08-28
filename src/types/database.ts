@@ -1791,6 +1791,42 @@ export type Database = {
         }
         Relationships: []
       }
+      "membership_permission_overrides": {
+        Row: {
+          "id": string
+          "membership_id": string
+          "permission_key": string
+          "effect": string
+          "reason": string
+          "granted_by": string | null
+          "expires_at": string | null
+          "revoked_at": string | null
+          "created_at": string
+        }
+        Insert: {
+          "id"?: string
+          "membership_id": string
+          "permission_key": string
+          "effect": string
+          "reason": string
+          "granted_by"?: string | null
+          "expires_at"?: string | null
+          "revoked_at"?: string | null
+          "created_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "membership_id"?: string
+          "permission_key"?: string
+          "effect"?: string
+          "reason"?: string
+          "granted_by"?: string | null
+          "expires_at"?: string | null
+          "revoked_at"?: string | null
+          "created_at"?: string
+        }
+        Relationships: []
+      }
       "message_reads": {
         Row: {
           "message_id": string
@@ -2331,6 +2367,81 @@ export type Database = {
         }
         Relationships: []
       }
+      "permission_catalog": {
+        Row: {
+          "key": string
+          "category": string
+          "description": string
+          "requires_aal2": boolean
+          "created_at": string
+        }
+        Insert: {
+          "key": string
+          "category": string
+          "description": string
+          "requires_aal2"?: boolean
+          "created_at"?: string
+        }
+        Update: {
+          "key"?: string
+          "category"?: string
+          "description"?: string
+          "requires_aal2"?: boolean
+          "created_at"?: string
+        }
+        Relationships: []
+      }
+      "platform_invitations": {
+        Row: {
+          "id": string
+          "email": string
+          "template_code": string
+          "status": Database["public"]["Enums"]["invitation_status"]
+          "token_hash": string
+          "invited_by": string | null
+          "accepted_by": string | null
+          "reason": string
+          "expires_at": string
+          "accepted_at": string | null
+          "revoked_at": string | null
+          "revoked_by": string | null
+          "created_at": string
+          "updated_at": string
+        }
+        Insert: {
+          "id"?: string
+          "email": string
+          "template_code": string
+          "status"?: Database["public"]["Enums"]["invitation_status"]
+          "token_hash": string
+          "invited_by"?: string | null
+          "accepted_by"?: string | null
+          "reason": string
+          "expires_at": string
+          "accepted_at"?: string | null
+          "revoked_at"?: string | null
+          "revoked_by"?: string | null
+          "created_at"?: string
+          "updated_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "email"?: string
+          "template_code"?: string
+          "status"?: Database["public"]["Enums"]["invitation_status"]
+          "token_hash"?: string
+          "invited_by"?: string | null
+          "accepted_by"?: string | null
+          "reason"?: string
+          "expires_at"?: string
+          "accepted_at"?: string | null
+          "revoked_at"?: string | null
+          "revoked_by"?: string | null
+          "created_at"?: string
+          "updated_at"?: string
+        }
+        Relationships: []
+      }
       "platform_roles": {
         Row: {
           "user_id": string
@@ -2853,6 +2964,111 @@ export type Database = {
           "previous_case_id"?: string | null
           "period_label"?: string
           "created_at"?: string
+        }
+        Relationships: []
+      }
+      "role_assignments": {
+        Row: {
+          "id": string
+          "user_id": string
+          "template_code": string
+          "scope_kind": string
+          "scope_id": string | null
+          "organization_id": string | null
+          "granted_by": string | null
+          "reason": string
+          "starts_at": string
+          "expires_at": string | null
+          "revoked_at": string | null
+          "revoked_by": string | null
+          "revoke_reason": string | null
+          "created_at": string
+          "updated_at": string
+        }
+        Insert: {
+          "id"?: string
+          "user_id": string
+          "template_code": string
+          "scope_kind": string
+          "scope_id"?: string | null
+          "organization_id"?: string | null
+          "granted_by"?: string | null
+          "reason": string
+          "starts_at"?: string
+          "expires_at"?: string | null
+          "revoked_at"?: string | null
+          "revoked_by"?: string | null
+          "revoke_reason"?: string | null
+          "created_at"?: string
+          "updated_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "user_id"?: string
+          "template_code"?: string
+          "scope_kind"?: string
+          "scope_id"?: string | null
+          "organization_id"?: string | null
+          "granted_by"?: string | null
+          "reason"?: string
+          "starts_at"?: string
+          "expires_at"?: string | null
+          "revoked_at"?: string | null
+          "revoked_by"?: string | null
+          "revoke_reason"?: string | null
+          "created_at"?: string
+          "updated_at"?: string
+        }
+        Relationships: []
+      }
+      "role_template_permissions": {
+        Row: {
+          "template_code": string
+          "permission_key": string
+        }
+        Insert: {
+          "template_code": string
+          "permission_key": string
+        }
+        Update: {
+          "template_code"?: string
+          "permission_key"?: string
+        }
+        Relationships: []
+      }
+      "role_templates": {
+        Row: {
+          "code": string
+          "workspace": string
+          "label_en": string
+          "label_bn": string
+          "description": string
+          "is_assignable": boolean
+          "requires_mfa": boolean
+          "created_at": string
+          "updated_at": string
+        }
+        Insert: {
+          "code": string
+          "workspace": string
+          "label_en": string
+          "label_bn": string
+          "description": string
+          "is_assignable"?: boolean
+          "requires_mfa"?: boolean
+          "created_at"?: string
+          "updated_at"?: string
+        }
+        Update: {
+          "code"?: string
+          "workspace"?: string
+          "label_en"?: string
+          "label_bn"?: string
+          "description"?: string
+          "is_assignable"?: boolean
+          "requires_mfa"?: boolean
+          "created_at"?: string
+          "updated_at"?: string
         }
         Relationships: []
       }

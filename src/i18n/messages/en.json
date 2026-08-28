@@ -987,6 +987,19 @@
       "scopeRequired": "Describe the scope before assigning a partner.",
       "alreadyAssigned": "This case already has a live partner assignment.",
       "saved": "Saved."
+    },
+    "staffInvites": {
+      "heading": "Staff invitations",
+      "inviteSent": "Invitation sent.",
+      "inviteRevoked": "Invitation revoked.",
+      "alreadyInvited": "There is already a pending invitation for that address.",
+      "templateNotAllowed": "You cannot invite that role. A role can only be handed out by someone who already holds every permission in it.",
+      "templateNotInternal": "That is not an internal role.",
+      "mfaRequired": "Set up your second factor before inviting staff.",
+      "rateLimited": "Too many invitations just now. Try again shortly.",
+      "reasonTooShort": "Say why this person needs the role.",
+      "templateRequired": "Choose a role.",
+      "generic": "We could not send that invitation. Please try again."
     }
   },
   "caseStatus": {
@@ -1064,6 +1077,18 @@
       "wrongEmail": "This invitation was sent to a different email address. Sign in with that address to accept it.",
       "unavailable": "We could not process the invitation right now. Please try again shortly.",
       "accepted": "You have joined the organisation."
+    },
+    "staffInvitation": {
+      "title": "Join the BDoor staff workspace",
+      "invalid": "That invitation link is not valid.",
+      "expired": "That invitation has expired. Ask an administrator for a new one.",
+      "wrongEmail": "This invitation was sent to a different email address. Sign in with that address to accept it.",
+      "unconfirmed": "Confirm your email address before accepting a staff invitation. Check your inbox for the confirmation link.",
+      "unavailable": "We could not process the invitation right now. Please try again shortly.",
+      "accepted": "You have joined the staff workspace.",
+      "mfaNext": "Set up a second factor now. Every staff account needs one before the workspace will open.",
+      "setUpMfaCta": "Set up two-factor authentication",
+      "backCta": "Back to the workspace"
     }
   },
   "documents": {
