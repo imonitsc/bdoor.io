@@ -56,35 +56,63 @@ export default async function AdminLayout({
     caps.some((cap) => session.capabilities.has(cap));
 
   const items: NavItem[] = [
-    { href: ADMIN_ROUTES.dashboard, label: t('dashboard'), icon: LayoutDashboard },
+    {
+      href: ADMIN_ROUTES.dashboard,
+      label: t('dashboard'),
+      icon: <LayoutDashboard className="size-4" />,
+    },
     ...(has('case.manage')
-      ? [{ href: ADMIN_ROUTES.leads, label: t('leads'), icon: UserRound }]
+      ? [{ href: ADMIN_ROUTES.leads, label: t('leads'), icon: <UserRound className="size-4" /> }]
       : []),
-    { href: ADMIN_ROUTES.cases, label: t('cases'), icon: Briefcase },
+    { href: ADMIN_ROUTES.cases, label: t('cases'), icon: <Briefcase className="size-4" /> },
     ...(has('kyc.read', 'risk.read')
-      ? [{ href: ADMIN_ROUTES.kyc, label: t('kyc'), icon: ShieldAlert }]
+      ? [{ href: ADMIN_ROUTES.kyc, label: t('kyc'), icon: <ShieldAlert className="size-4" /> }]
       : []),
     ...(has('partner.verify', 'case.assign_partner')
-      ? [{ href: ADMIN_ROUTES.partners, label: t('partners'), icon: Handshake }]
+      ? [
+          {
+            href: ADMIN_ROUTES.partners,
+            label: t('partners'),
+            icon: <Handshake className="size-4" />,
+          },
+        ]
       : []),
     ...(has('service.manage')
-      ? [{ href: ADMIN_ROUTES.services, label: t('services'), icon: Tags }]
+      ? [{ href: ADMIN_ROUTES.services, label: t('services'), icon: <Tags className="size-4" /> }]
       : []),
     ...(has('payment.read')
-      ? [{ href: ADMIN_ROUTES.finance, label: t('finance'), icon: Banknote }]
+      ? [{ href: ADMIN_ROUTES.finance, label: t('finance'), icon: <Banknote className="size-4" /> }]
       : []),
-    { href: ADMIN_ROUTES.compliance, label: t('compliance'), icon: CalendarCheck },
+    {
+      href: ADMIN_ROUTES.compliance,
+      label: t('compliance'),
+      icon: <CalendarCheck className="size-4" />,
+    },
     ...(has('content.publish')
-      ? [{ href: ADMIN_ROUTES.content, label: t('content'), icon: Newspaper }]
+      ? [
+          {
+            href: ADMIN_ROUTES.content,
+            label: t('content'),
+            icon: <Newspaper className="size-4" />,
+          },
+        ]
       : []),
-    ...(has('user.manage') ? [{ href: ADMIN_ROUTES.users, label: t('users'), icon: Users }] : []),
+    ...(has('user.manage')
+      ? [{ href: ADMIN_ROUTES.users, label: t('users'), icon: <Users className="size-4" /> }]
+      : []),
     ...(has('audit.read')
-      ? [{ href: ADMIN_ROUTES.audit, label: t('audit'), icon: ScrollText }]
+      ? [{ href: ADMIN_ROUTES.audit, label: t('audit'), icon: <ScrollText className="size-4" /> }]
       : []),
     ...(has('settings.manage')
-      ? [{ href: ADMIN_ROUTES.settings, label: t('settings'), icon: Settings }]
+      ? [
+          {
+            href: ADMIN_ROUTES.settings,
+            label: t('settings'),
+            icon: <Settings className="size-4" />,
+          },
+        ]
       : []),
-    { href: ADMIN_ROUTES.documents, label: t('documents'), icon: FileText },
+    { href: ADMIN_ROUTES.documents, label: t('documents'), icon: <FileText className="size-4" /> },
   ];
 
   return (

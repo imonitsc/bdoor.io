@@ -42,17 +42,34 @@ export default async function CustomerLayout({
     .is('read_at', null);
 
   const items: NavItem[] = [
-    { href: APP_ROUTES.dashboard, label: t('dashboard'), icon: LayoutDashboard },
-    { href: APP_ROUTES.applications, label: t('applications'), icon: FileText },
-    { href: APP_ROUTES.companies, label: t('companies'), icon: Building2 },
-    { href: APP_ROUTES.documents, label: t('documents'), icon: FileText },
-    { href: APP_ROUTES.billing, label: t('billing'), icon: CreditCard },
-    { href: APP_ROUTES.compliance, label: t('compliance'), icon: CalendarCheck },
-    { href: APP_ROUTES.messages, label: t('messages'), icon: MessageSquare },
-    { href: APP_ROUTES.notifications, label: t('notifications'), icon: Bell, badge: unread ?? 0 },
-    { href: APP_ROUTES.team, label: t('team'), icon: Users },
-    { href: APP_ROUTES.settings, label: t('settings'), icon: Settings },
-    { href: APP_ROUTES.security, label: t('security'), icon: ShieldCheck },
+    {
+      href: APP_ROUTES.dashboard,
+      label: t('dashboard'),
+      icon: <LayoutDashboard className="size-4" />,
+    },
+    {
+      href: APP_ROUTES.applications,
+      label: t('applications'),
+      icon: <FileText className="size-4" />,
+    },
+    { href: APP_ROUTES.companies, label: t('companies'), icon: <Building2 className="size-4" /> },
+    { href: APP_ROUTES.documents, label: t('documents'), icon: <FileText className="size-4" /> },
+    { href: APP_ROUTES.billing, label: t('billing'), icon: <CreditCard className="size-4" /> },
+    {
+      href: APP_ROUTES.compliance,
+      label: t('compliance'),
+      icon: <CalendarCheck className="size-4" />,
+    },
+    { href: APP_ROUTES.messages, label: t('messages'), icon: <MessageSquare className="size-4" /> },
+    {
+      href: APP_ROUTES.notifications,
+      label: t('notifications'),
+      icon: <Bell className="size-4" />,
+      badge: unread ?? 0,
+    },
+    { href: APP_ROUTES.team, label: t('team'), icon: <Users className="size-4" /> },
+    { href: APP_ROUTES.settings, label: t('settings'), icon: <Settings className="size-4" /> },
+    { href: APP_ROUTES.security, label: t('security'), icon: <ShieldCheck className="size-4" /> },
   ];
 
   const nav = await getTranslations('nav');
