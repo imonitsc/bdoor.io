@@ -20,7 +20,7 @@ test.describe('marketing site', () => {
     await expect(page.getByRole('heading', { level: 1 })).toContainText(
       'Everything your business needs in Bangladesh',
     );
-    await expect(page.getByText('Independent platform')).toBeVisible();
+    await expect(page.getByText('Independent platform · Partner professionals')).toBeVisible();
     await expect(
       page.getByText('BDoor is not a government authority or law firm', { exact: false }),
     ).toBeVisible();
