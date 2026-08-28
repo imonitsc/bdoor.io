@@ -149,25 +149,25 @@ that needs an account will tell you it is unavailable rather than crashing.
 Every variable is declared and validated in `src/lib/env.ts`. `.env.example`
 carries names and comments only — never a value.
 
-| Variable                               | Required        | Notes                                                                                            |
-| -------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------ |
-| `NEXT_PUBLIC_SITE_URL`                 | production      | Absolute origin, no trailing slash. Canonical URLs, OG images, auth redirects.                   |
-| `NEXT_PUBLIC_SUPABASE_URL`             | production      | Project URL.                                                                                     |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | production      | The anon key. Safe in the browser — RLS is what protects the data.                               |
-| `SUPABASE_SECRET_KEY`                  | production      | **Server only.** Bypasses RLS. Never prefix with `NEXT_PUBLIC_`.                                 |
-| `PAYMENT_PROVIDER`                     | no              | `mock` (default), `sslcommerz`, `stripe`.                                                        |
-| `PAYMENT_WEBHOOK_SECRET`               | when not mock   | HMAC secret for inbound webhooks, ≥16 chars.                                                     |
-| `PAYMENT_RETURN_URL`                   | no              | Overrides where the gateway returns the customer.                                                |
-| `EMAIL_PROVIDER`                       | no              | `mock` (default), `resend`, `smtp`.                                                              |
-| `EMAIL_FROM`                           | when not mock   | Sending address.                                                                                 |
-| `SCREENING_PROVIDER`                   | no              | `mock` (default) or `live`.                                                                      |
-| `MALWARE_SCAN_PROVIDER`                | no              | `mock` (default) or `live`.                                                                      |
-| `AI_PROVIDER`                          | no              | `disabled` (default) or `anthropic`.                                                             |
-| `AI_API_KEY`                           | when AI enabled |                                                                                                  |
-| `SENTRY_DSN`                           | no              |                                                                                                  |
-| `RATE_LIMIT_DISABLED`                  | no              | `true` turns the limiter off. Never in production.                                               |
-| `STRICT_ENV`                           | no              | Defaults to on. Set `false` only on a preview that deliberately runs without production secrets. |
-| `NEXT_PUBLIC_ANALYTICS_ENABLED`        | no              |                                                                                                  |
+| Variable                               | Required        | Notes                                                                                                             |
+| -------------------------------------- | --------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL`                 | production      | Absolute origin, no trailing slash. Canonical URLs, OG images, auth redirects. Blank counts as unset — see below. |
+| `NEXT_PUBLIC_SUPABASE_URL`             | production      | Project URL.                                                                                                      |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | production      | The anon key. Safe in the browser — RLS is what protects the data.                                                |
+| `SUPABASE_SECRET_KEY`                  | production      | **Server only.** Bypasses RLS. Never prefix with `NEXT_PUBLIC_`.                                                  |
+| `PAYMENT_PROVIDER`                     | no              | `mock` (default), `sslcommerz`, `stripe`.                                                                         |
+| `PAYMENT_WEBHOOK_SECRET`               | when not mock   | HMAC secret for inbound webhooks, ≥16 chars.                                                                      |
+| `PAYMENT_RETURN_URL`                   | no              | Overrides where the gateway returns the customer.                                                                 |
+| `EMAIL_PROVIDER`                       | no              | `mock` (default), `resend`, `smtp`.                                                                               |
+| `EMAIL_FROM`                           | when not mock   | Sending address.                                                                                                  |
+| `SCREENING_PROVIDER`                   | no              | `mock` (default) or `live`.                                                                                       |
+| `MALWARE_SCAN_PROVIDER`                | no              | `mock` (default) or `live`.                                                                                       |
+| `AI_PROVIDER`                          | no              | `disabled` (default) or `anthropic`.                                                                              |
+| `AI_API_KEY`                           | when AI enabled |                                                                                                                   |
+| `SENTRY_DSN`                           | no              |                                                                                                                   |
+| `RATE_LIMIT_DISABLED`                  | no              | `true` turns the limiter off. Never in production.                                                                |
+| `STRICT_ENV`                           | no              | Defaults to on. Set `false` only on a preview that deliberately runs without production secrets.                  |
+| `NEXT_PUBLIC_ANALYTICS_ENABLED`        | no              |                                                                                                                   |
 
 `src/instrumentation.ts` runs the production completeness check once at boot. An
 incomplete production environment fails to start rather than returning 500s at
@@ -316,6 +316,12 @@ run rules out the class of defects it can see.
    goes in as a plain (server) environment variable — Vercel does not expose it
    to the browser unless you name it `NEXT_PUBLIC_*`.
 3. Set `NEXT_PUBLIC_SITE_URL` to the production origin, no trailing slash.
+   Leave it out entirely rather than adding it with an empty value: a declared
+   blank is still a declared variable. `siteUrl()` treats blank as unset and
+   falls back to the origin Vercel injects — the production domain on a
+   production deploy, the deployment's own URL on a preview — so the build
+   survives either way, but only an explicit value gives you canonical URLs on
+   your own domain.
 4. Add the production origin to the Supabase Auth redirect list.
 5. Point the payment gateway's webhook at `<origin>/api/payments/webhook` and
    set `PAYMENT_WEBHOOK_SECRET` on both sides.
