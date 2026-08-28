@@ -170,10 +170,25 @@ jobs:
       - name: Audit dependencies
         run: pnpm audit --audit-level high
 
+  # Reviews the dependency *diff* of a pull request.
+  #
+  # Non-blocking, and deliberately so: the action needs GitHub's Dependency
+  # graph enabled on the repository and errors out with "Dependency review is
+  # not supported on this repository" when it is off — a repository setting no
+  # change in this repo can satisfy. Blocking on it would leave every pull
+  # request permanently red for a reason no author can fix.
+  #
+  # This drops no vulnerability coverage. The `security` job above runs
+  # `pnpm audit --audit-level high` over the whole resolved tree and DOES fail
+  # the build, which is broader than the diff this action inspects.
+  #
+  # Enable Dependency graph at Settings → Code security, then delete the
+  # `continue-on-error` line to make this blocking too.
   dependency-review:
     name: Dependency review
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
+    continue-on-error: true
     permissions:
       contents: read
       pull-requests: read
