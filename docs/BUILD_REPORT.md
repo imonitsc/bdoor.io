@@ -76,15 +76,21 @@ Actually executed in this session:
 | `pnpm run format:check`     | pass                                                               |
 | `pnpm run lint`             | pass                                                               |
 | `pnpm run typecheck`        | pass                                                               |
-| Unit tests                  | **108 passed** (103 existing + 5 new)                              |
+| Unit tests                  | **111 passed** (103 existing + 8 new)                              |
 | Critical-logic coverage     | **89.3% statements, 92.8% lines, 74.0% branches, 87.7% functions** |
 | Migrations from zero + seed | pass — 13 migrations against PostgreSQL 16                         |
-| Integration / RLS           | **60 passed**                                                      |
+| Integration / RLS           | **60 passed**, stable across 5 consecutive rebuilt-database runs   |
 | `pnpm run build`            | pass                                                               |
 
-**Not executed in this session:** Playwright. It is wired into CI and the config
-builds and starts the app itself, but the suite was not run here, so no claim is
-made about it.
+**Playwright: 41 of 41 passed** locally, including the axe accessibility specs
+and the full questionnaire journeys — run against a server started with _no_
+Supabase environment variables, which is exactly the CI configuration. Confirmed
+in CI afterwards: run 33180358769 completed the job in 1m40s with conclusion
+`success`, and every job in that workflow was green.
+
+The sandbox ships `chromium_headless_shell-1194` while this Playwright wants
+`1234`, so the run used `PLAYWRIGHT_CHROMIUM_PATH` to point at the available
+build. CI installs the matching browser itself and is unaffected.
 
 Coverage is measured on the seven pure-logic modules the unit suite targets, not
 on all of `src/`. Measuring Server Actions and React here would produce a number
@@ -130,19 +136,19 @@ claimed as working.
 
 **Engineering, not yet built**
 
-| Gap                                               | Where it bites                                                                                                 |
-| ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| Preview and production share one Supabase project | A preview can reach production data. Highest-priority fix                                                      |
-| No transactional outbox                           | A failed notification side-effect is lost                                                                      |
-| No `idempotency_keys` table                       | Idempotency rests on `payment_events` uniqueness alone                                                         |
-| No scheduler                                      | `compliance_reminders` rows are created but never sent                                                         |
-| No `price_versions` history                       | A published price can change with no audit trail                                                               |
-| No `government_fee_rules` engine                  | No slab calculator, no staleness gate at checkout                                                              |
-| No CSP, no Turnstile, no field-level encryption   | Header and abuse hardening incomplete                                                                          |
-| Rate limiter is in-process                        | Resets on deploy, per-instance                                                                                 |
-| No `/ops` route group                             | Operations shares `/admin`                                                                                     |
-| Missing roles                                     | `content_editor` and `auditor` from the brief do not exist                                                     |
-| Dependency graph disabled on the repository       | `Dependency review` cannot run, so it is non-blocking until the setting is enabled at Settings → Code security |
+| Gap                                               | Where it bites                                                                                                                                                               |
+| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Preview and production share one Supabase project | A preview can reach production data. Highest-priority fix                                                                                                                    |
+| No transactional outbox                           | A failed notification side-effect is lost                                                                                                                                    |
+| No `idempotency_keys` table                       | Idempotency rests on `payment_events` uniqueness alone                                                                                                                       |
+| No scheduler                                      | `compliance_reminders` rows are created but never sent                                                                                                                       |
+| No `price_versions` history                       | A published price can change with no audit trail                                                                                                                             |
+| No `government_fee_rules` engine                  | No slab calculator, no staleness gate at checkout                                                                                                                            |
+| No CSP, no Turnstile, no field-level encryption   | Header and abuse hardening incomplete                                                                                                                                        |
+| Rate limiter is in-process                        | Resets on deploy, per-instance                                                                                                                                               |
+| No `/ops` route group                             | Operations shares `/admin`                                                                                                                                                   |
+| Missing roles                                     | `content_editor` and `auditor` from the brief do not exist                                                                                                                   |
+| Dependency graph disabled on the repository       | `Dependency review` detects this and skips with a warning; the PR dependency diff is not reviewed until it is enabled at Settings → Code security. `pnpm audit` still blocks |
 
 ---
 

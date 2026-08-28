@@ -6,6 +6,9 @@ import { DataList, type DataListColumn } from '@/components/ui/data-list';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PageHeading } from '@/components/dashboard/page-heading';
 import { Alert } from '@/components/ui/alert';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { RevokeStaffInvitationButton, StaffInviteForm } from '@/components/forms/staff-invite-form';
+import { invitableTemplates } from '@/features/admin/invitable-templates';
 import { requireCapability } from '@/lib/auth/session';
 import { createClient } from '@/lib/supabase/server';
 
@@ -23,13 +26,14 @@ type UserRow = {
 export default async function AdminUsersPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  await requireCapability('user.manage');
+  const session = await requireCapability('user.manage');
 
-  const [t, tRoles, tCommon, tAuth, format] = await Promise.all([
+  const [t, tRoles, tCommon, tAuth, tInvites, format] = await Promise.all([
     getTranslations('admin.nav'),
     getTranslations('roles'),
     getTranslations('common'),
     getTranslations('auth.mfa'),
+    getTranslations('admin.staffInvites'),
     getFormatter(),
   ]);
 
@@ -43,6 +47,37 @@ export default async function AdminUsersPage({ params }: { params: Promise<{ loc
     supabase.from('platform_roles').select('user_id, role'),
     supabase.from('user_security_settings').select('user_id, mfa_enrolled_at'),
   ]);
+
+  const [templatesResult, bundlesResult, invitationsResult] = await Promise.all([
+    supabase
+      .from('role_templates')
+      .select('code, label_en, label_bn')
+      .eq('workspace', 'internal')
+      .eq('is_assignable', true)
+      .order('code'),
+    supabase.from('role_template_permissions').select('template_code, permission_key'),
+    supabase
+      .from('platform_invitations')
+      .select('id, email, template_code, expires_at, created_at')
+      .eq('status', 'pending')
+      .order('created_at', { ascending: false }),
+  ]);
+
+  const invitableList = invitableTemplates(
+    templatesResult.data ?? [],
+    bundlesResult.data ?? [],
+    session.capabilities,
+    locale,
+  );
+
+  const templateLabels = new Map(
+    (templatesResult.data ?? []).map((template) => [
+      template.code,
+      locale === 'bn' ? template.label_bn : template.label_en,
+    ]),
+  );
+
+  const pendingInvitations = invitationsResult.data ?? [];
 
   const rolesByUser = new Map<string, string[]>();
   for (const row of rolesResult.data ?? []) {
@@ -125,6 +160,42 @@ export default async function AdminUsersPage({ params }: { params: Promise<{ loc
         caption={t('users')}
         empty={<EmptyState icon={<Users className="size-5" />} title={tCommon('noResults')} />}
       />
+
+      <Card>
+        <CardHeader>
+          <CardTitle as="h2">{tInvites('heading')}</CardTitle>
+          <CardDescription>{tInvites('intro')}</CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-6">
+          <StaffInviteForm templates={invitableList} />
+
+          <div className="flex flex-col gap-2">
+            <h3 className="text-ink text-sm font-medium">{tInvites('pending')}</h3>
+            {pendingInvitations.length === 0 ? (
+              <p className="text-muted text-sm">{tInvites('noPending')}</p>
+            ) : (
+              <ul className="flex flex-col divide-y divide-[var(--color-border)]">
+                {pendingInvitations.map((invitation) => (
+                  <li
+                    key={invitation.id}
+                    className="flex flex-wrap items-center justify-between gap-3 py-2"
+                  >
+                    <div className="min-w-0">
+                      <p className="text-ink truncate text-sm">{invitation.email}</p>
+                      <p className="text-muted text-xs">
+                        {templateLabels.get(invitation.template_code) ?? invitation.template_code} ·{' '}
+                        {tInvites('expires')}{' '}
+                        {format.dateTime(new Date(invitation.expires_at), 'short')}
+                      </p>
+                    </div>
+                    <RevokeStaffInvitationButton invitationId={invitation.id} />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

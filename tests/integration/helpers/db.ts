@@ -62,24 +62,73 @@ export async function disconnect(client: Client | undefined): Promise<void> {
   await client?.end();
 }
 
+/**
+ * Switches the *current transaction* to act as `userId`.
+ *
+ * Separate from `asUser` because a test that has to set something up as the
+ * database owner and then read it back as a user needs both identities inside
+ * one transaction — the setup must not be committed to a database other test
+ * files are using at the same time.
+ *
+ * `extraClaims` carries verified claims beyond the subject, e.g. `{ aal:
+ * 'aal2' }`. Supabase puts the assurance level in the JWT, so a test that
+ * exercises a step-up check has to be able to say which level the request
+ * arrived with.
+ */
+export async function setIdentity(
+  client: Client,
+  userId: string | null,
+  extraClaims: Record<string, unknown> = {},
+): Promise<void> {
+  await client.query(`set local role ${userId ? 'authenticated' : 'anon'}`);
+  await client.query('select set_config($1, $2, true)', [
+    'request.jwt.claims',
+    JSON.stringify({ sub: userId, role: userId ? 'authenticated' : 'anon', ...extraClaims }),
+  ]);
+}
+
 /** Runs `fn` with the session acting as `userId` under the `authenticated` role. */
 export async function asUser<T>(
   client: Client,
   userId: string | null,
   fn: (client: Client) => Promise<T>,
+  extraClaims: Record<string, unknown> = {},
 ): Promise<T> {
   await client.query('begin');
   try {
-    await client.query(`set local role ${userId ? 'authenticated' : 'anon'}`);
-    await client.query('select set_config($1, $2, true)', [
-      'request.jwt.claims',
-      JSON.stringify({ sub: userId, role: userId ? 'authenticated' : 'anon' }),
-    ]);
+    await setIdentity(client, userId, extraClaims);
     return await fn(client);
   } finally {
     await client.query('rollback');
   }
 }
+
+/**
+ * Runs `fn` inside a transaction that is always rolled back.
+ *
+ * Every integration test file shares one database and vitest runs them in
+ * parallel, so a test that writes must not commit.
+ */
+export async function inRolledBackTransaction<T>(
+  client: Client,
+  fn: (client: Client) => Promise<T>,
+): Promise<T> {
+  await client.query('begin');
+  try {
+    return await fn(client);
+  } finally {
+    await client.query('rollback');
+  }
+}
+
+/**
+ * A request that presented a second factor.
+ *
+ * The step-up policies added in 20260101001500 refuse a sensitive write unless
+ * `auth.jwt() ->> 'aal'` is 'aal2', so a test exercising one of those writes has
+ * to say so — the same way a real staff request does after the MFA challenge.
+ */
+export const AAL2 = { aal: 'aal2' } as const;
 
 /** Rows visible to `userId` for a simple select. */
 export async function selectAs(
@@ -87,8 +136,9 @@ export async function selectAs(
   userId: string | null,
   sql: string,
   values: unknown[] = [],
+  extraClaims: Record<string, unknown> = {},
 ): Promise<Array<Record<string, unknown>>> {
-  return asUser(client, userId, async (c) => (await c.query(sql, values)).rows);
+  return asUser(client, userId, async (c) => (await c.query(sql, values)).rows, extraClaims);
 }
 
 /** Captures the error code of a statement that is expected to be refused. */
@@ -97,29 +147,45 @@ export async function expectRejected(
   userId: string | null,
   sql: string,
   values: unknown[] = [],
+  extraClaims: Record<string, unknown> = {},
 ): Promise<{ rejected: boolean; code?: string; message?: string }> {
-  return asUser(client, userId, async (c) => {
-    try {
-      await c.query(sql, values);
-      return { rejected: false };
-    } catch (error) {
-      const err = error as { code?: string; message?: string };
-      return { rejected: true, code: err.code, message: err.message };
-    }
-  });
+  return asUser(
+    client,
+    userId,
+    async (c) => {
+      try {
+        await c.query(sql, values);
+        return { rejected: false };
+      } catch (error) {
+        const err = error as { code?: string; message?: string };
+        return { rejected: true, code: err.code, message: err.message };
+      }
+    },
+    extraClaims,
+  );
 }
 
-/** Ensures the extra test user exists without touching the seed file. */
+/**
+ * Ensures the extra test user exists without touching the seed file.
+ *
+ * The conflict clauses name no arbiter on purpose. Two test files call this
+ * from `beforeAll`, vitest runs files in parallel, and they share one database
+ * — so these inserts genuinely race. `on conflict (id)` covers only the primary
+ * key, so when the concurrent insert trips `users_email_key` first the
+ * statement raises instead of doing nothing. Which index trips first is not
+ * deterministic, which is why that form passed twice in CI and then failed.
+ * Unqualified `on conflict do nothing` covers every unique constraint.
+ */
 export async function ensureStranger(client: Client): Promise<void> {
   await client.query(
     `insert into auth.users (id, email) values ($1, 'stranger@example.test')
-     on conflict (id) do nothing`,
+     on conflict do nothing`,
     [USERS.stranger],
   );
   await client.query(
     `insert into public.profiles (id, full_name, email)
      values ($1, 'Unrelated Person (sample)', 'stranger@example.test')
-     on conflict (id) do nothing`,
+     on conflict do nothing`,
     [USERS.stranger],
   );
 }

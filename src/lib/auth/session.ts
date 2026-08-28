@@ -3,14 +3,22 @@ import 'server-only';
 import { cache } from 'react';
 import { createClient } from '@/lib/supabase/server';
 import {
+  mfaStep,
+  requiresStepUp,
   organizationCapabilities,
   platformCapabilities,
   requiresMfa,
+  type AssuranceLevel,
   type Capability,
+  type MfaStep,
   type OrganizationRole,
   type PlatformRole,
 } from '@/lib/permissions/roles';
-import { AuthenticationError, AuthorizationError } from '@/lib/permissions/errors';
+import {
+  AuthenticationError,
+  AuthorizationError,
+  StepUpRequiredError,
+} from '@/lib/permissions/errors';
 
 export type OrganizationMembership = {
   organizationId: string;
@@ -30,6 +38,14 @@ export type SessionContext = {
   capabilities: Set<Capability>;
   mfaRequired: boolean;
   mfaSatisfied: boolean;
+  /**
+   * The assurance level this request actually arrived with. Distinct from
+   * `mfaSatisfied`, which is only "the requirement for this account is met" and
+   * is therefore true for a customer who has no requirement at all.
+   */
+  assuranceLevel: AssuranceLevel;
+  /** When MFA is outstanding, whether the user must enrol or only present a factor. */
+  mfaStep: MfaStep;
 };
 
 /**
@@ -93,6 +109,9 @@ export const getSession = cache(async (): Promise<SessionContext | null> => {
   ]);
 
   const aal = aalResult.data;
+  const mfaRequired = requiresMfa(platformRoles, orgRoles);
+  const currentLevel = (aal?.currentLevel ?? null) as AssuranceLevel;
+  const step = mfaStep(mfaRequired, currentLevel, (aal?.nextLevel ?? null) as AssuranceLevel);
 
   return {
     userId,
@@ -102,9 +121,13 @@ export const getSession = cache(async (): Promise<SessionContext | null> => {
     platformRoles,
     memberships,
     capabilities,
-    mfaRequired: requiresMfa(platformRoles, orgRoles),
-    // aal2 means a second factor was actually presented this session.
-    mfaSatisfied: aal?.currentLevel === 'aal2' || aal?.nextLevel !== 'aal2',
+    mfaRequired,
+    // Only `currentLevel` is evidence that a factor was presented on this
+    // request. `nextLevel` describes what the account could reach, so reading
+    // it here would admit an account that never enrolled. See `mfaStep`.
+    mfaSatisfied: step === 'satisfied',
+    mfaStep: step,
+    assuranceLevel: currentLevel,
   };
 });
 
@@ -115,11 +138,27 @@ export async function requireSession(): Promise<SessionContext> {
   return session;
 }
 
-/** Throws unless the session holds the capability. */
+/**
+ * Throws unless the session holds the capability.
+ *
+ * For a capability marked as needing step-up, holding it is not enough: a
+ * second factor must have been presented on this request. The workspace layouts
+ * already refuse a staff session below aal2, so in the ordinary path this is
+ * defence in depth — but a Server Action is reachable without ever rendering
+ * the layout that guards it, and that is exactly the path an attacker with a
+ * stolen cookie would take.
+ */
 export async function requireCapability(capability: Capability): Promise<SessionContext> {
   const session = await requireSession();
   if (!session.capabilities.has(capability)) {
     throw new AuthorizationError(capability);
+  }
+  // Deliberately assuranceLevel, not mfaSatisfied. The latter only means "this
+  // account's MFA requirement is met", which is true for a customer who has no
+  // requirement — so it would wave through a step-up capability reached by a
+  // scoped assignment rather than a platform role.
+  if (requiresStepUp(capability) && session.assuranceLevel !== 'aal2') {
+    throw new StepUpRequiredError(capability);
   }
   return session;
 }

@@ -453,7 +453,10 @@
       "disabled": "Two-factor authentication is off.",
       "removeCta": "Remove authenticator",
       "requiredForRole": "Your role requires two-factor authentication before you can continue.",
-      "factorName": "Authenticator app"
+      "factorName": "Authenticator app",
+      "challengeSubtitle": "Open your authenticator app and enter the six-digit code for BDoor.",
+      "challengeNoFactor": "You do not have a second factor set up yet. Set one up to continue.",
+      "challengeEnrolCta": "Set up two-factor authentication"
     },
     "errors": {
       "invalidCredentials": "That email and password combination did not work.",
@@ -987,6 +990,32 @@
       "scopeRequired": "Describe the scope before assigning a partner.",
       "alreadyAssigned": "This case already has a live partner assignment.",
       "saved": "Saved."
+    },
+    "staffInvites": {
+      "heading": "Staff invitations",
+      "intro": "Invite someone to the staff workspace. They accept with a single-use link, confirm their email, and set up a second factor before the workspace opens.",
+      "email": "Email address",
+      "role": "Role",
+      "reason": "Why this person needs the role",
+      "reasonHelp": "Recorded with the invitation. An audit later cannot explain a role granted for no stated reason.",
+      "send": "Send invitation",
+      "revoke": "Revoke",
+      "pending": "Pending invitations",
+      "noPending": "No pending invitations.",
+      "invitedBy": "Invited by",
+      "expires": "Expires",
+      "nothingInvitable": "You cannot invite any role. A role can only be handed out by someone who already holds every permission in it.",
+      "emailRequired": "Enter a valid email address.",
+      "inviteSent": "Invitation sent.",
+      "inviteRevoked": "Invitation revoked.",
+      "alreadyInvited": "There is already a pending invitation for that address.",
+      "templateNotAllowed": "You cannot invite that role. A role can only be handed out by someone who already holds every permission in it.",
+      "templateNotInternal": "That is not an internal role.",
+      "mfaRequired": "Set up your second factor before inviting staff.",
+      "rateLimited": "Too many invitations just now. Try again shortly.",
+      "reasonTooShort": "Say why this person needs the role.",
+      "templateRequired": "Choose a role.",
+      "generic": "We could not send that invitation. Please try again."
     }
   },
   "caseStatus": {
@@ -1064,6 +1093,18 @@
       "wrongEmail": "This invitation was sent to a different email address. Sign in with that address to accept it.",
       "unavailable": "We could not process the invitation right now. Please try again shortly.",
       "accepted": "You have joined the organisation."
+    },
+    "staffInvitation": {
+      "title": "Join the BDoor staff workspace",
+      "invalid": "That invitation link is not valid.",
+      "expired": "That invitation has expired. Ask an administrator for a new one.",
+      "wrongEmail": "This invitation was sent to a different email address. Sign in with that address to accept it.",
+      "unconfirmed": "Confirm your email address before accepting a staff invitation. Check your inbox for the confirmation link.",
+      "unavailable": "We could not process the invitation right now. Please try again shortly.",
+      "accepted": "You have joined the staff workspace.",
+      "mfaNext": "Set up a second factor now. Every staff account needs one before the workspace will open.",
+      "setUpMfaCta": "Set up two-factor authentication",
+      "backCta": "Back to the workspace"
     }
   },
   "documents": {

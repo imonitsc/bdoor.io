@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { requireCapability } from '@/lib/auth/session';
 import { recordAudit } from '@/lib/audit';
+import { logger } from '@/lib/logger';
 
 export type FinanceState = { status: 'idle' | 'error' | 'success'; message?: string };
 
@@ -117,10 +118,21 @@ export async function recordDisbursement(
 
   if (error) return { status: 'error', message: 'generic' };
 
-  await supabase
+  // Checked for a row: a disbursement recorded against an advance whose
+  // running total never moved is a reconciliation that silently does not add up.
+  const { data: advanceRows, error: advanceError } = await supabase
     .from('government_fee_advances')
     .update({ disbursed_minor: advance.disbursed_minor + parsed.data.amountMinor })
-    .eq('id', parsed.data.advanceId);
+    .eq('id', parsed.data.advanceId)
+    .select('id');
+
+  if (advanceError || (advanceRows ?? []).length === 0) {
+    logger.error('finance.advance_not_updated', {
+      advanceId: parsed.data.advanceId,
+      code: advanceError?.code ?? 'no_rows',
+    });
+    return { status: 'error', message: 'generic' };
+  }
 
   await recordAudit({
     action: 'disbursement.recorded',

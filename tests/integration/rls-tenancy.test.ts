@@ -9,6 +9,7 @@ import {
   ensureStranger,
   expectRejected,
   selectAs,
+  AAL2,
 } from './helpers/db';
 
 /**
@@ -192,14 +193,29 @@ describe('nobody can grant themselves a role', () => {
     expect(result.rejected).toBe(true);
   });
 
-  it('lets an admin grant a role to somebody else', async () => {
+  it('lets an admin grant a role to somebody else, with a second factor', async () => {
+    const result = await expectRejected(
+      client,
+      USERS.admin,
+      `insert into public.platform_roles (user_id, role) values ($1, 'case_manager')`,
+      [USERS.stranger],
+      AAL2,
+    );
+    expect(result.rejected).toBe(false);
+  });
+
+  it('refuses the same grant without one', async () => {
+    // user.manage is a step-up capability. Holding the role is not enough — a
+    // second factor has to have been presented on this request, or a stolen
+    // cookie is all it takes to hand out a platform role.
     const result = await expectRejected(
       client,
       USERS.admin,
       `insert into public.platform_roles (user_id, role) values ($1, 'case_manager')`,
       [USERS.stranger],
     );
-    expect(result.rejected).toBe(false);
+    expect(result.rejected).toBe(true);
+    expect(result.code).toBe('42501');
   });
 
   it('refuses a customer joining an organisation by inserting a membership', async () => {

@@ -70,6 +70,30 @@ export const inviteSchema = z.object({
   role: z.enum(['customer_owner', 'customer_member', 'partner_owner', 'partner_staff']),
 });
 
+/**
+ * Inviting BDoor staff.
+ *
+ * `templateCode` is validated as a non-empty string rather than an enum: the
+ * internal templates are rows in `role_templates`, so an enum here would have
+ * to be edited every time one is added, and would silently diverge. The
+ * database is the authority — `app.may_invite_template()` decides whether this
+ * caller may hand out this template, and a trigger holds it to the internal
+ * workspace. This schema only rejects what is obviously not a template code.
+ *
+ * `reason` is required. A platform role granted for no stated reason is the
+ * thing an audit later cannot explain.
+ */
+export const staffInviteSchema = z.object({
+  email: emailSchema,
+  templateCode: z
+    .string()
+    .trim()
+    .min(2, 'templateRequired')
+    .max(64)
+    .regex(/^[a-z_]+$/, 'templateRequired'),
+  reason: z.string().trim().min(8, 'reasonTooShort').max(500),
+});
+
 export type SignInInput = z.infer<typeof signInSchema>;
 export type SignUpInput = z.infer<typeof signUpSchema>;
 export type OrganizationInput = z.infer<typeof organizationSchema>;

@@ -21,35 +21,44 @@ export const ORGANIZATION_ROLES: readonly OrganizationRole[] = [
 /**
  * Every capability the application checks. Adding a screen means adding a
  * capability here, not sprinkling role names through components.
+ *
+ * This is an array rather than a bare union so the set exists at runtime:
+ * `public.permission_catalog` seeds the same 27 keys, and
+ * `tests/integration/authorization-core.test.ts` fails if the two drift — the
+ * same guard `case_status_transitions` has against the case state machine. The
+ * `Capability` type is derived from it, so the list cannot fall behind the type.
  */
-export type Capability =
-  | 'case.read.own'
-  | 'case.create'
-  | 'case.manage'
-  | 'case.transition'
-  | 'case.assign_partner'
-  | 'document.upload'
-  | 'document.review'
-  | 'document.quarantine'
-  | 'kyc.read'
-  | 'kyc.decide'
-  | 'risk.read'
-  | 'risk.write'
-  | 'quote.read'
-  | 'quote.prepare'
-  | 'quote.approve'
-  | 'quote.accept'
-  | 'payment.read'
-  | 'payment.reconcile'
-  | 'refund.approve'
-  | 'partner.read_assigned'
-  | 'partner.respond_assignment'
-  | 'partner.verify'
-  | 'content.publish'
-  | 'service.manage'
-  | 'user.manage'
-  | 'audit.read'
-  | 'settings.manage';
+export const ALL_CAPABILITIES = [
+  'case.read.own',
+  'case.create',
+  'case.manage',
+  'case.transition',
+  'case.assign_partner',
+  'document.upload',
+  'document.review',
+  'document.quarantine',
+  'kyc.read',
+  'kyc.decide',
+  'risk.read',
+  'risk.write',
+  'quote.read',
+  'quote.prepare',
+  'quote.approve',
+  'quote.accept',
+  'payment.read',
+  'payment.reconcile',
+  'refund.approve',
+  'partner.read_assigned',
+  'partner.respond_assignment',
+  'partner.verify',
+  'content.publish',
+  'service.manage',
+  'user.manage',
+  'audit.read',
+  'settings.manage',
+] as const;
+
+export type Capability = (typeof ALL_CAPABILITIES)[number];
 
 const PLATFORM_CAPABILITIES: Record<PlatformRole, readonly Capability[]> = {
   case_manager: [
@@ -206,4 +215,66 @@ export function requiresMfa(
     platformRoles.some((r) => MFA_REQUIRED_PLATFORM_ROLES.includes(r)) ||
     organizationRoles.some((r) => MFA_REQUIRED_ORGANIZATION_ROLES.includes(r))
   );
+}
+
+/**
+ * Capabilities that need a second factor presented on *this* request, not just
+ * a factor enrolled on the account.
+ *
+ * These are the operations where the damage from a stolen session is worst: a
+ * compliance decision, a refund, a reconciliation, a quarantine, a change to
+ * who holds which role, and the platform settings themselves.
+ *
+ * `public.permission_catalog.requires_aal2` carries the same list, and
+ * `tests/integration/authorization-core.test.ts` fails if the two disagree.
+ * The set lives here as well so `requireCapability()` can decide without a
+ * round trip on every call.
+ */
+export const STEP_UP_CAPABILITIES: ReadonlySet<Capability> = new Set<Capability>([
+  'document.quarantine',
+  'kyc.decide',
+  'partner.verify',
+  'payment.reconcile',
+  'quote.approve',
+  'refund.approve',
+  'risk.write',
+  'settings.manage',
+  'user.manage',
+]);
+
+export function requiresStepUp(capability: Capability): boolean {
+  return STEP_UP_CAPABILITIES.has(capability);
+}
+
+/** The assurance level of a session, as Supabase reports it. */
+export type AssuranceLevel = 'aal1' | 'aal2' | null;
+
+/** What the user must still do before an MFA-required workspace will let them in. */
+export type MfaStep = 'satisfied' | 'enroll' | 'challenge';
+
+/**
+ * Decides whether a second factor still stands between the user and the
+ * workspace, and if so which one of the two things they have to do.
+ *
+ * The distinction that matters is between `currentLevel` and `nextLevel`.
+ * `currentLevel` is the assurance level of the token in hand — 'aal2' only once
+ * a factor has actually been presented on this session. `nextLevel` is the
+ * highest level the account *could* reach, which Supabase raises to 'aal2' as
+ * soon as one verified factor exists. So `nextLevel` describes the account and
+ * `currentLevel` describes the request; only `currentLevel` is evidence.
+ *
+ * Reading `nextLevel` as though it were evidence inverts the control: an
+ * account that never enrolled has `nextLevel === 'aal1'` and would look like it
+ * had nothing outstanding, so the gate would admit precisely the accounts with
+ * no second factor and stop only the ones that had set it up.
+ */
+export function mfaStep(
+  required: boolean,
+  currentLevel: AssuranceLevel,
+  nextLevel: AssuranceLevel,
+): MfaStep {
+  if (currentLevel === 'aal2') return 'satisfied';
+  if (!required) return 'satisfied';
+  // A verified factor exists but was not presented on this session.
+  return nextLevel === 'aal2' ? 'challenge' : 'enroll';
 }

@@ -3,6 +3,7 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
+import { safeNextPath } from '@/lib/auth/safe-next';
 import { createClient } from '@/lib/supabase/server';
 import { enforceRateLimit, resetRateLimit } from '@/lib/rate-limit';
 import { hashIdentifier } from '@/lib/utils/hash';
@@ -77,7 +78,7 @@ export async function signIn(_previous: AuthState, formData: FormData): Promise<
 
   const next = String(formData.get('next') ?? '');
   const locale = await getLocale();
-  redirect(next.startsWith('/') && !next.startsWith('//') ? next : `/${locale}/app`);
+  redirect(safeNextPath(next, `/${locale}/app`));
 }
 
 export async function signUp(_previous: AuthState, formData: FormData): Promise<AuthState> {

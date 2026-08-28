@@ -101,6 +101,7 @@ supabase/
 scripts/
   local-db/              apply the schema to a plain Postgres, generate snapshots
   seed-auth-users.mjs    give the seeded accounts a password
+  invite-initial-super-admin.mjs   grant the first super_admin on a fresh project
 tests/
   unit/ integration/ e2e/
 docs/                    role matrix, case states, data retention, incident response, launch checklist
@@ -434,10 +435,41 @@ rather than a number. `tests/e2e/marketing.spec.ts` asserts this.
 
 ### Grant a staff role
 
-Roles are rows in `public.platform_roles`. The write policy is
-`app.is_admin() and user_id <> auth.uid()`: an administrator can grant a role to
-someone else and can never grant one to themselves. The first administrator is
-inserted by migration or by hand with the service role.
+Staff roles arrive through `public.platform_invitations`. An administrator
+invites an address, the invitee accepts a single-use token, and the row records
+who invited whom and why. Nothing about a platform role happens by public
+signup.
+
+Who may invite whom is not a list — `app.may_invite_template()` refuses if the
+invited role holds any permission the inviter does not hold themselves. So a
+plain `admin` may invite `admin`, `case_manager`, `operations_manager`,
+`support`, `content_editor`, `legal_policy_publisher` and `auditor`, but **not**
+`compliance_officer` (`kyc.decide`, `risk.write`) or `finance`
+(`refund.approve`). Those are precisely the permissions `admin` is deliberately
+denied, and inviting a second account that holds them would be the obvious way
+around the denial. Only a `super_admin` can invite those.
+
+The older path still exists underneath: roles are rows in
+`public.platform_roles`, whose write policy is
+`app.is_admin() and user_id <> auth.uid()` — an administrator can grant a role
+to someone else and can never grant one to themselves.
+
+#### The first super_admin
+
+On a fresh database nobody holds anything, so nobody can invite the first
+`super_admin`. Something outside the permission system has to start it:
+
+```bash
+# The person signs up through the application first and confirms their address.
+node scripts/invite-initial-super-admin.mjs someone@example.com
+```
+
+It raises an account that already exists — it does not create one and does not
+set a password, because seeding a password would be inventing a credential. It
+refuses against anything that is not obviously a local project unless
+`ALLOW_NON_LOCAL=1`, refuses an unconfirmed address, and refuses outright once a
+`super_admin` exists. Bootstrap happens once; every later grant goes through the
+invitation flow, where it is attributable.
 
 ### Change the case state machine
 

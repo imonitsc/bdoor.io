@@ -72,10 +72,23 @@ export async function acceptQuote(
     return { status: 'error', message: 'generic' };
   }
 
-  await supabase
+  // Checked, and checked for a row rather than only for an error. RLS filters
+  // an update the caller may not make down to zero rows, which PostgREST
+  // reports as success with nothing changed — which is exactly how this went
+  // unnoticed: the acceptance was recorded but the quote stayed `sent`.
+  const { data: accepted, error: acceptError } = await supabase
     .from('quote_versions')
     .update({ status: 'accepted', accepted_at: new Date().toISOString() })
-    .eq('id', row.id);
+    .eq('id', row.id)
+    .select('id');
+
+  if (acceptError || (accepted ?? []).length === 0) {
+    logger.error('quote.accept_not_applied', {
+      quoteVersionId: row.id,
+      code: acceptError?.code ?? 'no_rows',
+    });
+    return { status: 'error', message: 'generic' };
+  }
 
   await recordAudit({
     action: 'quote.accepted',
