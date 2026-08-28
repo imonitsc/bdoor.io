@@ -130,7 +130,10 @@ export function SignUpForm() {
   if (state.status === 'success') {
     return (
       <Alert tone="success" title={t('verifyTitle')} live="polite">
-        <p>{t('verifyBody', { email: tCommon('email') })}</p>
+        {/* The address the caller just typed. It used to interpolate
+            tCommon('email'), a UI label key that does not exist — so the screen
+            read "we sent a link to common.email". */}
+        <p>{t('verifyBody', { email: state.email ?? '' })}</p>
       </Alert>
     );
   }
