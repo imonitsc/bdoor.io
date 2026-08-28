@@ -172,28 +172,55 @@ jobs:
 
   # Reviews the dependency *diff* of a pull request.
   #
-  # Non-blocking, and deliberately so: the action needs GitHub's Dependency
-  # graph enabled on the repository and errors out with "Dependency review is
-  # not supported on this repository" when it is off — a repository setting no
-  # change in this repo can satisfy. Blocking on it would leave every pull
-  # request permanently red for a reason no author can fix.
+  # The action needs GitHub's Dependency graph enabled on the repository and
+  # hard-errors with "Dependency review is not supported on this repository"
+  # when it is off — a repository setting that no change here can satisfy.
   #
-  # This drops no vulnerability coverage. The `security` job above runs
-  # `pnpm audit --audit-level high` over the whole resolved tree and DOES fail
-  # the build, which is broader than the diff this action inspects.
+  # So probe for it first and skip only that case. A blanket
+  # `continue-on-error` would also swallow a real vulnerability finding once
+  # the setting is enabled, which is exactly the failure this job exists to
+  # catch. When the graph is available the action runs normally and a high or
+  # critical advisory fails the build.
   #
-  # Enable Dependency graph at Settings → Code security, then delete the
-  # `continue-on-error` line to make this blocking too.
+  # Note this is the narrower check either way: the `security` job runs
+  # `pnpm audit --audit-level high` over the whole resolved tree, not just the
+  # pull request's diff, and always blocks.
   dependency-review:
     name: Dependency review
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
-    continue-on-error: true
     permissions:
       contents: read
       pull-requests: read
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/dependency-review-action@v4
+
+      - name: Is the dependency graph available?
+        id: graph
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          code=$(curl -sS -o /dev/null -w '%{http_code}' \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/dependency-graph/compare/$BASE...$HEAD")
+          echo "http_code=$code"
+          if [ "$code" = "200" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - if: steps.graph.outputs.available == 'true'
+        uses: actions/dependency-review-action@v4
         with:
           fail-on-severity: high
+
+      - if: steps.graph.outputs.available != 'true'
+        run: |
+          echo "::warning title=Dependency review skipped::Dependency graph is not \
+          enabled for this repository, so the pull-request dependency diff cannot be \
+          reviewed. Enable it at Settings → Code security. pnpm audit still runs and \
+          still blocks."
