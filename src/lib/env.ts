@@ -131,6 +131,20 @@ export function productionEnvProblems(): string[] {
   const env = serverEnv();
   const problems: string[] = [];
 
+  // The proxy builds a Supabase client on EVERY request, so a missing public
+  // variable is a total outage rather than a degraded feature. They are checked
+  // here, not only in `clientEnv()`, because nothing calls `clientEnv()` at
+  // boot: without these lines the server starts "healthy" and then 500s on
+  // every request — the exact failure this whole check exists to prevent.
+  // Read from `process.env` directly: they are inlined at build time, so a
+  // blank one is a defined empty string and `||` is deliberate over `??`.
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()) {
+    problems.push('NEXT_PUBLIC_SUPABASE_URL — required by the proxy on every request');
+  }
+  if (!process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim()) {
+    problems.push('NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY — required by the proxy on every request');
+  }
+
   if (!env.SUPABASE_SECRET_KEY) {
     problems.push(
       'SUPABASE_SECRET_KEY — required for webhooks, invitations and the compliance schema',
