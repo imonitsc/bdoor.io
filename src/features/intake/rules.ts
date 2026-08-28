@@ -111,7 +111,16 @@ function pushUnique(target: string[], values: readonly string[] | undefined) {
  * that names a structure wins, so a high-priority "this needs review" rule can
  * pre-empt a lower-priority default without the default overwriting it.
  */
+/** Map the first assessment answer onto fields the rule engine already understands. */
+function normalizeAnswers(answers: PartialAnswers): PartialAnswers {
+  const out = { ...answers };
+  if (answers.help_scope === 'start_bangladesh') out.existing_business = false;
+  if (answers.help_scope === 'manage_bangladesh') out.existing_business = true;
+  return out;
+}
+
 export function recommend(answers: PartialAnswers, rules: readonly Rule[]): Recommendation {
+  const normalized = normalizeAnswers(answers);
   const ordered = [...rules].sort((a, b) => a.priority - b.priority || a.key.localeCompare(b.key));
 
   const result: Recommendation = {
@@ -126,7 +135,7 @@ export function recommend(answers: PartialAnswers, rules: readonly Rule[]): Reco
   };
 
   for (const rule of ordered) {
-    if (!evaluateGroup(rule.conditions, answers)) continue;
+    if (!evaluateGroup(rule.conditions, normalized)) continue;
 
     result.ruleKeysMatched.push(rule.key);
     const { outcome } = rule;
@@ -146,13 +155,17 @@ export function recommend(answers: PartialAnswers, rules: readonly Rule[]): Reco
 
   // A structure the founder explicitly chose is respected unless a rule already
   // decided otherwise, but "unsure" is never echoed back as a recommendation.
-  if (result.suggestedStructure === null && answers.structure && answers.structure !== 'unsure') {
-    result.suggestedStructure = answers.structure;
+  if (
+    result.suggestedStructure === null &&
+    normalized.structure &&
+    normalized.structure !== 'unsure'
+  ) {
+    result.suggestedStructure = normalized.structure;
   }
 
   // Safety net independent of the configurable rules: these always need a human,
   // whatever the rule table says.
-  const hardManualReview = hardManualReviewReasons(answers);
+  const hardManualReview = hardManualReviewReasons(normalized);
   if (hardManualReview.length > 0) {
     result.requiresManualReview = true;
     pushUnique(result.manualReviewReasons, hardManualReview);
@@ -169,6 +182,12 @@ export function recommend(answers: PartialAnswers, rules: readonly Rule[]): Reco
 export function hardManualReviewReasons(answers: PartialAnswers): string[] {
   const reasons: string[] = [];
 
+  if (answers.help_scope === 'form_abroad') {
+    reasons.push('international_formation');
+  }
+  if (answers.help_scope === 'unsure') {
+    reasons.push('scope_unclear');
+  }
   if (answers.entity_owner === true) {
     reasons.push('corporate_or_trust_owner');
   }

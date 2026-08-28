@@ -1,27 +1,18 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { useTranslations } from 'next-intl';
-import {
-  ArrowRight,
-  Building2,
-  CalendarCheck,
-  FileBadge,
-  Globe,
-  Receipt,
-  Ship,
-} from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Section, SectionHeading } from '@/components/ui/section';
-import { Alert } from '@/components/ui/alert';
-import { ServiceFinder } from '@/components/marketing/service-finder';
-import { PortalVisual } from '@/components/marketing/portal-visual';
-import { HeroAdvisor } from '@/components/marketing/hero-advisor';
+import { PackageSelector } from '@/components/marketing/package-selector';
+import { FeeBreakdownExample } from '@/components/marketing/fee-breakdown-example';
+import { InternationalOfferCards } from '@/components/marketing/international-offer-cards';
+import { SpecialistServicesList } from '@/components/marketing/specialist-services-list';
 import { WorkspacePreview } from '@/components/marketing/workspace-preview';
 import { FaqList } from '@/components/marketing/faq-list';
-import { getCategories, getGlobalFaqs } from '@/features/catalog/queries';
-import { pick, type Locale } from '@/features/catalog/types';
+import { getGlobalFaqs } from '@/features/catalog/queries';
+import type { Locale } from '@/features/catalog/types';
 import { MARKETING_ROUTES } from '@/lib/navigation';
 import { localizedUrl } from '@/lib/site';
 
@@ -43,15 +34,6 @@ export async function generateMetadata({
     },
   };
 }
-
-const CATEGORY_ICONS: Record<string, typeof Building2> = {
-  'company-formation': Building2,
-  licences: FileBadge,
-  'import-export': Ship,
-  'tax-vat': Receipt,
-  'foreign-founders': Globe,
-  compliance: CalendarCheck,
-};
 
 function Hero() {
   const t = useTranslations('home.hero');
@@ -81,17 +63,24 @@ function Hero() {
               variant="ghost"
               className="border-border-inverse text-ink-inverse hover:bg-surface-inverse-soft border"
             >
-              <Link href={MARKETING_ROUTES.contact}>{t('secondaryCta')}</Link>
+              <Link href={MARKETING_ROUTES.international}>{t('secondaryCta')}</Link>
             </Button>
           </div>
 
-          <p className="text-muted-inverse mt-8 text-sm">{t('trustLine')}</p>
-
-          <PortalVisual className="pointer-events-none mt-10 hidden max-w-sm opacity-90 lg:block" />
+          <p className="text-muted-inverse mt-8 text-sm">{t('operatorLine')}</p>
         </div>
 
         <div className="lg:pt-4">
-          <HeroAdvisor />
+          <div className="border-border bg-surface flex flex-col gap-4 rounded-[var(--radius-panel)] border p-5 shadow-md md:p-6">
+            <h2 className="text-ink text-base font-semibold">{t('advisorTitle')}</h2>
+            <p className="text-muted text-sm leading-relaxed">{t('advisorBody')}</p>
+            <Button asChild size="lg" className="mt-2 w-full">
+              <Link href={MARKETING_ROUTES.start}>
+                {t('primaryCta')}
+                <ArrowRight className="size-4" aria-hidden="true" />
+              </Link>
+            </Button>
+          </div>
         </div>
       </div>
     </section>
@@ -100,13 +89,13 @@ function Hero() {
 
 function HowItWorks() {
   const t = useTranslations('home.howItWorks');
-  const steps = ['one', 'two', 'three', 'four', 'five', 'six', 'seven'] as const;
+  const steps = ['one', 'two', 'three', 'four'] as const;
 
   return (
     <Section tone="surface">
       <div className="container-page">
         <SectionHeading eyebrow={t('eyebrow')} title={t('title')} />
-        <ol className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <ol className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((step, index) => (
             <li key={step} className="flex flex-col gap-3">
               <span
@@ -125,138 +114,25 @@ function HowItWorks() {
   );
 }
 
-function ServiceFinderSection() {
-  const t = useTranslations('home.serviceFinder');
-  return (
-    <Section>
-      <div className="container-page grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
-        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
-        <ServiceFinder />
-      </div>
-    </Section>
-  );
-}
-
-async function InternationalSection() {
-  const t = await getTranslations('home.international');
-  return (
-    <Section tone="surface">
-      <div className="container-page grid gap-8 lg:grid-cols-2 lg:items-center lg:gap-16">
-        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
-        <div className="flex flex-col gap-4">
-          <Button asChild size="lg" className="w-fit">
-            <Link href={MARKETING_ROUTES.international}>
-              {t('cta')}
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </Link>
-          </Button>
-        </div>
-      </div>
-    </Section>
-  );
-}
-
-function ComplianceSection() {
-  const t = useTranslations('home.compliance');
-  return (
-    <Section>
-      <div className="container-page max-w-3xl">
-        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
-        <Button asChild className="mt-7" size="lg" variant="secondary">
-          <Link href={MARKETING_ROUTES.howItWorks}>
-            {t('eyebrow')}
-            <ArrowRight className="size-4" aria-hidden="true" />
-          </Link>
-        </Button>
-      </div>
-    </Section>
-  );
-}
-
-async function Categories({ locale }: { locale: Locale }) {
-  const [{ data: categories }, t] = await Promise.all([
-    getCategories(),
-    getTranslations('home.categories'),
-  ]);
-  const tCommon = await getTranslations('common');
-
+function PackagesSection({ locale }: { locale: Locale }) {
+  const t = useTranslations('home.packages');
   return (
     <Section>
       <div className="container-page">
         <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
-        <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {categories.map((category) => {
-            const Icon = CATEGORY_ICONS[category.slug] ?? Building2;
-            return (
-              <li key={category.id}>
-                <Card
-                  as="article"
-                  className="group relative h-full p-5 transition-shadow hover:shadow-md md:p-6"
-                >
-                  <span
-                    className="bg-accent-soft text-accent-strong flex size-10 items-center justify-center rounded-[12px]"
-                    aria-hidden="true"
-                  >
-                    <Icon className="size-5" />
-                  </span>
-                  <h3 className="text-ink mt-4 text-base font-semibold">
-                    <Link
-                      href={`/services?category=${category.slug}`}
-                      className="rounded before:absolute before:inset-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
-                    >
-                      {pick(category.name, locale)}
-                    </Link>
-                  </h3>
-                  <p className="text-muted mt-2 text-sm leading-relaxed">
-                    {pick(category.summary, locale)}
-                  </p>
-                  <p className="text-primary mt-4 flex items-center gap-1.5 text-sm font-medium">
-                    {tCommon('viewAll')}
-                    <ArrowRight
-                      className="size-4 transition-transform group-hover:translate-x-0.5"
-                      aria-hidden="true"
-                    />
-                  </p>
-                </Card>
-              </li>
-            );
-          })}
-        </ul>
+        <PackageSelector locale={locale} />
       </div>
     </Section>
   );
 }
 
-function ForeignFounders() {
-  const t = useTranslations('home.foreignFounders');
-  const points = ['one', 'two', 'three'] as const;
-
+function FeeExampleSection({ locale }: { locale: Locale }) {
+  const t = useTranslations('home.feeExample');
   return (
     <Section tone="surface">
-      <div className="container-page grid gap-10 lg:grid-cols-2 lg:gap-16">
-        <div>
-          <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
-          <Button asChild className="mt-7" size="lg">
-            <Link href={MARKETING_ROUTES.foreignFounders}>
-              {t('cta')}
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </Link>
-          </Button>
-        </div>
-        <div className="flex flex-col gap-5">
-          <ul className="flex flex-col gap-4">
-            {points.map((point) => (
-              <li key={point} className="flex gap-3">
-                <span
-                  className="bg-accent mt-2 size-1.5 shrink-0 rounded-full"
-                  aria-hidden="true"
-                />
-                <p className="text-ink text-sm leading-relaxed">{t(`points.${point}`)}</p>
-              </li>
-            ))}
-          </ul>
-          <Alert tone="warning" title={t('important')} />
-        </div>
+      <div className="container-page grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
+        <FeeBreakdownExample locale={locale} />
       </div>
     </Section>
   );
@@ -276,66 +152,42 @@ function Preview() {
   );
 }
 
-function Pricing() {
-  const t = useTranslations('home.pricing');
-  const tFees = useTranslations('services.feeCategories');
-  const categories = [
-    'platform_service_fee',
-    'government_fee_estimate',
-    'partner_professional_fee',
-    'third_party_cost',
-    'tax',
-  ] as const;
-
+function SpecialistSection({ locale }: { locale: Locale }) {
+  const t = useTranslations('home.specialist');
   return (
     <Section>
-      <div className="container-page grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
-        <div>
-          <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
-          <Button asChild className="mt-7" size="lg" variant="secondary">
-            <Link href={MARKETING_ROUTES.pricing}>
-              {t('cta')}
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </Link>
-          </Button>
-        </div>
-        <Card className="p-5 md:p-6">
-          <ul className="divide-border divide-y">
-            {categories.map((category) => (
-              <li key={category} className="flex items-center justify-between gap-4 py-3.5">
-                <span className="text-ink text-sm font-medium">{tFees(category)}</span>
-                <span className="text-muted text-sm">
-                  {category === 'platform_service_fee' ? 'BDoor' : '—'}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </Card>
+      <div className="container-page max-w-3xl">
+        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
+        <SpecialistServicesList locale={locale} />
       </div>
     </Section>
   );
 }
 
-function Partners() {
-  const t = useTranslations('home.partners');
+function InternationalSection({ locale }: { locale: Locale }) {
+  const t = useTranslations('home.international');
   return (
-    <Section tone="inverse">
+    <Section tone="surface">
       <div className="container-page">
-        <SectionHeading
-          eyebrow={t('eyebrow')}
-          title={t('title')}
-          body={t('body')}
-          inverse
-          align="center"
-        />
-        <div className="mt-8 flex justify-center">
-          <Button asChild variant="inverse" size="lg">
-            <Link href={MARKETING_ROUTES.partners}>
-              {t('cta')}
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </Link>
-          </Button>
-        </div>
+        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
+        <InternationalOfferCards locale={locale} />
+      </div>
+    </Section>
+  );
+}
+
+function ComplianceSection() {
+  const t = useTranslations('home.compliance');
+  return (
+    <Section>
+      <div className="container-page max-w-3xl">
+        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
+        <Button asChild className="mt-7" size="lg" variant="secondary">
+          <Link href={MARKETING_ROUTES.start}>
+            {t('cta')}
+            <ArrowRight className="size-4" aria-hidden="true" />
+          </Link>
+        </Button>
       </div>
     </Section>
   );
@@ -349,7 +201,7 @@ async function Faqs({ locale }: { locale: Locale }) {
       <div className="container-page grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
         <SectionHeading eyebrow={t('eyebrow')} title={t('title')} />
         <div>
-          <FaqList faqs={faqs} locale={locale} limit={5} />
+          <FaqList faqs={faqs} locale={locale} limit={6} />
           <Button asChild variant="link" className="mt-5">
             <Link href={MARKETING_ROUTES.howItWorks}>
               {t('cta')}
@@ -388,20 +240,19 @@ function FinalCta() {
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const typedLocale = locale as Locale;
 
   return (
     <>
       <Hero />
-      <ServiceFinderSection />
       <HowItWorks />
-      <Categories locale={locale as Locale} />
-      <ForeignFounders />
+      <PackagesSection locale={typedLocale} />
+      <FeeExampleSection locale={typedLocale} />
       <Preview />
-      <Pricing />
-      <InternationalSection />
-      <Partners />
+      <SpecialistSection locale={typedLocale} />
+      <InternationalSection locale={typedLocale} />
       <ComplianceSection />
-      <Faqs locale={locale as Locale} />
+      <Faqs locale={typedLocale} />
       <FinalCta />
     </>
   );

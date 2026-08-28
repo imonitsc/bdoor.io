@@ -130,6 +130,10 @@ export async function startCheckout(
   const amountMinor = invoice.total_minor - invoice.paid_minor;
   if (amountMinor <= 0) return { status: 'error', message: 'alreadyPaid' };
 
+  if (invoice.currency !== 'BDT' && invoice.currency !== 'USD') {
+    return { status: 'error', message: 'generic' };
+  }
+
   const provider = getPaymentProvider();
   const locale = await getLocale();
   const idempotencyKey = `${invoice.id}:${amountMinor}`;

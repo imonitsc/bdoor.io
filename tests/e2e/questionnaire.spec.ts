@@ -23,12 +23,23 @@ async function answer(
   await expect(progress).not.toHaveAttribute('aria-valuenow', before ?? '');
 }
 
+async function startBangladeshAssessment(
+  page: import('@playwright/test').Page,
+) {
+  await answer(page, async () => {
+    await page.getByRole('radio', { name: 'Start a business in Bangladesh' }).click();
+  });
+}
+
 test.describe('questionnaire', () => {
   test('branches on the answers given', async ({ page }) => {
     await page.goto('/en/start');
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Start your business');
 
-    // Step 1 — a founder inside Bangladesh.
+    await expect(page.getByText('Where do you want help?')).toBeVisible();
+    await startBangladeshAssessment(page);
+
+    // Founder inside Bangladesh.
     await expect(page.getByText('Where are you based right now?')).toBeVisible();
     await answer(page, async () => {
       await page.getByRole('radio', { name: 'In Bangladesh' }).click();
@@ -40,12 +51,13 @@ test.describe('questionnaire', () => {
       await page.getByRole('combobox').selectOption('BD');
     });
 
-    await expect(page.getByText('Does this business already exist?')).toBeVisible();
+    await expect(page.getByText('What will the business actually do?')).toBeVisible();
     await expect(page.getByText('Which country do you currently live in?')).toHaveCount(0);
   });
 
   test('asks a foreign founder the questions a local founder is spared', async ({ page }) => {
     await page.goto('/en/start');
+    await startBangladeshAssessment(page);
 
     await answer(page, async () => {
       await page.getByRole('radio', { name: 'Outside Bangladesh' }).click();
@@ -62,14 +74,12 @@ test.describe('questionnaire', () => {
 
   test('validates before it advances', async ({ page }) => {
     await page.goto('/en/start');
+    await startBangladeshAssessment(page);
     await answer(page, async () => {
       await page.getByRole('radio', { name: 'In Bangladesh' }).click();
     });
     await answer(page, async () => {
       await page.getByRole('combobox').selectOption('BD');
-    });
-    await answer(page, async () => {
-      await page.getByRole('radio', { name: 'No', exact: true }).click();
     });
 
     // A one-word activity is rejected by the shared schema.
@@ -84,15 +94,17 @@ test.describe('questionnaire', () => {
   test('shows the "why we ask" explanation on sensitive questions', async ({ page }) => {
     await page.goto('/en/start');
     await page.getByRole('button', { name: 'Why we ask' }).click();
-    await expect(page.getByText('Founder location determines', { exact: false })).toBeVisible();
+    await expect(
+      page.getByText('This routes you to the right package', { exact: false }),
+    ).toBeVisible();
   });
 
   test('reaches a preliminary recommendation and labels it as preliminary', async ({ page }) => {
     await page.goto('/en/start');
+    await startBangladeshAssessment(page);
 
     await answer(page, async () => page.getByRole('radio', { name: 'In Bangladesh' }).click());
     await answer(page, async () => page.getByRole('combobox').selectOption('BD'));
-    await answer(page, async () => page.getByRole('radio', { name: 'No', exact: true }).click());
     await answer(page, async () =>
       page.getByRole('textbox').fill('Sell handmade leather bags from a shop in Dhaka.'),
     );
@@ -128,11 +140,11 @@ test.describe('questionnaire', () => {
 
   test('sends a foreign founder to manual review', async ({ page }) => {
     await page.goto('/en/start');
+    await startBangladeshAssessment(page);
 
     await answer(page, async () => page.getByRole('radio', { name: 'Outside Bangladesh' }).click());
     await answer(page, async () => page.getByRole('combobox').selectOption('GB'));
     await answer(page, async () => page.getByRole('combobox').selectOption('GB')); // residence
-    await answer(page, async () => page.getByRole('radio', { name: 'No', exact: true }).click()); // existing
     await answer(page, async () =>
       page.getByRole('textbox').fill('Import cotton fabric and sell to local garment factories.'),
     );
@@ -168,10 +180,10 @@ test.describe('questionnaire', () => {
 
   test('warns that capital never comes to BDoor', async ({ page }) => {
     await page.goto('/en/start');
+    await startBangladeshAssessment(page);
     await answer(page, async () => page.getByRole('radio', { name: 'Outside Bangladesh' }).click());
     await answer(page, async () => page.getByRole('combobox').selectOption('SG'));
     await answer(page, async () => page.getByRole('combobox').selectOption('SG'));
-    await answer(page, async () => page.getByRole('radio', { name: 'No', exact: true }).click());
     await answer(page, async () =>
       page.getByRole('textbox').fill('Provide software consulting services to local banks.'),
     );
@@ -192,6 +204,7 @@ test.describe('questionnaire', () => {
 
   test('can step back and change an answer', async ({ page }) => {
     await page.goto('/en/start');
+    await startBangladeshAssessment(page);
     await answer(page, async () => page.getByRole('radio', { name: 'In Bangladesh' }).click());
     await expect(page.getByText('What is your nationality?')).toBeVisible();
 
