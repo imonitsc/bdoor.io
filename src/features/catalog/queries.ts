@@ -9,6 +9,7 @@ import {
   SNAPSHOT_RESOURCES,
   SNAPSHOT_SERVICES,
 } from '@/content/catalog-snapshot';
+import { mergeCategories, mergeServices } from '@/content/directory/taxonomy';
 import type { CatalogSource, Faq, ResourcePage, Service, ServiceCategory } from './types';
 
 export type CatalogResult<T> = { data: T; source: CatalogSource };
@@ -27,7 +28,9 @@ function supabaseConfigured(): boolean {
  * outside production so nobody mistakes stale snapshot content for live data.
  */
 export const getCategories = cache(async (): Promise<CatalogResult<ServiceCategory[]>> => {
-  if (!supabaseConfigured()) return { data: SNAPSHOT_CATEGORIES, source: 'snapshot' };
+  if (!supabaseConfigured()) {
+    return { data: mergeCategories(SNAPSHOT_CATEGORIES), source: 'snapshot' };
+  }
 
   try {
     const supabase = createPublicClient();
@@ -39,25 +42,27 @@ export const getCategories = cache(async (): Promise<CatalogResult<ServiceCatego
 
     if (error || !data || data.length === 0) {
       if (error) logger.warn('catalog.categories_fallback', { message: error.message });
-      return { data: SNAPSHOT_CATEGORIES, source: 'snapshot' };
+      return { data: mergeCategories(SNAPSHOT_CATEGORIES), source: 'snapshot' };
     }
 
     return {
       source: 'database',
-      data: data.map((row) => ({
-        id: row.id,
-        slug: row.slug,
-        name: { en: row.name_en, bn: row.name_bn },
-        summary: { en: row.summary_en ?? '', bn: row.summary_bn ?? '' },
-        icon: row.icon,
-        sortOrder: row.sort_order,
-      })),
+      data: mergeCategories(
+        data.map((row) => ({
+          id: row.id,
+          slug: row.slug,
+          name: { en: row.name_en, bn: row.name_bn },
+          summary: { en: row.summary_en ?? '', bn: row.summary_bn ?? '' },
+          icon: row.icon,
+          sortOrder: row.sort_order,
+        })),
+      ),
     };
   } catch (error) {
     logger.warn('catalog.categories_threw', {
       message: error instanceof Error ? error.message : 'unknown',
     });
-    return { data: SNAPSHOT_CATEGORIES, source: 'snapshot' };
+    return { data: mergeCategories(SNAPSHOT_CATEGORIES), source: 'snapshot' };
   }
 });
 
@@ -187,7 +192,9 @@ function mapService(row: ServiceRow): Service {
 }
 
 export const getServices = cache(async (): Promise<CatalogResult<Service[]>> => {
-  if (!supabaseConfigured()) return { data: SNAPSHOT_SERVICES, source: 'snapshot' };
+  if (!supabaseConfigured()) {
+    return { data: mergeServices(SNAPSHOT_SERVICES), source: 'snapshot' };
+  }
 
   try {
     const supabase = createPublicClient();
@@ -199,15 +206,18 @@ export const getServices = cache(async (): Promise<CatalogResult<Service[]>> => 
 
     if (error || !data || data.length === 0) {
       if (error) logger.warn('catalog.services_fallback', { message: error.message });
-      return { data: SNAPSHOT_SERVICES, source: 'snapshot' };
+      return { data: mergeServices(SNAPSHOT_SERVICES), source: 'snapshot' };
     }
 
-    return { data: (data as unknown as ServiceRow[]).map(mapService), source: 'database' };
+    return {
+      data: mergeServices((data as unknown as ServiceRow[]).map(mapService)),
+      source: 'database',
+    };
   } catch (error) {
     logger.warn('catalog.services_threw', {
       message: error instanceof Error ? error.message : 'unknown',
     });
-    return { data: SNAPSHOT_SERVICES, source: 'snapshot' };
+    return { data: mergeServices(SNAPSHOT_SERVICES), source: 'snapshot' };
   }
 });
 

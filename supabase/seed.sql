@@ -983,3 +983,128 @@ insert into public.notifications (user_id, organization_id, case_id, kind, title
 on conflict do nothing;
 
 commit;
+
+-- =============================================================================
+-- Directory, evidence and social configuration (additive).
+-- Social rows are inactive until the owner records a verified live URL.
+-- Evidence drafts stay non-public.
+-- =============================================================================
+
+begin;
+
+insert into public.countries
+  (code, slug, name_en, name_bn, summary_en, summary_bn, operational_status, is_flagship, sort_order)
+values
+  ('BD', 'bangladesh', 'Bangladesh', 'বাংলাদেশ',
+   'Company formation, licences, tax coordination and ongoing compliance — the flagship product.',
+   'কোম্পানি গঠন, লাইসেন্স, কর সমন্বয় ও চলমান কমপ্লায়েন্স — মূল পণ্য।',
+   'active', true, 10),
+  ('US', 'united-states', 'United States', 'যুক্তরাষ্ট্র',
+   'LLC and C-Corp routes through a verified country specialist, when that specialist is contracted.',
+   'যাচাইকৃত দেশ বিশেষজ্ঞের মাধ্যমে এলএলসি ও সি-কর্প — সেই বিশেষজ্ঞ চুক্তিবদ্ধ হলে।',
+   'coming_soon', false, 20),
+  ('GB', 'united-kingdom', 'United Kingdom', 'যুক্তরাজ্য',
+   'Private limited company coordination through a verified UK specialist, when contracted.',
+   'যাচাইকৃত যুক্তরাজ্য বিশেষজ্ঞের মাধ্যমে প্রাইভেট লিমিটেড কোম্পানি — চুক্তি হলে।',
+   'coming_soon', false, 30),
+  ('AE', 'united-arab-emirates', 'United Arab Emirates', 'সংযুক্ত আরব আমিরাত',
+   'Free-zone and mainland options through a verified UAE specialist, when contracted.',
+   'যাচাইকৃত ইউএই বিশেষজ্ঞের মাধ্যমে ফ্রি-জোন ও মেইনল্যান্ড বিকল্প — চুক্তি হলে।',
+   'coming_soon', false, 40),
+  ('SG', 'singapore', 'Singapore', 'সিঙ্গাপুর',
+   'Pte Ltd coordination through a verified Singapore specialist, when contracted.',
+   'যাচাইকৃত সিঙ্গাপুর বিশেষজ্ঞের মাধ্যমে প্রাইভেট লিমিটেড — চুক্তি হলে।',
+   'coming_soon', false, 50)
+on conflict (code) do nothing;
+
+insert into public.evidence_claims
+  (id, text_en, text_bn, source_type, last_verified_at, reviewer, status, countries, services, is_public, note)
+values
+  ('EVD-INDEPENDENCE',
+   'Independent platform — not a government authority or law firm.',
+   'স্বাধীন প্ল্যাটফর্ম — সরকারি কর্তৃপক্ষ বা আইনি প্রতিষ্ঠান নয়।',
+   'product_policy', current_date, 'platform', 'verified', array['BD'], array['*'], true,
+   'Positioning asserted by tests/e2e/marketing.spec.ts.'),
+  ('EVD-PRIVATE-STORAGE',
+   'Documents stay in a private vault, not a public link.',
+   'কাগজপত্র থাকে ব্যক্তিগত ভল্টে, পাবলিক লিঙ্কে নয়।',
+   'implementation', current_date, 'engineering', 'verified', array['BD'], array['*'], true,
+   'storage migration and document actions.'),
+  ('EVD-STAFF-MFA',
+   'Staff and partners use multi-factor authentication.',
+   'কর্মী ও অংশীদাররা মাল্টি-ফ্যাক্টর প্রমাণীকরণ ব্যবহার করেন।',
+   'implementation', current_date, 'engineering', 'verified', array['BD'], array['*'], true, null),
+  ('EVD-ITEMISED-QUOTES',
+   'Every quote itemises the bdoor fee separately from official charges.',
+   'প্রতিটি কোটেশনে bdoor-এর ফি সরকারি খরচ থেকে আলাদা করে দেখানো হয়।',
+   'implementation', current_date, 'engineering', 'verified', array['BD'], array['*'], true, null),
+  ('EVD-OPERATOR-ENTITY',
+   'Operator legal entity',
+   'পরিচালক আইনি সত্তা',
+   'owner', null, null, 'draft', array['BD'], array['*'], false,
+   'Blocked on owner input. Must not render.')
+on conflict (id) do nothing;
+
+insert into public.social_profiles (network, handle, url, status, verified)
+values
+  ('facebook', null, null, 'inactive', false),
+  ('linkedin', null, null, 'inactive', false),
+  ('instagram', null, null, 'inactive', false),
+  ('youtube', null, null, 'inactive', false),
+  ('tiktok', null, null, 'inactive', false),
+  ('x', null, null, 'inactive', false),
+  ('threads', null, null, 'inactive', false),
+  ('whatsapp', null, null, 'inactive', false),
+  ('google_business', null, null, 'inactive', false)
+on conflict (network) do nothing;
+
+insert into public.industries
+  (slug, name_en, name_bn, summary_en, summary_bn, related_category_slugs, operational_status, sort_order)
+values
+  ('technology-software', 'Technology and software', 'প্রযুক্তি ও সফটওয়্যার',
+   'Usually a private limited company, e-TIN and, where you trade from premises, a trade licence.',
+   'সাধারণত প্রাইভেট লিমিটেড কোম্পানি, ই-টিআইএন, আর কার্যালয় থেকে ব্যবসা করলে ট্রেড লাইসেন্স।',
+   array['company-formation','tax-vat','licences'], 'active', 10),
+  ('ecommerce', 'E-commerce', 'ই-কমার্স',
+   'Structure, trade licence, tax/VAT and, if you import stock, IRC — confirmed after review of what you actually sell.',
+   'কাঠামো, ট্রেড লাইসেন্স, কর/ভ্যাট, আর মজুদ আমদানি করলে IRC — আপনি আসলে কী বিক্রি করেন তা দেখে নিশ্চিত।',
+   array['company-formation','licences','import-export','tax-vat'], 'active', 20),
+  ('import-export', 'Import and export', 'আমদানি ও রপ্তানি',
+   'IRC or ERC sit after trade licence, e-TIN, BIN and a bank account — not before.',
+   'IRC বা ERC আসে ট্রেড লাইসেন্স, ই-টিআইএন, বিআইএন ও ব্যাংক হিসাবের পরে — আগে নয়।',
+   array['import-export','licences','tax-vat'], 'active', 30),
+  ('professional-services', 'Professional services', 'পেশাগত সেবা',
+   'A company or partnership depending on owners, liability and whether anyone will invest. The assessment is the starting point.',
+   'মালিক, দায় ও বিনিয়োগের সম্ভাবনা দেখে কোম্পানি বা পার্টনারশিপ। শুরুটা প্রশ্নমালা দিয়ে।',
+   array['company-formation','tax-vat','compliance'], 'active', 120)
+on conflict (slug) do nothing;
+
+insert into public.authorities
+  (slug, name_en, name_bn, role_en, role_bn, official_url, url_verified, related_category_slugs, operational_status, sort_order)
+values
+  ('rjsc',
+   'Registrar of Joint Stock Companies and Firms (RJSC)',
+   'যৌথ মূলধন কোম্পানি ও ফার্মসমূহের পরিদপ্তর (RJSC)',
+   'Company incorporation, annual returns and changes to the company register.',
+   'কোম্পানি নিবন্ধন, বার্ষিক রিটার্ন ও কোম্পানি রেজিস্টারের পরিবর্তন।',
+   null, false, array['company-formation','compliance'], 'active', 10),
+  ('nbr',
+   'National Board of Revenue (NBR)', 'জাতীয় রাজস্ব বোর্ড (NBR)',
+   'e-TIN, BIN/VAT and tax administration.',
+   'ই-টিআইএন, বিআইএন/ভ্যাট ও কর প্রশাসন।',
+   null, false, array['tax-vat'], 'active', 20),
+  ('bida',
+   'Bangladesh Investment Development Authority (BIDA)',
+   'বাংলাদেশ বিনিয়োগ উন্নয়ন কর্তৃপক্ষ (BIDA)',
+   'Investment and project registration relevant to many foreign-owned structures.',
+   'অনেক বিদেশি মালিকানা কাঠামোর জন্য বিনিয়োগ ও প্রকল্প নিবন্ধন।',
+   null, false, array['foreign-founders'], 'active', 30),
+  ('ccie',
+   'Office of the Chief Controller of Imports and Exports (CCI&E)',
+   'আমদানি ও রপ্তানি প্রধান নিয়ন্ত্রকের দপ্তর (CCI&E)',
+   'Commercial IRC and ERC.',
+   'বাণিজ্যিক IRC ও ERC।',
+   null, false, array['import-export'], 'active', 40)
+on conflict (slug) do nothing;
+
+commit;

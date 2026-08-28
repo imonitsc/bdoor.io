@@ -119,3 +119,22 @@ export function displayableFee(component: ServiceFeeComponent): number | null {
     return null;
   return component.amountBdt;
 }
+
+/**
+ * Public itemised example. A total is only a number when every line that
+ * belongs in the total has a displayable amount. Otherwise the total is
+ * "quoted after review" — never a dash pretending to be a figure.
+ */
+export function itemisedPublicTotals(service: Service): {
+  lines: Array<{ category: ServiceFeeComponent['category']; amountBdt: number | null }>;
+  totalBdt: number | null;
+  complete: boolean;
+} {
+  const lines = service.feeComponents.map((component) => ({
+    category: component.category,
+    amountBdt: displayableFee(component),
+  }));
+  const complete = lines.length > 0 && lines.every((line) => line.amountBdt !== null);
+  const totalBdt = complete ? lines.reduce((sum, line) => sum + (line.amountBdt ?? 0), 0) : null;
+  return { lines, totalBdt, complete };
+}
