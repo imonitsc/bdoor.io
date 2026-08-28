@@ -1,6 +1,7 @@
 import type { Client } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
+  AAL2,
   ORGS,
   USERS,
   asUser,
@@ -524,15 +525,28 @@ describe('row level security on the authorization tables', () => {
     expect(result.code).toBe('42501');
   });
 
-  it('lets an administrator assign somebody else', async () => {
+  it('lets an administrator assign somebody else, with a second factor', async () => {
     const result = await expectRejected(
       client,
       USERS.admin,
       `insert into public.role_assignments (user_id, template_code, scope_kind, reason)
        values ($1, 'auditor', 'platform', 'legitimate grant')`,
       [USERS.colleague],
+      AAL2,
     );
     expect(result.rejected).toBe(false);
+  });
+
+  it('refuses the same assignment without one', async () => {
+    const result = await expectRejected(
+      client,
+      USERS.admin,
+      `insert into public.role_assignments (user_id, template_code, scope_kind, reason)
+       values ($1, 'auditor', 'platform', 'no second factor')`,
+      [USERS.colleague],
+    );
+    expect(result.rejected).toBe(true);
+    expect(result.code).toBe('42501');
   });
 
   it('shows a user their own assignments and nobody else theirs', async () => {

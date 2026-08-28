@@ -121,14 +121,24 @@ export async function inRolledBackTransaction<T>(
   }
 }
 
+/**
+ * A request that presented a second factor.
+ *
+ * The step-up policies added in 20260101001500 refuse a sensitive write unless
+ * `auth.jwt() ->> 'aal'` is 'aal2', so a test exercising one of those writes has
+ * to say so — the same way a real staff request does after the MFA challenge.
+ */
+export const AAL2 = { aal: 'aal2' } as const;
+
 /** Rows visible to `userId` for a simple select. */
 export async function selectAs(
   client: Client,
   userId: string | null,
   sql: string,
   values: unknown[] = [],
+  extraClaims: Record<string, unknown> = {},
 ): Promise<Array<Record<string, unknown>>> {
-  return asUser(client, userId, async (c) => (await c.query(sql, values)).rows);
+  return asUser(client, userId, async (c) => (await c.query(sql, values)).rows, extraClaims);
 }
 
 /** Captures the error code of a statement that is expected to be refused. */
@@ -137,16 +147,22 @@ export async function expectRejected(
   userId: string | null,
   sql: string,
   values: unknown[] = [],
+  extraClaims: Record<string, unknown> = {},
 ): Promise<{ rejected: boolean; code?: string; message?: string }> {
-  return asUser(client, userId, async (c) => {
-    try {
-      await c.query(sql, values);
-      return { rejected: false };
-    } catch (error) {
-      const err = error as { code?: string; message?: string };
-      return { rejected: true, code: err.code, message: err.message };
-    }
-  });
+  return asUser(
+    client,
+    userId,
+    async (c) => {
+      try {
+        await c.query(sql, values);
+        return { rejected: false };
+      } catch (error) {
+        const err = error as { code?: string; message?: string };
+        return { rejected: true, code: err.code, message: err.message };
+      }
+    },
+    extraClaims,
+  );
 }
 
 /**

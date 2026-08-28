@@ -1,6 +1,7 @@
 import type { Client } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
+  AAL2,
   USERS,
   connect,
   disconnect,
@@ -100,20 +101,20 @@ describe('who may invite whom', () => {
 describe('writing an invitation', () => {
   it('lets an administrator invite a case manager', async () => {
     const { sql, values } = invitation('newcm@bdoor.test', 'case_manager', 'a');
-    const result = await expectRejected(client, USERS.admin, sql, values);
+    const result = await expectRejected(client, USERS.admin, sql, values, AAL2);
     expect(result.rejected).toBe(false);
   });
 
   it('refuses an administrator inviting a compliance officer', async () => {
     const { sql, values } = invitation('newco@bdoor.test', 'compliance_officer', 'b');
-    const result = await expectRejected(client, USERS.admin, sql, values);
+    const result = await expectRejected(client, USERS.admin, sql, values, AAL2);
     expect(result.rejected).toBe(true);
     expect(result.code).toBe('42501');
   });
 
   it('refuses an administrator inviting a super administrator', async () => {
     const { sql, values } = invitation('newsa@bdoor.test', 'super_admin', 'c');
-    const result = await expectRejected(client, USERS.admin, sql, values);
+    const result = await expectRejected(client, USERS.admin, sql, values, AAL2);
     expect(result.rejected).toBe(true);
     expect(result.code).toBe('42501');
   });
@@ -140,6 +141,7 @@ describe('writing an invitation', () => {
          (email, template_code, token_hash, invited_by, reason, expires_at)
        values ('stale@bdoor.test', 'case_manager', 'hash-e', $1, 'test', now() - interval '1 day')`,
       [USERS.admin],
+      AAL2,
     );
     expect(result.rejected).toBe(true);
   });
@@ -155,13 +157,14 @@ describe('writing an invitation', () => {
        values ('pre@bdoor.test', 'case_manager', 'accepted', 'hash-f', $1, 'test',
                now() + interval '1 day', $2, now())`,
       [USERS.admin, USERS.colleague],
+      AAL2,
     );
     expect(result.rejected).toBe(true);
   });
 
   it('refuses a second live invitation to the same address', async () => {
     await inRolledBackTransaction(client, async (c) => {
-      await setIdentity(c, USERS.admin);
+      await setIdentity(c, USERS.admin, AAL2);
       const first = invitation('dupe@bdoor.test', 'case_manager', 'g1');
       await c.query(first.sql, first.values);
       const second = invitation('dupe@bdoor.test', 'support', 'g2');
@@ -180,6 +183,7 @@ describe('writing an invitation', () => {
          (email, template_code, token_hash, invited_by, reason, expires_at)
        values ('Mixed@BDoor.test', 'case_manager', 'hash-h', $1, 'test', now() + interval '1 day')`,
       [USERS.admin],
+      AAL2,
     );
     // The acceptance check compares addresses, so one casing is the only way
     // that comparison stays honest.
@@ -190,7 +194,7 @@ describe('writing an invitation', () => {
 describe('reading and revoking', () => {
   it('shows an invitation to platform staff', async () => {
     await inRolledBackTransaction(client, async (c) => {
-      await setIdentity(c, USERS.admin);
+      await setIdentity(c, USERS.admin, AAL2);
       const { sql, values } = invitation('visible@bdoor.test', 'case_manager', 'i');
       await c.query(sql, values);
       await setIdentity(c, USERS.finance);
@@ -204,7 +208,7 @@ describe('reading and revoking', () => {
 
   it('hides it from everybody else', async () => {
     await inRolledBackTransaction(client, async (c) => {
-      await setIdentity(c, USERS.admin);
+      await setIdentity(c, USERS.admin, AAL2);
       const { sql, values } = invitation('hidden@bdoor.test', 'case_manager', 'j');
       await c.query(sql, values);
       for (const actor of [USERS.localFounder, USERS.partnerOwner, USERS.colleague]) {
@@ -222,7 +226,7 @@ describe('reading and revoking', () => {
 
   it('lets an administrator revoke one', async () => {
     await inRolledBackTransaction(client, async (c) => {
-      await setIdentity(c, USERS.admin);
+      await setIdentity(c, USERS.admin, AAL2);
       const { sql, values } = invitation('revokeme@bdoor.test', 'case_manager', 'k');
       await c.query(sql, values);
       const { rowCount } = await c.query(
@@ -237,7 +241,7 @@ describe('reading and revoking', () => {
 
   it('refuses a case manager revoking one', async () => {
     await inRolledBackTransaction(client, async (c) => {
-      await setIdentity(c, USERS.admin);
+      await setIdentity(c, USERS.admin, AAL2);
       const { sql, values } = invitation('safe@bdoor.test', 'case_manager', 'l');
       await c.query(sql, values);
       await setIdentity(c, USERS.caseManager);
@@ -253,7 +257,7 @@ describe('reading and revoking', () => {
 
   it('stops an administrator editing a row into a role they could not create', async () => {
     await inRolledBackTransaction(client, async (c) => {
-      await setIdentity(c, USERS.admin);
+      await setIdentity(c, USERS.admin, AAL2);
       const { sql, values } = invitation('escalate@bdoor.test', 'case_manager', 'm');
       await c.query(sql, values);
       // The insert gate would be pointless if update could reach past it.
@@ -268,7 +272,7 @@ describe('reading and revoking', () => {
 
   it('lets only a super administrator delete', async () => {
     await inRolledBackTransaction(client, async (c) => {
-      await setIdentity(c, USERS.admin);
+      await setIdentity(c, USERS.admin, AAL2);
       const { sql, values } = invitation('deleteme@bdoor.test', 'case_manager', 'n');
       await c.query(sql, values);
       // An admin revokes, leaving the trail. Deleting the evidence is
@@ -284,7 +288,7 @@ describe('reading and revoking', () => {
 describe('the token', () => {
   it('is unique across every invitation', async () => {
     await inRolledBackTransaction(client, async (c) => {
-      await setIdentity(c, USERS.admin);
+      await setIdentity(c, USERS.admin, AAL2);
       const first = invitation('one@bdoor.test', 'case_manager', 'shared');
       await c.query(first.sql, first.values);
       const second = invitation('two@bdoor.test', 'case_manager', 'shared');
@@ -294,7 +298,7 @@ describe('the token', () => {
 
   it('is never readable by the invitee, who matches no policy', async () => {
     await inRolledBackTransaction(client, async (c) => {
-      await setIdentity(c, USERS.admin);
+      await setIdentity(c, USERS.admin, AAL2);
       const { sql, values } = invitation('invitee@bdoor.test', 'case_manager', 'o');
       await c.query(sql, values);
       // The invitee holds no platform role yet, so acceptance has to go
@@ -319,7 +323,7 @@ describe('the invitation table does not weaken what already existed', () => {
 
   it('grants nothing until the invitation is accepted', async () => {
     await inRolledBackTransaction(client, async (c) => {
-      await setIdentity(c, USERS.admin);
+      await setIdentity(c, USERS.admin, AAL2);
       const { sql, values } = invitation('colleague@bdoor.test', 'case_manager', 'p');
       await c.query(sql, values);
 
