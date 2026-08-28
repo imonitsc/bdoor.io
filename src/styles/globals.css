@@ -10,22 +10,42 @@
 --------------------------------------------------------------------------- */
 
 :root {
-  /* Palette */
-  --bd-midnight: #0a1020;
-  --bd-midnight-soft: #141c31;
-  --bd-cobalt-50: #eef2ff;
-  --bd-cobalt-100: #dfe6ff;
-  --bd-cobalt-200: #c2d0ff;
-  --bd-cobalt-500: #315efb;
-  --bd-cobalt-600: #2a4fd8;
-  --bd-cobalt-700: #2340ad;
-  --bd-teal-50: #e8f8f4;
-  --bd-teal-500: #19b89a;
-  --bd-teal-600: #13957d;
-  --bd-teal-700: #0f7563;
-  --bd-offwhite: #f7f8f5;
+  /* ---------------------------------------------------------------------
+     Brand palette — redesign brief §5.2. The seven published values are used
+     exactly; the -50/-100/-200 tints and the -600/-700 shades are derived for
+     hover, active and soft surfaces.
+
+     Three brand colours cannot carry text at their published values. Measured
+     on white: turquoise 2.47:1, vermilion 3.77:1, marigold 1.66:1. They are
+     fills, borders and large display type. Anything legible at body size uses
+     the `-text` companions below, which are the same hues scaled toward black
+     until they reach 4.5:1 on white.
+
+     src/lib/brand/palette.ts holds the same numbers and
+     tests/unit/palette-contrast.test.ts enforces every pairing, so a colour
+     cannot quietly be given a role it fails.
+  --------------------------------------------------------------------- */
+  --bd-midnight: #081633;
+  --bd-midnight-soft: #14213f;
+  --bd-cobalt-50: #eef2fe;
+  --bd-cobalt-100: #dbe4fd;
+  --bd-cobalt-200: #b9cbfb;
+  --bd-cobalt-500: #164eeb;
+  --bd-cobalt-600: #1240c4;
+  --bd-cobalt-700: #0e339c;
+  --bd-turquoise-50: #e7f8f7;
+  --bd-turquoise-500: #13b8ae;
+  --bd-turquoise-text: #0d7d76;
+  --bd-vermilion-50: #ffecec;
+  --bd-vermilion-500: #ff2630;
+  --bd-vermilion-text: #db2129;
+  --bd-marigold-50: #fff7e6;
+  --bd-marigold-500: #ffbe2e;
+  --bd-marigold-text: #8f6a1a;
+  --bd-cloud: #f2f5f8;
+  --bd-offwhite: #f2f5f8;
   --bd-white: #ffffff;
-  --bd-ink: #111827;
+  --bd-ink: #081633;
   /* slate-600, not slate-500: 500 lands at 4.4:1 on the canvas and fails AA. */
   --bd-muted: #475569;
   --bd-border: #e5e7eb;
@@ -44,7 +64,7 @@
   /* Semantic mapping */
   --color-canvas: var(--bd-offwhite);
   --color-surface: var(--bd-white);
-  --color-surface-sunken: #f1f3ef;
+  --color-surface-sunken: var(--bd-cloud);
   --color-surface-inverse: var(--bd-midnight);
   --color-surface-inverse-soft: var(--bd-midnight-soft);
 
@@ -63,9 +83,9 @@
   --color-primary-soft: var(--bd-cobalt-50);
   --color-on-primary: var(--bd-white);
 
-  --color-accent: var(--bd-teal-600);
-  --color-accent-strong: var(--bd-teal-700);
-  --color-accent-soft: var(--bd-teal-50);
+  --color-accent: var(--bd-turquoise-text);
+  --color-accent-strong: var(--bd-turquoise-text);
+  --color-accent-soft: var(--bd-turquoise-50);
 
   --color-success: var(--bd-success-600);
   --color-success-soft: var(--bd-success-50);
@@ -76,7 +96,7 @@
   --color-info: var(--bd-info-700);
   --color-info-soft: var(--bd-info-50);
 
-  --color-focus: #1d4ed8;
+  --color-focus: var(--bd-cobalt-600);
 
   /* Radii — 14–20px on containers, tighter on controls */
   --radius-control: 10px;
@@ -138,9 +158,9 @@
   --shadow-lg: var(--shadow-lg);
 
   --font-sans:
-    var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    var(--font-sans-brand), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-bengali:
-    var(--font-noto-bengali), var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+    var(--font-noto-bengali), var(--font-sans-brand), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
 
   /* 8px rhythm helpers used by section spacing */

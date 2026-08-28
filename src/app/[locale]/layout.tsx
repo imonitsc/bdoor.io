@@ -2,16 +2,21 @@ import type { Metadata, Viewport } from 'next';
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider, hasLocale } from 'next-intl';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
-import { Geist, Geist_Mono, Noto_Sans_Bengali } from 'next/font/google';
+import { Geist_Mono, Manrope, Noto_Sans_Bengali } from 'next/font/google';
 import { routing, localeTags, type Locale } from '@/i18n/routing';
 import { AnnouncerProvider } from '@/components/ui/announcer';
 import { siteUrl, localizedUrl } from '@/lib/site';
 import '@/styles/globals.css';
 
-const geistSans = Geist({
+// Manrope for Latin content, per the redesign brief §5.3. The weights are the
+// ones the brief names: 700 display, 600 headings and controls, 400/500 body.
+// next/font self-hosts and subsets it, so there is no request to Google at
+// runtime and no layout shift from a late webfont.
+const manrope = Manrope({
   subsets: ['latin'],
-  variable: '--font-geist-sans',
+  variable: '--font-sans-brand',
   display: 'swap',
+  weight: ['400', '500', '600', '700'],
 });
 
 const geistMono = Geist_Mono({
@@ -106,7 +111,7 @@ export default async function LocaleLayout({
     <html
       lang={localeTags[locale as Locale]}
       dir="ltr"
-      className={`${geistSans.variable} ${geistMono.variable} ${notoBengali.variable}`}
+      className={`${manrope.variable} ${geistMono.variable} ${notoBengali.variable}`}
       suppressHydrationWarning
     >
       <body className="bg-canvas text-ink min-h-dvh antialiased">

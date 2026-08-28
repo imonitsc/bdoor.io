@@ -59,7 +59,7 @@ function Hero() {
     <section className="bg-surface-inverse text-ink-inverse relative overflow-hidden">
       <div className="container-page grid gap-12 py-16 md:py-20 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16 lg:py-24">
         <div className="flex flex-col justify-center">
-          <p className="text-xs font-semibold tracking-[0.14em] text-[color:var(--bd-teal-500)] uppercase">
+          <p className="text-xs font-semibold tracking-[0.14em] text-[color:var(--bd-turquoise-500)] uppercase">
             {t('eyebrow')}
           </p>
           <h1 className="text-ink-inverse mt-4 max-w-2xl text-4xl leading-[1.1] md:text-5xl lg:text-[3.4rem]">
