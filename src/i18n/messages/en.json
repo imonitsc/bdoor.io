@@ -688,6 +688,12 @@
       "continueCta": "Continue in your workspace",
       "noServices": "We could not match a service confidently. A case manager will review your answers."
     },
+    "categoryPicker": {
+      "searchLabel": "Search categories",
+      "searchPlaceholder": "e.g. garments, restaurant, software",
+      "noMatches": "No category matches that search. Try a shorter word, or choose “Other — not listed here”.",
+      "matchCount": "{count, plural, one {# category} other {# categories}}"
+    },
     "questions": {
       "founder_location": {
         "label": "Where are you based right now?",
@@ -705,6 +711,11 @@
       "residence": {
         "label": "Which country do you currently live in?",
         "why": "Residence affects tax registration, address evidence and how your identity documents are verified."
+      },
+      "business_category": {
+        "label": "What kind of business is it?",
+        "help": "Search or pick the closest category. If nothing fits, choose “Other — not listed here”.",
+        "why": "The category decides which licences apply and whether the sector is regulated or restricted. Picking one lets us compare your application against others in the same trade."
       },
       "activity": {
         "label": "What will the business actually do?",
