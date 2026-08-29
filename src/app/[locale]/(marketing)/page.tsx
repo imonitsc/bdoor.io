@@ -45,7 +45,7 @@ function Hero() {
 
   return (
     <section className="bg-canvas border-border relative border-b">
-      <div className="container-page grid items-center gap-10 py-14 md:gap-12 md:py-16 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-16 lg:py-[4.5rem]">
+      <div className="mx-auto grid w-full max-w-[80rem] items-center gap-10 px-5 py-14 md:gap-12 md:px-8 md:py-16 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-16 lg:py-[4.5rem] xl:max-w-none xl:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] xl:pr-8 xl:pl-[max(2rem,calc((100vw-1280px)/2+2rem))]">
         <div className="flex max-w-[38.75rem] flex-col justify-center">
           <p className="text-muted font-mono text-xs tracking-[0.14em] uppercase">{t('eyebrow')}</p>
           <h1 className="text-ink mt-4 text-[2.5rem] leading-[1.04] font-semibold md:text-[3.5rem] lg:text-[3.75rem]">
