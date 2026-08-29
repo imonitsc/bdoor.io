@@ -12,6 +12,7 @@ import { recommend } from './rules';
 import { submitApplication, type SubmittedApplication } from './application';
 import {
   applicableQuestions,
+  asQuestionKey,
   firstUnansweredIndex,
   isComplete,
   validateAnswer,
@@ -55,10 +56,13 @@ export async function loadIntake(preset?: IntakePreset): Promise<IntakeState> {
 
   // Preset answers (a validated ?country=/&objective=) fill gaps only: a
   // saved draft answer always wins over a link parameter, so following a
-  // country CTA never silently rewrites an application in progress.
+  // country CTA never silently rewrites an application in progress. The
+  // write target is always the canonical key from the question model, never
+  // the incoming string — no query parameter can name a property here.
   for (const [key, value] of Object.entries(preset?.answers ?? {})) {
-    if (answers[key as QuestionKey] === undefined) {
-      (answers as Record<string, unknown>)[key] = value;
+    const qk = asQuestionKey(key);
+    if (qk !== undefined && answers[qk] === undefined) {
+      (answers as Record<string, unknown>)[qk] = value;
     }
   }
 
@@ -157,11 +161,19 @@ export async function intakeAction(
   // reload keeps the chosen country. The applicability check matters: after
   // an earlier answer changes, `saveAnswer` prunes answers that stopped
   // applying, and this loop must not quietly resurrect them.
+  // Action state makes a round trip through the client, so every key is
+  // resolved to its canonical form and every value re-validated before it
+  // is stored — nothing client-shaped names a property or reaches the
+  // database as-is.
   const applicable = new Set(applicableQuestions(answers).map((q) => q.key));
   for (const [presetKey, presetValue] of Object.entries(previous.answers)) {
-    const qk = presetKey as QuestionKey;
-    if (qk === key || answers[qk] !== undefined || !applicable.has(qk)) continue;
-    answers = await saveAnswer(session.id, qk, presetValue);
+    const qk = asQuestionKey(presetKey);
+    if (qk === undefined || qk === key || answers[qk] !== undefined || !applicable.has(qk)) {
+      continue;
+    }
+    const revalidated = validateAnswer(qk, presetValue);
+    if (!revalidated.success) continue;
+    answers = await saveAnswer(session.id, qk, revalidated.data);
   }
 
   return {
