@@ -351,8 +351,8 @@
     }
   },
   "partnersPage": {
-    "title": "Partners",
-    "description": "How verified advocates and specialist firms work with bdoor.",
+    "title": "Join our specialist network",
+    "description": "How licensed advocates, chartered accountants and specialist firms work with bdoor — and how verification protects customers before any case is shared.",
     "applyTitle": "Work with us",
     "applyBody": "If you are a licensed advocate, chartered accountant or specialist consultancy in Bangladesh, tell us about your practice. Every partner is verified before receiving a case.",
     "applyCta": "Register interest",
@@ -360,7 +360,6 @@
     "canTitle": "What a partner can do",
     "cannotTitle": "What a partner cannot do",
     "directoryTitle": "Verified partners",
-    "directoryEmpty": "No partner organisation has completed verification yet. We will list them here once they have.",
     "can": {
       "assigned": "See only the cases assigned to their organisation.",
       "documents": "Receive case documents once the customer has authorised that specific sharing.",
@@ -497,7 +496,11 @@
     "draftBanner": "Draft awaiting professional review",
     "draftBannerBody": "This document is a working draft prepared to support the platform. It has not yet been reviewed and approved by qualified Bangladesh counsel and must not be relied on as final terms.",
     "lastUpdated": "Last updated {date}",
-    "tableOfContents": "On this page"
+    "tableOfContents": "On this page",
+    "preLaunchTitle": "Under professional review",
+    "preLaunchBody": "bdoor's customer terms and privacy documentation are under professional review. Payments and identity-document collection are not yet enabled.",
+    "preLaunchDetail": "The approved document will be published here with its version and effective date. Until then, nothing on this platform is chargeable and no identity documents are collected, so there is no agreement you need to rely on today.",
+    "preLaunchOperator": "The bdoor platform is operated by {legalName}. Questions about this document are welcome by email."
   },
   "auth": {
     "signInTitle": "Sign in",

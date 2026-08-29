@@ -2600,6 +2600,7 @@ export type Database = {
           "contact_email": string | null
           "contact_phone": string | null
           "verification_status": Database["public"]["Enums"]["partner_verification_status"]
+          "public_profile_approved": boolean
           "conflict_policy_accepted_at": string | null
           "dpa_accepted_at": string | null
           "insurance_expires_on": string | null
@@ -2621,6 +2622,7 @@ export type Database = {
           "contact_email"?: string | null
           "contact_phone"?: string | null
           "verification_status"?: Database["public"]["Enums"]["partner_verification_status"]
+          "public_profile_approved"?: boolean
           "conflict_policy_accepted_at"?: string | null
           "dpa_accepted_at"?: string | null
           "insurance_expires_on"?: string | null
@@ -2642,6 +2644,7 @@ export type Database = {
           "contact_email"?: string | null
           "contact_phone"?: string | null
           "verification_status"?: Database["public"]["Enums"]["partner_verification_status"]
+          "public_profile_approved"?: boolean
           "conflict_policy_accepted_at"?: string | null
           "dpa_accepted_at"?: string | null
           "insurance_expires_on"?: string | null
