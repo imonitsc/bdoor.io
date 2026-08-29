@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { ArrowLeft, ArrowRight, HelpCircle, Info, Save } from 'lucide-react';
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { ChoiceCard, RadioGroup, RadioItem } from '@/components/ui/choice';
+import { ChoiceCard } from '@/components/ui/choice';
 import { Field, FieldControl, FieldDescription, FieldLabel } from '@/components/ui/field';
 import { Input, NativeSelect, Textarea } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
@@ -115,23 +115,28 @@ function QuestionInput({
           <fieldset>
             <legend className="text-ink text-lg font-semibold">{t(`${key}.label`)}</legend>
             {help ? <p className="text-muted mt-1.5 text-sm">{help}</p> : null}
-            <RadioGroup
-              name="value"
-              defaultValue={typeof value === 'string' ? value : undefined}
-              required
-              className="mt-4 flex flex-col gap-2"
-            >
+            <div className="mt-4 flex flex-col gap-2">
               {choiceOptions.map((option) => (
                 <ChoiceCard
                   key={option}
                   htmlFor={`${key}-${option}`}
                   selected={value === option}
-                  control={<RadioItem value={option} id={`${key}-${option}`} />}
+                  control={
+                    <input
+                      type="radio"
+                      id={`${key}-${option}`}
+                      name="value"
+                      value={option}
+                      defaultChecked={value === option}
+                      required
+                      className="size-5 accent-[var(--color-primary)]"
+                    />
+                  }
                 >
                   {t(`${key}.options.${option}`)}
                 </ChoiceCard>
               ))}
-            </RadioGroup>
+            </div>
           </fieldset>
         </Field>
       );
