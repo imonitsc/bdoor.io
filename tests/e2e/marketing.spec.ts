@@ -20,10 +20,15 @@ test.describe('marketing site', () => {
     await expect(page.getByRole('heading', { level: 1 })).toContainText(
       'Start and run your business in Bangladesh',
     );
-    await expect(page.getByText('Operated by bdoor compliance ltd')).toBeVisible();
     await expect(page.getByText('Itemised quote before payment').first()).toBeVisible();
     await expect(
       page.getByText('bdoor is not a government authority or law firm', { exact: false }),
+    ).toBeVisible();
+    // The operating entity is disclosed once, in the footer's © line — the
+    // hero carries no operator small print (owner's request, 29 Aug 2026).
+    await expect(page.locator('main').getByText('bdoor compliance ltd')).toHaveCount(0);
+    await expect(
+      page.locator('footer').getByText('bdoor compliance ltd', { exact: false }),
     ).toBeVisible();
   });
 
