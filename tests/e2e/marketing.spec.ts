@@ -37,7 +37,7 @@ test.describe('marketing site', () => {
     await expect(page.getByText('Product preview — sample data')).toBeVisible();
     await expect(page.locator('#international')).toHaveCount(0);
 
-    const hero = page.locator('img[src*="bdoor-home-hero-founder"]');
+    const hero = page.locator('img[src*="bdoor-homepage-hero-large"]');
     await expect(hero).toHaveCount(1);
     await expect(hero).toBeVisible();
 
@@ -72,7 +72,7 @@ test.describe('marketing site', () => {
     const main = page.locator('main');
     const cta = await main.getByTestId('home-hero-start').boundingBox();
     const imageSlot = await main
-      .locator('img[src*="bdoor-home-hero-founder"]')
+      .locator('img[src*="bdoor-homepage-hero-large"]')
       .first()
       .boundingBox();
     expect(cta).not.toBeNull();
