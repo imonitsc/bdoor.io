@@ -13,7 +13,7 @@ export type FeeLayer =
   | 'refundable_deposit'
   | 'discount';
 
-export type PackageCurrency = 'BDT' | 'USD' | 'GBP' | 'AED' | 'SGD';
+export type PackageCurrency = 'BDT' | 'USD' | 'GBP' | 'AED' | 'SAR' | 'QAR' | 'SGD';
 
 export type PackageFeeComponent = {
   layer: FeeLayer;
@@ -62,6 +62,28 @@ export type ServicePackage = {
 };
 
 /**
+ * Where a route stands operationally, from research through to online sale.
+ * The order is the launch ladder itself: a route climbs one state at a time
+ * and may only be *sold as available* in the last two — `available_by_quote`
+ * once a contracted partner's scope, wholesale price and refund rule are
+ * signed, `available_online` once checkout has also survived a pilot case.
+ * Everything earlier is honest only as "register interest".
+ */
+export type AvailabilityState =
+  | 'research_only'
+  | 'partner_sourcing'
+  | 'partner_pilot'
+  | 'available_by_quote'
+  | 'available_online'
+  | 'paused';
+
+/** Availability states in which the public may be told a route is available. */
+export const SELLABLE_AVAILABILITY: readonly AvailabilityState[] = [
+  'available_by_quote',
+  'available_online',
+];
+
+/**
  * What the public is told about an international route. This is deliberately
  * separate from the internal `status`: a route can be well into preparation
  * internally while the only honest public statement is "register interest".
@@ -78,6 +100,12 @@ export type InternationalOffer = {
   route: { en: string; bn: string };
   /** Internal readiness. Never rendered to customers. */
   status: PackageStatus;
+  /**
+   * Operational position on the launch ladder. Never rendered to customers;
+   * `publicStatus` may say "available" only while this is one of
+   * `SELLABLE_AVAILABILITY`, and checkout requires `available_online`.
+   */
+  availability: AvailabilityState;
   /** What visitors see. Prices render only when `priceApproved` is true. */
   publicStatus: InternationalPublicStatus;
   /** The owner has an approved provider agreement for this route. */
@@ -85,6 +113,12 @@ export type InternationalOffer = {
   /** The owner has approved the public price sheet for this route. */
   priceApproved: boolean;
   checkoutEnabled: boolean;
+  /**
+   * Screened markets (Saudi Arabia, Qatar) never get a buy-style call to
+   * action: the public step is an eligibility check, and a quotation exists
+   * only after a partner-approved review.
+   */
+  eligibilityLed?: boolean;
   /**
    * Public price label. Only present once `priceApproved` is true — while a
    * route is register-interest there is nothing truthful to print.

@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Section, SectionHeading } from '@/components/ui/section';
 import { PackageSelector } from '@/components/marketing/package-selector';
 import { FeeBreakdownExample } from '@/components/marketing/fee-breakdown-example';
-import { InternationalOfferCards } from '@/components/marketing/international-offer-cards';
+import { CountrySelector } from '@/components/marketing/country-selector';
 import { SpecialistServicesList } from '@/components/marketing/specialist-services-list';
 import { HeroFounder } from '@/components/marketing/hero-founder';
 import { WorkspacePreview } from '@/components/marketing/workspace-preview';
@@ -87,7 +87,7 @@ function Hero() {
               variant="ghost"
               className="border-border-inverse text-ink-inverse hover:bg-surface-inverse-soft border"
             >
-              <Link href={MARKETING_ROUTES.international}>{t('secondaryCta')}</Link>
+              <Link href={MARKETING_ROUTES.countries}>{t('secondaryCta')}</Link>
             </Button>
           </div>
 
@@ -210,13 +210,17 @@ function Preview() {
   );
 }
 
-function InternationalSection({ locale }: { locale: Locale }) {
-  const t = useTranslations('home.internationalSection');
+/**
+ * The seven-country selector (spec §6.1): the Bangladesh card larger, six
+ * international cards compact, each linking to its country page.
+ */
+function CountriesSection({ locale }: { locale: Locale }) {
+  const t = useTranslations('home.countriesSection');
   return (
     <Section>
       <div className="container-page">
         <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
-        <InternationalOfferCards locale={locale} />
+        <CountrySelector locale={locale} />
       </div>
     </Section>
   );
@@ -275,7 +279,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <PackagesSection locale={typedLocale} />
       {FOUNDER_IMAGE_EXISTS ? <Preview /> : null}
       <ProcessAndFees locale={typedLocale} />
-      <InternationalSection locale={typedLocale} />
+      <CountriesSection locale={typedLocale} />
       <FaqAndNextStep locale={typedLocale} />
     </>
   );

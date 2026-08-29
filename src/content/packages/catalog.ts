@@ -4,6 +4,13 @@ import type { InternationalOffer, ServicePackage } from '@/features/packages/typ
 export const COMMERCIAL_REVIEW_DATE = '2026-08-28';
 const REVIEW_DATE = COMMERCIAL_REVIEW_DATE;
 
+/**
+ * Research date of the seven-country specification. Internal working figures
+ * added by that research carry this date; nothing they contain is published
+ * until the availability ladder and the approval flags say it may be.
+ */
+const SEVEN_COUNTRY_RESEARCH_DATE = '2026-08-29';
+
 function bdFee(
   amountBdt: number,
   label: { en: string; bn: string },
@@ -263,9 +270,10 @@ export const INTERNATIONAL_OFFERS: InternationalOffer[] = [
   {
     slug: 'usa-wyoming-llc',
     countryCode: 'US',
-    countrySlug: 'united-states',
+    countrySlug: 'usa',
     route: { en: 'Wyoming LLC', bn: 'ওয়াইমিং LLC' },
     status: 'draft',
+    availability: 'research_only',
     publicStatus: 'register_interest',
     providerApproved: false,
     priceApproved: false,
@@ -306,9 +314,10 @@ export const INTERNATIONAL_OFFERS: InternationalOffer[] = [
   {
     slug: 'uk-non-resident-ltd',
     countryCode: 'GB',
-    countrySlug: 'united-kingdom',
+    countrySlug: 'uk',
     route: { en: 'Non-resident LTD', bn: 'নন-রেসিডেন্ট LTD' },
     status: 'draft',
+    availability: 'research_only',
     publicStatus: 'register_interest',
     providerApproved: false,
     priceApproved: false,
@@ -354,6 +363,7 @@ export const INTERNATIONAL_OFFERS: InternationalOffer[] = [
     countrySlug: 'uae',
     route: { en: 'Sharjah no-visa route', bn: 'শারজাহ নো-ভিসা রুট' },
     status: 'draft',
+    availability: 'research_only',
     publicStatus: 'register_interest',
     providerApproved: false,
     priceApproved: false,
@@ -399,6 +409,7 @@ export const INTERNATIONAL_OFFERS: InternationalOffer[] = [
     countrySlug: 'singapore',
     route: { en: 'Pte Ltd with resident director', bn: 'রেসিডেন্ট ডিরেক্টরসহ Pte Ltd' },
     status: 'draft',
+    availability: 'research_only',
     publicStatus: 'register_interest',
     providerApproved: false,
     priceApproved: false,
@@ -446,6 +457,149 @@ export const INTERNATIONAL_OFFERS: InternationalOffer[] = [
         payee: 'government_authority',
         taxTreatment: 'not_applicable',
         reviewedAt: REVIEW_DATE,
+      },
+    ],
+  },
+  // Saudi Arabia and Qatar are screened, eligibility-led markets: the public
+  // page collects interest and an assessment, never a checkout. The figures
+  // below are internal working numbers from the seven-country research —
+  // authority amounts with their sources, and unvalidated professional
+  // allowances a contracted partner must confirm before anything is priced
+  // publicly.
+  {
+    slug: 'saudi-market-entry',
+    countryCode: 'SA',
+    countrySlug: 'saudi-arabia',
+    route: { en: 'Screened market-entry routes', bn: 'যাচাইকৃত মার্কেট-এন্ট্রি রুট' },
+    status: 'draft',
+    availability: 'research_only',
+    publicStatus: 'register_interest',
+    providerApproved: false,
+    priceApproved: false,
+    checkoutEnabled: false,
+    eligibilityLed: true,
+    summary: {
+      en: 'Investment-registration and company-setup routes, assessed for eligibility first.',
+      bn: 'বিনিয়োগ নিবন্ধন ও কোম্পানি গঠনের রুট, আগে যোগ্যতা যাচাই করা হয়।',
+    },
+    disclosures: [
+      {
+        en: 'Every Saudi route starts with an eligibility assessment before any quotation.',
+        bn: 'প্রতিটি সৌদি রুট কোনো মূল্য উদ্ধৃতির আগে যোগ্যতা যাচাই দিয়ে শুরু হয়।',
+      },
+      {
+        en: 'Authority, legalisation, office and visa costs are quoted after review.',
+        bn: 'কর্তৃপক্ষ, বৈধকরণ, অফিস ও ভিসা খরচ পর্যালোচনার পর জানানো হয়।',
+      },
+    ],
+    feeComponents: [
+      {
+        layer: 'partner_professional_fee',
+        label: {
+          en: 'Partner and bdoor professional allowance (unvalidated)',
+          bn: 'অংশীদার ও bdoor পেশাদার বরাদ্দ (অযাচাইকৃত)',
+        },
+        amountMinor: 4_900_00,
+        currency: 'USD',
+        isEstimate: true,
+        isRefundable: false,
+        payee: 'partner_firm',
+        taxTreatment: 'pending_review',
+        reviewedAt: SEVEN_COUNTRY_RESEARCH_DATE,
+      },
+      {
+        layer: 'government_fee_estimate',
+        label: { en: 'LLC commercial registration', bn: 'LLC বাণিজ্যিক নিবন্ধন' },
+        amountMinor: 1_200_00,
+        currency: 'SAR',
+        isEstimate: true,
+        isRefundable: false,
+        payee: 'government_authority',
+        taxTreatment: 'not_applicable',
+        sourceUrl: 'https://business.sa/en/eservices/details/2487249f-078c-44e3-1063-08dd6aa798b2',
+        reviewedAt: SEVEN_COUNTRY_RESEARCH_DATE,
+      },
+      {
+        layer: 'government_fee_estimate',
+        label: { en: 'Registration publication', bn: 'নিবন্ধন প্রকাশনা' },
+        amountMinor: 500_00,
+        currency: 'SAR',
+        isEstimate: true,
+        isRefundable: false,
+        payee: 'government_authority',
+        taxTreatment: 'not_applicable',
+        sourceUrl: 'https://business.sa/en/eservices/details/2487249f-078c-44e3-1063-08dd6aa798b2',
+        reviewedAt: SEVEN_COUNTRY_RESEARCH_DATE,
+      },
+    ],
+  },
+  {
+    slug: 'qatar-qfc',
+    countryCode: 'QA',
+    countrySlug: 'qatar',
+    route: { en: 'QFC professional-services route', bn: 'QFC পেশাদার-সেবা রুট' },
+    status: 'draft',
+    availability: 'research_only',
+    publicStatus: 'register_interest',
+    providerApproved: false,
+    priceApproved: false,
+    checkoutEnabled: false,
+    eligibilityLed: true,
+    summary: {
+      en: 'A Qatar Financial Centre route for non-regulated activities, scoped after review.',
+      bn: 'অনিয়ন্ত্রিত কার্যক্রমের জন্য কাতার ফাইন্যান্সিয়াল সেন্টার রুট, পর্যালোচনার পর নির্ধারিত।',
+    },
+    disclosures: [
+      {
+        en: 'QFC application and annual licence fees apply in addition to professional fees.',
+        bn: 'পেশাদার ফির পাশাপাশি QFC আবেদন ও বার্ষিক লাইসেন্স ফি প্রযোজ্য।',
+      },
+      {
+        en: 'Mainland, free-zone and regulated activities need a separate assessment.',
+        bn: 'মেইনল্যান্ড, ফ্রি-জোন ও নিয়ন্ত্রিত কার্যক্রমের জন্য আলাদা যাচাই প্রয়োজন।',
+      },
+    ],
+    feeComponents: [
+      {
+        layer: 'partner_professional_fee',
+        label: {
+          en: 'Partner, bdoor and office allowance (unvalidated)',
+          bn: 'অংশীদার, bdoor ও অফিস বরাদ্দ (অযাচাইকৃত)',
+        },
+        amountMinor: 5_400_00,
+        currency: 'USD',
+        isEstimate: true,
+        isRefundable: false,
+        payee: 'partner_firm',
+        taxTreatment: 'pending_review',
+        reviewedAt: SEVEN_COUNTRY_RESEARCH_DATE,
+      },
+      {
+        layer: 'government_fee_estimate',
+        label: { en: 'QFC application fee', bn: 'QFC আবেদন ফি' },
+        amountMinor: 500_00,
+        currency: 'USD',
+        isEstimate: false,
+        isRefundable: false,
+        payee: 'government_authority',
+        taxTreatment: 'not_applicable',
+        sourceUrl: 'https://qfcra-en.thomsonreuters.com/rulebook/schedule-4-fees',
+        reviewedAt: SEVEN_COUNTRY_RESEARCH_DATE,
+      },
+      {
+        layer: 'government_fee_estimate',
+        label: {
+          en: 'QFC annual licence, single activity',
+          bn: 'QFC বার্ষিক লাইসেন্স, একক কার্যক্রম',
+        },
+        amountMinor: 5_000_00,
+        currency: 'USD',
+        isEstimate: false,
+        isRefundable: false,
+        payee: 'government_authority',
+        taxTreatment: 'not_applicable',
+        sourceUrl: 'https://qfcra-en.thomsonreuters.com/rulebook/schedule-4-fees',
+        reviewedAt: SEVEN_COUNTRY_RESEARCH_DATE,
       },
     ],
   },
