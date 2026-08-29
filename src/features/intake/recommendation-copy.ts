@@ -7,6 +7,14 @@
 type Bilingual = { en: string; bn: string };
 
 export const MANUAL_REVIEW_REASONS: Record<string, Bilingual> = {
+  international_formation: {
+    en: 'Formation outside Bangladesh needs a partner scope review before we can quote or accept payment.',
+    bn: 'বাংলাদেশের বাইরে গঠনের জন্য কোটেশন বা পেমেন্ট গ্রহণের আগে অংশীদার সুযোগ পর্যালোচনা প্রয়োজন।',
+  },
+  scope_unclear: {
+    en: 'Your scope is not clear yet. A case manager will confirm what applies before we quote.',
+    bn: 'আপনার সুযোগ এখনো স্পষ্ট নয়। কোটেশন দেওয়ার আগে কেস ম্যানেজার নিশ্চিত করবেন কী প্রযোজ্য।',
+  },
   corporate_or_trust_owner: {
     en: 'One of the owners is a company, trust or fund. We must identify the people who ultimately own or control it before we can proceed.',
     bn: 'মালিকদের একজন কোম্পানি, ট্রাস্ট বা ফান্ড। এগোনোর আগে যাঁরা প্রকৃতপক্ষে এর মালিক বা নিয়ন্ত্রক, তাঁদের শনাক্ত করতে হবে।',

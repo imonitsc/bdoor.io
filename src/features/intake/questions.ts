@@ -11,6 +11,13 @@ import { z } from 'zod';
  * Nothing here is customer-facing copy: labels come from `start.questions.*`.
  */
 
+export const HELP_SCOPES = [
+  'start_bangladesh',
+  'manage_bangladesh',
+  'form_abroad',
+  'unsure',
+] as const;
+
 export const FOUNDER_LOCATIONS = ['bangladesh', 'outside'] as const;
 export const STRUCTURES = [
   'private_limited',
@@ -41,6 +48,7 @@ const country = z
   .transform((v) => v.toUpperCase());
 
 export const answersSchema = z.object({
+  help_scope: z.enum(HELP_SCOPES, { message: 'requiredChoice' }),
   founder_location: z.enum(FOUNDER_LOCATIONS, { message: 'requiredChoice' }),
   nationality: country,
   residence: country,
@@ -102,13 +110,22 @@ const always = () => true;
 
 export const QUESTIONS: readonly QuestionDefinition[] = [
   {
+    key: 'help_scope',
+    section: 'about_you',
+    kind: 'choice',
+    options: HELP_SCOPES,
+    showWhy: true,
+    shouldAsk: always,
+    schema: answersSchema.shape.help_scope,
+  },
+  {
     key: 'founder_location',
     section: 'about_you',
     kind: 'choice',
     options: FOUNDER_LOCATIONS,
     hasHelp: true,
     showWhy: true,
-    shouldAsk: always,
+    shouldAsk: (a) => a.help_scope !== 'form_abroad',
     schema: answersSchema.shape.founder_location,
   },
   {
@@ -133,7 +150,11 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     section: 'the_business',
     kind: 'boolean',
     showWhy: true,
-    shouldAsk: always,
+    shouldAsk: (a) =>
+      !a.help_scope ||
+      (a.help_scope !== 'start_bangladesh' &&
+        a.help_scope !== 'manage_bangladesh' &&
+        a.help_scope !== 'form_abroad'),
     schema: answersSchema.shape.existing_business,
   },
   {

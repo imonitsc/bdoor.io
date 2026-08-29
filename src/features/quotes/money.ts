@@ -8,7 +8,13 @@ export type PayeeType = Enums<'payee_type'>;
  * All money is handled in minor units (paisa / cents) as integers. Nothing in
  * this file ever produces a float, so a quote total is exactly what was shown.
  */
-export const MINOR_UNITS: Record<Currency, number> = { BDT: 100, USD: 100 };
+export const MINOR_UNITS: Record<Currency, number> = {
+  BDT: 100,
+  USD: 100,
+  GBP: 100,
+  AED: 100,
+  SGD: 100,
+};
 
 export type QuoteItemInput = {
   category: QuoteItemCategory;

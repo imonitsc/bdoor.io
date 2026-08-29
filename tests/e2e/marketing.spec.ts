@@ -14,13 +14,13 @@ test.describe('marketing site', () => {
     await expect(page).toHaveURL(/\/(en|bn)$/);
   });
 
-  test('shows the hero, the trust line and the independence disclosure', async ({ page }) => {
+  test('shows the hero, operator disclosure and the independence disclosure', async ({ page }) => {
     await page.goto('/en');
 
     await expect(page.getByRole('heading', { level: 1 })).toContainText(
-      'Everything your business needs in Bangladesh',
+      'Start your business in Bangladesh',
     );
-    await expect(page.getByText('Independent platform')).toBeVisible();
+    await expect(page.getByText('bdoor is operated by bdoor compliance ltd')).toBeVisible();
     await expect(
       page.getByText('BDoor is not a government authority or law firm', { exact: false }),
     ).toBeVisible();
