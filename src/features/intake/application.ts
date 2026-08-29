@@ -32,8 +32,16 @@ export type SubmittedApplication = {
  * retries with a fresh draw.
  */
 export function newApplicationReference(now = new Date()): string {
-  const draw = crypto.getRandomValues(new Uint32Array(1))[0]! % 1_000_000;
-  return `BD-${now.getUTCFullYear()}-${String(draw).padStart(6, '0')}`;
+  // Rejection sampling: 2^32 is not a multiple of 10^6, so bare `%` would
+  // slightly favour low residues. Redraw values at or above the largest
+  // multiple of 10^6 below 2^32 (~0.02% of draws).
+  const RANGE = 1_000_000;
+  const LIMIT = Math.floor(2 ** 32 / RANGE) * RANGE;
+  let draw: number;
+  do {
+    draw = crypto.getRandomValues(new Uint32Array(1))[0]!;
+  } while (draw >= LIMIT);
+  return `BD-${now.getUTCFullYear()}-${String(draw % RANGE).padStart(6, '0')}`;
 }
 
 export type SubmitInput = {

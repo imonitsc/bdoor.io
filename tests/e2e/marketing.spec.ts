@@ -14,16 +14,20 @@ test.describe('marketing site', () => {
     await expect(page).toHaveURL(/\/(en|bn)$/);
   });
 
-  test('shows the hero, operator disclosure and the independence disclosure', async ({ page }) => {
+  test('shows the hero and the independence disclosure', async ({ page }) => {
     await page.goto('/en');
 
     await expect(page.getByRole('heading', { level: 1 })).toContainText(
       'Start and run your business in Bangladesh',
     );
-    await expect(page.getByText('Operated by bdoor compliance ltd')).toBeVisible();
     await expect(page.getByRole('link', { name: 'Start now' }).first()).toBeVisible();
     await expect(
       page.getByText('bdoor is not a government authority or law firm', { exact: false }),
+    ).toBeVisible();
+    // Operating entity is disclosed in the footer © line only — not the hero.
+    await expect(page.locator('main').getByText('bdoor compliance ltd')).toHaveCount(0);
+    await expect(
+      page.locator('footer').getByText('bdoor compliance ltd', { exact: false }),
     ).toBeVisible();
   });
 

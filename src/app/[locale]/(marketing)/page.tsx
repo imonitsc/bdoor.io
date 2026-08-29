@@ -67,7 +67,6 @@ function Hero() {
           </div>
 
           <p className="text-muted mt-6 text-sm">{t('trustLine')}</p>
-          <p className="text-muted mt-2 text-xs">{t('operatorLine')}</p>
         </div>
 
         <HeroDoorImage alt={t('doorAlt')} />

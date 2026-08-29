@@ -13,6 +13,7 @@ import { submitApplication, type SubmittedApplication } from './application';
 import {
   applicableQuestions,
   answersImpliedByMarketScope,
+  asQuestionKey,
   firstUnansweredIndex,
   isComplete,
   validateAnswer,
@@ -57,10 +58,13 @@ export async function loadIntake(preset?: IntakePreset): Promise<IntakeState> {
 
   // Preset answers (a validated ?country=/&objective=) fill gaps only: a
   // saved draft answer always wins over a link parameter, so following a
-  // country CTA never silently rewrites an application in progress.
+  // country CTA never silently rewrites an application in progress. The
+  // write target is always the canonical key from the question model, never
+  // the incoming string — no query parameter can name a property here.
   for (const [key, value] of Object.entries(preset?.answers ?? {})) {
-    if (answers[key as QuestionKey] === undefined) {
-      (answers as Record<string, unknown>)[key] = value;
+    const qk = asQuestionKey(key);
+    if (qk !== undefined && answers[qk] === undefined) {
+      (answers as Record<string, unknown>)[qk] = value;
     }
   }
 
@@ -97,10 +101,18 @@ export async function intakeAction(
     const rawAnswers = formData.get('answers');
     if (typeof rawAnswers === 'string' && rawAnswers.length > 0) {
       try {
-        const clientAnswers = JSON.parse(rawAnswers) as PartialAnswers;
+        const parsed = JSON.parse(rawAnswers) as Record<string, unknown>;
+        const clientAnswers: PartialAnswers = { ...previous.answers };
+        for (const [rawKey, rawValue] of Object.entries(parsed)) {
+          const qk = asQuestionKey(rawKey);
+          if (qk === undefined) continue;
+          const revalidated = validateAnswer(qk, rawValue);
+          if (!revalidated.success) continue;
+          (clientAnswers as Record<string, unknown>)[qk] = revalidated.data;
+        }
         return submitIntakeApplication({
           ...previous,
-          answers: { ...previous.answers, ...clientAnswers },
+          answers: clientAnswers,
         });
       } catch {
         // Fall through to previous.answers if the client payload is malformed.
@@ -109,7 +121,7 @@ export async function intakeAction(
     return submitIntakeApplication(previous);
   }
 
-  const key = formData.get('questionKey') as QuestionKey | null;
+  const key = asQuestionKey(String(formData.get('questionKey') ?? ''));
   if (!key) return { ...previous, error: 'generic' };
 
   const raw = formData.getAll('value');
@@ -173,8 +185,9 @@ export async function intakeAction(
   if (key === 'market_scope') {
     const implied = answersImpliedByMarketScope(validation.data as MarketScope);
     for (const [impliedKey, impliedValue] of Object.entries(implied)) {
-      if (impliedKey === 'market_scope' || impliedValue === undefined) continue;
-      answers = await saveAnswer(session.id, impliedKey as QuestionKey, impliedValue);
+      const qk = asQuestionKey(impliedKey);
+      if (qk === undefined || qk === 'market_scope' || impliedValue === undefined) continue;
+      answers = await saveAnswer(session.id, qk, impliedValue);
     }
   }
 
@@ -183,11 +196,19 @@ export async function intakeAction(
   // reload keeps the chosen country. The applicability check matters: after
   // an earlier answer changes, `saveAnswer` prunes answers that stopped
   // applying, and this loop must not quietly resurrect them.
+  // Action state makes a round trip through the client, so every key is
+  // resolved to its canonical form and every value re-validated before it
+  // is stored — nothing client-shaped names a property or reaches the
+  // database as-is.
   const applicable = new Set(applicableQuestions(answers).map((q) => q.key));
   for (const [presetKey, presetValue] of Object.entries(previous.answers)) {
-    const qk = presetKey as QuestionKey;
-    if (qk === key || answers[qk] !== undefined || !applicable.has(qk)) continue;
-    answers = await saveAnswer(session.id, qk, presetValue);
+    const qk = asQuestionKey(presetKey);
+    if (qk === undefined || qk === key || answers[qk] !== undefined || !applicable.has(qk)) {
+      continue;
+    }
+    const revalidated = validateAnswer(qk, presetValue);
+    if (!revalidated.success) continue;
+    answers = await saveAnswer(session.id, qk, revalidated.data);
   }
 
   return {
@@ -271,8 +292,9 @@ export async function persistAnswerBackground(
   if (key === 'market_scope') {
     const implied = answersImpliedByMarketScope(validation.data as MarketScope);
     for (const [impliedKey, impliedValue] of Object.entries(implied)) {
-      if (impliedKey === 'market_scope' || impliedValue === undefined) continue;
-      answers = await saveAnswer(session.id, impliedKey as QuestionKey, impliedValue);
+      const qk = asQuestionKey(impliedKey);
+      if (qk === undefined || qk === 'market_scope' || impliedValue === undefined) continue;
+      answers = await saveAnswer(session.id, qk, impliedValue);
     }
   }
   void answers;
