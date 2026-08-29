@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BRAND, TEXT_SAFE, contrastRatio } from '@/lib/brand/palette';
+import { BRAND, GRADIENT, GRADIENT_INVERSE, TEXT_SAFE, contrastRatio } from '@/lib/brand/palette';
 
 /**
  * The brief mandates both an exact palette (§5.2) and WCAG 2.2 AA (§24), and
@@ -71,6 +71,31 @@ describe('brand palette contrast', () => {
       expect(contrastRatio(hex, BRAND.white), `${name} on white`).toBeGreaterThanOrEqual(AA_TEXT);
       expect(contrastRatio(hex, BRAND.cloud), `${name} on cloud`).toBeGreaterThanOrEqual(AA_TEXT);
     }
+  });
+
+  describe('the signature gradient', () => {
+    it('keeps a white button label AA at the gradient’s lightest point', () => {
+      // A gradient button's text sits on every colour between the stops; the
+      // lighter stop is the one that binds. The design system's suggested
+      // endpoint (#4D7CFF) failed this at 3.72:1 and was rejected.
+      expect(contrastRatio(BRAND.white, GRADIENT.to)).toBeGreaterThanOrEqual(AA_TEXT);
+      expect(contrastRatio(BRAND.white, GRADIENT.from)).toBeGreaterThanOrEqual(AA_TEXT);
+    });
+
+    it('keeps gradient display text readable on both light surfaces', () => {
+      for (const stop of [GRADIENT.from, GRADIENT.to]) {
+        expect(contrastRatio(stop, BRAND.white)).toBeGreaterThanOrEqual(AA_TEXT);
+        expect(contrastRatio(stop, BRAND.cloud)).toBeGreaterThanOrEqual(AA_TEXT);
+      }
+    });
+
+    it('keeps the inverse gradient readable on midnight at both stops', () => {
+      // Used for the hero's highlighted phrase — display size, but both stops
+      // clear even the normal-text threshold, so size never becomes a caveat.
+      for (const stop of [GRADIENT_INVERSE.from, GRADIENT_INVERSE.to]) {
+        expect(contrastRatio(stop, BRAND.midnight)).toBeGreaterThanOrEqual(AA_TEXT);
+      }
+    });
   });
 
   it('computes a known ratio correctly', () => {

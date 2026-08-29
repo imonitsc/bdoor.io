@@ -50,12 +50,29 @@ export function SectionHeading({
       )}
     >
       {eyebrow ? (
+        /*
+          The section-label system: every section opens with the same pill —
+          pulsing dot, mono uppercase, tinted border — so scrolling has a
+          visible rhythm and the label reads as a designed element rather
+          than stray text. The dot is decorative; the pulse dies under
+          prefers-reduced-motion via the global kill-switch.
+        */
         <p
           className={cn(
-            'text-xs font-semibold tracking-[0.12em] uppercase',
-            inverse ? 'text-[color:var(--bd-turquoise-500)]' : 'text-accent-strong',
+            'inline-flex w-fit items-center gap-2.5 rounded-[var(--radius-pill)] border px-4 py-1.5',
+            'font-mono text-xs tracking-[0.15em] uppercase',
+            inverse
+              ? 'border-[color:var(--bd-turquoise-500)]/35 bg-white/5 text-[color:var(--bd-turquoise-500)]'
+              : 'bg-primary-soft text-info border-[color:var(--bd-cobalt-200)]',
           )}
         >
+          <span
+            aria-hidden="true"
+            className={cn(
+              'animate-pulse-dot size-1.5 rounded-full',
+              inverse ? 'bg-[color:var(--bd-turquoise-500)]' : 'bg-primary',
+            )}
+          />
           {eyebrow}
         </p>
       ) : null}

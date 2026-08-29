@@ -65,7 +65,15 @@ function Hero() {
   const t = useTranslations('home.hero');
 
   return (
-    <section className="bg-surface-inverse text-ink-inverse relative overflow-hidden">
+    <section className="bg-surface-inverse text-ink-inverse texture-dots relative overflow-hidden">
+      {/*
+        Ambient depth: one large cobalt glow bleeding in from the top-right
+        corner, felt more than seen. Decorative only, clipped by the section.
+      */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-48 -right-48 size-[30rem] rounded-full bg-[color:var(--bd-cobalt-500)] opacity-[0.16] blur-[150px]"
+      />
       {/*
         The image column is deliberately wider than the copy column (1.2 vs
         1.05 before): the illustration read visually small inside its
@@ -75,11 +83,17 @@ function Hero() {
       */}
       <div className="container-page grid items-center gap-12 py-16 md:py-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:gap-12 lg:py-24">
         <div className="flex flex-col justify-center">
-          <p className="text-xs font-semibold tracking-[0.14em] text-[color:var(--bd-turquoise-500)] uppercase">
+          <p className="inline-flex w-fit items-center gap-2.5 rounded-[var(--radius-pill)] border border-[color:var(--bd-turquoise-500)]/35 bg-white/5 px-4 py-1.5 font-mono text-xs tracking-[0.15em] text-[color:var(--bd-turquoise-500)] uppercase">
+            <span
+              aria-hidden="true"
+              className="animate-pulse-dot size-1.5 rounded-full bg-[color:var(--bd-turquoise-500)]"
+            />
             {t('eyebrow')}
           </p>
-          <h1 className="text-ink-inverse mt-4 max-w-2xl text-4xl leading-[1.08] md:text-5xl">
-            {t('headline')}
+          <h1 className="text-ink-inverse mt-5 max-w-2xl text-4xl leading-[1.08] md:text-5xl">
+            {t.rich('headline', {
+              g: (chunks) => <span className="gradient-text-inverse">{chunks}</span>,
+            })}
           </h1>
           <p className="text-muted-inverse mt-5 max-w-xl text-lg leading-relaxed">{t('support')}</p>
 

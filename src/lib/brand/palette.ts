@@ -38,6 +38,27 @@ export const TEXT_SAFE = {
   marigold: '#8F6A1A',
 } as const;
 
+/**
+ * The signature gradient (Minimalist Modern design language, mapped onto
+ * the brand). The `to` endpoint is chosen for contrast, not taste: a
+ * gradient button's white label must stay AA at the gradient's lightest
+ * point, and gradient display text must stay readable at both ends. The
+ * design system's own suggested endpoint (#4D7CFF) measured 3.72:1 under
+ * white text and was rejected for exactly that reason.
+ *
+ * `INVERSE` is for display text on midnight surfaces, where cobalt-500
+ * itself would sink into the background.
+ */
+export const GRADIENT = {
+  from: '#164EEB',
+  to: '#3A63F0',
+} as const;
+
+export const GRADIENT_INVERSE = {
+  from: '#B9CBFB',
+  to: '#13B8AE',
+} as const;
+
 /** WCAG 2.x relative luminance. */
 export function luminance(hex: string): number {
   const channels = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
