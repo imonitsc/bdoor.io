@@ -435,6 +435,16 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
   },
 ] as const;
 
+/**
+ * Resolves an untrusted string to the canonical question key, or undefined.
+ * The value returned comes from `QUESTIONS`, never from the caller — use it
+ * (not the raw input) wherever a key indexes into an answers object, so a
+ * hostile "__proto__"/"constructor" can never become a write target.
+ */
+export function asQuestionKey(value: string): QuestionKey | undefined {
+  return QUESTIONS.find((q) => q.key === value)?.key;
+}
+
 /** The questions that apply given what has been answered so far. */
 export function applicableQuestions(answers: PartialAnswers): QuestionDefinition[] {
   return QUESTIONS.filter((q) => q.shouldAsk(answers));
