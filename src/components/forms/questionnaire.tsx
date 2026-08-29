@@ -317,11 +317,37 @@ export function Questionnaire({ initial }: { initial: IntakeState }) {
   const announce = useAnnounce();
 
   const [serverState, formAction, saving] = useActionState(intakeAction, initial);
-  const [answers, setAnswers] = useState<PartialAnswers>(initial.answers);
-  const [index, setIndex] = useState(initial.index);
+  const [answers, setAnswers] = useState<PartialAnswers>(() => {
+    if (typeof window === 'undefined') return initial.answers;
+    try {
+      const raw = window.localStorage.getItem('bdoor_intake_draft');
+      if (!raw) return initial.answers;
+      const parsed = JSON.parse(raw) as { answers?: PartialAnswers };
+      return { ...initial.answers, ...(parsed.answers ?? {}) };
+    } catch {
+      return initial.answers;
+    }
+  });
+  const [index, setIndex] = useState(() =>
+    firstUnansweredIndex({
+      ...initial.answers,
+      ...(typeof window !== 'undefined'
+        ? (() => {
+            try {
+              const raw = window.localStorage.getItem('bdoor_intake_draft');
+              if (!raw) return {};
+              return (JSON.parse(raw) as { answers?: PartialAnswers }).answers ?? {};
+            } catch {
+              return {};
+            }
+          })()
+        : {}),
+    }),
+  );
   const [fieldError, setFieldError] = useState<string | undefined>();
   const [syncState, setSyncState] = useState<'idle' | 'saving' | 'saved' | 'local'>('idle');
   const headingRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const questions = useMemo(() => applicableQuestions(answers), [answers]);
   const safeIndex = Math.min(index, questions.length);
@@ -357,6 +383,14 @@ export function Questionnaire({ initial }: { initial: IntakeState }) {
 
   function onContinue(formData: FormData) {
     if (!question) return;
+    // Native FormData can miss a radio in some label/nesting cases; fall back
+    // to the checked control so Continue never stalls on an empty value.
+    if (formData.get('value') === null && formRef.current) {
+      const checked = formRef.current.querySelector<HTMLInputElement>(
+        'input[name="value"]:checked',
+      );
+      if (checked) formData.set('value', checked.value);
+    }
     const raw = formData.getAll('value');
     const kind = question.kind;
     let value: unknown;
@@ -393,10 +427,23 @@ export function Questionnaire({ initial }: { initial: IntakeState }) {
     setIndex(firstUnansweredIndex(next));
     persistLocal(next);
 
-    setSyncState('saving');
-    void persistAnswerBackground(question.key, validation.data).then((result) => {
-      setSyncState(result.ok ? 'saved' : 'local');
-    });
+    // Do not await a Server Action on Continue/Back: Next.js refreshes the
+    // surrounding RSC tree when the action settles, which remounts this
+    // client component and wipes the just-advanced step. Persist locally
+    // immediately; background-sync only after contact/email is known.
+    if (next.email) {
+      setSyncState('saving');
+      void persistAnswerBackground(question.key, validation.data).then((result) => {
+        setSyncState(result.ok ? 'saved' : 'local');
+      });
+    } else {
+      setSyncState('local');
+    }
+  }
+
+  function submitCurrent() {
+    if (!formRef.current) return;
+    onContinue(new FormData(formRef.current));
   }
 
   if (serverState.submitted) {
@@ -450,10 +497,15 @@ export function Questionnaire({ initial }: { initial: IntakeState }) {
           />
         ) : (
           <form
+            key={question.key}
+            ref={formRef}
             className="flex flex-col gap-6"
             noValidate
             data-question-key={question.key}
-            action={(formData) => onContinue(formData)}
+            onSubmit={(event) => {
+              event.preventDefault();
+              submitCurrent();
+            }}
           >
             <input type="hidden" name="questionKey" value={question.key} readOnly />
             <QuestionInput

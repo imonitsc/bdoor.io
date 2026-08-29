@@ -14,26 +14,16 @@ async function answer(
   // values), so this is deliberately not Promise<void>.
   action: () => Promise<unknown>,
 ) {
-  // Each step swaps the input out for the next question's. Without waiting
-  // for the step to actually advance, the next `action()` can run against the
-  // control that is about to be replaced and the answer is lost. Progress is
-  // reported per stage, so the progressbar often does NOT move between
-  // consecutive questions — the hidden questionKey input is the reliable
-  // signal: it changes on every step and disappears at review.
+  // Progress is reported per visible step, so the progressbar often does NOT
+  // move between consecutive questions — the hidden questionKey input is the
+  // reliable signal: it changes on every step and disappears at review.
   const keyInput = page.locator('input[name="questionKey"]');
-  // count() does not auto-wait, so the read is instant even once the input is
-  // gone (review and the confirmation have no question form at all). The read
-  // itself must ALSO be bounded: the input can be removed between count()
-  // and inputValue() when the last answer swaps the form for the review
-  // screen, and with no actionTimeout configured inputValue() would then
-  // auto-wait forever — toPass cannot retry an attempt that never returns,
-  // so the walk hung on its final step until the test budget died.
   const readKey = async () => {
     if ((await keyInput.count()) === 0) return null;
     try {
       return await keyInput.inputValue({ timeout: 1_000 });
     } catch {
-      return null; // removed mid-read: the form is gone, same as count() === 0
+      return null;
     }
   };
   const before = await readKey();
@@ -41,18 +31,22 @@ async function answer(
   await page.getByRole('button', { name: /^Continue$/ }).click();
   await expect(async () => {
     expect(await readKey()).not.toBe(before);
-  }).toPass();
+  }).toPass({ timeout: 15_000 });
 }
 
 async function chooseCountry(page: import('@playwright/test').Page, name: string) {
   await answer(page, async () => {
-    await page.getByRole('radio', { name, exact: true }).click();
+    const radio = page.getByRole('radio', { name, exact: true });
+    await radio.check();
+    await expect(radio).toBeChecked();
   });
 }
 
 async function chooseObjective(page: import('@playwright/test').Page, name: string) {
   await answer(page, async () => {
-    await page.getByRole('radio', { name }).click();
+    const radio = page.getByRole('radio', { name });
+    await radio.check();
+    await expect(radio).toBeChecked();
   });
 }
 
