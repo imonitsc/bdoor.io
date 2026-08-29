@@ -14,12 +14,12 @@ Status: preview-only — **do not deploy production**
 
 ## Missing owner inputs
 
-| Item | Path / action |
-|------|----------------|
-| Hero image | `public/images/bdoor/open-door-dhaka.webp` |
-| How-it-works image | `public/images/bdoor/compliance-review.webp` |
-| Services image | `public/images/bdoor/formation-documents.webp` |
-| Legal approval | Keep `LEGAL_CONTENT_STATUS=draft` and `LEGAL_LAUNCH_APPROVED=false` until counsel signs off |
+| Item               | Path / action                                                                               |
+| ------------------ | ------------------------------------------------------------------------------------------- |
+| Hero image         | `public/images/bdoor/open-door-dhaka.webp`                                                  |
+| How-it-works image | `public/images/bdoor/compliance-review.webp`                                                |
+| Services image     | `public/images/bdoor/formation-documents.webp`                                              |
+| Legal approval     | Keep `LEGAL_CONTENT_STATUS=draft` and `LEGAL_LAUNCH_APPROVED=false` until counsel signs off |
 
 ## Known limitations
 
