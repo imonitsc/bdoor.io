@@ -1,4 +1,8 @@
-import { INTERNATIONAL_OFFERS } from '@/content/packages/catalog';
+import {
+  featuredOfferForCountry,
+  homepageInternationalOffers,
+  INTERNATIONAL_OFFERS,
+} from '@/content/packages/catalog';
 import type { InternationalOffer } from '@/features/packages/types';
 
 /**
@@ -7,10 +11,9 @@ import type { InternationalOffer } from '@/features/packages/types';
  * the overview page, the country pages, the homepage cards and the footer all
  * read this shape.
  *
- * What is deliberately absent: prices, timelines, government fees and legal
- * or tax claims. None of those may be published for a route that has no
- * approved provider and price sheet (see docs/INTERNATIONAL_LAUNCH_MATRIX.md),
- * and guessing them is worse than omitting them.
+ * Multiple formation routes may share a country (e.g. Wyoming / Delaware /
+ * Florida). Country listings use the featured offer; country pages load every
+ * route via `offersForCountry`.
  */
 export type InternationalCountry = {
   slug: string;
@@ -37,7 +40,7 @@ export const BANGLADESH_COUNTRY = {
   slug: 'bangladesh',
   code: 'BD',
   name: { en: 'Bangladesh', bn: 'বাংলাদেশ' },
-  /** The owner-published featured starting price (29 Aug 2026 table). */
+  /** Featured Solo Start starting price (65/35 master, 28 Aug 2026). */
   featured: {
     label: { en: 'From ৳9,900', bn: '৳৯,৯০০ থেকে' },
     alt: { en: 'About $80', bn: 'আনুমানিক $৮০' },
@@ -50,8 +53,30 @@ export function allCountrySlugs(): string[] {
   return [BANGLADESH_COUNTRY.slug, ...internationalCountries().map((c) => c.slug)];
 }
 
+/** One entry per international country, using the featured formation route. */
 export function internationalCountries(): InternationalCountry[] {
-  return INTERNATIONAL_OFFERS.map((offer) => ({
+  const seen = new Set<string>();
+  const countries: InternationalCountry[] = [];
+  for (const offer of INTERNATIONAL_OFFERS) {
+    if (seen.has(offer.countrySlug)) continue;
+    seen.add(offer.countrySlug);
+    const featured = featuredOfferForCountry(offer.countrySlug) ?? offer;
+    countries.push({
+      slug: featured.countrySlug,
+      code: featured.countryCode,
+      name: COUNTRY_NAMES[featured.countryCode] ?? {
+        en: featured.countryCode,
+        bn: featured.countryCode,
+      },
+      offer: featured,
+    });
+  }
+  return countries;
+}
+
+/** Four homepage cards — USA, UK, UAE, Singapore only (master §8). */
+export function homepageCountries(): InternationalCountry[] {
+  return homepageInternationalOffers().map((offer) => ({
     slug: offer.countrySlug,
     code: offer.countryCode,
     name: COUNTRY_NAMES[offer.countryCode] ?? { en: offer.countryCode, bn: offer.countryCode },

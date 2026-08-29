@@ -113,13 +113,14 @@
   },
   "home": {
     "hero": {
-      "eyebrow": "Business formation and compliance",
-      "headline": "Start in Bangladesh. <g>Build anywhere.</g>",
-      "support": "Form and manage businesses in Bangladesh, the USA, UK, UAE, Saudi Arabia, Qatar and Singapore through one secure platform and an appointed network of country specialists.",
-      "primaryCta": "Start your application",
-      "secondaryCta": "Compare countries",
+      "eyebrow": "Bangladesh business setup and compliance",
+      "headline": "Start your business in Bangladesh. <g>Grow beyond borders.</g>",
+      "support": "Form your company, complete essential registrations and manage ongoing compliance in one secure workspace. When you are ready, bdoor also supports formation in the USA, UK, UAE and Singapore.",
+      "primaryCta": "Start in Bangladesh",
+      "secondaryCta": "Explore international formation",
       "trustLine": "Free initial assessment · Itemised quote before payment · Third-party specialists disclosed before engagement",
-      "operatorLine": "Operated by bdoor compliance ltd.",
+      "operatorLine": "bdoor is operated by bdoor compliance ltd.",
+      "founderAlt": "Founder using the bdoor workspace on a laptop.",
       "module": {
         "previewLabel": "Product preview",
         "reviewed": "Specialist reviewed",
@@ -198,16 +199,17 @@
       "specialists": "Specialists engaged separately when required"
     },
     "process": {
-      "eyebrow": "Process and fees",
+      "eyebrow": "How bdoor works",
       "title": "Four steps, one transparent quote.",
+      "body": "A short assessment, a specialist review, an itemised quote, then a workspace that keeps formation and compliance organised.",
       "steps": {
         "one": {
-          "title": "Choose your country and apply",
-          "body": "Pick one of the seven countries and answer only what applies to you. Applying is free and creates no obligation."
+          "title": "Tell us where you need help",
+          "body": "Start in Bangladesh or explore formation abroad. Answer only what applies to you — applying is free and creates no obligation."
         },
         "two": {
           "title": "bdoor reviews and appoints your provider",
-          "body": "A specialist reviews your application within one business day and sources the licensed provider responsible for any regulated work."
+          "body": "A specialist reviews your application and sources the licensed provider responsible for any regulated work."
         },
         "three": {
           "title": "Receive and accept an itemised quote",
@@ -220,6 +222,18 @@
       },
       "standaloneTitle": "Standalone services",
       "standaloneSummary": "Published bdoor fees for common registrations"
+    },
+    "specialist": {
+      "eyebrow": "Bangladesh specialist services",
+      "title": "Registrations you can add on their own.",
+      "body": "Published bdoor fees for common filings. Government and authority amounts are always separate — and never described as part of the bdoor fee."
+    },
+    "international": {
+      "eyebrow": "International formation",
+      "title": "USA, UK, UAE and Singapore — when you are ready.",
+      "body": "Starting estimates for formation routes abroad. Partner agreements must be approved before checkout; until then you can request a quote.",
+      "cta": "View country route",
+      "allCountries": "Compare all countries"
     },
     "countriesSection": {
       "eyebrow": "Countries",
@@ -776,9 +790,19 @@
           "bida": "BIDA registration"
         }
       },
+      "help_scope": {
+        "label": "Where do you want help?",
+        "why": "Your answer chooses the Bangladesh package path or an international formation review.",
+        "options": {
+          "bangladesh_new": "Start a business in Bangladesh",
+          "bangladesh_existing": "Manage an existing Bangladesh business",
+          "international": "Form a company outside Bangladesh",
+          "unsure": "I am not sure"
+        }
+      },
       "target_country": {
         "label": "Where do you want to start or run your business?",
-        "why": "The application is country-first: your answer routes your case to the right question set, the right specialist and the right provider.",
+        "why": "Your answer routes your case to the right question set, the right specialist and the right provider.",
         "options": {
           "bangladesh": "Bangladesh",
           "usa": "United States",

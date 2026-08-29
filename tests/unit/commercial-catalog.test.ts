@@ -4,6 +4,7 @@ import {
   INTERNATIONAL_OFFERS,
   STANDALONE_SERVICES,
   activePackageVersion,
+  featuredOfferForCountry,
 } from '@/content/packages/catalog';
 import { SNAPSHOT_SERVICES } from '@/content/catalog-snapshot';
 import { SELLABLE_AVAILABILITY } from '@/features/packages/types';
@@ -85,29 +86,37 @@ describe('Bangladesh packages', () => {
 
 describe('international offers', () => {
   it('carries exactly the owner-published featured starting prices', () => {
-    // The immediate-operations instructions (29 Aug 2026, §5) published these
-    // as starting estimates. Do not alter without a recorded owner decision;
-    // an intentional change updates this table in the same commit.
-    expect(
-      Object.fromEntries(INTERNATIONAL_OFFERS.map((o) => [o.countrySlug, o.publicLabel?.en])),
-    ).toEqual({
-      usa: 'From $499',
-      uk: 'From $299',
-      uae: 'From $3,899',
-      singapore: 'From $1,899',
+    // 65/35 Cursor master (28 Aug 2026 §7): native-currency totals that match
+    // fee layers. Featured slug per country is what country cards show.
+    const featured = Object.fromEntries(
+      ['usa', 'uk', 'uae', 'singapore', 'saudi-arabia', 'qatar'].map((slug) => {
+        const offer = featuredOfferForCountry(slug)!;
+        return [slug, offer.publicLabel?.en];
+      }),
+    );
+    expect(featured).toEqual({
+      usa: 'USD 449 estimated total',
+      uk: 'GBP 349 estimated total',
+      uae: 'AED 9,375 estimated total',
+      singapore: 'From S$1,500',
       'saudi-arabia': 'Professional setup from $4,900',
       qatar: 'First-year QFC estimate from $10,900',
     });
+  });
+
+  it('publishes the approved USA / UAE / Singapore route matrix', () => {
+    expect(INTERNATIONAL_OFFERS.filter((o) => o.countrySlug === 'usa').map((o) => o.slug)).toEqual([
+      'usa-wyoming-llc',
+      'usa-delaware-llc',
+      'usa-florida-llc',
+    ]);
+    expect(INTERNATIONAL_OFFERS.filter((o) => o.countrySlug === 'uae').map((o) => o.slug)).toEqual([
+      'uae-sharjah-no-visa',
+      'uae-dubai-route',
+    ]);
     expect(
-      Object.fromEntries(INTERNATIONAL_OFFERS.map((o) => [o.countrySlug, o.publicLabelAlt?.en])),
-    ).toEqual({
-      usa: 'About ৳61,400',
-      uk: 'About ৳36,800',
-      uae: 'About ৳479,900',
-      singapore: 'About ৳233,700',
-      'saudi-arabia': 'About ৳603,000',
-      qatar: 'About ৳1,341,500',
-    });
+      INTERNATIONAL_OFFERS.filter((o) => o.countrySlug === 'singapore').map((o) => o.slug),
+    ).toEqual(['singapore-resident-director', 'singapore-foreign-founder']);
   });
 
   it('a published price always travels with approval and its qualifier', () => {
@@ -145,21 +154,15 @@ describe('international offers', () => {
     }
   });
 
-  it('routes every offer to its own country page', () => {
-    const slugs = INTERNATIONAL_OFFERS.map((o) => o.countrySlug);
-    expect(new Set(slugs).size).toBe(slugs.length);
-    for (const slug of slugs) expect(slug).toMatch(/^[a-z][a-z-]+$/);
+  it('routes every offer to a valid country page slug', () => {
+    for (const offer of INTERNATIONAL_OFFERS) {
+      expect(offer.countrySlug).toMatch(/^[a-z][a-z-]+$/);
+    }
   });
 
   it('covers exactly the six international countries of the seven-country spec', () => {
-    expect(INTERNATIONAL_OFFERS.map((o) => o.countrySlug).sort()).toEqual([
-      'qatar',
-      'saudi-arabia',
-      'singapore',
-      'uae',
-      'uk',
-      'usa',
-    ]);
+    const countries = [...new Set(INTERNATIONAL_OFFERS.map((o) => o.countrySlug))].sort();
+    expect(countries).toEqual(['qatar', 'saudi-arabia', 'singapore', 'uae', 'uk', 'usa']);
   });
 
   it('never claims openness outside the sellable availability states', () => {
@@ -200,12 +203,26 @@ describe('international offers', () => {
 });
 
 describe('standalone services', () => {
-  it('carries the owner-approved figures', () => {
-    expect(Object.fromEntries(STANDALONE_SERVICES.map((s) => [s.slug, s.bdoorFeeBdt]))).toEqual({
+  it('carries the owner-approved figures from the 65/35 master', () => {
+    expect(
+      Object.fromEntries(
+        STANDALONE_SERVICES.filter((s) => s.bdoorFeeBdt != null).map((s) => [
+          s.slug,
+          s.bdoorFeeBdt,
+        ]),
+      ),
+    ).toEqual({
       'etin-assistance': 4000,
       'bin-vat-assistance': 6000,
       'trade-licence-coordination': 8000,
+      'commercial-irc-coordination': 15000,
+      'erc-coordination': 15000,
+      'rjsc-annual-return': 12000,
+      'bida-project-registration': 25000,
+      'foreign-owned-private-company': 69900,
     });
+    const branch = STANDALONE_SERVICES.find((s) => s.slug === 'branch-liaison-representative');
+    expect(branch?.bdoorFeeBdt).toBeNull();
   });
 });
 

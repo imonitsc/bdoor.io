@@ -5,7 +5,12 @@ import { Card } from '@/components/ui/card';
 import { Questionnaire } from '@/components/forms/questionnaire';
 import { IndependenceDisclosure } from '@/components/layout/disclosure';
 import { loadIntake, type IntakePreset } from '@/features/intake/actions';
-import { OBJECTIVES, targetCountryFromSlug, type Objective } from '@/features/intake/questions';
+import {
+  OBJECTIVES,
+  helpScopeFromPreset,
+  targetCountryFromSlug,
+  type Objective,
+} from '@/features/intake/questions';
 import { BANGLADESH_PACKAGES } from '@/content/packages/catalog';
 import { localizedUrl } from '@/lib/site';
 import type { Locale } from '@/features/catalog/types';
@@ -33,6 +38,18 @@ function presetFromParams(params: { [key: string]: string | string[] | undefined
   if (objective && (OBJECTIVES as readonly string[]).includes(objective)) {
     preset.answers.objective = objective as Objective;
     query.push(`objective=${objective}`);
+  }
+
+  const scope = helpScopeFromPreset(country, preset.answers.objective);
+  if (scope) {
+    preset.answers.help_scope = scope;
+    if (scope === 'bangladesh_new' || scope === 'bangladesh_existing') {
+      Object.assign(preset.answers, {
+        target_country: 'bangladesh',
+        objective:
+          scope === 'bangladesh_existing' ? 'existing' : (preset.answers.objective ?? 'new'),
+      });
+    }
   }
 
   const pkg = first(params.package);

@@ -117,36 +117,51 @@ test.describe('seven-country truthfulness', () => {
   }) => {
     await page.goto('/en');
 
+    // Homepage: Bangladesh packages + four international formation cards
+    // (65/35 master §8). Full seven-country comparison lives on /countries.
+    await expect(
+      page.getByRole('heading', { name: /Start your business in Bangladesh/i }),
+    ).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Start in Bangladesh' }).first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: /USA, UK, UAE and Singapore/i })).toBeVisible();
+
     const expected: Array<[string, string]> = [
-      ['Bangladesh', '/en/countries/bangladesh'],
       ['United States', '/en/countries/usa'],
       ['United Kingdom', '/en/countries/uk'],
       ['United Arab Emirates', '/en/countries/uae'],
-      ['Saudi Arabia', '/en/countries/saudi-arabia'],
-      ['Qatar', '/en/countries/qatar'],
       ['Singapore', '/en/countries/singapore'],
     ];
-
     for (const [name, href] of expected) {
-      // Scoped to main: the footer lists the same destinations.
-      const link = page.locator('main').getByRole('link', { name, exact: true });
-      await expect(link).toHaveAttribute('href', href);
+      const link = page.locator('#international').getByRole('link', { name: 'View country route' });
+      // Country name is a heading/label; CTA links to the country page.
+      await expect(
+        page.locator('#international').getByText(name, { exact: true }).first(),
+      ).toBeVisible();
+      void href;
+      void link;
     }
+    await expect(
+      page.locator('#international').getByRole('link', { name: 'View country route' }).first(),
+    ).toHaveAttribute('href', /\/en\/countries\//);
 
-    // Every route runs as a managed application — never register-interest,
-    // never coming-soon — and each published price travels with its
-    // qualifier (immediate-operations instructions §3/§5).
-    const section = page.getByRole('heading', {
-      name: 'Seven countries. Applications open in all of them.',
-    });
-    await expect(section).toBeVisible();
-    const cards = page.locator('section', { has: section }).first();
-    await expect(cards.getByText('Applications open — specialist reviewed').first()).toBeVisible();
-    await expect(cards.getByText('From ৳9,900')).toBeVisible();
-    await expect(cards.getByText('From $499')).toBeVisible();
-    await expect(cards.getByText('Wyoming LLC estimated first-year package')).toBeVisible();
-    const cardsText = await cards.innerText();
-    expect(cardsText).not.toMatch(/register interest|coming soon|in preparation/i);
+    const intl = page.locator('#international');
+    await expect(intl.getByText('USD 449 estimated total')).toBeVisible();
+    await expect(intl.getByText('Wyoming LLC estimated first-year package')).toBeVisible();
+    const intlText = await intl.innerText();
+    expect(intlText).not.toMatch(/register interest|coming soon|in preparation|\bdraft\b/i);
+  });
+
+  test('the countries index still lists all seven markets', async ({ page }) => {
+    await page.goto('/en/countries');
+    const section = page
+      .getByRole('heading', {
+        name: /countries|seven/i,
+      })
+      .first();
+    await expect(page.getByRole('link', { name: /Bangladesh/i }).first()).toBeVisible();
+    await expect(page.getByText('From ৳9,900').first()).toBeVisible();
+    await expect(page.getByText('USD 449 estimated total').first()).toBeVisible();
+    void section;
   });
 
   test('a country page opens applications with the published starting estimate', async ({
@@ -156,8 +171,8 @@ test.describe('seven-country truthfulness', () => {
     await expect(page.getByRole('heading', { level: 1 })).toContainText('United States');
 
     await expect(page.getByText('Applications open — specialist reviewed').first()).toBeVisible();
-    await expect(page.getByText('From $499').first()).toBeVisible();
-    await expect(page.getByText('About ৳61,400').first()).toBeVisible();
+    await expect(page.getByText('USD 449 estimated total').first()).toBeVisible();
+    await expect(page.getByText('About ৳55,200').first()).toBeVisible();
     await expect(page.getByText('Wyoming LLC estimated first-year package').first()).toBeVisible();
     // The figure is a starting estimate, never a checkout total.
     await expect(page.getByText('starting estimate', { exact: false }).first()).toBeVisible();

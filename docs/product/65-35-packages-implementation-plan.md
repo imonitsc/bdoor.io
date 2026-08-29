@@ -1,46 +1,51 @@
 # 65/35 packages — implementation plan
 
-Pricing review date: 28 August 2026.
+Pricing / source review date: 28 August 2026.
+Branch: `feat/bdoor-65-35-packages`.
 
 ## Checkpoints
 
-| #   | Checkpoint                                                                                     | Status         |
-| --- | ---------------------------------------------------------------------------------------------- | -------------- |
-| 1   | Data model and migrations (`service_packages`, versions, fee components, international offers) | Done           |
-| 2   | TypeScript catalog + layer pricing helpers                                                     | Done           |
-| 3   | Public package components (selector, fee example, international cards, specialist list)        | Done           |
-| 4   | Homepage 65/35 redesign (section order, hero copy, operator disclosure)                        | Done           |
-| 5   | Assessment `help_scope` first question + manual-review gates                                   | Done           |
-| 6   | Admin packages list at `/admin/pricing`                                                        | Done           |
-| 7   | English/Bangla `packages.*` and updated `home.*` keys                                          | Done           |
-| 8   | Unit tests (pricing matrix) + integration RLS test                                             | Done           |
-| 9   | `pnpm run verify`, integration, e2e                                                            | Pending CI     |
-| 10  | Vercel preview on feature branch                                                               | Pending deploy |
+| #   | Checkpoint                                                                      | Status          |
+| --- | ------------------------------------------------------------------------------- | --------------- |
+| 1   | Data model (existing migration) + seed of packages / draft international offers | In progress     |
+| 2   | Price/source administration (admin list; publish mutations follow-up)           | Partial         |
+| 3   | Public package components + four-country international cards                    | In progress     |
+| 4   | Homepage 65/35 redesign (master section order, hero copy, founder image)        | In progress     |
+| 5   | Bangladesh service/package pages (pricing page already shares catalog)          | Done / preserve |
+| 6   | International country pages (multi-route aware; native currency labels)         | In progress     |
+| 7   | Assessment `help_scope` + recommendation/manual-review gates                    | In progress     |
+| 8   | Quote and payment safeguards (existing gates; draft int'l checkout off)         | Preserve        |
+| 9   | English/Bangla content for new copy                                             | In progress     |
+| 10  | Analytics, SEO, accessibility                                                   | Verify          |
+| 11  | Tests and Vercel preview                                                        | Pending         |
 
-## Homepage section order (implemented)
+## Homepage section order (master §8)
 
-1. Bangladesh-first hero with international secondary CTA
+1. Bangladesh-first hero with international secondary CTA + founder image
 2. Four-step bdoor process
-3. Bangladesh package selector (New / Existing tabs, three cards)
-4. Transparent fee example
-5. Workspace preview
-6. Compact specialist services list
-7. Four international country cards
-8. Existing-business compliance value
-9. Six FAQs
+3. Bangladesh package selector (New / Existing; three cards)
+4. Transparent-fee example
+5. Real workspace preview
+6. Compact Bangladesh specialist-services list
+7. Four international country cards (USA, UK, UAE, Singapore)
+8. Existing-business / compliance value
+9. Six FAQs maximum
 10. Final assessment CTA
+
+Seven-country comparison remains on `/countries`, not in the homepage first composition.
 
 ## Published vs draft
 
-| Package / offer                   | Public status       | Checkout |
-| --------------------------------- | ------------------- | -------- |
-| Six Bangladesh packages           | Published (catalog) | Enabled  |
-| USA / UK / UAE / Singapore offers | Draft               | Disabled |
+| Package / offer                   | Public status              | Checkout                             |
+| --------------------------------- | -------------------------- | ------------------------------------ |
+| Six Bangladesh packages           | Published (catalog + seed) | Catalog `true`; runtime launch-gated |
+| USA / UK / UAE / Singapore offers | Draft; request-quote       | Disabled until partner gates         |
+| Saudi Arabia / Qatar              | Draft; eligibility-led     | Disabled                             |
 
-## Follow-up (not blocking preview)
+## Follow-up (not blocking feature-branch preview)
 
-- Seed `service_packages` rows from catalog into Postgres.
-- Admin publish/approve workflow wired to DB mutations.
-- Package-specific pages (`/packages/[slug]`).
-- Founder hero image when asset is supplied.
-- Bangla legal/commercial human review before production.
+- Admin approve/publish mutations against Postgres with audit.
+- Partner agreement records and margin checks wired to checkout enablement.
+- Package detail routes `/packages/[slug]`.
+- Human review of Bangla legal/commercial wording.
+- Claude Code / research instruction files if the owner supplies them later.

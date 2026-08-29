@@ -48,6 +48,20 @@ export const OBJECTIVES = ['new', 'existing', 'expand', 'unsure'] as const;
 
 export type Objective = (typeof OBJECTIVES)[number];
 
+/**
+ * First assessment question (65/35 master §13): where the visitor needs help.
+ * Bangladesh new/existing can skip the country + objective questions; the
+ * other two still ask which country (and, for unsure, the objective).
+ */
+export const HELP_SCOPES = [
+  'bangladesh_new',
+  'bangladesh_existing',
+  'international',
+  'unsure',
+] as const;
+
+export type HelpScope = (typeof HELP_SCOPES)[number];
+
 export const FOUNDER_LOCATIONS = ['bangladesh', 'outside'] as const;
 export const STRUCTURES = [
   'private_limited',
@@ -78,6 +92,7 @@ const country = z
   .transform((v) => v.toUpperCase());
 
 export const answersSchema = z.object({
+  help_scope: z.enum(HELP_SCOPES, { message: 'requiredChoice' }),
   target_country: z.enum(TARGET_COUNTRIES, { message: 'requiredChoice' }),
   objective: z.enum(OBJECTIVES, { message: 'requiredChoice' }),
   founder_location: z.enum(FOUNDER_LOCATIONS, { message: 'requiredChoice' }),
@@ -174,14 +189,55 @@ const isInternational = (a: PartialAnswers) =>
 const managesExistingBusiness = (a: PartialAnswers) =>
   a.objective === 'existing' || (a.objective === 'unsure' && a.existing_business === true);
 
+/** Derive country/objective implied by the master help_scope question. */
+export function answersImpliedByHelpScope(scope: HelpScope): PartialAnswers {
+  switch (scope) {
+    case 'bangladesh_new':
+      return { help_scope: scope, target_country: 'bangladesh', objective: 'new' };
+    case 'bangladesh_existing':
+      return { help_scope: scope, target_country: 'bangladesh', objective: 'existing' };
+    case 'international':
+      return { help_scope: scope };
+    case 'unsure':
+      return { help_scope: scope };
+  }
+}
+
+/** Reverse of answersImpliedByHelpScope for URL presets. */
+export function helpScopeFromPreset(
+  country?: TargetCountry,
+  objective?: Objective,
+): HelpScope | undefined {
+  if (country === 'bangladesh' && objective === 'existing') return 'bangladesh_existing';
+  if (country === 'bangladesh') return 'bangladesh_new';
+  if (country) return 'international';
+  return undefined;
+}
+
 export const QUESTIONS: readonly QuestionDefinition[] = [
+  {
+    key: 'help_scope',
+    section: 'about_you',
+    kind: 'choice',
+    options: HELP_SCOPES,
+    showWhy: true,
+    // Always applicable so pruneInapplicable never drops the master first answer.
+    shouldAsk: always,
+    schema: answersSchema.shape.help_scope,
+  },
   {
     key: 'target_country',
     section: 'about_you',
     kind: 'choice',
     options: TARGET_COUNTRIES,
     showWhy: true,
-    shouldAsk: always,
+    shouldAsk: (a) => {
+      // Keep a derived/preset answer in the applicable set so prune cannot drop it.
+      if (a.target_country !== undefined) return true;
+      return (
+        a.help_scope === 'international' || a.help_scope === 'unsure' || a.help_scope === undefined
+      );
+    },
     schema: answersSchema.shape.target_country,
   },
   {
@@ -190,7 +246,12 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     kind: 'choice',
     options: OBJECTIVES,
     showWhy: true,
-    shouldAsk: always,
+    shouldAsk: (a) => {
+      if (a.objective !== undefined) return true;
+      return (
+        a.help_scope === 'international' || a.help_scope === 'unsure' || a.help_scope === undefined
+      );
+    },
     schema: answersSchema.shape.objective,
   },
   {

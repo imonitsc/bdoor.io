@@ -49,10 +49,12 @@ function QuestionInput({
   question,
   value,
   fieldError,
+  helpScope,
 }: {
   question: QuestionDefinition;
   value: unknown;
   fieldError?: string;
+  helpScope?: PartialAnswers['help_scope'];
 }) {
   const t = useTranslations('start.questions');
   const tCommon = useTranslations('common');
@@ -61,6 +63,10 @@ function QuestionInput({
   const error = fieldError ? tValidation(fieldError) : undefined;
 
   const help = question.hasHelp ? t(`${key}.help`) : undefined;
+  const choiceOptions =
+    question.key === 'target_country' && helpScope === 'international'
+      ? (question.options ?? []).filter((option) => option !== 'bangladesh')
+      : (question.options ?? []);
 
   switch (question.kind) {
     case 'boolean':
@@ -107,7 +113,7 @@ function QuestionInput({
               required
               className="mt-4 flex flex-col gap-2"
             >
-              {(question.options ?? []).map((option) => (
+              {choiceOptions.map((option) => (
                 <ChoiceCard
                   key={option}
                   htmlFor={`${key}-${option}`}
@@ -375,6 +381,7 @@ export function Questionnaire({ initial }: { initial: IntakeState }) {
               question={question}
               value={state.answers[question.key]}
               fieldError={state.fieldError}
+              helpScope={state.answers.help_scope}
             />
 
             {question.showWhy ? <WhyWeAsk text={tQuestions(`${question.key}.why`)} /> : null}

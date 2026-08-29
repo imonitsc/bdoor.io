@@ -13,6 +13,7 @@ import {
   internationalCountryBySlug,
   pickText,
 } from '@/content/international';
+import { offersForCountry } from '@/content/packages/catalog';
 import { countryGuideBySlug } from '@/content/countries/guides';
 import type { Locale } from '@/features/catalog/types';
 import { MARKETING_ROUTES } from '@/lib/navigation';
@@ -74,6 +75,7 @@ export default async function InternationalCountryPage({
   const loc = locale as Locale;
   const name = pickText(country.name, loc);
   const { offer } = country;
+  const routes = offersForCountry(country.slug);
   const guide = countryGuideBySlug(country.slug);
 
   return (
@@ -95,6 +97,31 @@ export default async function InternationalCountryPage({
             <p className="text-ink mt-3 text-base leading-relaxed">
               {pickText(offer.summary, loc)}
             </p>
+
+            {routes.length > 1 ? (
+              <ul className="mt-6 flex flex-col gap-4">
+                {routes.map((route) => (
+                  <li key={route.slug} className="border-border border-b pb-4 last:border-0">
+                    <p className="text-ink font-semibold">{pickText(route.route, loc)}</p>
+                    {route.publicLabel ? (
+                      <p className="text-ink mt-1 text-base font-semibold">
+                        {pickText(route.publicLabel, loc)}
+                        {route.publicLabelAlt ? (
+                          <span className="text-muted ml-2 text-sm font-normal">
+                            {pickText(route.publicLabelAlt, loc)}
+                          </span>
+                        ) : null}
+                      </p>
+                    ) : null}
+                    {route.publicQualifier ? (
+                      <p className="text-muted mt-1 text-xs leading-relaxed">
+                        {pickText(route.publicQualifier, loc)}
+                      </p>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
 
             <ul className="mt-5 flex flex-col gap-3">
               {offer.disclosures.map((disclosure) => (

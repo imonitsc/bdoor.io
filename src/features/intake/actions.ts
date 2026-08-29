@@ -12,9 +12,11 @@ import { recommend } from './rules';
 import { submitApplication, type SubmittedApplication } from './application';
 import {
   applicableQuestions,
+  answersImpliedByHelpScope,
   firstUnansweredIndex,
   isComplete,
   validateAnswer,
+  type HelpScope,
   type PartialAnswers,
   type QuestionKey,
 } from './questions';
@@ -138,7 +140,10 @@ export async function intakeAction(
   if (!session) {
     // No service role configured: keep the flow usable in-memory so the
     // questionnaire can still be walked through, and say so.
-    const answers = { ...previous.answers, [key]: validation.data } as PartialAnswers;
+    let answers = { ...previous.answers, [key]: validation.data } as PartialAnswers;
+    if (key === 'help_scope') {
+      answers = { ...answers, ...answersImpliedByHelpScope(validation.data as HelpScope) };
+    }
     return {
       ...previous,
       answers,
@@ -151,6 +156,15 @@ export async function intakeAction(
   }
 
   let answers = await saveAnswer(session.id, key, validation.data);
+
+  // Master §13: help_scope implies Bangladesh country/objective when selected.
+  if (key === 'help_scope') {
+    const implied = answersImpliedByHelpScope(validation.data as HelpScope);
+    for (const [impliedKey, impliedValue] of Object.entries(implied)) {
+      if (impliedKey === 'help_scope' || impliedValue === undefined) continue;
+      answers = await saveAnswer(session.id, impliedKey as QuestionKey, impliedValue);
+    }
+  }
 
   // Preset answers seeded from the /start URL live only in the action state
   // until now; persist any that are still applicable and unstored so a

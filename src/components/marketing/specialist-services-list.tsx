@@ -14,8 +14,9 @@ export function SpecialistServicesList({ locale }: { locale: Locale }) {
         >
           <span className="text-ink text-sm font-medium">{pick(service.name, locale)}</span>
           <span className="text-muted text-sm">
-            BDT {service.bdoorFeeBdt.toLocaleString(locale === 'bn' ? 'bn-BD' : 'en-US')} ·{' '}
-            {pick(service.note, locale)}
+            {service.bdoorFeeBdt == null
+              ? pick(service.note, locale)
+              : `${'priceType' in service && service.priceType === 'from' ? (locale === 'bn' ? 'থেকে ' : 'From ') : ''}BDT ${service.bdoorFeeBdt.toLocaleString(locale === 'bn' ? 'bn-BD' : 'en-US')} · ${pick(service.note, locale)}`}
           </span>
         </li>
       ))}

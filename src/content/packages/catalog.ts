@@ -266,12 +266,38 @@ export const BANGLADESH_PACKAGES: ServicePackage[] = [
   },
 ];
 
-export const INTERNATIONAL_OFFERS: InternationalOffer[] = [
+/**
+ * Shared disclosures for every US LLC route (master §7).
+ * Domestic US-created companies are currently exempt from standard FinCEN
+ * BOI reporting — do not sell BOI filing as a default deliverable.
+ */
+const USA_DISCLOSURES = [
+  { en: 'EIN has no IRS fee.', bn: 'EIN-এর জন্য IRS ফি নেই।' },
+  { en: 'US state and annual fees vary.', bn: 'মার্কিন রাজ্য ও বার্ষিক ফি ভিন্ন হতে পারে।' },
   {
-    slug: 'usa-wyoming-llc',
+    en: 'Domestic US-created companies are currently exempt from standard FinCEN BOI reporting; BOI filing is not a default deliverable.',
+    bn: 'দেশীয়ভাবে গঠিত মার্কিন কোম্পানি বর্তমানে মানক FinCEN BOI রিপোর্টিং থেকে অব্যাহতিপ্রাপ্ত; BOI ফাইলিং ডিফল্ট ডেলিভারেবল নয়।',
+  },
+  {
+    en: 'Banking, payment accounts, visas, licences and government approvals are never guaranteed.',
+    bn: 'ব্যাংকিং, পেমেন্ট অ্যাকাউন্ট, ভিসা, লাইসেন্স ও সরকারি অনুমোদন কখনোই নিশ্চিত নয়।',
+  },
+] as const;
+
+function usaLlcOffer(opts: {
+  slug: string;
+  route: { en: string; bn: string };
+  stateFeeMinor: number;
+  stateFeeLabel: { en: string; bn: string };
+  publicLabel: { en: string; bn: string };
+  publicLabelAlt: { en: string; bn: string };
+  publicQualifier: { en: string; bn: string };
+}): InternationalOffer {
+  return {
+    slug: opts.slug,
     countryCode: 'US',
     countrySlug: 'usa',
-    route: { en: 'Wyoming LLC', bn: 'ওয়াইমিং LLC' },
+    route: opts.route,
     status: 'draft',
     availability: 'available_by_quote',
     mode: 'managed_application',
@@ -279,20 +305,14 @@ export const INTERNATIONAL_OFFERS: InternationalOffer[] = [
     providerApproved: false,
     priceApproved: true,
     checkoutEnabled: false,
-    publicLabel: { en: 'From $499', bn: '$৪৯৯ থেকে' },
-    publicLabelAlt: { en: 'About ৳61,400', bn: 'আনুমানিক ৳৬১,৪০০' },
-    publicQualifier: {
-      en: 'Wyoming LLC estimated first-year package',
-      bn: 'ওয়াইমিং LLC আনুমানিক প্রথম বছরের প্যাকেজ',
-    },
+    publicLabel: opts.publicLabel,
+    publicLabelAlt: opts.publicLabelAlt,
+    publicQualifier: opts.publicQualifier,
     summary: {
       en: 'LLC formation with EIN support, delivered with a licensed US provider.',
       bn: 'লাইসেন্সপ্রাপ্ত মার্কিন প্রদানকারীর সঙ্গে LLC গঠন ও EIN সহায়তা।',
     },
-    disclosures: [
-      { en: 'EIN has no IRS fee.', bn: 'EIN-এর জন্য IRS ফি নেই।' },
-      { en: 'State and annual fees vary.', bn: 'রাজ্য ও বার্ষিক ফি ভিন্ন হতে পারে।' },
-    ],
+    disclosures: [...USA_DISCLOSURES],
     feeComponents: [
       {
         layer: 'platform_service_fee',
@@ -307,8 +327,8 @@ export const INTERNATIONAL_OFFERS: InternationalOffer[] = [
       },
       {
         layer: 'government_fee_estimate',
-        label: { en: 'Wyoming state fee', bn: 'ওয়াইমিং রাজ্য ফি' },
-        amountMinor: 100_00,
+        label: opts.stateFeeLabel,
+        amountMinor: opts.stateFeeMinor,
         currency: 'USD',
         isEstimate: true,
         isRefundable: false,
@@ -317,7 +337,46 @@ export const INTERNATIONAL_OFFERS: InternationalOffer[] = [
         reviewedAt: REVIEW_DATE,
       },
     ],
-  },
+  };
+}
+
+export const INTERNATIONAL_OFFERS: InternationalOffer[] = [
+  usaLlcOffer({
+    slug: 'usa-wyoming-llc',
+    route: { en: 'Wyoming LLC', bn: 'ওয়াইমিং LLC' },
+    stateFeeMinor: 100_00,
+    stateFeeLabel: { en: 'Wyoming state fee', bn: 'ওয়াইমিং রাজ্য ফি' },
+    publicLabel: { en: 'USD 449 estimated total', bn: 'আনুমানিক মোট ৪৪৯ মার্কিন ডলার' },
+    publicLabelAlt: { en: 'About ৳55,200', bn: 'আনুমানিক ৳৫৫,২০০' },
+    publicQualifier: {
+      en: 'Wyoming LLC estimated first-year package',
+      bn: 'ওয়াইমিং LLC আনুমানিক প্রথম বছরের প্যাকেজ',
+    },
+  }),
+  usaLlcOffer({
+    slug: 'usa-delaware-llc',
+    route: { en: 'Delaware LLC', bn: 'ডেলাওয়্যার LLC' },
+    stateFeeMinor: 110_00,
+    stateFeeLabel: { en: 'Delaware state fee', bn: 'ডেলাওয়্যার রাজ্য ফি' },
+    publicLabel: { en: 'USD 459 estimated total', bn: 'আনুমানিক মোট ৪৫৯ মার্কিন ডলার' },
+    publicLabelAlt: { en: 'About ৳56,500', bn: 'আনুমানিক ৳৫৬,৫০০' },
+    publicQualifier: {
+      en: 'Delaware LLC estimated first-year package',
+      bn: 'ডেলাওয়্যার LLC আনুমানিক প্রথম বছরের প্যাকেজ',
+    },
+  }),
+  usaLlcOffer({
+    slug: 'usa-florida-llc',
+    route: { en: 'Florida LLC', bn: 'ফ্লোরিডা LLC' },
+    stateFeeMinor: 125_00,
+    stateFeeLabel: { en: 'Florida state fee', bn: 'ফ্লোরিডা রাজ্য ফি' },
+    publicLabel: { en: 'USD 474 estimated total', bn: 'আনুমানিক মোট ৪৭৪ মার্কিন ডলার' },
+    publicLabelAlt: { en: 'About ৳58,300', bn: 'আনুমানিক ৳৫৮,৩০০' },
+    publicQualifier: {
+      en: 'Florida LLC estimated first-year package',
+      bn: 'ফ্লোরিডা LLC আনুমানিক প্রথম বছরের প্যাকেজ',
+    },
+  }),
   {
     slug: 'uk-non-resident-ltd',
     countryCode: 'GB',
@@ -330,8 +389,8 @@ export const INTERNATIONAL_OFFERS: InternationalOffer[] = [
     providerApproved: false,
     priceApproved: true,
     checkoutEnabled: false,
-    publicLabel: { en: 'From $299', bn: '$২৯৯ থেকে' },
-    publicLabelAlt: { en: 'About ৳36,800', bn: 'আনুমানিক ৳৩৬,৮০০' },
+    publicLabel: { en: 'GBP 349 estimated total', bn: 'আনুমানিক মোট ৩৪৯ পাউন্ড' },
+    publicLabelAlt: { en: 'About ৳55,800', bn: 'আনুমানিক ৳৫৫,৮০০' },
     publicQualifier: {
       en: 'Non-resident LTD estimated first-year package',
       bn: 'অনাবাসী LTD আনুমানিক প্রথম বছরের প্যাকেজ',
@@ -344,6 +403,10 @@ export const INTERNATIONAL_OFFERS: InternationalOffer[] = [
       {
         en: 'UK identity verification and registered-office eligibility apply.',
         bn: 'যুক্তরাজ্য পরিচয় যাচাই ও নিবন্ধিত অফিস যোগ্যতা প্রযোজ্য।',
+      },
+      {
+        en: 'Banking, payment accounts, visas, licences and government approvals are never guaranteed.',
+        bn: 'ব্যাংকিং, পেমেন্ট অ্যাকাউন্ট, ভিসা, লাইসেন্স ও সরকারি অনুমোদন কখনোই নিশ্চিত নয়।',
       },
     ],
     feeComponents: [
@@ -375,7 +438,7 @@ export const INTERNATIONAL_OFFERS: InternationalOffer[] = [
     slug: 'uae-sharjah-no-visa',
     countryCode: 'AE',
     countrySlug: 'uae',
-    route: { en: 'Zero-visa free-zone route', bn: 'জিরো-ভিসা ফ্রি-জোন রুট' },
+    route: { en: 'Sharjah eligible no-visa route', bn: 'শারজাহ যোগ্য নো-ভিসা রুট' },
     status: 'draft',
     availability: 'available_by_quote',
     mode: 'managed_application',
@@ -383,11 +446,11 @@ export const INTERNATIONAL_OFFERS: InternationalOffer[] = [
     providerApproved: false,
     priceApproved: true,
     checkoutEnabled: false,
-    publicLabel: { en: 'From $3,899', bn: '$৩,৮৯৯ থেকে' },
-    publicLabelAlt: { en: 'About ৳479,900', bn: 'আনুমানিক ৳৪,৭৯,৯০০' },
+    publicLabel: { en: 'AED 9,375 estimated total', bn: 'আনুমানিক মোট ৯,৩৭৫ দিরহাম' },
+    publicLabelAlt: { en: 'About ৳314,000', bn: 'আনুমানিক ৳৩,১৪,০০০' },
     publicQualifier: {
-      en: 'Zero-visa free-zone estimated package',
-      bn: 'জিরো-ভিসা ফ্রি-জোন আনুমানিক প্যাকেজ',
+      en: 'Eligible Sharjah no-visa estimated package',
+      bn: 'যোগ্য শারজাহ নো-ভিসা আনুমানিক প্যাকেজ',
     },
     summary: {
       en: 'Free-zone licence routes scoped to the intended activity.',
@@ -395,8 +458,12 @@ export const INTERNATIONAL_OFFERS: InternationalOffer[] = [
     },
     disclosures: [
       {
-        en: 'Activity, free zone and facility determine final cost.',
-        bn: 'কার্যক্রম, ফ্রি জোন ও সুবিধা চূড়ান্ত খরচ নির্ধারণ করে।',
+        en: 'UAE activity, free zone, visa and facility determine final cost.',
+        bn: 'ইউএই কার্যক্রম, ফ্রি জোন, ভিসা ও সুবিধা চূড়ান্ত খরচ নির্ধারণ করে।',
+      },
+      {
+        en: 'Banking, payment accounts, visas, licences and government approvals are never guaranteed.',
+        bn: 'ব্যাংকিং, পেমেন্ট অ্যাকাউন্ট, ভিসা, লাইসেন্স ও সরকারি অনুমোদন কখনোই নিশ্চিত নয়।',
       },
     ],
     feeComponents: [
@@ -425,10 +492,10 @@ export const INTERNATIONAL_OFFERS: InternationalOffer[] = [
     ],
   },
   {
-    slug: 'singapore-pte-ltd',
-    countryCode: 'SG',
-    countrySlug: 'singapore',
-    route: { en: 'Foreign-founder Pte Ltd', bn: 'বিদেশি-প্রতিষ্ঠাতা Pte Ltd' },
+    slug: 'uae-dubai-route',
+    countryCode: 'AE',
+    countrySlug: 'uae',
+    route: { en: 'Dubai formation route', bn: 'দুবাই গঠন রুট' },
     status: 'draft',
     availability: 'available_by_quote',
     mode: 'managed_application',
@@ -436,26 +503,94 @@ export const INTERNATIONAL_OFFERS: InternationalOffer[] = [
     providerApproved: false,
     priceApproved: true,
     checkoutEnabled: false,
-    publicLabel: { en: 'From $1,899', bn: '$১,৮৯৯ থেকে' },
-    publicLabelAlt: { en: 'About ৳233,700', bn: 'আনুমানিক ৳২,৩৩,৭০০' },
+    publicLabel: { en: 'From AED 15,000', bn: '১৫,০০০ দিরহাম থেকে' },
+    publicLabelAlt: { en: 'About ৳503,000', bn: 'আনুমানিক ৳৫,০৩,০০০' },
     publicQualifier: {
-      en: 'Foreign-founder first-year estimate; conditions apply',
-      bn: 'বিদেশি-প্রতিষ্ঠাতা প্রথম বছরের আনুমানিক; শর্ত প্রযোজ্য',
+      en: 'Dubai licence from AED 12,500 plus bdoor fee; activity dependent',
+      bn: 'দুবাই লাইসেন্স ১২,৫০০ দিরহাম থেকে + bdoor ফি; কার্যক্রম নির্ভর',
     },
     summary: {
-      en: 'Pte Ltd formation through a licensed corporate service provider.',
-      bn: 'লাইসেন্সপ্রাপ্ত কর্পোরেট সেবা প্রদানকারীর মাধ্যমে Pte Ltd গঠন।',
+      en: 'Dubai free-zone and mainland routes scoped after activity review.',
+      bn: 'কার্যক্রম পর্যালোচনার পর দুবাই ফ্রি-জোন ও মেইনল্যান্ড রুট।',
     },
     disclosures: [
       {
-        en: 'A refundable nominee-director deposit is not a service fee.',
-        bn: 'ফেরতযোগ্য নমিনি-ডিরেক্টর ডিপোজিট সেবা ফি নয়।',
+        en: 'UAE activity, free zone, visa and facility determine final cost.',
+        bn: 'ইউএই কার্যক্রম, ফ্রি জোন, ভিসা ও সুবিধা চূড়ান্ত খরচ নির্ধারণ করে।',
+      },
+      {
+        en: 'Banking, payment accounts, visas, licences and government approvals are never guaranteed.',
+        bn: 'ব্যাংকিং, পেমেন্ট অ্যাকাউন্ট, ভিসা, লাইসেন্স ও সরকারি অনুমোদন কখনোই নিশ্চিত নয়।',
       },
     ],
     feeComponents: [
       {
         layer: 'platform_service_fee',
-        label: { en: 'bdoor/partner fee', bn: 'bdoor/অংশীদার ফি' },
+        label: { en: 'bdoor fee', bn: 'bdoor ফি' },
+        amountMinor: 250_000,
+        currency: 'AED',
+        isEstimate: false,
+        isRefundable: false,
+        payee: 'bdoor',
+        taxTreatment: 'pending_review',
+        reviewedAt: REVIEW_DATE,
+      },
+      {
+        layer: 'government_fee_estimate',
+        label: { en: 'Licence fee from', bn: 'লাইসেন্স ফি থেকে' },
+        amountMinor: 1_250_000,
+        currency: 'AED',
+        isEstimate: true,
+        isRefundable: false,
+        payee: 'government_authority',
+        taxTreatment: 'not_applicable',
+        reviewedAt: REVIEW_DATE,
+      },
+    ],
+  },
+  {
+    slug: 'singapore-resident-director',
+    countryCode: 'SG',
+    countrySlug: 'singapore',
+    route: {
+      en: 'Pte Ltd with qualifying resident director',
+      bn: 'যোগ্য রেসিডেন্ট ডিরেক্টরসহ Pte Ltd',
+    },
+    status: 'draft',
+    availability: 'available_by_quote',
+    mode: 'managed_application',
+    publicStatus: 'applications_open',
+    providerApproved: false,
+    priceApproved: true,
+    checkoutEnabled: false,
+    publicLabel: { en: 'From S$1,500', bn: 'S$১,৫০০ থেকে' },
+    publicLabelAlt: { en: 'About ৳137,000', bn: 'আনুমানিক ৳১,৩৭,০০০' },
+    publicQualifier: {
+      en: 'Partner/CSP scope must be confirmed; government fees separate',
+      bn: 'অংশীদার/CSP পরিধি নিশ্চিত করতে হবে; সরকারি ফি আলাদা',
+    },
+    summary: {
+      en: 'Pte Ltd formation when a qualifying Singapore resident director is available.',
+      bn: 'যোগ্য সিঙ্গাপুর রেসিডেন্ট ডিরেক্টর থাকলে Pte Ltd গঠন।',
+    },
+    disclosures: [
+      {
+        en: 'Singapore foreign founders need a Corporate Service Provider and a qualifying resident director.',
+        bn: 'সিঙ্গাপুরে বিদেশি প্রতিষ্ঠাতাদের কর্পোরেট সার্ভিস প্রোভাইডার ও যোগ্য রেসিডেন্ট ডিরেক্টর প্রয়োজন।',
+      },
+      {
+        en: 'A refundable nominee-director deposit is not a service fee.',
+        bn: 'ফেরতযোগ্য নমিনি-ডিরেক্টর ডিপোজিট সেবা ফি নয়।',
+      },
+      {
+        en: 'Banking, payment accounts, visas, licences and government approvals are never guaranteed.',
+        bn: 'ব্যাংকিং, পেমেন্ট অ্যাকাউন্ট, ভিসা, লাইসেন্স ও সরকারি অনুমোদন কখনোই নিশ্চিত নয়।',
+      },
+    ],
+    feeComponents: [
+      {
+        layer: 'platform_service_fee',
+        label: { en: 'bdoor/partner fee from', bn: 'bdoor/অংশীদার ফি থেকে' },
         amountMinor: 150_000,
         currency: 'SGD',
         isEstimate: true,
@@ -488,12 +623,79 @@ export const INTERNATIONAL_OFFERS: InternationalOffer[] = [
       },
     ],
   },
-  // Saudi Arabia and Qatar are screened, eligibility-led markets: the public
-  // page collects interest and an assessment, never a checkout. The figures
-  // below are internal working numbers from the seven-country research —
-  // authority amounts with their sources, and unvalidated professional
-  // allowances a contracted partner must confirm before anything is priced
-  // publicly.
+  {
+    slug: 'singapore-foreign-founder',
+    countryCode: 'SG',
+    countrySlug: 'singapore',
+    route: { en: 'Foreign-founder Pte Ltd', bn: 'বিদেশি-প্রতিষ্ঠাতা Pte Ltd' },
+    status: 'draft',
+    availability: 'available_by_quote',
+    mode: 'managed_application',
+    publicStatus: 'applications_open',
+    providerApproved: false,
+    priceApproved: true,
+    checkoutEnabled: false,
+    publicLabel: { en: 'From S$3,690', bn: 'S$৩,৬৯০ থেকে' },
+    publicLabelAlt: { en: 'About ৳337,000', bn: 'আনুমানিক ৳৩,৩৭,০০০' },
+    publicQualifier: {
+      en: 'Nominee director/KYC; deposit separate when required',
+      bn: 'নমিনি ডিরেক্টর/KYC; প্রয়োজনে ডিপোজিট আলাদা',
+    },
+    summary: {
+      en: 'Pte Ltd formation for foreign founders through a licensed corporate service provider.',
+      bn: 'লাইসেন্সপ্রাপ্ত কর্পোরেট সেবা প্রদানকারীর মাধ্যমে বিদেশি প্রতিষ্ঠাতাদের Pte Ltd গঠন।',
+    },
+    disclosures: [
+      {
+        en: 'Singapore foreign founders need a Corporate Service Provider and a qualifying resident director.',
+        bn: 'সিঙ্গাপুরে বিদেশি প্রতিষ্ঠাতাদের কর্পোরেট সার্ভিস প্রোভাইডার ও যোগ্য রেসিডেন্ট ডিরেক্টর প্রয়োজন।',
+      },
+      {
+        en: 'A refundable nominee-director deposit is not a service fee.',
+        bn: 'ফেরতযোগ্য নমিনি-ডিরেক্টর ডিপোজিট সেবা ফি নয়।',
+      },
+      {
+        en: 'Banking, payment accounts, visas, licences and government approvals are never guaranteed.',
+        bn: 'ব্যাংকিং, পেমেন্ট অ্যাকাউন্ট, ভিসা, লাইসেন্স ও সরকারি অনুমোদন কখনোই নিশ্চিত নয়।',
+      },
+    ],
+    feeComponents: [
+      {
+        layer: 'platform_service_fee',
+        label: { en: 'bdoor/partner fee from', bn: 'bdoor/অংশীদার ফি থেকে' },
+        amountMinor: 337_500,
+        currency: 'SGD',
+        isEstimate: true,
+        isRefundable: false,
+        payee: 'partner_firm',
+        taxTreatment: 'pending_review',
+        reviewedAt: REVIEW_DATE,
+      },
+      {
+        layer: 'government_fee_estimate',
+        label: { en: 'ACRA filing', bn: 'ACRA ফাইলিং' },
+        amountMinor: 15_00,
+        currency: 'SGD',
+        isEstimate: false,
+        isRefundable: false,
+        payee: 'government_authority',
+        taxTreatment: 'not_applicable',
+        reviewedAt: REVIEW_DATE,
+      },
+      {
+        layer: 'government_fee_estimate',
+        label: { en: 'Name reservation', bn: 'নাম সংরক্ষণ' },
+        amountMinor: 300_00,
+        currency: 'SGD',
+        isEstimate: false,
+        isRefundable: false,
+        payee: 'government_authority',
+        taxTreatment: 'not_applicable',
+        reviewedAt: REVIEW_DATE,
+      },
+    ],
+  },
+  // Saudi Arabia and Qatar remain screened, eligibility-led markets.
   {
     slug: 'saudi-market-entry',
     countryCode: 'SA',
@@ -650,6 +852,37 @@ export const INTERNATIONAL_OFFERS: InternationalOffer[] = [
   },
 ];
 
+/**
+ * Homepage and country-card featured slug per country (master §7 / §8).
+ * Extra routes for the same country remain on the country page and in admin.
+ */
+export const FEATURED_INTERNATIONAL_SLUGS = [
+  'usa-wyoming-llc',
+  'uk-non-resident-ltd',
+  'uae-sharjah-no-visa',
+  'singapore-resident-director',
+] as const;
+
+/** The four homepage international cards (USA, UK, UAE, Singapore). */
+export function homepageInternationalOffers(): InternationalOffer[] {
+  return FEATURED_INTERNATIONAL_SLUGS.map((slug) =>
+    INTERNATIONAL_OFFERS.find((o) => o.slug === slug)!,
+  );
+}
+
+/** Featured offer for a country slug (lowest / primary starting estimate). */
+export function featuredOfferForCountry(countrySlug: string): InternationalOffer | undefined {
+  const featured = FEATURED_INTERNATIONAL_SLUGS.map((slug) =>
+    INTERNATIONAL_OFFERS.find((o) => o.slug === slug)!,
+  ).find((o) => o.countrySlug === countrySlug);
+  if (featured) return featured;
+  return INTERNATIONAL_OFFERS.find((o) => o.countrySlug === countrySlug);
+}
+
+export function offersForCountry(countrySlug: string): InternationalOffer[] {
+  return INTERNATIONAL_OFFERS.filter((o) => o.countrySlug === countrySlug);
+}
+
 export const STANDALONE_SERVICES = [
   {
     slug: 'etin-assistance',
@@ -659,7 +892,10 @@ export const STANDALONE_SERVICES = [
   },
   {
     slug: 'bin-vat-assistance',
-    name: { en: 'BIN/VAT application assistance', bn: 'বিআইএন/ভ্যাট আবেদন সহায়তা' },
+    name: {
+      en: 'BIN/VAT assessment and application assistance',
+      bn: 'বিআইএন/ভ্যাট যাচাই ও আবেদন সহায়তা',
+    },
     bdoorFeeBdt: 6000,
     note: { en: 'Government application fee BDT 0', bn: 'সরকারি আবেদন ফি ০ টাকা' },
   },
@@ -668,6 +904,67 @@ export const STANDALONE_SERVICES = [
     name: { en: 'Trade-licence coordination', bn: 'ট্রেড লাইসেন্স সমন্বয়' },
     bdoorFeeBdt: 8000,
     note: { en: 'Authority fee varies', bn: 'কর্তৃপক্ষের ফি ভিন্ন' },
+  },
+  {
+    slug: 'commercial-irc-coordination',
+    name: { en: 'Commercial IRC coordination', bn: 'বাণিজ্যিক IRC সমন্বয়' },
+    bdoorFeeBdt: 15000,
+    note: { en: 'Official fee varies by class', bn: 'শ্রেণি অনুযায়ী সরকারি ফি ভিন্ন' },
+  },
+  {
+    slug: 'erc-coordination',
+    name: { en: 'ERC coordination', bn: 'ERC সমন্বয়' },
+    bdoorFeeBdt: 15000,
+    note: {
+      en: 'Official certificate/renewal costs separate',
+      bn: 'সরকারি সনদ/নবায়ন খরচ আলাদা',
+    },
+  },
+  {
+    slug: 'rjsc-annual-return',
+    name: {
+      en: 'Standard RJSC annual return/company change',
+      bn: 'মানক RJSC বার্ষিক রিটার্ন/কোম্পানি পরিবর্তন',
+    },
+    bdoorFeeBdt: 12000,
+    note: {
+      en: 'From BDT 12,000; government and late fees at actuals',
+      bn: '১২,০০০ টাকা থেকে; সরকারি ও বিলম্ব ফি প্রকৃত খরচে',
+    },
+    priceType: 'from' as const,
+  },
+  {
+    slug: 'bida-project-registration',
+    name: { en: 'BIDA project-registration coordination', bn: 'বিডা প্রকল্প-নিবন্ধন সমন্বয়' },
+    bdoorFeeBdt: 25000,
+    note: {
+      en: 'From BDT 25,000; official investment slab + applicable VAT',
+      bn: '২৫,০০০ টাকা থেকে; সরকারি বিনিয়োগ স্তর + প্রযোজ্য ভ্যাট',
+    },
+    priceType: 'from' as const,
+  },
+  {
+    slug: 'foreign-owned-private-company',
+    name: {
+      en: 'Foreign-owned Bangladesh private company',
+      bn: 'বিদেশি-মালিকানাধীন বাংলাদেশি প্রাইভেট কোম্পানি',
+    },
+    bdoorFeeBdt: 69900,
+    note: {
+      en: 'From BDT 69,900; government, bank, attestation and partner costs extra',
+      bn: '৬৯,৯০০ টাকা থেকে; সরকারি, ব্যাংক, অ্যাটেস্টেশন ও অংশীদার খরচ অতিরিক্ত',
+    },
+    priceType: 'from' as const,
+  },
+  {
+    slug: 'branch-liaison-representative',
+    name: { en: 'Branch/liaison/representative office', bn: 'শাখা/লিয়াজোঁ/প্রতিনিধি অফিস' },
+    bdoorFeeBdt: null,
+    note: {
+      en: 'Custom quotation; authority and partner costs at actuals',
+      bn: 'কাস্টম উদ্ধৃতি; কর্তৃপক্ষ ও অংশীদার খরচ প্রকৃত হিসাবে',
+    },
+    priceType: 'quote_required' as const,
   },
 ] as const;
 
