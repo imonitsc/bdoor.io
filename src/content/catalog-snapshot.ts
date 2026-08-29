@@ -269,8 +269,8 @@ export const SNAPSHOT_SERVICES: Service[] = [
       {
         category: 'platform_service_fee',
         label: {
-          en: 'BDoor service fee',
-          bn: 'BDoor সেবা ফি',
+          en: 'bdoor service fee',
+          bn: 'bdoor সেবা ফি',
         },
         payee: 'bdoor',
         amountBdt: 24900,
@@ -557,8 +557,8 @@ export const SNAPSHOT_SERVICES: Service[] = [
       {
         category: 'platform_service_fee',
         label: {
-          en: 'BDoor service fee',
-          bn: 'BDoor সেবা ফি',
+          en: 'bdoor service fee',
+          bn: 'bdoor সেবা ফি',
         },
         payee: 'bdoor',
         amountBdt: 8000,
@@ -888,8 +888,8 @@ export const SNAPSHOT_FAQS: Faq[] = [
       bn: 'আইনি কাজটা কে করেন?',
     },
     answer: {
-      en: 'BDoor is not a law firm. We coordinate your case, hold your documents and manage the process. Where a matter needs legal or specialist authority — drafting, representation, regulated filings — a verified partner advocate or firm is engaged under a separate agreement with you. We tell you which partner, and what they will receive, before anything is shared.',
-      bn: 'BDoor কোনো আইনি প্রতিষ্ঠান নয়। আমরা আপনার কেস সমন্বয় করি, কাগজপত্র রাখি এবং প্রক্রিয়াটি পরিচালনা করি। যেখানে আইনি বা বিশেষায়িত কর্তৃত্ব দরকার — খসড়া প্রণয়ন, প্রতিনিধিত্ব, নিয়ন্ত্রিত দাখিল — সেখানে যাচাইকৃত অংশীদার আইনজীবী বা প্রতিষ্ঠান আপনার সঙ্গে আলাদা চুক্তিতে যুক্ত হন। কোনো কিছু শেয়ার করার আগেই আমরা জানাই কোন অংশীদার এবং তাঁরা কী পাবেন।',
+      en: 'bdoor is not a law firm. We coordinate your case, hold your documents and manage the process. Where a matter needs legal or specialist authority — drafting, representation, regulated filings — a verified partner advocate or firm is engaged under a separate agreement with you. We tell you which partner, and what they will receive, before anything is shared.',
+      bn: 'bdoor কোনো আইনি প্রতিষ্ঠান নয়। আমরা আপনার কেস সমন্বয় করি, কাগজপত্র রাখি এবং প্রক্রিয়াটি পরিচালনা করি। যেখানে আইনি বা বিশেষায়িত কর্তৃত্ব দরকার — খসড়া প্রণয়ন, প্রতিনিধিত্ব, নিয়ন্ত্রিত দাখিল — সেখানে যাচাইকৃত অংশীদার আইনজীবী বা প্রতিষ্ঠান আপনার সঙ্গে আলাদা চুক্তিতে যুক্ত হন। কোনো কিছু শেয়ার করার আগেই আমরা জানাই কোন অংশীদার এবং তাঁরা কী পাবেন।',
     },
     isGlobal: true,
     isComplianceSensitive: false,
@@ -920,8 +920,8 @@ export const SNAPSHOT_FAQS: Faq[] = [
       bn: 'আমার কাগজপত্র কীভাবে সুরক্ষিত থাকে?',
     },
     answer: {
-      en: 'Documents go into private storage, never a public link and never email. Download links are short-lived and every view, download and replacement is logged with who did it and when. Your assigned BDoor case team can see them; a partner can only see them after you have authorised that specific sharing, and we show you which partner and why.',
-      bn: 'কাগজপত্র যায় ব্যক্তিগত স্টোরেজে — কখনো পাবলিক লিঙ্কে বা ইমেইলে নয়। ডাউনলোড লিঙ্ক স্বল্পস্থায়ী, আর প্রতিটি দেখা, ডাউনলোড ও প্রতিস্থাপন কে কখন করল তা নথিভুক্ত হয়। আপনার নিযুক্ত BDoor কেস টিম এগুলো দেখতে পায়; অংশীদার দেখতে পান কেবল আপনি ওই নির্দিষ্ট শেয়ারিং অনুমোদন করার পর, এবং কোন অংশীদার ও কেন তা আমরা আপনাকে জানাই।',
+      en: 'Documents go into private storage, never a public link and never email. Download links are short-lived and every view, download and replacement is logged with who did it and when. Your assigned bdoor case team can see them; a partner can only see them after you have authorised that specific sharing, and we show you which partner and why.',
+      bn: 'কাগজপত্র যায় ব্যক্তিগত স্টোরেজে — কখনো পাবলিক লিঙ্কে বা ইমেইলে নয়। ডাউনলোড লিঙ্ক স্বল্পস্থায়ী, আর প্রতিটি দেখা, ডাউনলোড ও প্রতিস্থাপন কে কখন করল তা নথিভুক্ত হয়। আপনার নিযুক্ত bdoor কেস টিম এগুলো দেখতে পায়; অংশীদার দেখতে পান কেবল আপনি ওই নির্দিষ্ট শেয়ারিং অনুমোদন করার পর, এবং কোন অংশীদার ও কেন তা আমরা আপনাকে জানাই।',
     },
     isGlobal: true,
     isComplianceSensitive: false,
@@ -932,8 +932,8 @@ export const SNAPSHOT_FAQS: Faq[] = [
     id: '8501b4b7-da44-47cd-ade4-732ec30596be',
     serviceSlug: null,
     question: {
-      en: 'Can BDoor guarantee approval?',
-      bn: 'BDoor কি অনুমোদনের নিশ্চয়তা দিতে পারে?',
+      en: 'Can bdoor guarantee approval?',
+      bn: 'bdoor কি অনুমোদনের নিশ্চয়তা দিতে পারে?',
     },
     answer: {
       en: 'No, and nobody honestly can. Approval is a decision for the relevant authority. What we can do is make sure your application is complete, correct and submitted properly, tell you plainly if we think something will not be approved, and keep you informed if a query is raised.',
@@ -959,8 +959,8 @@ export const SNAPSHOT_RESOURCES: ResourcePage[] = [
       bn: 'বেশিরভাগ দেরি হয় ঠিক কাজগুলো ভুল ক্রমে করার কারণে।',
     },
     body: {
-      en: "## The order matters more than the speed\n\nA foreign-invested company in Bangladesh involves a bank, a registrar, a revenue authority and sometimes an investment authority. Each expects something the previous step produced. Do them out of order and you will redo them.\n\n## A typical sequence\n\n1. **Eligibility review.** Can this activity be foreign-owned, and to what extent? Establish this before spending anything.\n2. **Name clearance.** Reserve the proposed company name.\n3. **Temporary bank account.** Opened in the proposed company's name so capital can be received before the company legally exists.\n4. **Inward remittance.** Capital is sent from abroad into that account, and the bank issues an encashment certificate. **This money goes to the bank, never to BDoor.**\n5. **Incorporation.** Filed with the encashment certificate as evidence of capital.\n6. **Post-incorporation registrations.** Trade licence, e-TIN, BIN/VAT, and any sector licence.\n7. **Investment registration.** Where applicable, registered with the investment authority.\n\n## What this does not give you\n\nNone of the above is an immigration decision. If you intend to live or work in Bangladesh, a visa and usually a work permit are separate applications with their own requirements and their own outcome.\n\n## Where it usually goes wrong\n\n- Sending capital before the account exists in the right name.\n- Assuming the sector is open without checking.\n- Discovering a corporate shareholder's ownership chain cannot be documented.",
-      bn: '## গতি নয়, ক্রমটাই বেশি গুরুত্বপূর্ণ\n\nবাংলাদেশে বিদেশি-বিনিয়োগকৃত কোম্পানির সঙ্গে জড়িত থাকে ব্যাংক, নিবন্ধক, রাজস্ব কর্তৃপক্ষ এবং কখনো বিনিয়োগ কর্তৃপক্ষ। প্রত্যেকে চায় আগের ধাপে তৈরি হওয়া কিছু একটা। ক্রম উল্টে গেলে কাজ আবার করতে হবে।\n\n## সাধারণ ক্রম\n\n১. **যোগ্যতা যাচাই।** এই কার্যক্রমে বিদেশি মালিকানা চলে কি, চললে কতটুকু? খরচ করার আগেই নিশ্চিত হোন।\n২. **নাম ছাড়পত্র।** প্রস্তাবিত কোম্পানির নাম সংরক্ষণ করুন।\n৩. **অস্থায়ী ব্যাংক হিসাব।** প্রস্তাবিত কোম্পানির নামে খোলা হয়, যাতে কোম্পানি আইনত অস্তিত্ব পাওয়ার আগেই মূলধন গ্রহণ করা যায়।\n৪. **বিদেশ থেকে অর্থ প্রেরণ।** ওই হিসাবে বিদেশ থেকে মূলধন আসে, ব্যাংক এনক্যাশমেন্ট সার্টিফিকেট দেয়। **এই অর্থ যায় ব্যাংকে, কখনোই BDoor-এ নয়।**\n৫. **কোম্পানি গঠন।** মূলধনের প্রমাণ হিসেবে এনক্যাশমেন্ট সার্টিফিকেটসহ দাখিল।\n৬. **গঠন-পরবর্তী নিবন্ধন।** ট্রেড লাইসেন্স, ই-টিআইএন, বিআইএন/ভ্যাট এবং প্রযোজ্য খাত-লাইসেন্স।\n৭. **বিনিয়োগ নিবন্ধন।** প্রযোজ্য ক্ষেত্রে বিনিয়োগ কর্তৃপক্ষে নিবন্ধন।\n\n## এতে যা পাওয়া যায় না\n\nউপরের কোনোটিই অভিবাসনের সিদ্ধান্ত নয়। বাংলাদেশে থাকতে বা কাজ করতে চাইলে ভিসা এবং সাধারণত ওয়ার্ক পারমিট আলাদা আবেদন, যার নিজস্ব শর্ত ও নিজস্ব ফলাফল।\n\n## সাধারণত যেখানে ভুল হয়\n\n- সঠিক নামে হিসাব খোলার আগেই মূলধন পাঠানো।\n- যাচাই না করে ধরে নেওয়া যে খাতটি উন্মুক্ত।\n- কর্পোরেট শেয়ারহোল্ডারের মালিকানা-শৃঙ্খল নথিভুক্ত করা যাচ্ছে না, তা দেরিতে বোঝা।',
+      en: "## The order matters more than the speed\n\nA foreign-invested company in Bangladesh involves a bank, a registrar, a revenue authority and sometimes an investment authority. Each expects something the previous step produced. Do them out of order and you will redo them.\n\n## A typical sequence\n\n1. **Eligibility review.** Can this activity be foreign-owned, and to what extent? Establish this before spending anything.\n2. **Name clearance.** Reserve the proposed company name.\n3. **Temporary bank account.** Opened in the proposed company's name so capital can be received before the company legally exists.\n4. **Inward remittance.** Capital is sent from abroad into that account, and the bank issues an encashment certificate. **This money goes to the bank, never to bdoor.**\n5. **Incorporation.** Filed with the encashment certificate as evidence of capital.\n6. **Post-incorporation registrations.** Trade licence, e-TIN, BIN/VAT, and any sector licence.\n7. **Investment registration.** Where applicable, registered with the investment authority.\n\n## What this does not give you\n\nNone of the above is an immigration decision. If you intend to live or work in Bangladesh, a visa and usually a work permit are separate applications with their own requirements and their own outcome.\n\n## Where it usually goes wrong\n\n- Sending capital before the account exists in the right name.\n- Assuming the sector is open without checking.\n- Discovering a corporate shareholder's ownership chain cannot be documented.",
+      bn: '## গতি নয়, ক্রমটাই বেশি গুরুত্বপূর্ণ\n\nবাংলাদেশে বিদেশি-বিনিয়োগকৃত কোম্পানির সঙ্গে জড়িত থাকে ব্যাংক, নিবন্ধক, রাজস্ব কর্তৃপক্ষ এবং কখনো বিনিয়োগ কর্তৃপক্ষ। প্রত্যেকে চায় আগের ধাপে তৈরি হওয়া কিছু একটা। ক্রম উল্টে গেলে কাজ আবার করতে হবে।\n\n## সাধারণ ক্রম\n\n১. **যোগ্যতা যাচাই।** এই কার্যক্রমে বিদেশি মালিকানা চলে কি, চললে কতটুকু? খরচ করার আগেই নিশ্চিত হোন।\n২. **নাম ছাড়পত্র।** প্রস্তাবিত কোম্পানির নাম সংরক্ষণ করুন।\n৩. **অস্থায়ী ব্যাংক হিসাব।** প্রস্তাবিত কোম্পানির নামে খোলা হয়, যাতে কোম্পানি আইনত অস্তিত্ব পাওয়ার আগেই মূলধন গ্রহণ করা যায়।\n৪. **বিদেশ থেকে অর্থ প্রেরণ।** ওই হিসাবে বিদেশ থেকে মূলধন আসে, ব্যাংক এনক্যাশমেন্ট সার্টিফিকেট দেয়। **এই অর্থ যায় ব্যাংকে, কখনোই bdoor-এ নয়।**\n৫. **কোম্পানি গঠন।** মূলধনের প্রমাণ হিসেবে এনক্যাশমেন্ট সার্টিফিকেটসহ দাখিল।\n৬. **গঠন-পরবর্তী নিবন্ধন।** ট্রেড লাইসেন্স, ই-টিআইএন, বিআইএন/ভ্যাট এবং প্রযোজ্য খাত-লাইসেন্স।\n৭. **বিনিয়োগ নিবন্ধন।** প্রযোজ্য ক্ষেত্রে বিনিয়োগ কর্তৃপক্ষে নিবন্ধন।\n\n## এতে যা পাওয়া যায় না\n\nউপরের কোনোটিই অভিবাসনের সিদ্ধান্ত নয়। বাংলাদেশে থাকতে বা কাজ করতে চাইলে ভিসা এবং সাধারণত ওয়ার্ক পারমিট আলাদা আবেদন, যার নিজস্ব শর্ত ও নিজস্ব ফলাফল।\n\n## সাধারণত যেখানে ভুল হয়\n\n- সঠিক নামে হিসাব খোলার আগেই মূলধন পাঠানো।\n- যাচাই না করে ধরে নেওয়া যে খাতটি উন্মুক্ত।\n- কর্পোরেট শেয়ারহোল্ডারের মালিকানা-শৃঙ্খল নথিভুক্ত করা যাচ্ছে না, তা দেরিতে বোঝা।',
     },
     lastReviewedAt: '2026-08-17',
     nextReviewDue: '2026-11-15',

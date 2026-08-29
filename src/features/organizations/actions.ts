@@ -170,8 +170,8 @@ export async function inviteMember(_previous: OrgState, formData: FormData): Pro
 
   await getEmailProvider().send({
     to: parsed.data.email,
-    subject: `You have been invited to ${membership.organizationName} on BDoor`,
-    text: `${session.fullName} invited you to join ${membership.organizationName} on BDoor.\n\nAccept the invitation: ${acceptUrl}\n\nThis link expires in ${INVITE_TTL_DAYS} days. If you were not expecting this, you can ignore it.`,
+    subject: `You have been invited to ${membership.organizationName} on bdoor`,
+    text: `${session.fullName} invited you to join ${membership.organizationName} on bdoor.\n\nAccept the invitation: ${acceptUrl}\n\nThis link expires in ${INVITE_TTL_DAYS} days. If you were not expecting this, you can ignore it.`,
     template: 'organization-invitation',
     locale: locale === 'bn' ? 'bn' : 'en',
   });

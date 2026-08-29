@@ -175,7 +175,7 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
                   <span className="text-ink text-sm font-medium">{tFees(category)}</span>
                   <Badge tone={category === 'platform_service_fee' ? 'info' : 'neutral'}>
                     {category === 'platform_service_fee'
-                      ? 'BDoor'
+                      ? 'bdoor'
                       : category === 'government_fee_estimate'
                         ? tServices('authority')
                         : category === 'partner_professional_fee'

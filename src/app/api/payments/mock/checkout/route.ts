@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Sandbox checkout — BDoor</title>
+<title>Sandbox checkout — bdoor</title>
 <style>
   :root { color-scheme: light; }
   body { margin:0; min-height:100dvh; display:grid; place-items:center;

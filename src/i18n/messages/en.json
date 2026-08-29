@@ -1,9 +1,9 @@
 {
   "brand": {
-    "name": "BDoor",
+    "name": "bdoor",
     "tagline": "Your door to business in Bangladesh",
     "promise": "Everything your business needs in Bangladesh. One door.",
-    "disclosure": "BDoor is an independent business setup and administrative-support platform. BDoor is not a government authority or law firm. Legal services, where required, are provided under a separate engagement by independent advocates or partner law firms. Government approval and processing times are not guaranteed."
+    "disclosure": "bdoor is an independent business setup and administrative-support platform. bdoor is not a government authority or law firm. Legal services, where required, are provided under a separate engagement by independent advocates or partner law firms. Government approval and processing times are not guaranteed."
   },
   "common": {
     "continue": "Continue",
@@ -220,7 +220,7 @@
     "foreignFounders": {
       "eyebrow": "Foreign founders",
       "title": "Enter Bangladesh with a clear path.",
-      "body": "BDoor coordinates structure review, incorporation, investment registration, capital-remittance documentation and visa or work-permit support through appropriate professionals. We tell you which steps require a partner advocate and which we handle directly.",
+      "body": "bdoor coordinates structure review, incorporation, investment registration, capital-remittance documentation and visa or work-permit support through appropriate professionals. We tell you which steps require a partner advocate and which we handle directly.",
       "important": "Company incorporation does not itself grant residency or work authorisation. Those are separate applications decided by the relevant authorities.",
       "cta": "Explore foreign-founder services",
       "points": {
@@ -254,7 +254,7 @@
     "partners": {
       "eyebrow": "Partner model",
       "title": "We coordinate. Verified professionals do the regulated work.",
-      "body": "BDoor manages your case, your documents and your deadlines. Where a matter requires legal or specialist authority — drafting, representation, regulated filings — a verified partner advocate or firm is engaged separately and identified to you before any document is shared.",
+      "body": "bdoor manages your case, your documents and your deadlines. Where a matter requires legal or specialist authority — drafting, representation, regulated filings — a verified partner advocate or firm is engaged separately and identified to you before any document is shared.",
       "cta": "How partnering works"
     },
     "faq": {
@@ -270,11 +270,11 @@
     }
   },
   "howItWorksPage": {
-    "title": "How BDoor works",
+    "title": "How bdoor works",
     "description": "From your first question to your annual filings — what happens, who does it, and what it costs.",
     "responsibilities": {
       "title": "Who does what",
-      "bdoor": "BDoor",
+      "bdoor": "bdoor",
       "partner": "Partner professional",
       "authority": "Government authority",
       "customer": "You"
@@ -341,13 +341,13 @@
     "milestones": "Process milestones",
     "fees": "How fees work",
     "authority": "Responsible authority",
-    "authorityNote": "BDoor is not affiliated with this authority and does not act on its behalf.",
+    "authorityNote": "bdoor is not affiliated with this authority and does not act on its behalf.",
     "faq": "Common questions",
     "emptyState": "No services match these filters yet.",
     "comingSoonNote": "This service is not open for new cases yet. Tell us you are interested and we will contact you when it opens.",
     "notifyMe": "Tell us you are interested",
     "feeCategories": {
-      "platform_service_fee": "BDoor service fee",
+      "platform_service_fee": "bdoor service fee",
       "government_fee_estimate": "Government fee (estimate)",
       "partner_professional_fee": "Partner professional fee",
       "third_party_cost": "Third-party cost",
@@ -358,9 +358,9 @@
   },
   "pricingPage": {
     "title": "Pricing",
-    "description": "What BDoor charges, what the government charges, and what is decided case by case.",
+    "description": "What bdoor charges, what the government charges, and what is decided case by case.",
     "intro": "We do not force every service into a fixed package, because official fees genuinely vary by capital, location and sector. Here is how we handle that.",
-    "standardTitle": "Standardised BDoor work",
+    "standardTitle": "Standardised bdoor work",
     "standardBody": "Where our work is predictable, we publish a starting service fee. It covers preparation, review, submission handling and case management.",
     "quoteTitle": "Personalised quotes",
     "quoteBody": "Foreign ownership, regulated sectors, complex structures and multi-licence projects get an itemised quote after review. You see the breakdown before you accept anything.",
@@ -383,7 +383,7 @@
     "stepsBody": "Most delays come from doing the right things in the wrong order. This is the sequence banks and authorities expect.",
     "notTitle": "What this does not give you",
     "capitalTitle": "Where your investment capital goes",
-    "capitalBody": "Investment and share capital is remitted to a bank account in the company’s name through the proper channel, and the bank issues an encashment certificate. It is never paid to BDoor, and BDoor never holds it.",
+    "capitalBody": "Investment and share capital is remitted to a bank account in the company’s name through the proper channel, and the bank issues an encashment certificate. It is never paid to bdoor, and bdoor never holds it.",
     "servicesTitle": "Services for foreign founders",
     "cta": "Start with an eligibility review",
     "sequence": {
@@ -419,7 +419,7 @@
   },
   "partnersPage": {
     "title": "Partners",
-    "description": "How verified advocates and specialist firms work with BDoor.",
+    "description": "How verified advocates and specialist firms work with bdoor.",
     "applyTitle": "Work with us",
     "applyBody": "If you are a licensed advocate, chartered accountant or specialist consultancy in Bangladesh, tell us about your practice. Every partner is verified before receiving a case.",
     "applyCta": "Register interest",
@@ -434,10 +434,10 @@
       "tasks": "Update their own tasks and the milestones they own.",
       "upload": "Upload drafts, applications, official receipts and certificates.",
       "message": "Message the customer through a controlled, logged case thread.",
-      "notes": "Add confidential notes visible only to authorised BDoor and partner staff."
+      "notes": "Add confidential notes visible only to authorised bdoor and partner staff."
     },
     "cannot": {
-      "browse": "Browse BDoor customers they are not assigned to.",
+      "browse": "Browse bdoor customers they are not assigned to.",
       "finance": "Change financial records outside their own scope.",
       "selfVerify": "Approve their own organisation’s verification.",
       "aml": "View internal AML analysis unless specifically authorised.",
@@ -484,17 +484,17 @@
     "empty": "No guides published yet."
   },
   "about": {
-    "title": "About BDoor",
+    "title": "About bdoor",
     "description": "Why we built a Bangladesh-focused company operating system, and how we work.",
     "missionTitle": "Why we built this",
     "howTitle": "How we work",
     "limitsTitle": "What we are not",
     "mission1": "Starting a business in Bangladesh is not hard because the rules are secret. It is hard because they are scattered: different authorities, different offices, different forms, and no single place that tells you what actually applies to you and in what order.",
-    "mission2": "BDoor exists to be that place. One workspace where you explain what you want to build, get a clear list of what it needs, upload your documents once, see a quote that separates our fee from everyone else’s, and watch each step move.",
+    "mission2": "bdoor exists to be that place. One workspace where you explain what you want to build, get a clear list of what it needs, upload your documents once, see a quote that separates our fee from everyone else’s, and watch each step move.",
     "how1": "We start by asking. The guided questionnaire branches on your answers, so a local founder with one shop is not asked about capital remittance, and a foreign investor is not left to guess about sector eligibility. From those answers we produce a preliminary recommendation using rules our operations team can inspect and change — not a black box.",
     "how2": "Then a person takes over. A case manager scopes the work, requests exactly the documents that are needed, and where the matter requires legal or specialist authority, engages a verified partner advocate under a separate agreement with you. Every status change, document view and fee is recorded.",
     "limits1": "We are not a government authority and we have no influence over any decision an authority makes. We do not present ourselves as a law firm, and we do not give legal advice. Where legal work is required it is done by independent advocates or partner firms under their own engagement with you, and we tell you who they are before anything is shared.",
-    "limits2": "We do not guarantee approval, a visa, a bank account, or a completion date. We give you an estimate, we tell you what it assumes, and we tell you when it changes. Investment and share capital never passes through BDoor.",
+    "limits2": "We do not guarantee approval, a visa, a bank account, or a completion date. We give you an estimate, we tell you what it assumes, and we tell you when it changes. Investment and share capital never passes through bdoor.",
     "cta": "Start your business"
   },
   "contact": {
@@ -505,7 +505,7 @@
     "phoneLabel": "Phone (optional)",
     "topicLabel": "What is this about?",
     "messageLabel": "Your message",
-    "consentLabel": "I agree that BDoor may use these details to reply to me, as described in the Privacy Policy.",
+    "consentLabel": "I agree that bdoor may use these details to reply to me, as described in the Privacy Policy.",
     "submit": "Send message",
     "successTitle": "Message received",
     "successBody": "Thank you. We have your message and will reply to the address you gave us.",
@@ -546,8 +546,8 @@
   },
   "auth": {
     "signInTitle": "Sign in",
-    "signInSubtitle": "Continue to your BDoor workspace.",
-    "signUpTitle": "Create your BDoor account",
+    "signInSubtitle": "Continue to your bdoor workspace.",
+    "signUpTitle": "Create your bdoor account",
     "signUpSubtitle": "You can start the questionnaire first and create an account when you are ready.",
     "email": "Email address",
     "password": "Password",
@@ -586,7 +586,7 @@
       "removeCta": "Remove authenticator",
       "requiredForRole": "Your role requires two-factor authentication before you can continue.",
       "factorName": "Authenticator app",
-      "challengeSubtitle": "Open your authenticator app and enter the six-digit code for BDoor.",
+      "challengeSubtitle": "Open your authenticator app and enter the six-digit code for bdoor.",
       "challengeNoFactor": "You do not have a second factor set up yet. Set one up to continue.",
       "challengeEnrolCta": "Set up two-factor authentication"
     },
@@ -644,7 +644,7 @@
     "recommendation": {
       "title": "Your preliminary recommendation",
       "preliminaryBadge": "Preliminary — subject to review",
-      "disclaimer": "This is a preliminary, software-generated suggestion based on your answers. It is not legal advice and it is not a decision by any authority. A BDoor case manager, and a partner advocate where required, will confirm what actually applies to you.",
+      "disclaimer": "This is a preliminary, software-generated suggestion based on your answers. It is not legal advice and it is not a decision by any authority. A bdoor case manager, and a partner advocate where required, will confirm what actually applies to you.",
       "structureTitle": "Suggested structure",
       "servicesTitle": "Services that are likely to apply",
       "assumptionsTitle": "Assumptions we made",
@@ -730,7 +730,7 @@
       "remit_capital": {
         "label": "Will investment capital be sent into Bangladesh from abroad?",
         "why": "Inward remittance needs a specific bank process and an encashment certificate. Getting the order wrong causes real delays.",
-        "note": "Investment or share capital is never paid to BDoor. It goes to a bank account in the company's name through the proper channel."
+        "note": "Investment or share capital is never paid to bdoor. It goes to a bank account in the company's name through the proper channel."
       },
       "founder_will_work": {
         "label": "Will you live or work in Bangladesh yourself?",
@@ -891,7 +891,7 @@
       "relatedTo": "Related to",
       "expiresOn": "Expires on",
       "whoSeesThis": "Who can see this",
-      "whoSeesThisBody": "Your organisation's members, your assigned BDoor case team, and — only when you have authorised it — the partner working on this case."
+      "whoSeesThisBody": "Your organisation's members, your assigned bdoor case team, and — only when you have authorised it — the partner working on this case."
     },
     "billing": {
       "title": "Billing",
@@ -913,7 +913,7 @@
       "payableTo": "Payable to",
       "governmentNote": "Government fees are estimates until the authority issues a receipt. Any unused advance is returned to you.",
       "separateEngagementNote": "Partner professional fees are invoiced under a separate engagement with that firm.",
-      "capitalNote": "Share capital and investment funds are never paid to BDoor. They go directly to a bank account in the company's name.",
+      "capitalNote": "Share capital and investment funds are never paid to bdoor. They go directly to a bank account in the company's name.",
       "noQuotes": "No quote has been prepared yet.",
       "sandboxBanner": "Payments are running in sandbox mode. No real money moves.",
       "paymentSuccess": "Payment recorded. Your case team has been notified.",
@@ -1018,7 +1018,7 @@
     },
     "notes": {
       "title": "Partner notes",
-      "help": "Visible to authorised BDoor staff and your organisation only. Not visible to the customer.",
+      "help": "Visible to authorised bdoor staff and your organisation only. Not visible to the customer.",
       "add": "Add note"
     },
     "empty": "No cases are assigned to your organisation yet."
@@ -1258,7 +1258,7 @@
       "accepted": "You have joined the organisation."
     },
     "staffInvitation": {
-      "title": "Join the BDoor staff workspace",
+      "title": "Join the bdoor staff workspace",
       "invalid": "That invitation link is not valid.",
       "expired": "That invitation has expired. Ask an administrator for a new one.",
       "wrongEmail": "This invitation was sent to a different email address. Sign in with that address to accept it.",
