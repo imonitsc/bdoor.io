@@ -189,10 +189,10 @@ export function recommend(answers: PartialAnswers, rules: readonly Rule[]): Reco
 export function hardManualReviewReasons(answers: PartialAnswers): string[] {
   const reasons: string[] = [];
 
-  if (answers.target_country !== undefined && answers.target_country !== 'bangladesh') {
+  if (answers.business_location === 'outside') {
     reasons.push('international_formation');
   }
-  if (answers.objective === 'unsure') {
+  if (answers.objective === 'unsure' || answers.formation_type === 'not_sure') {
     reasons.push('scope_unclear');
   }
   if (answers.entity_owner === true) {

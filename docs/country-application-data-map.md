@@ -11,25 +11,23 @@ the gated document flow — the application stage is deliberately documents-free
 
 ## Common to every application
 
-| Field            | Stage     | Notes                                                     |
-| ---------------- | --------- | --------------------------------------------------------- |
-| `target_country` | about_you | one of the seven; no "not sure" — country-first by design |
-| `objective`      | about_you | new / existing / expand / unsure                          |
-| `nationality`    | about_you | ISO-3166 alpha-2                                          |
-| `activity`       | business  | free text, 15–1000 chars                                  |
-| `entity_owner`   | ownership | corporate/trust owner → hard manual review                |
-| `start_window`   | timing    | urgency only; never rendered as a delivery promise        |
-| `full_name`      | contact   | who the acknowledgement and review are addressed to       |
-| `email`          | contact   | where the reference and acknowledgement go                |
-| `phone`          | contact   | optional                                                  |
-| `consent`        | contact   | explicit; the application cannot be submitted without it  |
+| Field               | Stage     | Notes                                                    |
+| ------------------- | --------- | -------------------------------------------------------- |
+| `business_location` | about_you | Bangladesh or outside — the one question everyone gets   |
+| `activity`          | business  | free text, 15–1000 chars                                 |
+| `start_window`      | timing    | urgency only; never rendered as a delivery promise       |
+| `full_name`         | contact   | who the acknowledgement and review are addressed to      |
+| `email`             | contact   | where the reference and acknowledgement go               |
+| `phone`             | contact   | optional                                                 |
+| `consent`           | contact   | explicit; the application cannot be submitted without it |
 
 ## Bangladesh branch (operating market)
 
-Adds the full operating-market set: `founder_location`, `residence` (only
-when the founder is outside Bangladesh), `existing_business` (only when the
-objective is "unsure"), `existing_registrations` (existing businesses),
-`location`, `structure`, `owner_count`, `director_count` (companies only),
+Adds `objective` (start a new business / manage an existing one) and the
+full operating-market set: `founder_location`, `nationality`, `residence`
+(only when the founder is outside Bangladesh), `existing_registrations`
+(existing businesses), `location`, `structure`, `owner_count`,
+`director_count` (companies only),
 `foreign_owners`, `foreign_ownership_percent` and `remit_capital`
 (foreign-linked cases), `founder_will_work` (founders abroad),
 `import_export`, `hire_employees`, `regulated_activity`, `need_address`.
@@ -38,15 +36,19 @@ Bangladesh submissions also run the deterministic recommendation engine
 (`src/features/intake/rules.ts`) and show a preliminary recommendation
 beneath the confirmation.
 
-## International branch (§4.5 subset)
+## International branch (short by design)
 
 Adds only what a specialist needs to review and source a provider:
-`residence`, `owner_count`, `need_visa`, `need_banking`, `notes`
-(optional). Everything else is confirmed by the appointed provider per
-case, so asking it up front would be theatre. Every international
+`target_country` (the six routes), `formation_type` (new company, branch
+or subsidiary, not sure), `support_needed` (formation, visa/residency,
+banking, tax and accounting, ongoing compliance — at least one), and
+`notes` (optional). Everything else is confirmed by the appointed provider
+per case, so asking it up front would be theatre. Every international
 application is flagged `international_formation` for manual review — the
 rule lives in code, not configuration, so it cannot be switched off by
-editing the rules table.
+editing the rules table. `applications.country` derives from the branch
+(Bangladesh, or the chosen route) and `applications.objective` from the
+objective or formation type, so the stored vocabulary is unchanged.
 
 ## Storage
 

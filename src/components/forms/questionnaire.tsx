@@ -324,13 +324,7 @@ export function Questionnaire({ initial }: { initial: IntakeState }) {
   }, [state.fieldError, announce, tErrors]);
 
   if (state.submitted) {
-    return (
-      <SubmittedPanel
-        submitted={state.submitted}
-        answers={state.answers}
-        recommendation={state.recommendation}
-      />
-    );
+    return <SubmittedPanel submitted={state.submitted} recommendation={state.recommendation} />;
   }
 
   return (
@@ -503,20 +497,19 @@ function ReviewStep({
  */
 function SubmittedPanel({
   submitted,
-  answers,
   recommendation,
 }: {
   submitted: NonNullable<IntakeState['submitted']>;
-  answers: PartialAnswers;
   recommendation: IntakeState['recommendation'];
 }) {
   const t = useTranslations('start.submitted');
   const tQuestions = useTranslations('start.questions');
 
-  const country = answers.target_country
-    ? tQuestions(`target_country.options.${answers.target_country}`)
-    : '';
-  const objective = answers.objective ? tQuestions(`objective.options.${answers.objective}`) : '';
+  // The server derived both from whichever branch was walked — the
+  // Bangladesh branch never answers a country, the international branch
+  // never answers an objective — so render its values, not raw answers.
+  const country = tQuestions(`target_country.options.${submitted.countrySlug.replace(/-/g, '_')}`);
+  const objective = tQuestions(`objective.options.${submitted.objective}`);
 
   return (
     <div className="flex flex-col gap-6">

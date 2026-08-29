@@ -17,31 +17,43 @@ test.describe('marketing site', () => {
   test('shows the hero, operator disclosure and the independence disclosure', async ({ page }) => {
     await page.goto('/en');
 
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('Start in Bangladesh');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(
+      'Start and run your business in Bangladesh',
+    );
     await expect(page.getByText('Operated by bdoor compliance ltd')).toBeVisible();
-    await expect(page.getByText('Transparent itemised quotes')).toBeVisible();
+    await expect(page.getByText('Itemised quote before payment').first()).toBeVisible();
     await expect(
       page.getByText('bdoor is not a government authority or law firm', { exact: false }),
     ).toBeVisible();
   });
 
-  test('the hero shows the product module, labelled as a preview', async ({ page }) => {
+  test('the homepage is Bangladesh-first: no country grid, no international prices', async ({
+    page,
+  }) => {
     await page.goto('/en');
+    const main = await page.locator('main').innerText();
 
-    // §7.1: no generated person — a real product module, honestly labelled.
-    await expect(page.getByText('Product preview', { exact: true })).toBeVisible();
-    await expect(page.getByText('Specialist reviewed').first()).toBeVisible();
-    await expect(page.getByText('From ৳9,900').first()).toBeVisible();
+    // The seven-country grid, international price cards and country CTAs are
+    // gone from the homepage — the six routes live at /countries, linked
+    // from the footer only.
+    expect(main).not.toContain('Applications open — specialist reviewed');
+    expect(main).not.toMatch(/From \$\d/);
+    expect(main).not.toContain('Compare countries');
+    await expect(page.locator('main a[href*="/countries/"]')).toHaveCount(0);
+    await expect(page.locator('footer a[href="/en/countries/qatar"]')).toBeVisible();
+
+    // One clean hero action.
+    await expect(
+      page.locator('section').first().getByRole('link', { name: 'Start now' }),
+    ).toHaveCount(1);
     await expect(page.locator('img[src*="bdoor-home-hero-founder"]')).toHaveCount(0);
   });
 
-  test('the H1 is fully visible and the hero CTAs precede the module on a phone', async ({
-    page,
-  }) => {
+  test('the H1 is fully visible with a tappable CTA on a phone', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/en');
 
-    // §7.2: the headline must never be clipped by the header or the section.
+    // The headline must never be clipped by the header or the section.
     const h1 = page.getByRole('heading', { level: 1 });
     await expect(h1).toBeVisible();
     const h1Box = await h1.boundingBox();
@@ -51,17 +63,11 @@ test.describe('marketing site', () => {
       header ? header.y + header.height : 0,
     );
 
-    const cta = await page
-      .getByRole('link', { name: 'Start your application' })
-      .first()
-      .boundingBox();
-    const moduleBox = await page.getByText('Product preview', { exact: true }).boundingBox();
+    const cta = await page.getByRole('link', { name: 'Start now' }).first().boundingBox();
     expect(cta).not.toBeNull();
-    expect(moduleBox).not.toBeNull();
-    expect(cta!.y).toBeLessThan(moduleBox!.y);
     expect(cta!.height).toBeGreaterThanOrEqual(44);
 
-    // §7.10: no horizontal overflow at phone width.
+    // No horizontal overflow at phone width.
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     );

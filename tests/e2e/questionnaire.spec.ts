@@ -1,12 +1,13 @@
 import { expect, test } from '@playwright/test';
 
 /**
- * The country-first application flow.
+ * The Bangladesh-first application flow: one location question, then either
+ * the operating-market branch or the short international branch. Both must
+ * reach a submitted application with a reference — no dead ends.
  *
  * No Supabase is configured in the test environment, so neither the draft
  * nor the submitted application is persisted — which is exactly the degraded
- * mode the flow has to survive. The branching, validation, contact stage,
- * submission confirmation and recommendation must all still work.
+ * mode the flow has to survive.
  */
 async function answer(
   page: import('@playwright/test').Page,
@@ -44,15 +45,9 @@ async function answer(
   }).toPass();
 }
 
-async function chooseCountry(page: import('@playwright/test').Page, name: string) {
+async function pick(page: import('@playwright/test').Page, name: string) {
   await answer(page, async () => {
     await page.getByRole('radio', { name, exact: true }).click();
-  });
-}
-
-async function chooseObjective(page: import('@playwright/test').Page, name: string) {
-  await answer(page, async () => {
-    await page.getByRole('radio', { name }).click();
   });
 }
 
@@ -91,9 +86,9 @@ test.describe('application flow', () => {
     };
 
     await record();
-    await chooseCountry(page, 'Bangladesh');
+    await pick(page, 'Bangladesh');
     await record();
-    await chooseObjective(page, 'Start a new business');
+    await pick(page, 'Start a new business');
     await record();
     await answer(page, async () => {
       await page.getByRole('radio', { name: 'In Bangladesh' }).click();
@@ -109,14 +104,36 @@ test.describe('application flow', () => {
     await expect(progress).toBeVisible();
   });
 
-  test('opens with the seven countries and branches on the answers given', async ({ page }) => {
+  test('opens with the location question and branches to Bangladesh', async ({ page }) => {
     await page.goto('/en/start');
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Start your business');
 
-    // Country first (§4.1): all seven, no "not sure".
-    await expect(page.getByText('Where do you want to start or run your business?')).toBeVisible();
+    await expect(page.getByText('Where do you want to start or manage a business?')).toBeVisible();
+    await expect(page.getByRole('radio', { name: 'Bangladesh', exact: true })).toBeVisible();
+    await expect(
+      page.getByRole('radio', { name: 'Outside Bangladesh', exact: true }),
+    ).toBeVisible();
+    await pick(page, 'Bangladesh');
+
+    // Bangladesh: new or existing, then the operating-market questions.
+    await expect(page.getByText('What do you want to do in Bangladesh?')).toBeVisible();
+    await expect(page.getByRole('radio', { name: 'Start a new business' })).toBeVisible();
+    await expect(page.getByRole('radio', { name: 'Manage an existing business' })).toBeVisible();
+    await pick(page, 'Start a new business');
+
+    await expect(page.getByText('Where are you based right now?')).toBeVisible();
+    await answer(page, async () => {
+      await page.getByRole('radio', { name: 'In Bangladesh' }).click();
+    });
+    await expect(page.getByText('What is your nationality?')).toBeVisible();
+  });
+
+  test('branches to the six international countries', async ({ page }) => {
+    await page.goto('/en/start');
+    await pick(page, 'Outside Bangladesh');
+
+    await expect(page.getByText('Which country?')).toBeVisible();
     for (const name of [
-      'Bangladesh',
       'United States',
       'United Kingdom',
       'United Arab Emirates',
@@ -126,56 +143,26 @@ test.describe('application flow', () => {
     ]) {
       await expect(page.getByRole('radio', { name, exact: true })).toBeVisible();
     }
-    await chooseCountry(page, 'Bangladesh');
+    // Bangladesh was answered one question earlier; it is not re-offered.
+    await expect(page.getByRole('radio', { name: 'Bangladesh', exact: true })).toHaveCount(0);
 
-    await expect(page.getByText('What do you want to do there?')).toBeVisible();
-    await chooseObjective(page, 'Start a new business');
-
-    // Founder inside Bangladesh.
-    await expect(page.getByText('Where are you based right now?')).toBeVisible();
-    await answer(page, async () => {
-      await page.getByRole('radio', { name: 'In Bangladesh' }).click();
-    });
-
-    // Nationality follows; residence must NOT be asked of a local founder.
-    await expect(page.getByText('What is your nationality?')).toBeVisible();
-    await answer(page, async () => {
-      await page.getByRole('combobox').selectOption('BD');
-    });
-
-    await expect(page.getByText('What will the business actually do?')).toBeVisible();
-    await expect(page.getByText('Which country do you currently live in?')).toHaveCount(0);
+    await pick(page, 'United States');
+    await expect(page.getByText('What do you want to set up?')).toBeVisible();
   });
 
-  test('preselects a validated ?country= and ?objective=, skipping those steps', async ({
-    page,
-  }) => {
-    await page.goto('/en/start?country=usa&objective=new');
-    // Both preset answers hold, so the flow opens on the next question.
-    await expect(page.getByText('What is your nationality?')).toBeVisible();
+  test('preselects a validated ?country= and lands on the branch', async ({ page }) => {
+    // An international slug answers the location AND the country question.
+    await page.goto('/en/start?country=usa');
+    await expect(page.getByText('What do you want to set up?')).toBeVisible();
+
+    // Bangladesh with an objective lands on the first operating question.
+    await page.goto('/en/start?country=bangladesh&objective=new');
+    await expect(page.getByText('Where are you based right now?')).toBeVisible();
   });
 
   test('ignores an invalid ?country= parameter', async ({ page }) => {
     await page.goto('/en/start?country=mars&objective=teleport');
-    await expect(page.getByText('Where do you want to start or run your business?')).toBeVisible();
-  });
-
-  test('asks a foreign founder the questions a local founder is spared', async ({ page }) => {
-    await page.goto('/en/start');
-    await chooseCountry(page, 'Bangladesh');
-    await chooseObjective(page, 'Start a new business');
-
-    await answer(page, async () => {
-      await page.getByRole('radio', { name: 'Outside Bangladesh' }).click();
-    });
-
-    await expect(page.getByText('What is your nationality?')).toBeVisible();
-    await answer(page, async () => {
-      await page.getByRole('combobox').selectOption('GB');
-    });
-
-    // Residence is only asked of founders outside Bangladesh.
-    await expect(page.getByText('Which country do you currently live in?')).toBeVisible();
+    await expect(page.getByText('Where do you want to start or manage a business?')).toBeVisible();
   });
 
   test('validates before it advances', async ({ page }) => {
@@ -200,7 +187,7 @@ test.describe('application flow', () => {
     await page.goto('/en/start');
     await page.getByRole('button', { name: 'Why we ask' }).click();
     await expect(
-      page.getByText('The application is country-first', { exact: false }),
+      page.getByText('This routes you to the right question set', { exact: false }),
     ).toBeVisible();
   });
 
@@ -212,8 +199,8 @@ test.describe('application flow', () => {
     // race documented in answer().
     test.setTimeout(420_000);
     await page.goto('/en/start');
-    await chooseCountry(page, 'Bangladesh');
-    await chooseObjective(page, 'Start a new business');
+    await pick(page, 'Bangladesh');
+    await pick(page, 'Start a new business');
 
     await answer(page, async () => page.getByRole('radio', { name: 'In Bangladesh' }).click());
     await answer(page, async () => page.getByRole('combobox').selectOption('BD'));
@@ -242,9 +229,6 @@ test.describe('application flow', () => {
 
     await expect(page.getByRole('heading', { name: 'Application received' })).toBeVisible();
     await expect(page.getByText(/^BD-\d{4}-\d{6}$/)).toBeVisible();
-    await expect(
-      page.getByText('specialist reviews your application', { exact: false }),
-    ).toBeVisible();
 
     // Bangladesh keeps its preliminary guidance, beneath the confirmation.
     await expect(
@@ -260,18 +244,17 @@ test.describe('application flow', () => {
   }) => {
     test.setTimeout(420_000);
     await page.goto('/en/start');
-    await chooseCountry(page, 'United States');
-    await chooseObjective(page, 'Start a new business');
-
-    await answer(page, async () => page.getByRole('combobox').selectOption('BD')); // nationality
-    await answer(page, async () => page.getByRole('combobox').selectOption('BD')); // residence
+    await pick(page, 'Outside Bangladesh');
+    await pick(page, 'United States');
+    await pick(page, 'A new company');
+    await answer(page, async () => {
+      // Required support is a multi-select; at least one must be chosen.
+      await page.getByRole('checkbox', { name: 'Company formation' }).check();
+      await page.getByRole('checkbox', { name: 'Business bank account' }).check();
+    });
     await answer(page, async () =>
       page.getByRole('textbox').fill('Sell software subscriptions to customers in the USA.'),
     );
-    await answer(page, async () => page.getByRole('spinbutton').fill('1')); // owners
-    await answer(page, async () => page.getByRole('radio', { name: 'No', exact: true }).click()); // entity owner
-    await answer(page, async () => page.getByRole('radio', { name: 'No', exact: true }).click()); // visa
-    await answer(page, async () => page.getByRole('radio', { name: 'Yes', exact: true }).click()); // banking
     await answer(page, async () =>
       page.getByRole('radio', { name: 'As soon as possible' }).click(),
     );
@@ -290,19 +273,27 @@ test.describe('application flow', () => {
     await expect(page.getByText('No payment has been taken', { exact: false })).toBeVisible();
   });
 
+  test('requires at least one kind of support on the international branch', async ({ page }) => {
+    await page.goto('/en/start?country=qatar');
+    await pick(page, 'A new company');
+
+    await expect(page.getByText('What support will you need?')).toBeVisible();
+    await page.getByRole('button', { name: /^Continue$/ }).click();
+    await expect(page.getByText('Choose one option to continue.')).toBeVisible();
+    await expect(page.getByText('What support will you need?')).toBeVisible();
+  });
+
   test('requires consent before an application can be submitted', async ({ page }) => {
     test.setTimeout(420_000);
-    await page.goto('/en/start?country=usa&objective=new');
+    await page.goto('/en/start?country=usa');
 
-    await answer(page, async () => page.getByRole('combobox').selectOption('BD'));
-    await answer(page, async () => page.getByRole('combobox').selectOption('BD'));
+    await pick(page, 'A new company');
+    await answer(page, async () => {
+      await page.getByRole('checkbox', { name: 'Company formation' }).check();
+    });
     await answer(page, async () =>
       page.getByRole('textbox').fill('Open an online store serving customers in the USA.'),
     );
-    await answer(page, async () => page.getByRole('spinbutton').fill('1'));
-    await answer(page, async () => page.getByRole('radio', { name: 'No', exact: true }).click());
-    await answer(page, async () => page.getByRole('radio', { name: 'No', exact: true }).click());
-    await answer(page, async () => page.getByRole('radio', { name: 'No', exact: true }).click());
     await answer(page, async () =>
       page.getByRole('radio', { name: 'As soon as possible' }).click(),
     );
@@ -346,8 +337,8 @@ test.describe('application flow', () => {
 
   test('can step back and change an answer', async ({ page }) => {
     await page.goto('/en/start');
-    await chooseCountry(page, 'Bangladesh');
-    await chooseObjective(page, 'Start a new business');
+    await pick(page, 'Bangladesh');
+    await pick(page, 'Start a new business');
     await answer(page, async () => page.getByRole('radio', { name: 'In Bangladesh' }).click());
     await expect(page.getByText('What is your nationality?')).toBeVisible();
 
