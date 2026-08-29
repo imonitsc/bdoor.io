@@ -38,7 +38,7 @@ test.describe('marketing site', () => {
     await page.goto('/en');
 
     const hero = page.getByRole('img', {
-      name: 'Bangladeshi entrepreneur managing a new business through bdoor',
+      name: 'Founder managing business formation and compliance through bdoor',
     });
     await expect(hero).toBeVisible();
     await expect(hero).toHaveCSS('object-fit', 'contain');
@@ -69,7 +69,7 @@ test.describe('marketing site', () => {
     const cta = await page.getByRole('link', { name: 'Start in Bangladesh' }).first().boundingBox();
     const image = await page
       .getByRole('img', {
-        name: 'Bangladeshi entrepreneur managing a new business through bdoor',
+        name: 'Founder managing business formation and compliance through bdoor',
       })
       .boundingBox();
 
