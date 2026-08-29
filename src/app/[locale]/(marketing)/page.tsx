@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { useTranslations } from 'next-intl';
@@ -43,11 +45,19 @@ export async function generateMetadata({
  * like, how fees and delivery work, which international routes are being
  * prepared, and what to do next.
  *
- * This branch swaps the hero's visual from the workspace preview to the
- * founder photograph and moves the preview into its own section; the unit
- * guard on the image file keeps the branch red until the photograph is
- * actually committed, so this cannot merge with an empty hero.
+ * The founder photograph is the intended hero visual, but the file has not
+ * been supplied to the repository yet, and the branch carrying the hero was
+ * merged anyway — which shipped a hero whose image 404s. So the visual is
+ * now a build-time switch on the file's existence: while
+ * public/images/bdoor-home-hero-founder.png is absent the hero renders the
+ * workspace preview (the pre-photograph layout, six sections); the moment
+ * the file is committed the founder hero and the standalone preview section
+ * both appear, with no code change. Every push rebuilds, so the switch can
+ * never be stale in a deployment.
  */
+const FOUNDER_IMAGE_EXISTS = existsSync(
+  join(process.cwd(), 'public/images/bdoor-home-hero-founder.png'),
+);
 
 function Hero() {
   const t = useTranslations('home.hero');
@@ -84,7 +94,11 @@ function Hero() {
           <p className="text-muted-inverse mt-8 text-sm">{t('operatorLine')}</p>
         </div>
 
-        <HeroFounder alt={t('imageAlt')} className="lg:self-end" />
+        {FOUNDER_IMAGE_EXISTS ? (
+          <HeroFounder alt={t('imageAlt')} className="lg:self-end" />
+        ) : (
+          <WorkspacePreview />
+        )}
       </div>
     </section>
   );
@@ -259,7 +273,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <Hero />
       <TrustStrip />
       <PackagesSection locale={typedLocale} />
-      <Preview />
+      {FOUNDER_IMAGE_EXISTS ? <Preview /> : null}
       <ProcessAndFees locale={typedLocale} />
       <InternationalSection locale={typedLocale} />
       <FaqAndNextStep locale={typedLocale} />
