@@ -12,10 +12,10 @@ import { SNAPSHOT_RULES } from '@/content/rules-snapshot';
 import { expandWithPrerequisites } from '@/features/intake/guide';
 
 const LOCAL_SOLE_TRADER: PartialAnswers = {
-  help_scope: 'start_bangladesh',
+  target_country: 'bangladesh',
+  objective: 'new',
   founder_location: 'bangladesh',
   nationality: 'BD',
-  existing_business: false,
   activity: 'Sell handmade leather bags from a shop in Dhaka.',
   location: 'Dhaka',
   structure: 'sole_proprietorship',
@@ -27,20 +27,31 @@ const LOCAL_SOLE_TRADER: PartialAnswers = {
   regulated_activity: false,
   need_address: false,
   start_window: 'immediately',
+  full_name: 'Sample Founder (sample)',
+  email: 'founder@example.com',
+  phone: '',
+  consent: true,
 };
 
 describe('questionnaire branching', () => {
-  it('asks where you want help before anything else', () => {
+  it('asks for the country before anything else', () => {
     const keys = applicableQuestions({}).map((q) => q.key);
-    expect(keys[0]).toBe('help_scope');
+    expect(keys[0]).toBe('target_country');
+    expect(keys[1]).toBe('objective');
   });
 
-  it('skips existing_business when help scope already answers it', () => {
-    const startKeys = applicableQuestions({ help_scope: 'start_bangladesh' }).map((q) => q.key);
-    expect(startKeys).not.toContain('existing_business');
-
-    const manageKeys = applicableQuestions({ help_scope: 'manage_bangladesh' }).map((q) => q.key);
-    expect(manageKeys).not.toContain('existing_business');
+  it('asks existing_business only when the objective is unsure', () => {
+    for (const objective of ['new', 'existing', 'expand'] as const) {
+      const keys = applicableQuestions({ target_country: 'bangladesh', objective }).map(
+        (q) => q.key,
+      );
+      expect(keys, objective).not.toContain('existing_business');
+    }
+    const unsureKeys = applicableQuestions({
+      target_country: 'bangladesh',
+      objective: 'unsure',
+    }).map((q) => q.key);
+    expect(unsureKeys).toContain('existing_business');
   });
 
   it('does not ask a Bangladesh-based founder about their country of residence', () => {
@@ -71,7 +82,7 @@ describe('questionnaire branching', () => {
   });
 
   it('asks an existing business what it already has, and not how to structure it', () => {
-    const keys = applicableQuestions({ ...LOCAL_SOLE_TRADER, existing_business: true }).map(
+    const keys = applicableQuestions({ ...LOCAL_SOLE_TRADER, objective: 'existing' }).map(
       (q) => q.key,
     );
     expect(keys).toContain('existing_registrations');
@@ -190,11 +201,11 @@ describe('recommendation engine', () => {
     expect(recommend({ regulated_activity: true }, []).requiresManualReview).toBe(true);
     expect(recommend({ remit_capital: true }, []).requiresManualReview).toBe(true);
     expect(recommend({ structure: 'branch_office' }, []).requiresManualReview).toBe(true);
-    expect(recommend({ help_scope: 'form_abroad' }, []).requiresManualReview).toBe(true);
-    expect(recommend({ help_scope: 'unsure' }, []).requiresManualReview).toBe(true);
+    expect(recommend({ target_country: 'usa' }, []).requiresManualReview).toBe(true);
+    expect(recommend({ objective: 'unsure' }, []).requiresManualReview).toBe(true);
 
     expect(hardManualReviewReasons({ entity_owner: true })).toContain('corporate_or_trust_owner');
-    expect(hardManualReviewReasons({ help_scope: 'form_abroad' })).toContain(
+    expect(hardManualReviewReasons({ target_country: 'qatar' })).toContain(
       'international_formation',
     );
   });

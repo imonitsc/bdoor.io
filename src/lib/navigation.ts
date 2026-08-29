@@ -55,6 +55,7 @@ export const PARTNER_ROUTES = {
 
 export const ADMIN_ROUTES = {
   dashboard: '/admin',
+  applications: '/admin/applications',
   leads: '/admin/leads',
   cases: '/admin/cases',
   kyc: '/admin/kyc',

@@ -84,25 +84,63 @@ describe('Bangladesh packages', () => {
 });
 
 describe('international offers', () => {
-  it('never publishes a price without price approval', () => {
+  it('carries exactly the owner-published featured starting prices', () => {
+    // The immediate-operations instructions (29 Aug 2026, §5) published these
+    // as starting estimates. Do not alter without a recorded owner decision;
+    // an intentional change updates this table in the same commit.
+    expect(
+      Object.fromEntries(INTERNATIONAL_OFFERS.map((o) => [o.countrySlug, o.publicLabel?.en])),
+    ).toEqual({
+      usa: 'From $499',
+      uk: 'From $299',
+      uae: 'From $3,899',
+      singapore: 'From $1,899',
+      'saudi-arabia': 'Professional setup from $4,900',
+      qatar: 'First-year QFC estimate from $10,900',
+    });
+    expect(
+      Object.fromEntries(INTERNATIONAL_OFFERS.map((o) => [o.countrySlug, o.publicLabelAlt?.en])),
+    ).toEqual({
+      usa: 'About ৳61,400',
+      uk: 'About ৳36,800',
+      uae: 'About ৳479,900',
+      singapore: 'About ৳233,700',
+      'saudi-arabia': 'About ৳603,000',
+      qatar: 'About ৳1,341,500',
+    });
+  });
+
+  it('a published price always travels with approval and its qualifier', () => {
     for (const offer of INTERNATIONAL_OFFERS) {
+      if (offer.publicLabel) {
+        expect(offer.priceApproved, `${offer.slug} label without approval`).toBe(true);
+        expect(offer.publicQualifier, `${offer.slug} label without qualifier`).toBeDefined();
+        expect(offer.publicQualifier!.en.length, offer.slug).toBeGreaterThan(10);
+        expect(offer.publicQualifier!.bn.length, offer.slug).toBeGreaterThan(10);
+      }
       if (!offer.priceApproved) {
-        expect(
-          offer.publicLabel,
-          `${offer.slug} has a public label without approval`,
-        ).toBeUndefined();
-        // Summaries must not smuggle a figure in either.
-        expect(offer.summary.en, offer.slug).not.toMatch(/\d{2,}/);
+        expect(offer.publicLabel, `${offer.slug} label without approval`).toBeUndefined();
       }
     }
   });
 
-  it('never enables checkout without provider and price approval', () => {
+  it('runs every route as a managed application with checkout off', () => {
+    for (const offer of INTERNATIONAL_OFFERS) {
+      expect(offer.mode, offer.slug).toBe('managed_application');
+      expect(offer.publicStatus, offer.slug).toBe('applications_open');
+      // A starting estimate is not a checkout total: payment stays off until
+      // provider, legal, payment and document-security readiness are approved.
+      expect(offer.checkoutEnabled, offer.slug).toBe(false);
+    }
+  });
+
+  it('never enables checkout without provider approval and full availability', () => {
     for (const offer of INTERNATIONAL_OFFERS) {
       if (offer.checkoutEnabled) {
         expect(offer.providerApproved, offer.slug).toBe(true);
         expect(offer.priceApproved, offer.slug).toBe(true);
-        expect(offer.publicStatus, offer.slug).toBe('available');
+        expect(offer.availability, offer.slug).toBe('available_online');
+        expect(offer.mode, offer.slug).toBe('online_checkout');
       }
     }
   });
@@ -124,10 +162,11 @@ describe('international offers', () => {
     ]);
   });
 
-  it('never says "available" outside the sellable availability states', () => {
+  it('never claims openness outside the sellable availability states', () => {
     for (const offer of INTERNATIONAL_OFFERS) {
       if (!SELLABLE_AVAILABILITY.includes(offer.availability)) {
         expect(offer.publicStatus, offer.slug).not.toBe('available');
+        expect(offer.publicStatus, offer.slug).not.toBe('applications_open');
         expect(offer.checkoutEnabled, offer.slug).toBe(false);
       }
       if (offer.checkoutEnabled) {

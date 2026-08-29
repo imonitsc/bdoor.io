@@ -16,9 +16,10 @@ describe('stage-based progress', () => {
   it('reports a constant total whatever has been answered', () => {
     const answerSets: PartialAnswers[] = [
       {},
-      { help_scope: 'start_bangladesh' },
-      { help_scope: 'start_bangladesh', founder_location: 'outside' },
-      { help_scope: 'manage_bangladesh', existing_business: true },
+      { target_country: 'bangladesh', objective: 'new' },
+      { target_country: 'bangladesh', objective: 'new', founder_location: 'outside' },
+      { target_country: 'bangladesh', objective: 'existing' },
+      { target_country: 'usa', objective: 'new' },
     ];
     for (const answers of answerSets) {
       for (let i = 0; i <= applicableQuestions(answers).length; i += 1) {
@@ -45,13 +46,17 @@ describe('stage-based progress', () => {
       const value =
         question.kind === 'boolean'
           ? false
-          : question.kind === 'choice'
-            ? (question.options?.[0] ?? '')
-            : question.kind === 'number'
-              ? 1
-              : question.kind === 'country'
-                ? 'BD'
-                : 'Sample answer';
+          : question.kind === 'consent'
+            ? true
+            : question.kind === 'choice'
+              ? (question.options?.[0] ?? '')
+              : question.kind === 'number'
+                ? 1
+                : question.kind === 'country'
+                  ? 'BD'
+                  : question.kind === 'email'
+                    ? 'founder@example.com'
+                    : 'Sample answer';
       (answers as Record<string, unknown>)[question.key] = value;
     }
     expect(previous).toBe(STAGES.length + 1);

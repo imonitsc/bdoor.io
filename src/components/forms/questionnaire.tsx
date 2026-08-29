@@ -153,6 +153,55 @@ function QuestionInput({
         </Field>
       );
 
+    case 'consent':
+      return (
+        <Field error={error}>
+          <fieldset>
+            <legend className="text-ink text-lg font-semibold">{t(`${key}.label`)}</legend>
+            {help ? <p className="text-muted mt-1.5 text-sm">{help}</p> : null}
+            <div className="mt-4">
+              <ChoiceCard
+                htmlFor={`${key}-true`}
+                selected={value === true}
+                control={
+                  <input
+                    type="checkbox"
+                    id={`${key}-true`}
+                    name="value"
+                    value="true"
+                    defaultChecked={value === true}
+                    className="size-5 accent-[var(--color-primary)]"
+                  />
+                }
+              >
+                {t(`${key}.statement`)}
+              </ChoiceCard>
+            </div>
+          </fieldset>
+        </Field>
+      );
+
+    case 'email':
+    case 'phone':
+      return (
+        <Field error={error}>
+          <FieldLabel required={!question.optional} className="text-lg font-semibold">
+            {t(`${key}.label`)}
+          </FieldLabel>
+          {help ? <FieldDescription>{help}</FieldDescription> : null}
+          <FieldControl hasDescription={Boolean(help)}>
+            <Input
+              name="value"
+              type={question.kind === 'email' ? 'email' : 'tel'}
+              autoComplete={question.kind === 'email' ? 'email' : 'tel'}
+              maxLength={question.kind === 'email' ? 254 : 32}
+              defaultValue={typeof value === 'string' ? value : ''}
+              required={!question.optional}
+            />
+          </FieldControl>
+        </Field>
+      );
+
     case 'country':
       return (
         <Field error={error}>
@@ -211,10 +260,10 @@ function QuestionInput({
             <Textarea
               name="value"
               rows={4}
-              minLength={15}
+              minLength={question.optional ? undefined : 15}
               maxLength={1000}
               defaultValue={typeof value === 'string' ? value : ''}
-              required
+              required={!question.optional}
             />
           </FieldControl>
         </Field>
@@ -231,8 +280,9 @@ function QuestionInput({
             <Input
               name="value"
               maxLength={120}
+              autoComplete={key === 'full_name' ? 'name' : undefined}
               defaultValue={typeof value === 'string' ? value : ''}
-              required
+              required={!question.optional}
             />
           </FieldControl>
         </Field>
@@ -273,8 +323,14 @@ export function Questionnaire({ initial }: { initial: IntakeState }) {
     if (state.fieldError) announce(tErrors('form'), true);
   }, [state.fieldError, announce, tErrors]);
 
-  if (state.recommendation) {
-    return <RecommendationPanel recommendation={state.recommendation} />;
+  if (state.submitted) {
+    return (
+      <SubmittedPanel
+        submitted={state.submitted}
+        answers={state.answers}
+        recommendation={state.recommendation}
+      />
+    );
   }
 
   return (
@@ -429,12 +485,71 @@ function ReviewStep({
       </dl>
 
       <form action={formAction}>
-        <input type="hidden" name="intent" value="generate" />
+        <input type="hidden" name="intent" value="submit" />
         <Button type="submit" size="lg" disabled={pending}>
-          {pending ? tCommon('loading') : t('generateCta')}
+          {pending ? tCommon('loading') : t('submitCta')}
           <ArrowRight className="size-4" aria-hidden="true" />
         </Button>
       </form>
+      <p className="text-muted text-xs leading-relaxed">{t('submitNote')}</p>
+    </div>
+  );
+}
+
+/**
+ * The confirmation screen (§11.1): the reference the acknowledgement email
+ * repeats, what happens next, and — for Bangladesh — the preliminary
+ * recommendation beneath it, clearly subordinate to the confirmation.
+ */
+function SubmittedPanel({
+  submitted,
+  answers,
+  recommendation,
+}: {
+  submitted: NonNullable<IntakeState['submitted']>;
+  answers: PartialAnswers;
+  recommendation: IntakeState['recommendation'];
+}) {
+  const t = useTranslations('start.submitted');
+  const tQuestions = useTranslations('start.questions');
+
+  const country = answers.target_country
+    ? tQuestions(`target_country.options.${answers.target_country}`)
+    : '';
+  const objective = answers.objective ? tQuestions(`objective.options.${answers.objective}`) : '';
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div role="status">
+        <h2 className="text-ink text-2xl font-semibold">{t('title')}</h2>
+        <p className="text-muted mt-2 text-sm leading-relaxed">
+          {t('body', { country, objective })}
+        </p>
+      </div>
+
+      <div className="border-border bg-surface-sunken rounded-[var(--radius-card)] border p-5">
+        <p className="text-muted text-xs font-medium tracking-wide uppercase">
+          {t('referenceLabel')}
+        </p>
+        <p className="text-ink mt-1 font-mono text-2xl font-semibold">{submitted.reference}</p>
+      </div>
+
+      <ul className="flex flex-col gap-2">
+        {(['ack', 'review', 'quote'] as const).map((step) => (
+          <li key={step} className="text-ink flex items-start gap-2.5 text-sm leading-relaxed">
+            <span className="bg-accent mt-2 size-1.5 shrink-0 rounded-full" aria-hidden="true" />
+            {t(`steps.${step}`)}
+          </li>
+        ))}
+      </ul>
+
+      <p className="text-muted text-xs leading-relaxed">{t('noPayment')}</p>
+
+      {recommendation ? (
+        <div className="border-border border-t pt-6">
+          <RecommendationPanel recommendation={recommendation} />
+        </div>
+      ) : null}
     </div>
   );
 }

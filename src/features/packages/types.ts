@@ -84,13 +84,29 @@ export const SELLABLE_AVAILABILITY: readonly AvailabilityState[] = [
 ];
 
 /**
+ * How a route operates day to day (immediate-operations instructions §3.3).
+ * Every route currently runs `managed_application`: applications are open,
+ * a specialist reviews each case, a provider is sourced per case, and a
+ * quote is issued only after provider scope and cost are confirmed. A
+ * route reaches `online_checkout` only by explicit owner approval once
+ * provider, legal, payment and document-security readiness are recorded.
+ */
+export type RouteMode =
+  | 'managed_application'
+  | 'provider_review'
+  | 'quote_ready'
+  | 'online_checkout'
+  | 'temporarily_paused';
+
+/**
  * What the public is told about an international route. This is deliberately
- * separate from the internal `status`: a route can be well into preparation
- * internally while the only honest public statement is "register interest".
- * Internal words like "draft" must never reach a customer.
+ * separate from the internal `status`: internal words like "draft" must
+ * never reach a customer. `applications_open` renders as
+ * "Applications open — specialist reviewed" — the managed-application
+ * operating model the owner activated on 29 Aug 2026.
  */
 export type InternationalPublicStatus =
-  'available' | 'request_quote' | 'register_interest' | 'not_available';
+  'applications_open' | 'available' | 'request_quote' | 'register_interest' | 'not_available';
 
 export type InternationalOffer = {
   slug: string;
@@ -102,10 +118,12 @@ export type InternationalOffer = {
   status: PackageStatus;
   /**
    * Operational position on the launch ladder. Never rendered to customers;
-   * `publicStatus` may say "available" only while this is one of
+   * `publicStatus` may say applications are open only while this is one of
    * `SELLABLE_AVAILABILITY`, and checkout requires `available_online`.
    */
   availability: AvailabilityState;
+  /** Day-to-day operating mode. All routes launch as `managed_application`. */
+  mode: RouteMode;
   /** What visitors see. Prices render only when `priceApproved` is true. */
   publicStatus: InternationalPublicStatus;
   /** The owner has an approved provider agreement for this route. */
@@ -120,10 +138,16 @@ export type InternationalOffer = {
    */
   eligibilityLed?: boolean;
   /**
-   * Public price label. Only present once `priceApproved` is true — while a
-   * route is register-interest there is nothing truthful to print.
+   * Public price label — a STARTING ESTIMATE, never a checkout total.
+   * Present only with `priceApproved` (the owner published these figures in
+   * the immediate-operations instructions of 29 Aug 2026) and always
+   * rendered with `publicQualifier` beside it.
    */
   publicLabel?: { en: string; bn: string };
+  /** Approximate second-currency figure ("About ৳61,400"). */
+  publicLabelAlt?: { en: string; bn: string };
+  /** The mandatory qualifier that must render with the price. */
+  publicQualifier?: { en: string; bn: string };
   summary: { en: string; bn: string };
   disclosures: Array<{ en: string; bn: string }>;
   /**

@@ -208,8 +208,8 @@
     },
     "countriesSection": {
       "eyebrow": "Countries",
-      "title": "Bangladesh first. Six more markets in preparation.",
-      "body": "Start and manage your business in Bangladesh today, and prepare your expansion to the USA, UK, UAE, Saudi Arabia, Qatar and Singapore from the same secure workspace."
+      "title": "Seven countries. Applications open in all of them.",
+      "body": "Start or manage a business in any of the seven countries. Applications are specialist-reviewed, providers are appointed per case, and every quote is itemised before engagement."
     }
   },
   "howItWorksPage": {
@@ -390,20 +390,21 @@
       "available": "Available",
       "request_quote": "Request a quote",
       "register_interest": "Register interest",
-      "not_available": "Not currently available"
+      "not_available": "Not currently available",
+      "applications_open": "Applications open — specialist reviewed"
     },
     "viewRoute": "View {country}",
-    "notifyNote": "Registering interest costs nothing and commits you to nothing. We contact you when the route is operationally ready.",
+    "notifyNote": "Submitting an application is free and creates no obligation. A service begins only after bdoor identifies the responsible provider, issues an itemised quote and you accept the terms.",
     "country": {
       "metaTitle": "{country} company formation",
-      "metaDescription": "The {country} formation route bdoor is preparing: scope, provider model and how to register interest.",
-      "lede": "{route} — a route we are preparing with licensed local specialists for {country}.",
-      "statusLine": "This route is in preparation and not yet open for orders.",
+      "metaDescription": "Apply for the {country} route today: scope, who performs the work, the starting price and how the specialist-reviewed quote is issued.",
+      "lede": "{route} — applications open today, fulfilled with licensed local specialists in {country}.",
+      "statusLine": "Every application is reviewed by a specialist; your quote follows once the responsible provider and scope are confirmed.",
       "scopeTitle": "What this route covers",
       "providerTitle": "Who performs the work",
       "providerBody": "Regulated work in this country is performed by a licensed local provider, not by bdoor. We name the responsible provider, and what they receive, before any engagement or payment. bdoor coordinates the case and your documents in one workspace.",
-      "pricingTitle": "Pricing",
-      "pricingBody": "No price is published for this route yet. When the provider agreement and price sheet are approved, the page will show an itemised quote that separates the bdoor fee from official and provider costs — until then, anything we printed would be a guess.",
+      "pricingTitle": "Starting price",
+      "pricingBody": "The figure shown is a starting estimate for the featured route, not a checkout total. Your itemised quote separates the bdoor fee, provider fee, government charges, third-party costs and taxes — and is issued only after specialist review.",
       "registerTitle": "Register your interest",
       "registerBody": "Tell us what you want to do in {country} and we will contact you when the route opens, with the full scope and an itemised price.",
       "registerCta": "Register interest",
@@ -417,7 +418,13 @@
       "documentsNote": "The appointed provider confirms the exact list for your case; nothing is uploaded until identity collection opens for your engagement.",
       "obligationsTitle": "Ongoing obligations after formation",
       "faqTitle": "Common questions",
-      "guideReviewed": "Guide content last reviewed {date}. Authority sources are kept in our source ledger and re-verified before any quotation."
+      "guideReviewed": "Guide content last reviewed {date}. Authority sources are kept in our source ledger and re-verified before any quotation.",
+      "applyTitle": "Start your application",
+      "applyBody": "Tell us about your plans for {country}. The initial assessment is free, creates no obligation, and a specialist reviews it within one business day.",
+      "applyCta": "Start {country} application",
+      "assessCta": "Start {country} assessment",
+      "disclosure": "bdoor accepts and coordinates your application. Country-specific formation, registered-agent, corporate-service, tax, legal and regulatory work is fulfilled by appointed third-party providers. Your provider, scope, itemised fees and terms are confirmed before engagement or payment.",
+      "sla": "Receive an application acknowledgement immediately and an initial specialist review within one business day."
     }
   },
   "industries": {
@@ -512,7 +519,7 @@
     "lastUpdated": "Last updated {date}",
     "tableOfContents": "On this page",
     "preLaunchTitle": "Under professional review",
-    "preLaunchBody": "bdoor's customer terms and privacy documentation are under professional review. Payments and identity-document collection are not yet enabled.",
+    "preLaunchBody": "Applications are open. Paid engagements, identity verification and document collection begin only after the applicable terms and provider scope are supplied for acceptance.",
     "preLaunchDetail": "The approved document will be published here with its version and effective date. Until then, nothing on this platform is chargeable and no identity documents are collected, so there is no agreement you need to rely on today.",
     "preLaunchOperator": "The bdoor platform is operated by {legalName}. Questions about this document are welcome by email."
   },
@@ -603,15 +610,14 @@
   },
   "start": {
     "title": "Start your business",
-    "description": "A short guided questionnaire. We only ask what applies to you, and you can save and resume.",
+    "description": "Choose your country, answer only what applies to you, and submit your application. It is free, you can save and resume, and a specialist reviews every application.",
     "sectionLabel": "Section",
     "whyWeAsk": "Why we ask",
     "saveAndExit": "Save and exit",
     "resumeNotice": "We restored your saved answers.",
     "anonymousNotice": "Your answers are held in this browser until you create an account.",
     "reviewTitle": "Review your answers",
-    "reviewBody": "Check anything that looks wrong before we prepare your preliminary recommendation.",
-    "generateCta": "See my preliminary recommendation",
+    "reviewBody": "Check anything that looks wrong before you submit your application.",
     "recommendation": {
       "title": "Your preliminary recommendation",
       "preliminaryBadge": "Preliminary — subject to review",
@@ -628,29 +634,6 @@
       "noServices": "We could not match a service confidently. A case manager will review your answers."
     },
     "questions": {
-      "help_scope": {
-        "label": "Where do you want help?",
-        "why": "This routes you to the right package, questions and review path — Bangladesh setup, ongoing compliance or international formation.",
-        "options": {
-          "start_bangladesh": "Start a business in Bangladesh",
-          "manage_bangladesh": "Manage an existing Bangladesh business",
-          "form_abroad": "Form a company outside Bangladesh",
-          "unsure": "I am not sure"
-        }
-      },
-      "destination_country": {
-        "label": "Where do you want to form the company?",
-        "why": "Each country has its own route, provider model and requirements. Routes outside Bangladesh are in preparation, so a specialist reviews every international request personally.",
-        "options": {
-          "usa": "United States",
-          "uk": "United Kingdom",
-          "uae": "United Arab Emirates",
-          "saudi_arabia": "Saudi Arabia",
-          "qatar": "Qatar",
-          "singapore": "Singapore",
-          "unsure": "I am not sure yet"
-        }
-      },
       "founder_location": {
         "label": "Where are you based right now?",
         "help": "This changes which documents you need and whether foreign-investment rules apply.",
@@ -769,6 +752,55 @@
           "erc": "Export Registration Certificate",
           "bida": "BIDA registration"
         }
+      },
+      "target_country": {
+        "label": "Where do you want to start or run your business?",
+        "why": "The application is country-first: your answer routes your case to the right question set, the right specialist and the right provider.",
+        "options": {
+          "bangladesh": "Bangladesh",
+          "usa": "United States",
+          "uk": "United Kingdom",
+          "uae": "United Arab Emirates",
+          "saudi_arabia": "Saudi Arabia",
+          "qatar": "Qatar",
+          "singapore": "Singapore"
+        }
+      },
+      "objective": {
+        "label": "What do you want to do there?",
+        "why": "Starting a new business, managing an existing one and expanding into a new country follow different routes and different reviews.",
+        "options": {
+          "new": "Start a new business",
+          "existing": "Manage an existing business",
+          "expand": "Expand an existing business into this country",
+          "unsure": "I am not sure yet"
+        }
+      },
+      "need_visa": {
+        "label": "Will anyone need a visa or residence permit for this country?",
+        "why": "Visa and residency work is regulated and performed by licensed providers, and it changes which provider we source for your case. Answering yes is not a promise of a visa — eligibility is always assessed."
+      },
+      "need_banking": {
+        "label": "Will the business need a bank account in this country?",
+        "why": "Account opening is always subject to the bank’s own checks — it can never be promised — but knowing early lets the specialist plan the route around it."
+      },
+      "notes": {
+        "label": "Anything else we should know? (optional)"
+      },
+      "full_name": {
+        "label": "Your full name",
+        "why": "Your acknowledgement and specialist review are addressed to you. No identity document — passport, NID or similar — is collected at this stage."
+      },
+      "email": {
+        "label": "Your email address",
+        "why": "Your application reference and acknowledgement are sent here."
+      },
+      "phone": {
+        "label": "Phone number (optional)"
+      },
+      "consent": {
+        "label": "Consent",
+        "statement": "I agree that bdoor may store these answers and contact me about this application, as described in the privacy policy."
       }
     },
     "validation": {
@@ -778,17 +810,37 @@
       "tooLong": "That is longer than we can store. Please shorten it.",
       "invalidNumber": "Enter a whole number.",
       "percentRange": "Enter a value between 0 and 100.",
-      "minOwners": "There must be at least one owner."
+      "minOwners": "There must be at least one owner.",
+      "invalidEmail": "Enter a valid email address.",
+      "consentRequired": "Please tick the consent box to submit your application."
     },
     "sections": {
       "about_you": "About you",
       "the_business": "The business",
       "ownership": "Ownership",
       "operations": "Operations",
-      "timing": "Timing"
+      "timing": "Timing",
+      "contact": "Contact details"
     },
     "stageLabel": "Stage {current} of {total}: {name}",
-    "review": "Review"
+    "review": "Review",
+    "submitCta": "Submit application",
+    "submitNote": "Submitting is free and creates no obligation. No payment is taken now — a service begins only after you accept an itemised quote and terms.",
+    "submitted": {
+      "title": "Application received",
+      "body": "Your application for {country} ({objective}) is with our team.",
+      "referenceLabel": "Your reference",
+      "steps": {
+        "ack": "An application acknowledgement is on its way to your email address.",
+        "review": "A specialist reviews your application within one business day.",
+        "quote": "You receive an itemised quote after review — your provider, scope, fees and terms are confirmed before any engagement or payment."
+      },
+      "noPayment": "No payment has been taken and no obligation has been created by submitting this application."
+    },
+    "ack": {
+      "subject": "We received your application {reference}",
+      "body": "Thank you — your application has been received.\n\nReference: {reference}\nCountry: {country}\n\nA specialist will review your application within one business day. You will receive an itemised quote after review; no payment is taken and no obligation is created until you accept a quote and terms.\n\nbdoor"
+    }
   },
   "workspace": {
     "nav": {
@@ -1024,7 +1076,8 @@
       "content": "Content",
       "users": "Users",
       "audit": "Audit log",
-      "settings": "Settings"
+      "settings": "Settings",
+      "applications": "Applications"
     },
     "queues": {
       "title": "Work queues",
@@ -1165,6 +1218,23 @@
       "reasonTooShort": "Say why this person needs the role.",
       "templateRequired": "Choose a role.",
       "generic": "We could not send that invitation. Please try again."
+    },
+    "applications": {
+      "title": "Applications",
+      "description": "Every submitted application, newest first. Specialist review is due within one business day of submission.",
+      "reference": "Reference",
+      "applicant": "Applicant",
+      "country": "Country",
+      "objective": "Objective",
+      "any": "Any",
+      "filter": "Apply filters",
+      "statuses": {
+        "new": "New",
+        "in_review": "In review",
+        "quoted": "Quoted",
+        "engaged": "Engaged",
+        "closed": "Closed"
+      }
     }
   },
   "caseStatus": {
@@ -1327,17 +1397,17 @@
   },
   "countries": {
     "title": "Countries",
-    "description": "Bangladesh today, with formation routes for the USA, UK, UAE, Saudi Arabia, Qatar and Singapore in preparation through appointed local providers.",
-    "intro": "Bangladesh is our flagship market and the most complete part of the platform. An international route opens only when an appointed local provider, operating process and price sheet are in place — until then the honest status is \"register interest\", and that is what we show.",
+    "description": "Applications are open for all seven countries. Every international case is reviewed and fulfilled through an appointed third-party provider before a final quote is issued.",
+    "intro": "Bangladesh is our flagship market and the most complete part of the platform. International applications are specialist-reviewed: bdoor coordinates your case, an appointed local provider performs the regulated work, and your itemised quote is confirmed before any engagement or payment.",
     "bangladesh": {
       "badge": "Open now",
       "body": "Company formation, licences, tax registrations and ongoing compliance are available today through the Bangladesh catalogue.",
       "cta": "Explore Bangladesh",
       "pricingCta": "See packages and pricing",
-      "previewBadge": "Accepting enquiries",
-      "previewBody": "Explore company formation, licences, tax registrations and ongoing compliance in the Bangladesh catalogue. Run the assessment and register your interest — the team confirms scope and pricing with you before any engagement."
+      "previewBadge": "Applications open",
+      "previewBody": "Company formation, licences, tax registrations and ongoing compliance — applications are reviewed by a specialist, and your itemised quote is confirmed before any engagement or payment."
     },
-    "routesTitle": "International routes in preparation",
+    "routesTitle": "International routes — applications open",
     "bangladeshPage": {
       "metaTitle": "Start and run a business in Bangladesh",
       "metaDescription": "Company formation, trade licences, tax registrations and ongoing compliance in Bangladesh, coordinated in one secure workspace.",
@@ -1364,8 +1434,8 @@
         "body": "Answer a short set of questions and receive a preliminary recommendation, always reviewed by a person before anything is quoted.",
         "cta": "Start the assessment"
       },
-      "previewLede": "The flagship market: explore the catalogue, run the assessment and enquire today. Engagements open once the pre-launch legal review completes.",
-      "previewOpenTitle": "What bdoor coordinates"
+      "previewLede": "The flagship market: apply today for formation, registrations or ongoing compliance. The initial assessment is free and a specialist reviews it within one business day.",
+      "previewOpenTitle": "What you can apply for today"
     }
   }
 }

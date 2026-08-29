@@ -59,6 +59,7 @@ export const RATE_LIMITS = {
   'auth.mfa_verify': { limit: 10, windowSeconds: 300 },
   'contact.submit': { limit: 3, windowSeconds: 3600 },
   'questionnaire.save': { limit: 120, windowSeconds: 3600 },
+  'application.submit': { limit: 5, windowSeconds: 3600 },
   'document.upload': { limit: 60, windowSeconds: 3600 },
   'document.download': { limit: 120, windowSeconds: 3600 },
   'invitation.send': { limit: 20, windowSeconds: 3600 },

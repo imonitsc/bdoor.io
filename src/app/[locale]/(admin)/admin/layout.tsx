@@ -6,6 +6,7 @@ import {
   CalendarCheck,
   FileText,
   Handshake,
+  Inbox,
   LayoutDashboard,
   Newspaper,
   Package,
@@ -63,7 +64,14 @@ export default async function AdminLayout({
       icon: <LayoutDashboard className="size-4" />,
     },
     ...(has('case.manage')
-      ? [{ href: ADMIN_ROUTES.leads, label: t('leads'), icon: <UserRound className="size-4" /> }]
+      ? [
+          {
+            href: ADMIN_ROUTES.applications,
+            label: t('applications'),
+            icon: <Inbox className="size-4" />,
+          },
+          { href: ADMIN_ROUTES.leads, label: t('leads'), icon: <UserRound className="size-4" /> },
+        ]
       : []),
     { href: ADMIN_ROUTES.cases, label: t('cases'), icon: <Briefcase className="size-4" /> },
     ...(has('kyc.read', 'risk.read')
