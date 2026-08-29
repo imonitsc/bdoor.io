@@ -150,7 +150,7 @@ insert into public.services (
   'At least two shareholders and two directors are usually required. Foreign shareholding, regulated activities and corporate shareholders are reviewed before we can confirm the path.',
   'সাধারণত অন্তত দুইজন শেয়ারহোল্ডার ও দুইজন পরিচালক প্রয়োজন। বিদেশি শেয়ারহোল্ডিং, নিয়ন্ত্রিত কার্যক্রম ও কর্পোরেট শেয়ারহোল্ডারের ক্ষেত্রে পথ নিশ্চিত করার আগে যাচাই করা হয়।',
   'Registrar of Joint Stock Companies and Firms (RJSC)', 'যৌথ মূলধন কোম্পানি ও ফার্মসমূহের পরিদপ্তর (RJSC)',
-  25000, 7, 21, current_date - 20,
+  24900, 7, 21, current_date - 20,
   'Internal process note BD-INC-2026-01. Verify RJSC schedule of fees before quoting.',
   false, false, 'published', current_date + 70, 10
 ),
@@ -348,7 +348,7 @@ on conflict do nothing;
 insert into public.service_fee_components
   (service_id, category, label_en, label_bn, payee, amount_bdt, is_estimate, is_refundable, tax_treatment, source_ref, reviewed_at, sort_order)
 values
-  ('d0000000-0000-4000-8000-000000000001', 'platform_service_fee', 'BDoor service fee', 'BDoor সেবা ফি', 'bdoor', 25000, false, false, 'exclusive', null, null, 10),
+  ('d0000000-0000-4000-8000-000000000001', 'platform_service_fee', 'BDoor service fee', 'BDoor সেবা ফি', 'bdoor', 24900, false, false, 'exclusive', null, null, 10),
   ('d0000000-0000-4000-8000-000000000001', 'government_fee_estimate', 'RJSC registration fees', 'RJSC নিবন্ধন ফি', 'government_authority', null, true, true, 'not_applicable', null, null, 20),
   ('d0000000-0000-4000-8000-000000000001', 'third_party_cost', 'Digital signature certificate', 'ডিজিটাল স্বাক্ষর সনদ', 'third_party', null, true, false, 'exclusive', null, null, 30),
   ('d0000000-0000-4000-8000-000000000002', 'platform_service_fee', 'BDoor service fee', 'BDoor সেবা ফি', 'bdoor', 8000, false, false, 'exclusive', null, null, 10),

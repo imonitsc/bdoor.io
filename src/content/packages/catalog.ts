@@ -34,6 +34,7 @@ export const BANGLADESH_PACKAGES: ServicePackage[] = [
         effectiveFrom: REVIEW_DATE,
         status: 'published',
         checkoutEnabled: true,
+        priceType: 'fixed',
         publicLabel: {
           en: 'BDT 9,900 + official fees',
           bn: '৯,৯০০ টাকা + সরকারি ফি',
@@ -76,6 +77,7 @@ export const BANGLADESH_PACKAGES: ServicePackage[] = [
         effectiveFrom: REVIEW_DATE,
         status: 'published',
         checkoutEnabled: true,
+        priceType: 'fixed',
         publicLabel: {
           en: 'BDT 24,900 + RJSC fees',
           bn: '২৪,৯০০ টাকা + আরজেএসসি ফি',
@@ -118,6 +120,7 @@ export const BANGLADESH_PACKAGES: ServicePackage[] = [
         effectiveFrom: REVIEW_DATE,
         status: 'published',
         checkoutEnabled: true,
+        priceType: 'fixed',
         publicLabel: {
           en: 'BDT 39,900 + official and third-party fees',
           bn: '৩৯,৯০০ টাকা + সরকারি ও তৃতীয় পক্ষের ফি',
@@ -154,6 +157,7 @@ export const BANGLADESH_PACKAGES: ServicePackage[] = [
         effectiveFrom: REVIEW_DATE,
         status: 'published',
         checkoutEnabled: true,
+        priceType: 'fixed',
         publicLabel: { en: 'BDT 14,900', bn: '১৪,৯০০ টাকা' },
         summary: {
           en: 'A structured review of filings, licences and registrations already on record.',
@@ -162,7 +166,7 @@ export const BANGLADESH_PACKAGES: ServicePackage[] = [
         inclusions: [
           { en: 'Registration inventory', bn: 'নিবন্ধন তালিকা' },
           { en: 'Gap analysis report', bn: 'ঘাটতি বিশ্লেষণ রিপোর্ট' },
-          { en: 'Renewal calendar draft', bn: 'নবায়ন ক্যালেন্ডার খসড়া' },
+          { en: 'Renewal calendar setup', bn: 'নবায়ন ক্যালেন্ডার সেটআপ' },
           { en: 'Priority action list', bn: 'অগ্রাধিকার তালিকা' },
           { en: 'One follow-up consultation', bn: 'একটি ফলো-আপ পরামর্শ' },
         ],
@@ -187,6 +191,7 @@ export const BANGLADESH_PACKAGES: ServicePackage[] = [
         effectiveFrom: REVIEW_DATE,
         status: 'published',
         checkoutEnabled: true,
+        priceType: 'fixed',
         publicLabel: {
           en: 'BDT 49,900/year + official, audit and specialist fees',
           bn: '৪৯,৯০০ টাকা/বছর + সরকারি, অডিট ও বিশেষজ্ঞ ফি',
@@ -223,6 +228,7 @@ export const BANGLADESH_PACKAGES: ServicePackage[] = [
         effectiveFrom: REVIEW_DATE,
         status: 'published',
         checkoutEnabled: true,
+        priceType: 'from',
         publicLabel: {
           en: 'From BDT 11,900/month',
           bn: '১১,৯০০ টাকা/মাস থেকে',
@@ -255,13 +261,16 @@ export const INTERNATIONAL_OFFERS: InternationalOffer[] = [
   {
     slug: 'usa-wyoming-llc',
     countryCode: 'US',
+    countrySlug: 'united-states',
     route: { en: 'Wyoming LLC', bn: 'ওয়াইমিং LLC' },
     status: 'draft',
+    publicStatus: 'register_interest',
+    providerApproved: false,
+    priceApproved: false,
     checkoutEnabled: false,
-    publicLabel: { en: 'USD 449 estimated total', bn: 'USD ৪৪৯ আনুমানিক মোট' },
     summary: {
-      en: 'USD 349 bdoor/partner fee + USD 100 Wyoming state fee.',
-      bn: 'USD ৩৪৯ bdoor/অংশীদার ফি + USD ১০০ ওয়াইমিং রাজ্য ফি।',
+      en: 'LLC formation with EIN support, delivered with a licensed US provider.',
+      bn: 'লাইসেন্সপ্রাপ্ত মার্কিন প্রদানকারীর সঙ্গে LLC গঠন ও EIN সহায়তা।',
     },
     disclosures: [
       { en: 'EIN has no IRS fee.', bn: 'EIN-এর জন্য IRS ফি নেই।' },
@@ -295,13 +304,16 @@ export const INTERNATIONAL_OFFERS: InternationalOffer[] = [
   {
     slug: 'uk-non-resident-ltd',
     countryCode: 'GB',
+    countrySlug: 'united-kingdom',
     route: { en: 'Non-resident LTD', bn: 'নন-রেসিডেন্ট LTD' },
     status: 'draft',
+    publicStatus: 'register_interest',
+    providerApproved: false,
+    priceApproved: false,
     checkoutEnabled: false,
-    publicLabel: { en: 'GBP 349 estimated total', bn: 'GBP ৩৪৯ আনুমানিক মোট' },
     summary: {
-      en: 'GBP 249 bdoor/partner fee + GBP 100 Companies House fee.',
-      bn: 'GBP ২৪৯ bdoor/অংশীদার ফি + GBP ১০০ কোম্পানিজ হাউস ফি।',
+      en: 'Private limited company formation for non-resident founders.',
+      bn: 'অনাবাসী প্রতিষ্ঠাতাদের জন্য প্রাইভেট লিমিটেড কোম্পানি গঠন।',
     },
     disclosures: [
       {
@@ -337,13 +349,16 @@ export const INTERNATIONAL_OFFERS: InternationalOffer[] = [
   {
     slug: 'uae-sharjah-no-visa',
     countryCode: 'AE',
+    countrySlug: 'uae',
     route: { en: 'Sharjah no-visa route', bn: 'শারজাহ নো-ভিসা রুট' },
     status: 'draft',
+    publicStatus: 'register_interest',
+    providerApproved: false,
+    priceApproved: false,
     checkoutEnabled: false,
-    publicLabel: { en: 'AED 9,375 estimated total', bn: 'AED ৯,৩৭৫ আনুমানিক মোট' },
     summary: {
-      en: 'AED 2,500 bdoor fee + AED 6,875 licence.',
-      bn: 'AED ২,৫০০ bdoor ফি + AED ৬,৮৭৫ লাইসেন্স।',
+      en: 'Free-zone licence routes scoped to the intended activity.',
+      bn: 'পরিকল্পিত কার্যক্রম অনুযায়ী ফ্রি-জোন লাইসেন্স রুট।',
     },
     disclosures: [
       {
@@ -379,13 +394,16 @@ export const INTERNATIONAL_OFFERS: InternationalOffer[] = [
   {
     slug: 'singapore-pte-ltd',
     countryCode: 'SG',
+    countrySlug: 'singapore',
     route: { en: 'Pte Ltd with resident director', bn: 'রেসিডেন্ট ডিরেক্টরসহ Pte Ltd' },
     status: 'draft',
+    publicStatus: 'register_interest',
+    providerApproved: false,
+    priceApproved: false,
     checkoutEnabled: false,
-    publicLabel: { en: 'From SGD 1,500', bn: 'SGD ১,৫০০ থেকে' },
     summary: {
-      en: 'Corporate Service Provider scope must be confirmed.',
-      bn: 'CSP সুযোগ নিশ্চিত করতে হবে।',
+      en: 'Pte Ltd formation through a licensed corporate service provider.',
+      bn: 'লাইসেন্সপ্রাপ্ত কর্পোরেট সেবা প্রদানকারীর মাধ্যমে Pte Ltd গঠন।',
     },
     disclosures: [
       {

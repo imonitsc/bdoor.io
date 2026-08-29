@@ -13,6 +13,7 @@ import { logger } from '@/lib/logger';
 import { absoluteUrl } from '@/lib/site';
 import { POLICY_VERSIONS } from '@/content/legal/documents';
 import { quoteIsExpired } from '@/features/quotes/money';
+import { bangladeshCheckoutStatus, paymentsStatus } from '@/lib/launch/gates';
 
 export type BillingState = { status: 'idle' | 'error' | 'success'; message?: string };
 
@@ -114,6 +115,14 @@ export async function startCheckout(
   formData: FormData,
 ): Promise<BillingState> {
   const session = await requireSession();
+
+  // Launch gate: while the customer terms are drafts nothing is chargeable,
+  // whatever the UI shows. Server-side, so a stale or hand-crafted form
+  // cannot start a checkout early.
+  if (paymentsStatus() !== 'enabled' || bangladeshCheckoutStatus() !== 'enabled') {
+    return { status: 'error', message: 'paymentsNotOpen' };
+  }
+
   const invoiceId = String(formData.get('invoiceId') ?? '');
   if (!invoiceId) return { status: 'error', message: 'generic' };
 

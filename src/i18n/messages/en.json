@@ -1284,7 +1284,8 @@
         "unsupported_type": "We accept PDF, JPG, PNG and WebP files only.",
         "type_mismatch": "That file is not the type its name suggests. Please upload the original file.",
         "name_too_long": "That file name is too long. Please rename it and try again."
-      }
+      },
+      "kycNotOpen": "Identity documents are not being collected yet. We will ask for them inside your workspace once collection opens."
     }
   },
   "billing": {
@@ -1294,7 +1295,8 @@
       "expired": "That quote has expired. Ask your case team for a new version.",
       "alreadyAccepted": "This quote has already been accepted.",
       "alreadyPaid": "This invoice is already paid in full.",
-      "quoteAccepted": "Quote accepted. You can now pay the amount due."
+      "quoteAccepted": "Quote accepted. You can now pay the amount due.",
+      "paymentsNotOpen": "Payments are not yet open. Your quote and workspace are unaffected, and we will tell you before anything becomes payable."
     }
   },
   "messaging": {

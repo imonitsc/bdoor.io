@@ -42,6 +42,12 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
+      // Vitest resolves with the default Node condition, where the
+      // `server-only` marker throws on import. Aliasing it to the package's
+      // own react-server entry (an empty module) lets unit tests exercise
+      // server-only logic such as the launch gates. The marker still does its
+      // real job in the Next.js build.
+      'server-only': fileURLToPath(new URL('./node_modules/server-only/empty.js', import.meta.url)),
     },
   },
 });

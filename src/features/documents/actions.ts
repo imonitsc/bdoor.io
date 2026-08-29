@@ -13,6 +13,7 @@ import { recordAudit } from '@/lib/audit';
 import { getMalwareScanner } from '@/lib/malware';
 import { logger } from '@/lib/logger';
 import { validateUpload } from './validation';
+import { kycUploadStatus } from '@/lib/launch/gates';
 
 export type UploadState = {
   status: 'idle' | 'error' | 'success';
@@ -104,6 +105,16 @@ export async function uploadDocument(
       .eq('id', requestId)
       .maybeSingle();
     if (data) category = data.category;
+  }
+
+  // Launch gate: identity and address-proof documents are KYC material, and
+  // KYC collection stays off while the legal documents are drafts. Ordinary
+  // case paperwork is unaffected.
+  if (
+    (category === 'identity' || category === 'address_proof') &&
+    kycUploadStatus() !== 'enabled'
+  ) {
+    return { status: 'error', message: 'kycNotOpen' };
   }
 
   const bucket = bucketFor(category);
