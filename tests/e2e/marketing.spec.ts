@@ -1,4 +1,3 @@
-import { existsSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 
 /**
@@ -18,9 +17,7 @@ test.describe('marketing site', () => {
   test('shows the hero, operator disclosure and the independence disclosure', async ({ page }) => {
     await page.goto('/en');
 
-    await expect(page.getByRole('heading', { level: 1 })).toContainText(
-      'Start and run your business in Bangladesh',
-    );
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Start in Bangladesh');
     await expect(page.getByText('Operated by bdoor compliance ltd')).toBeVisible();
     await expect(page.getByText('Transparent itemised quotes')).toBeVisible();
     await expect(
@@ -28,79 +25,47 @@ test.describe('marketing site', () => {
     ).toBeVisible();
   });
 
-  const FOUNDER_IMAGE_EXISTS = existsSync('public/images/bdoor-home-hero-founder.png');
-
-  test('without the founder photograph, the hero falls back to the workspace preview', async ({
-    page,
-  }) => {
-    test.skip(FOUNDER_IMAGE_EXISTS, 'photograph present — the founder tests below cover the hero');
+  test('the hero shows the product module, labelled as a preview', async ({ page }) => {
     await page.goto('/en');
 
-    // The preview widget carries an accessible label; it must sit inside the
-    // hero section, and no broken founder <img> may render anywhere.
-    const hero = page.locator('section').first();
-    await expect(hero.getByRole('img')).toBeVisible();
+    // §7.1: no generated person — a real product module, honestly labelled.
+    await expect(page.getByText('Product preview')).toBeVisible();
+    await expect(page.getByText('Specialist reviewed').first()).toBeVisible();
+    await expect(page.getByText('From ৳9,900').first()).toBeVisible();
     await expect(page.locator('img[src*="bdoor-home-hero-founder"]')).toHaveCount(0);
   });
 
-  /**
-   * The founder photograph is the hero. The e2e guard asserts the image
-   * DECODES, not just that the markup is right: with the PNG absent the
-   * element still carries a correct src/srcset/preload and only fails to
-   * load, which markup-only assertions cannot see. (.next/cache/images can
-   * mask the failure locally until cleared.)
-   */
-  test('serves the hero founder image through the optimizer, eagerly', async ({ page }) => {
-    test.skip(
-      !FOUNDER_IMAGE_EXISTS,
-      'photograph not supplied yet — fallback test above covers the hero',
-    );
-    await page.goto('/en');
-
-    const hero = page.getByRole('img', {
-      name: 'Founder managing business formation and compliance through bdoor.',
-    });
-    await expect(hero).toBeVisible();
-    await expect(hero).toHaveCSS('object-fit', 'contain');
-
-    const src = await hero.getAttribute('src');
-    expect(src).toContain('/_next/image');
-    expect(src).toContain('bdoor-home-hero-founder.png');
-    expect(await hero.getAttribute('loading')).not.toBe('lazy');
-    await expect(
-      page.locator('link[rel="preload"][as="image"][imagesrcset*="bdoor-home-hero-founder"]'),
-    ).toHaveCount(1);
-
-    const decoded = await hero.evaluate((node) => ({
-      width: (node as HTMLImageElement).naturalWidth,
-      complete: (node as HTMLImageElement).complete,
-    }));
-    expect(decoded.complete, 'the hero image never finished loading').toBe(true);
-    expect(
-      decoded.width,
-      'the hero image decoded to nothing — is the PNG committed?',
-    ).toBeGreaterThan(0);
-  });
-
-  test('the hero CTAs come before the founder image on a phone', async ({ page }) => {
-    test.skip(
-      !FOUNDER_IMAGE_EXISTS,
-      'photograph not supplied yet — fallback test above covers the hero',
-    );
+  test('the H1 is fully visible and the hero CTAs precede the module on a phone', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/en');
 
-    const cta = await page.getByRole('link', { name: 'Start in Bangladesh' }).first().boundingBox();
-    const image = await page
-      .getByRole('img', {
-        name: 'Founder managing business formation and compliance through bdoor.',
-      })
-      .boundingBox();
+    // §7.2: the headline must never be clipped by the header or the section.
+    const h1 = page.getByRole('heading', { level: 1 });
+    await expect(h1).toBeVisible();
+    const h1Box = await h1.boundingBox();
+    const header = await page.locator('header').first().boundingBox();
+    expect(h1Box).not.toBeNull();
+    expect(h1Box!.y, 'the H1 sits under the header').toBeGreaterThanOrEqual(
+      header ? header.y + header.height : 0,
+    );
 
+    const cta = await page
+      .getByRole('link', { name: 'Start your application' })
+      .first()
+      .boundingBox();
+    const moduleBox = await page.getByText('Product preview').boundingBox();
     expect(cta).not.toBeNull();
-    expect(image).not.toBeNull();
-    expect(cta!.y).toBeLessThan(image!.y);
+    expect(moduleBox).not.toBeNull();
+    expect(cta!.y).toBeLessThan(moduleBox!.y);
     expect(cta!.height).toBeGreaterThanOrEqual(44);
+
+    // §7.10: no horizontal overflow at phone width.
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(overflow).toBeLessThanOrEqual(0);
   });
 
   test('renders no raw translation-key path on the key pages', async ({ page }) => {
@@ -225,9 +190,13 @@ test.describe('marketing site', () => {
         page.getByText('Under professional review', { exact: true }),
         `${slug} is missing the pre-launch notice`,
       ).toBeVisible();
-      // The notice is honest about the consequences…
+      // The notice is honest about the consequences (§11.4 wording:
+      // applications open, nothing paid or identity-collected before terms).
       await expect(
-        page.getByText('Payments and identity-document collection are not yet enabled'),
+        page.getByText(
+          'Paid engagements, identity verification and document collection begin only after',
+          { exact: false },
+        ),
       ).toBeVisible();
       // …and the unapproved draft text must NOT be published as if final.
       const body = (await page.locator('body').innerText()).toLowerCase();
