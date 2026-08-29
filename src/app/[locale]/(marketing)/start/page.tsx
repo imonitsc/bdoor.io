@@ -6,8 +6,9 @@ import { Questionnaire } from '@/components/forms/questionnaire';
 import { IndependenceDisclosure } from '@/components/layout/disclosure';
 import { loadIntake, type IntakePreset } from '@/features/intake/actions';
 import {
+  BANGLADESH_OBJECTIVES,
   OBJECTIVES,
-  helpScopeFromPreset,
+  marketScopeFromPreset,
   targetCountryFromSlug,
   type Objective,
 } from '@/features/intake/questions';
@@ -40,15 +41,17 @@ function presetFromParams(params: { [key: string]: string | string[] | undefined
     query.push(`objective=${objective}`);
   }
 
-  const scope = helpScopeFromPreset(country, preset.answers.objective);
+  const scope = marketScopeFromPreset(country);
   if (scope) {
-    preset.answers.help_scope = scope;
-    if (scope === 'bangladesh_new' || scope === 'bangladesh_existing') {
-      Object.assign(preset.answers, {
-        target_country: 'bangladesh',
-        objective:
-          scope === 'bangladesh_existing' ? 'existing' : (preset.answers.objective ?? 'new'),
-      });
+    preset.answers.market_scope = scope;
+    if (scope === 'bangladesh') {
+      preset.answers.target_country = 'bangladesh';
+      if (
+        preset.answers.objective &&
+        !(BANGLADESH_OBJECTIVES as readonly string[]).includes(preset.answers.objective)
+      ) {
+        delete preset.answers.objective;
+      }
     }
   }
 
@@ -56,6 +59,8 @@ function presetFromParams(params: { [key: string]: string | string[] | undefined
   if (pkg && BANGLADESH_PACKAGES.some((p) => p.slug === pkg)) {
     preset.packageSlug = pkg;
     query.push(`package=${pkg}`);
+    preset.answers.market_scope = 'bangladesh';
+    preset.answers.target_country = 'bangladesh';
   }
 
   if (query.length > 0) preset.sourcePath = `/start?${query.join('&')}`;

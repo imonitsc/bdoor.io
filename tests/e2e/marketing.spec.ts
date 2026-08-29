@@ -177,33 +177,35 @@ test.describe('marketing site', () => {
     await expect(page.getByText('not open for new cases yet', { exact: false })).toBeVisible();
   });
 
-  test('legal pages carry the pre-launch notice while drafts are unapproved', async ({ page }) => {
+  test('legal pages show substantive drafts with a draft banner and stay noindex', async ({
+    page,
+  }) => {
     for (const slug of [
       'terms',
       'privacy',
       'refund-policy',
       'aml-kyc-policy',
       'legal-disclaimer',
+      'cookie-policy',
+      'complaints',
+      'acceptable-use',
+      'provider-disclosure',
+      'electronic-consent',
     ]) {
       await page.goto(`/en/${slug}`);
       await expect(
-        page.getByText('Under professional review', { exact: true }),
-        `${slug} is missing the pre-launch notice`,
+        page.getByText('Draft version 0.9 — professional approval required', { exact: true }),
+        `${slug} is missing the draft banner`,
       ).toBeVisible();
-      // The notice is honest about the consequences (§11.4 wording:
-      // applications open, nothing paid or identity-collected before terms).
-      await expect(
-        page.getByText(
-          'Paid engagements, identity verification and document collection begin only after',
-          { exact: false },
-        ),
-      ).toBeVisible();
-      // …and the unapproved draft text must NOT be published as if final.
-      const body = (await page.locator('body').innerText()).toLowerCase();
-      expect(body, `${slug} still renders draft legal sections`).not.toContain('governing law');
-      // Draft legal pages are not indexable.
+      // Substantive draft body is visible for counsel review in preview.
+      const body = await page.locator('main').innerText();
+      expect(body.length, `${slug} body too short`).toBeGreaterThan(400);
       await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
     }
+
+    await page.goto('/en/legal');
+    await expect(page.getByRole('heading', { name: 'Legal policies' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Terms of Service' })).toBeVisible();
   });
 });
 

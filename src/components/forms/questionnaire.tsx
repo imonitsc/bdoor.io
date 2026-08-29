@@ -13,11 +13,16 @@ import { useAnnounce } from '@/components/ui/announcer';
 import { COUNTRIES } from '@/features/intake/countries';
 import {
   applicableQuestions,
-  stageProgress,
+  answersImpliedByMarketScope,
+  firstUnansweredIndex,
+  pruneInapplicable,
+  validateAnswer,
+  visibleStep,
+  type MarketScope,
   type PartialAnswers,
   type QuestionDefinition,
 } from '@/features/intake/questions';
-import { intakeAction, type IntakeState } from '@/features/intake/actions';
+import { intakeAction, persistAnswerBackground, type IntakeState } from '@/features/intake/actions';
 import { RecommendationPanel } from './recommendation-panel';
 
 /** "Why we ask" disclosure. Collapsed by default so it never crowds the question. */
@@ -49,12 +54,12 @@ function QuestionInput({
   question,
   value,
   fieldError,
-  helpScope,
+  marketScope,
 }: {
   question: QuestionDefinition;
   value: unknown;
   fieldError?: string;
-  helpScope?: PartialAnswers['help_scope'];
+  marketScope?: PartialAnswers['market_scope'];
 }) {
   const t = useTranslations('start.questions');
   const tCommon = useTranslations('common');
@@ -63,10 +68,13 @@ function QuestionInput({
   const error = fieldError ? tValidation(fieldError) : undefined;
 
   const help = question.hasHelp ? t(`${key}.help`) : undefined;
-  const choiceOptions =
-    question.key === 'target_country' && helpScope === 'international'
-      ? (question.options ?? []).filter((option) => option !== 'bangladesh')
-      : (question.options ?? []);
+  let choiceOptions = question.options ?? [];
+  if (question.key === 'target_country' && marketScope === 'outside') {
+    choiceOptions = choiceOptions.filter((option) => option !== 'bangladesh');
+  }
+  if (question.key === 'objective' && marketScope === 'bangladesh') {
+    choiceOptions = choiceOptions.filter((option) => option === 'new' || option === 'existing');
+  }
 
   switch (question.kind) {
     case 'boolean':
@@ -303,63 +311,136 @@ export function Questionnaire({ initial }: { initial: IntakeState }) {
   const tErrors = useTranslations('contact.errors');
   const announce = useAnnounce();
 
-  const [state, formAction, saving] = useActionState(intakeAction, initial);
+  const [serverState, formAction, saving] = useActionState(intakeAction, initial);
+  const [answers, setAnswers] = useState<PartialAnswers>(initial.answers);
+  const [index, setIndex] = useState(initial.index);
+  const [fieldError, setFieldError] = useState<string | undefined>();
+  const [syncState, setSyncState] = useState<'idle' | 'saving' | 'saved' | 'local'>('idle');
   const headingRef = useRef<HTMLDivElement>(null);
 
-  const questions = useMemo(() => applicableQuestions(state.answers), [state.answers]);
-  const index = Math.min(state.index, questions.length);
-  const question = questions[index];
+  // After a successful server submit, prefer the server confirmation payload.
+  useEffect(() => {
+    if (serverState.submitted) {
+      setAnswers(serverState.answers);
+    }
+  }, [serverState.submitted, serverState.answers]);
+
+  const questions = useMemo(() => applicableQuestions(answers), [answers]);
+  const safeIndex = Math.min(index, questions.length);
+  const question = questions[safeIndex];
   const atReview = !question;
-  const progress = stageProgress(state.answers, index);
-  const stageName = atReview ? t('review') : t(`sections.${progress.stage}`);
-  const stageLabel = t('stageLabel', {
-    current: Math.min(progress.current, progress.total),
-    total: progress.total,
-    name: stageName,
+  const step = visibleStep(answers, safeIndex);
+  const stepName = atReview ? t('review') : t(`steps.${step.labelKey}`);
+  const stageLabel = t('stepLabel', {
+    current: Math.min(step.current, step.total),
+    total: step.total,
+    name: stepName,
   });
 
-  // Move focus to the new question so keyboard and screen-reader users are not
-  // left at the bottom of the previous step.
   useEffect(() => {
     headingRef.current?.focus();
     if (question) announce(stageLabel);
-  }, [index, question, stageLabel, announce]);
+  }, [safeIndex, question, stageLabel, announce]);
 
   useEffect(() => {
-    if (state.fieldError) announce(tErrors('form'), true);
-  }, [state.fieldError, announce, tErrors]);
+    if (fieldError) announce(tErrors('form'), true);
+  }, [fieldError, announce, tErrors]);
 
-  if (state.submitted) {
+  function persistLocal(next: PartialAnswers) {
+    try {
+      window.localStorage.setItem(
+        'bdoor_intake_draft',
+        JSON.stringify({ answers: next, savedAt: Date.now() }),
+      );
+    } catch {
+      // Private mode / quota — non-fatal; in-memory state still advances.
+    }
+  }
+
+  function onContinue(formData: FormData) {
+    if (!question) return;
+    const raw = formData.getAll('value');
+    const kind = question.kind;
+    let value: unknown;
+    switch (kind) {
+      case 'boolean':
+        value = raw[0] === 'true';
+        break;
+      case 'consent':
+        value = raw.includes('true');
+        break;
+      case 'number':
+        value = raw[0] === '' || raw[0] === undefined ? Number.NaN : Number(raw[0]);
+        break;
+      case 'multi':
+        value = raw.map(String);
+        break;
+      default:
+        value = raw[0] === undefined ? '' : String(raw[0]);
+    }
+
+    const validation = validateAnswer(question.key, value);
+    if (!validation.success) {
+      setFieldError(validation.error);
+      return;
+    }
+
+    let next: PartialAnswers = { ...answers, [question.key]: validation.data };
+    if (question.key === 'market_scope') {
+      next = { ...next, ...answersImpliedByMarketScope(validation.data as MarketScope) };
+    }
+    next = pruneInapplicable(next);
+    setAnswers(next);
+    setFieldError(undefined);
+    setIndex(firstUnansweredIndex(next));
+    persistLocal(next);
+
+    setSyncState('saving');
+    void persistAnswerBackground(question.key, validation.data).then((result) => {
+      setSyncState(result.ok ? 'saved' : 'local');
+    });
+  }
+
+  if (serverState.submitted) {
     return (
       <SubmittedPanel
-        submitted={state.submitted}
-        answers={state.answers}
-        recommendation={state.recommendation}
+        submitted={serverState.submitted}
+        answers={serverState.answers}
+        recommendation={serverState.recommendation}
       />
     );
   }
 
+  const countryLabel = answers.target_country
+    ? tQuestions(`target_country.options.${answers.target_country}`)
+    : null;
+  const packageSlug = initial.packageSlug;
+
   return (
     <div className="flex flex-col gap-6">
-      {state.unavailable ? (
+      {serverState.unavailable ? (
         <Alert tone="neutral" icon={<Info className="size-5" />}>
           {t('anonymousNotice')}
         </Alert>
       ) : null}
 
-      {/*
-        Stage-based progress, deliberately not "question X of Y": conditional
-        questions change the count as answers arrive, which made the label
-        jump (Step 1 of 16 → Step 3 of 15) and look broken. The stage of a
-        question never changes, so this only moves at real boundaries; the
-        bar fills a whole stage at a time and reaches full at review.
-      */}
+      {(countryLabel || packageSlug) && (
+        <div className="border-border bg-surface-sunken text-ink flex flex-wrap items-center gap-3 rounded-[var(--radius-control)] border px-4 py-3 text-sm">
+          {countryLabel ? (
+            <span>
+              {t('contextCountry', { country: countryLabel })}
+            </span>
+          ) : null}
+          {packageSlug ? <span>{t('contextPackage', { package: packageSlug })}</span> : null}
+        </div>
+      )}
+
       <div>
         <p className="text-muted text-sm font-medium">{stageLabel}</p>
         <Progress
           className="mt-2"
-          value={atReview ? progress.total : progress.current - 1}
-          max={progress.total}
+          value={atReview ? step.total : step.current - 1}
+          max={step.total}
           label={stageLabel}
         />
       </div>
@@ -367,21 +448,25 @@ export function Questionnaire({ initial }: { initial: IntakeState }) {
       <div ref={headingRef} tabIndex={-1} className="outline-none">
         {atReview ? (
           <ReviewStep
-            answers={state.answers}
+            answers={answers}
             questions={questions}
             formAction={formAction}
             pending={saving}
+            onEdit={(i) => setIndex(i)}
           />
         ) : (
-          <form action={formAction} className="flex flex-col gap-6" noValidate>
-            <input type="hidden" name="questionKey" value={question.key} />
-            <input type="hidden" name="kind" value={question.kind} />
-
+          <form
+            className="flex flex-col gap-6"
+            noValidate
+            data-question-key={question.key}
+            action={(formData) => onContinue(formData)}
+          >
+            <input type="hidden" name="questionKey" value={question.key} readOnly />
             <QuestionInput
               question={question}
-              value={state.answers[question.key]}
-              fieldError={state.fieldError}
-              helpScope={state.answers.help_scope}
+              value={answers[question.key]}
+              fieldError={fieldError}
+              marketScope={answers.market_scope}
             />
 
             {question.showWhy ? <WhyWeAsk text={tQuestions(`${question.key}.why`)} /> : null}
@@ -390,42 +475,34 @@ export function Questionnaire({ initial }: { initial: IntakeState }) {
               <Alert tone="info">{tQuestions('remit_capital.note')}</Alert>
             ) : null}
 
-            {state.error ? (
-              <Alert tone="danger" live="assertive">
-                {tErrors('generic')}
-              </Alert>
-            ) : null}
-
             <div className="border-border flex flex-wrap items-center gap-3 border-t pt-5">
-              <Button type="submit" name="intent" value="answer" size="lg" disabled={saving}>
-                {saving ? tCommon('saving') : tCommon('continue')}
+              <Button type="submit" size="lg">
+                {tCommon('continue')}
                 <ArrowRight className="size-4" aria-hidden="true" />
               </Button>
-              {index > 0 ? (
+              {safeIndex > 0 ? (
                 <Button
-                  type="submit"
+                  type="button"
                   variant="ghost"
                   size="lg"
-                  name="intent"
-                  value="back"
-                  formNoValidate
-                  onClick={(event) => {
-                    // Stepping back must not run the current step's validation,
-                    // and must carry the target index rather than the answer.
-                    const form = event.currentTarget.form;
-                    if (!form) return;
-                    const target = form.elements.namedItem('index');
-                    if (target instanceof HTMLInputElement) target.value = String(index - 1);
+                  onClick={() => {
+                    setFieldError(undefined);
+                    setIndex(Math.max(0, safeIndex - 1));
                   }}
                 >
                   <ArrowLeft className="size-4" aria-hidden="true" />
                   {tCommon('back')}
                 </Button>
               ) : null}
-              <input type="hidden" name="index" value={index - 1} />
               <span className="text-muted ms-auto inline-flex items-center gap-1.5 text-sm">
                 <Save className="size-4" aria-hidden="true" />
-                {t('saveAndExit')}
+                {answers.email
+                  ? syncState === 'saving'
+                    ? tCommon('saving')
+                    : syncState === 'local'
+                      ? t('savedLocally')
+                      : t('saveAndExit')
+                  : t('saveOnDevice')}
               </span>
             </div>
           </form>
@@ -440,11 +517,13 @@ function ReviewStep({
   questions,
   formAction,
   pending,
+  onEdit,
 }: {
   answers: PartialAnswers;
   questions: QuestionDefinition[];
   formAction: (formData: FormData) => void;
   pending: boolean;
+  onEdit: (index: number) => void;
 }) {
   const t = useTranslations('start');
   const tQuestions = useTranslations('start.questions');
@@ -478,20 +557,28 @@ function ReviewStep({
             </dt>
             <dd className="text-ink flex items-center gap-3 text-sm font-medium">
               <span>{display(question)}</span>
-              <form action={formAction}>
-                <input type="hidden" name="intent" value="back" />
-                <input type="hidden" name="index" value={i} />
-                <Button type="submit" variant="link" size="inline" className="text-xs">
-                  {tCommon('edit')}
-                  <span className="sr-only"> — {tQuestions(`${question.key}.label`)}</span>
-                </Button>
-              </form>
+              <Button
+                type="button"
+                variant="link"
+                size="inline"
+                className="text-xs"
+                onClick={() => onEdit(i)}
+              >
+                {tCommon('edit')}
+                <span className="sr-only"> — {tQuestions(`${question.key}.label`)}</span>
+              </Button>
             </dd>
           </div>
         ))}
       </dl>
 
-      <form action={formAction}>
+      <form
+        action={(formData) => {
+          formData.set('intent', 'submit');
+          formData.set('answers', JSON.stringify(answers));
+          formAction(formData);
+        }}
+      >
         <input type="hidden" name="intent" value="submit" />
         <Button type="submit" size="lg" disabled={pending}>
           {pending ? tCommon('loading') : t('submitCta')}

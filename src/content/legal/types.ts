@@ -5,9 +5,20 @@ export type LegalSection = {
   body: { en: string; bn: string };
 };
 
+export type LegalDocumentSlug =
+  | 'terms'
+  | 'privacy'
+  | 'refund-policy'
+  | 'aml-kyc-policy'
+  | 'legal-disclaimer'
+  | 'cookie-policy'
+  | 'complaints'
+  | 'acceptable-use'
+  | 'provider-disclosure'
+  | 'electronic-consent';
+
 export type LegalDocument = {
-  slug:
-    'terms' | 'privacy' | 'refund-policy' | 'aml-kyc-policy' | 'legal-disclaimer' | 'cookie-policy';
+  slug: LegalDocumentSlug;
   titleKey: string;
   /** Recorded against every acceptance, so we know which text a customer saw. */
   version: string;

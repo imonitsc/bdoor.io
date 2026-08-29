@@ -73,7 +73,7 @@
     "partners": "Partners",
     "about": "About",
     "contact": "Contact",
-    "primaryCta": "Start application",
+    "primaryCta": "Start now",
     "talkToSpecialist": "Talk to a specialist",
     "mainNavigation": "Main navigation",
     "workspace": "Workspace",
@@ -113,13 +113,14 @@
   },
   "home": {
     "hero": {
-      "eyebrow": "Bangladesh business setup and compliance",
-      "headline": "Start your business in Bangladesh. <g>Grow beyond borders.</g>",
-      "support": "Form your company, complete essential registrations and manage ongoing compliance in one secure workspace. When you are ready, bdoor also supports formation in the USA, UK, UAE and Singapore.",
-      "primaryCta": "Start in Bangladesh",
-      "secondaryCta": "Explore international formation",
-      "trustLine": "Free initial assessment · Itemised quote before payment · Third-party specialists disclosed before engagement",
-      "operatorLine": "bdoor is operated by bdoor compliance ltd.",
+      "eyebrow": "Business formation & compliance in Bangladesh",
+      "headline": "Start and run your business in Bangladesh.",
+      "support": "Company formation, licences, tax and ongoing compliance—coordinated through one clear process.",
+      "primaryCta": "Start now",
+      "secondaryCta": "See packages",
+      "trustLine": "Free assessment · Itemised quote · No obligation",
+      "operatorLine": "Operated by bdoor compliance ltd.",
+      "doorAlt": "An open doorway overlooking Dhaka's business district",
       "founderAlt": "Founder using the bdoor workspace on a laptop.",
       "module": {
         "previewLabel": "Product preview",
@@ -156,7 +157,7 @@
     "preview": {
       "eyebrow": "Your workspace",
       "title": "One workspace for the whole case.",
-      "body": "A product preview of the customer workspace, shown with sample data.",
+      "body": "Current milestone, required action, quote status and the next compliance date — shown with sample data.",
       "sample": {
         "kyc": "Identity checks complete",
         "review": "Partner eligibility review complete",
@@ -167,7 +168,8 @@
         "paid": "Paid",
         "renewal": "Trade licence renewal"
       },
-      "sampleNotice": "Sample data"
+      "sampleNotice": "Sample data",
+      "productPreviewNotice": "Product preview — sample data"
     },
     "pricing": {
       "eyebrow": "Transparent pricing",
@@ -187,9 +189,9 @@
       "cta": "Read how the whole process works"
     },
     "finalCta": {
-      "title": "Ready when you are.",
-      "body": "Start the assessment, or talk to us first — either way you see an itemised quote before anything is payable.",
-      "primary": "Start in Bangladesh",
+      "title": "Ready to start?",
+      "body": "Answer a few questions and receive an itemised quote before you commit.",
+      "primary": "Start now",
       "secondary": "Contact us"
     },
     "trust": {
@@ -199,25 +201,26 @@
       "specialists": "Specialists engaged separately when required"
     },
     "process": {
-      "eyebrow": "How bdoor works",
-      "title": "Four steps, one transparent quote.",
-      "body": "A short assessment, a specialist review, an itemised quote, then a workspace that keeps formation and compliance organised.",
+      "eyebrow": "How it works",
+      "title": "A clear process from first question to ongoing compliance.",
+      "body": "Tell us what you need, receive specialist review, accept an itemised quote, then track your case.",
+      "imageAlt": "Professionals reviewing a business compliance checklist",
       "steps": {
         "one": {
-          "title": "Tell us where you need help",
-          "body": "Start in Bangladesh or explore formation abroad. Answer only what applies to you — applying is free and creates no obligation."
+          "title": "Tell us what you need",
+          "body": "Answer a short assessment for Bangladesh or an international route. Applying is free and creates no obligation."
         },
         "two": {
-          "title": "bdoor reviews and appoints your provider",
-          "body": "A specialist reviews your application and sources the licensed provider responsible for any regulated work."
+          "title": "Receive specialist review",
+          "body": "A specialist reviews your application and identifies the appointed provider for any regulated work."
         },
         "three": {
-          "title": "Receive and accept an itemised quote",
-          "body": "The bdoor fee is separated from provider fees, government charges and third-party costs. Nothing is payable before you accept."
+          "title": "Accept an itemised quote",
+          "body": "The bdoor fee is separated from provider fees, government charges and third-party costs."
         },
         "four": {
-          "title": "Track formation and compliance",
-          "body": "Milestones, documents, renewals and filings stay organised in one secure workspace after launch."
+          "title": "Track your case and compliance",
+          "body": "Follow milestones, documents and renewals in one workspace after you accept a quote."
         }
       },
       "standaloneTitle": "Standalone services",
@@ -545,16 +548,26 @@
     }
   },
   "legal": {
+    "index": "All policies",
+    "indexTitle": "Legal policies",
+    "indexBody": "Working drafts for the bdoor platform. Draft status remains until professional approval. Payment and identity collection stay closed until then.",
     "terms": "Terms of Service",
     "privacy": "Privacy Policy",
-    "refund": "Refund Policy",
-    "amlKyc": "AML/KYC Policy",
-    "disclaimer": "Legal Disclaimer",
+    "refund": "Refund and Cancellation Policy",
+    "amlKyc": "AML, KYC and Sanctions Policy",
+    "disclaimer": "Legal and Professional Services Disclaimer",
     "cookies": "Cookie Policy",
-    "draftBanner": "Draft awaiting professional review",
-    "draftBannerBody": "This document is a working draft prepared to support the platform. It has not yet been reviewed and approved by qualified Bangladesh counsel and must not be relied on as final terms.",
+    "complaints": "Complaints Policy",
+    "acceptableUse": "Acceptable Use Policy",
+    "providerDisclosure": "Third-Party Professional and Provider Disclosure",
+    "electronicConsent": "Electronic Communications and Consent Policy",
+    "draftBanner": "Draft version 0.9 — professional approval required",
+    "draftBannerBody": "This document is a complete working draft. It has not yet been reviewed and approved by qualified Bangladesh counsel (and, where relevant, privacy or AML reviewers) and must not be relied on as final terms. Payment, KYC and identity-document collection remain closed until approval.",
     "lastUpdated": "Last updated {date}",
     "tableOfContents": "On this page",
+    "contactLine": "Questions: {email}. Operated by {legalName}.",
+    "translationReviewTitle": "Bangla translation under review",
+    "translationReviewBody": "Until a professional Bangla translation is approved, this page shows the complete English draft. Do not treat an automatic or abbreviated Bangla summary as the policy.",
     "preLaunchTitle": "Under professional review",
     "preLaunchBody": "Applications are open. Paid engagements, identity verification and document collection begin only after the applicable terms and provider scope are supplied for acceptance.",
     "preLaunchDetail": "The approved document will be published here with its version and effective date. Until then, nothing on this platform is chargeable and no identity documents are collected, so there is no agreement you need to rely on today.",
@@ -651,6 +664,10 @@
     "sectionLabel": "Section",
     "whyWeAsk": "Why we ask",
     "saveAndExit": "Save and exit",
+    "saveOnDevice": "Save on this device and exit",
+    "savedLocally": "Changes saved on this device. We will retry.",
+    "contextCountry": "Starting in {country}",
+    "contextPackage": "Selected package: {package}",
     "resumeNotice": "We restored your saved answers.",
     "anonymousNotice": "Your answers are held in this browser until you create an account.",
     "reviewTitle": "Review your answers",
@@ -790,18 +807,16 @@
           "bida": "BIDA registration"
         }
       },
-      "help_scope": {
-        "label": "Where do you want help?",
-        "why": "Your answer chooses the Bangladesh package path or an international formation review.",
+      "market_scope": {
+        "label": "Where do you want to start or manage a business?",
+        "why": "Bangladesh is our operating market. Outside Bangladesh opens the six-country selector so we can route your case to the right specialist.",
         "options": {
-          "bangladesh_new": "Start a business in Bangladesh",
-          "bangladesh_existing": "Manage an existing Bangladesh business",
-          "international": "Form a company outside Bangladesh",
-          "unsure": "I am not sure"
+          "bangladesh": "Bangladesh",
+          "outside": "Outside Bangladesh"
         }
       },
       "target_country": {
-        "label": "Where do you want to start or run your business?",
+        "label": "Which country?",
         "why": "Your answer routes your case to the right question set, the right specialist and the right provider.",
         "options": {
           "bangladesh": "Bangladesh",
@@ -814,8 +829,8 @@
         }
       },
       "objective": {
-        "label": "What do you want to do there?",
-        "why": "Starting a new business, managing an existing one and expanding into a new country follow different routes and different reviews.",
+        "label": "What do you want to do?",
+        "why": "Starting a new business and managing an existing one follow different routes and different reviews.",
         "options": {
           "new": "Start a new business",
           "existing": "Manage an existing business",
@@ -870,6 +885,16 @@
       "contact": "Contact details"
     },
     "stageLabel": "Stage {current} of {total}: {name}",
+    "stepLabel": "Step {current} of {total} · {name}",
+    "steps": {
+      "location": "Location",
+      "country": "Country",
+      "business_stage": "Business stage",
+      "structure": "Structure",
+      "support": "Support",
+      "details": "Business details",
+      "contact": "Contact and review"
+    },
     "review": "Review",
     "submitCta": "Submit application",
     "submitNote": "Submitting is free and creates no obligation. No payment is taken now — a service begins only after you accept an itemised quote and terms.",

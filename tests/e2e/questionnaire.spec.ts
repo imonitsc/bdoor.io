@@ -66,26 +66,24 @@ async function completeContactStage(page: import('@playwright/test').Page) {
 }
 
 test.describe('application flow', () => {
-  test('progress is stage-based and never jumps unpredictably', async ({ page }) => {
+  test('progress is step-based and never jumps unpredictably', async ({ page }) => {
     await page.goto('/en/start');
 
     const progress = page.getByRole('progressbar');
-    // The announcer mirrors the label into a live region, so scope to the
-    // visible paragraph rather than any text node.
-    const stageText = () =>
+    const stepText = () =>
       page
-        .locator('p', { hasText: /^Stage \d of \d/ })
+        .locator('p', { hasText: /^Step \d of \d/ })
         .first()
         .textContent();
 
-    await expect(page.locator('p', { hasText: /^Stage 1 of 6/ })).toBeVisible();
+    await expect(page.locator('p', { hasText: /^Step 1 of 6/ })).toBeVisible();
     const totals = new Set<string>();
     const seen: number[] = [];
 
     const record = async () => {
-      const text = (await stageText()) ?? '';
-      const match = text.match(/^Stage (\d) of (\d)/);
-      expect(match, `unparseable stage label: ${text}`).not.toBeNull();
+      const text = (await stepText()) ?? '';
+      const match = text.match(/^Step (\d) of (\d)/);
+      expect(match, `unparseable step label: ${text}`).not.toBeNull();
       seen.push(Number(match![1]));
       totals.add(match![2]!);
     };
@@ -109,26 +107,19 @@ test.describe('application flow', () => {
     await expect(progress).toBeVisible();
   });
 
-  test('opens with the seven countries and branches on the answers given', async ({ page }) => {
+  test('opens with Bangladesh / Outside Bangladesh and branches on the answers given', async ({
+    page,
+  }) => {
     await page.goto('/en/start');
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Start your business');
 
-    // Country first (§4.1): all seven, no "not sure".
-    await expect(page.getByText('Where do you want to start or run your business?')).toBeVisible();
-    for (const name of [
-      'Bangladesh',
-      'United States',
-      'United Kingdom',
-      'United Arab Emirates',
-      'Saudi Arabia',
-      'Qatar',
-      'Singapore',
-    ]) {
-      await expect(page.getByRole('radio', { name, exact: true })).toBeVisible();
-    }
+    // Market scope first: Bangladesh / Outside Bangladesh.
+    await expect(page.getByText('Where do you want to start or manage a business?')).toBeVisible();
+    await expect(page.getByRole('radio', { name: 'Bangladesh', exact: true })).toBeVisible();
+    await expect(page.getByRole('radio', { name: 'Outside Bangladesh', exact: true })).toBeVisible();
     await chooseCountry(page, 'Bangladesh');
 
-    await expect(page.getByText('What do you want to do there?')).toBeVisible();
+    await expect(page.getByText('What do you want to do?')).toBeVisible();
     await chooseObjective(page, 'Start a new business');
 
     // Founder inside Bangladesh.
@@ -157,7 +148,7 @@ test.describe('application flow', () => {
 
   test('ignores an invalid ?country= parameter', async ({ page }) => {
     await page.goto('/en/start?country=mars&objective=teleport');
-    await expect(page.getByText('Where do you want to start or run your business?')).toBeVisible();
+    await expect(page.getByText('Where do you want to start or manage a business?')).toBeVisible();
   });
 
   test('asks a foreign founder the questions a local founder is spared', async ({ page }) => {
@@ -260,6 +251,7 @@ test.describe('application flow', () => {
   }) => {
     test.setTimeout(420_000);
     await page.goto('/en/start');
+    await chooseCountry(page, 'Outside Bangladesh');
     await chooseCountry(page, 'United States');
     await chooseObjective(page, 'Start a new business');
 

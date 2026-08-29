@@ -112,43 +112,31 @@ test.describe('one commercial source of truth', () => {
 });
 
 test.describe('seven-country truthfulness', () => {
-  test('the homepage selector: Bangladesh first, applications open, honest prices', async ({
-    page,
-  }) => {
+  test('the homepage is Bangladesh-first with no international sales grid', async ({ page }) => {
     await page.goto('/en');
 
-    // Homepage: Bangladesh packages + four international formation cards
-    // (65/35 master §8). Full seven-country comparison lives on /countries.
     await expect(
-      page.getByRole('heading', { name: /Start your business in Bangladesh/i }),
+      page.getByRole('heading', { name: /Start and run your business in Bangladesh/i }),
     ).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Start in Bangladesh' }).first()).toBeVisible();
-    await expect(page.getByRole('heading', { name: /USA, UK, UAE and Singapore/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Start now' }).first()).toBeVisible();
 
-    const expected: Array<[string, string]> = [
-      ['United States', '/en/countries/usa'],
-      ['United Kingdom', '/en/countries/uk'],
-      ['United Arab Emirates', '/en/countries/uae'],
-      ['Singapore', '/en/countries/singapore'],
-    ];
-    for (const [name, href] of expected) {
-      const link = page.locator('#international').getByRole('link', { name: 'View country route' });
-      // Country name is a heading/label; CTA links to the country page.
-      await expect(
-        page.locator('#international').getByText(name, { exact: true }).first(),
-      ).toBeVisible();
-      void href;
-      void link;
+    // International country cards and prices stay off the homepage body.
+    await expect(page.locator('#international')).toHaveCount(0);
+    const body = await page.locator('main').innerText();
+    expect(body).not.toMatch(/USD 449 estimated total|Wyoming LLC|View country route/i);
+
+    // Footer still links the six international routes.
+    const footer = page.locator('footer');
+    for (const name of [
+      'United States',
+      'United Kingdom',
+      'United Arab Emirates',
+      'Saudi Arabia',
+      'Qatar',
+      'Singapore',
+    ]) {
+      await expect(footer.getByRole('link', { name, exact: true }).first()).toBeVisible();
     }
-    await expect(
-      page.locator('#international').getByRole('link', { name: 'View country route' }).first(),
-    ).toHaveAttribute('href', /\/en\/countries\//);
-
-    const intl = page.locator('#international');
-    await expect(intl.getByText('USD 449 estimated total')).toBeVisible();
-    await expect(intl.getByText('Wyoming LLC estimated first-year package')).toBeVisible();
-    const intlText = await intl.innerText();
-    expect(intlText).not.toMatch(/register interest|coming soon|in preparation|\bdraft\b/i);
   });
 
   test('the countries index still lists all seven markets', async ({ page }) => {
@@ -264,30 +252,31 @@ test.describe('responsive composition', () => {
   test('the desktop nav appears at xl and the drawer below it', async ({ page }) => {
     await page.goto('/en');
 
-    // 1280px: the five §7.3 destinations visible, menu button absent, and
-    // the bar itself must not overflow its row.
+    // 1280px: Start / Services / Pricing / Resources — Countries stays in the footer.
     await page.setViewportSize({ width: 1280, height: 800 });
     const nav = page.locator('header nav');
     await expect(nav.getByRole('link', { name: 'Start', exact: true })).toBeVisible();
     await expect(nav.getByRole('link', { name: 'Services', exact: true })).toBeVisible();
-    await expect(nav.getByRole('link', { name: 'Countries' })).toBeVisible();
     await expect(nav.getByRole('link', { name: 'Pricing' })).toBeVisible();
     await expect(nav.getByRole('link', { name: 'Resources' })).toBeVisible();
-    expect(await nav.first().getByRole('link').count()).toBe(5);
+    await expect(nav.getByRole('link', { name: 'Countries' })).toHaveCount(0);
+    expect(await nav.first().getByRole('link').count()).toBe(4);
     await expect(page.locator('button[aria-controls="mobile-navigation"]')).toBeHidden();
     const headerOverflow = await page
       .locator('header')
       .evaluate((el) => el.scrollWidth - el.clientWidth);
     expect(headerOverflow).toBeLessThanOrEqual(0);
 
-    // 1024px (below xl): the bar hides, the drawer carries everything.
+    // 1024px (below xl): the bar hides, the drawer carries primary + secondary links.
     await page.setViewportSize({ width: 1024, height: 768 });
     const toggle = page.locator('button[aria-controls="mobile-navigation"]');
     await expect(toggle).toBeVisible();
     await toggle.click();
     const drawer = page.locator('#mobile-navigation');
-    await expect(drawer.getByRole('link', { name: 'Countries' })).toBeVisible();
+    await expect(drawer.getByRole('link', { name: 'Start', exact: true })).toBeVisible();
+    await expect(drawer.getByRole('link', { name: 'Services' })).toBeVisible();
     await expect(drawer.getByRole('link', { name: 'Partners' })).toBeVisible();
     await expect(drawer.getByRole('link', { name: 'Contact' })).toBeVisible();
+    await expect(drawer.getByRole('link', { name: 'Countries' })).toHaveCount(0);
   });
 });

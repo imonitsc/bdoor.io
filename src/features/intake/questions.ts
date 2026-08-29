@@ -49,18 +49,26 @@ export const OBJECTIVES = ['new', 'existing', 'expand', 'unsure'] as const;
 export type Objective = (typeof OBJECTIVES)[number];
 
 /**
- * First assessment question (65/35 master §13): where the visitor needs help.
- * Bangladesh new/existing can skip the country + objective questions; the
- * other two still ask which country (and, for unsure, the objective).
+ * First assessment question (production-fix, 29 Aug 2026): Bangladesh or
+ * outside. Outside immediately opens the six-country selector; Bangladesh
+ * opens New / Existing business.
  */
-export const HELP_SCOPES = [
-  'bangladesh_new',
-  'bangladesh_existing',
-  'international',
-  'unsure',
-] as const;
+export const MARKET_SCOPES = ['bangladesh', 'outside'] as const;
 
-export type HelpScope = (typeof HELP_SCOPES)[number];
+export type MarketScope = (typeof MARKET_SCOPES)[number];
+
+/** International countries offered after "Outside Bangladesh". */
+export const OUTSIDE_TARGET_COUNTRIES = [
+  'usa',
+  'uk',
+  'uae',
+  'saudi_arabia',
+  'qatar',
+  'singapore',
+] as const satisfies ReadonlyArray<TargetCountry>;
+
+/** Bangladesh business-stage options on the second screen. */
+export const BANGLADESH_OBJECTIVES = ['new', 'existing'] as const satisfies ReadonlyArray<Objective>;
 
 export const FOUNDER_LOCATIONS = ['bangladesh', 'outside'] as const;
 export const STRUCTURES = [
@@ -92,7 +100,7 @@ const country = z
   .transform((v) => v.toUpperCase());
 
 export const answersSchema = z.object({
-  help_scope: z.enum(HELP_SCOPES, { message: 'requiredChoice' }),
+  market_scope: z.enum(MARKET_SCOPES, { message: 'requiredChoice' }),
   target_country: z.enum(TARGET_COUNTRIES, { message: 'requiredChoice' }),
   objective: z.enum(OBJECTIVES, { message: 'requiredChoice' }),
   founder_location: z.enum(FOUNDER_LOCATIONS, { message: 'requiredChoice' }),
@@ -189,41 +197,29 @@ const isInternational = (a: PartialAnswers) =>
 const managesExistingBusiness = (a: PartialAnswers) =>
   a.objective === 'existing' || (a.objective === 'unsure' && a.existing_business === true);
 
-/** Derive country/objective implied by the master help_scope question. */
-export function answersImpliedByHelpScope(scope: HelpScope): PartialAnswers {
-  switch (scope) {
-    case 'bangladesh_new':
-      return { help_scope: scope, target_country: 'bangladesh', objective: 'new' };
-    case 'bangladesh_existing':
-      return { help_scope: scope, target_country: 'bangladesh', objective: 'existing' };
-    case 'international':
-      return { help_scope: scope };
-    case 'unsure':
-      return { help_scope: scope };
+/** Derive answers implied by the Bangladesh / Outside first screen. */
+export function answersImpliedByMarketScope(scope: MarketScope): PartialAnswers {
+  if (scope === 'bangladesh') {
+    return { market_scope: scope, target_country: 'bangladesh' };
   }
+  return { market_scope: scope };
 }
 
-/** Reverse of answersImpliedByHelpScope for URL presets. */
-export function helpScopeFromPreset(
-  country?: TargetCountry,
-  objective?: Objective,
-): HelpScope | undefined {
-  if (country === 'bangladesh' && objective === 'existing') return 'bangladesh_existing';
-  if (country === 'bangladesh') return 'bangladesh_new';
-  if (country) return 'international';
-  return undefined;
+/** Reverse mapping for URL presets (?country=). */
+export function marketScopeFromPreset(country?: TargetCountry): MarketScope | undefined {
+  if (!country) return undefined;
+  return country === 'bangladesh' ? 'bangladesh' : 'outside';
 }
 
 export const QUESTIONS: readonly QuestionDefinition[] = [
   {
-    key: 'help_scope',
+    key: 'market_scope',
     section: 'about_you',
     kind: 'choice',
-    options: HELP_SCOPES,
+    options: MARKET_SCOPES,
     showWhy: true,
-    // Always applicable so pruneInapplicable never drops the master first answer.
     shouldAsk: always,
-    schema: answersSchema.shape.help_scope,
+    schema: answersSchema.shape.market_scope,
   },
   {
     key: 'target_country',
@@ -232,11 +228,8 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     options: TARGET_COUNTRIES,
     showWhy: true,
     shouldAsk: (a) => {
-      // Keep a derived/preset answer in the applicable set so prune cannot drop it.
       if (a.target_country !== undefined) return true;
-      return (
-        a.help_scope === 'international' || a.help_scope === 'unsure' || a.help_scope === undefined
-      );
+      return a.market_scope === 'outside' || a.market_scope === undefined;
     },
     schema: answersSchema.shape.target_country,
   },
@@ -248,9 +241,8 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     showWhy: true,
     shouldAsk: (a) => {
       if (a.objective !== undefined) return true;
-      return (
-        a.help_scope === 'international' || a.help_scope === 'unsure' || a.help_scope === undefined
-      );
+      // Bangladesh: New / Existing next. Outside: still ask after country.
+      return a.market_scope === 'bangladesh' || a.market_scope === 'outside' || a.market_scope === undefined;
     },
     schema: answersSchema.shape.objective,
   },
@@ -528,6 +520,66 @@ export type StageProgress = {
 };
 
 /** Stable stage-based progress for the question at `index` (review beyond). */
+/**
+ * Visible questionnaire steps for the production-fix progress label.
+ * Conditional questions still live under stages; this is the truthful
+ * customer-facing counter (Location → Country/Business stage → …).
+ */
+export type VisibleStep = {
+  current: number;
+  total: number;
+  labelKey: 'location' | 'country' | 'business_stage' | 'structure' | 'support' | 'details' | 'contact';
+};
+
+export function visibleStep(answers: PartialAnswers, index: number): VisibleStep {
+  const total = 6;
+  const question = applicableQuestions(answers)[index];
+  if (!question) {
+    return { current: total, total, labelKey: 'contact' };
+  }
+  const key = question.key;
+  if (key === 'market_scope') return { current: 1, total, labelKey: 'location' };
+  if (key === 'target_country') return { current: 2, total, labelKey: 'country' };
+  if (key === 'objective' || key === 'existing_business') {
+    return { current: 2, total, labelKey: answers.market_scope === 'bangladesh' ? 'business_stage' : 'country' };
+  }
+  if (
+    key === 'structure' ||
+    key === 'founder_location' ||
+    key === 'nationality' ||
+    key === 'residence'
+  ) {
+    return { current: 3, total, labelKey: 'structure' };
+  }
+  if (
+    key === 'need_visa' ||
+    key === 'need_banking' ||
+    key === 'need_address' ||
+    key === 'import_export' ||
+    key === 'hire_employees' ||
+    key === 'regulated_activity' ||
+    key === 'start_window'
+  ) {
+    return { current: 4, total, labelKey: 'support' };
+  }
+  if (
+    key === 'activity' ||
+    key === 'location' ||
+    key === 'owner_count' ||
+    key === 'director_count' ||
+    key === 'foreign_owners' ||
+    key === 'entity_owner' ||
+    key === 'foreign_ownership_percent' ||
+    key === 'remit_capital' ||
+    key === 'founder_will_work' ||
+    key === 'existing_registrations' ||
+    key === 'notes'
+  ) {
+    return { current: 5, total, labelKey: 'details' };
+  }
+  return { current: 6, total, labelKey: 'contact' };
+}
+
 export function stageProgress(answers: PartialAnswers, index: number): StageProgress {
   const question = applicableQuestions(answers)[index];
   if (!question) {
