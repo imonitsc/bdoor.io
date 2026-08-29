@@ -140,7 +140,7 @@
     "preview": {
       "eyebrow": "Your workspace",
       "title": "One workspace for the whole case.",
-      "body": "This is the real customer workspace, shown here in read-only preview with sample data.",
+      "body": "A product preview of the customer workspace, shown with sample data.",
       "sample": {
         "kyc": "Identity checks complete",
         "review": "Partner eligibility review complete",
@@ -257,7 +257,8 @@
     },
     "seeDetails": "See full details",
     "includes": "Included",
-    "excludes": "Not included"
+    "excludes": "Not included",
+    "approxUsd": "About ${amount} · Rate checked {date}"
   },
   "services": {
     "indexTitle": "Services",
@@ -410,7 +411,13 @@
       "disclaimer": "bdoor is not affiliated with any government authority in {country} and does not provide legal or tax advice. Route details are confirmed with the responsible provider before any engagement.",
       "eligibilityTitle": "Check your eligibility",
       "eligibilityBody": "Tell us what you want to do in {country}. A specialist reviews eligibility first; a quotation follows only after that review.",
-      "eligibilityCta": "Check eligibility"
+      "eligibilityCta": "Check eligibility",
+      "requirementsTitle": "Requirements and eligibility",
+      "documentsTitle": "Documents you should expect to provide",
+      "documentsNote": "The appointed provider confirms the exact list for your case; nothing is uploaded until identity collection opens for your engagement.",
+      "obligationsTitle": "Ongoing obligations after formation",
+      "faqTitle": "Common questions",
+      "guideReviewed": "Guide content last reviewed {date}. Authority sources are kept in our source ledger and re-verified before any quotation."
     }
   },
   "industries": {
@@ -487,6 +494,10 @@
       "consentRequired": "Please agree before sending.",
       "spam": "We could not send your message.",
       "form": "Please check the form."
+    },
+    "interest": {
+      "title": "You're asking about",
+      "defaultMessage": "I would like to register interest in {country}. Please contact me when this route opens, with the full scope and an itemised price."
     }
   },
   "legal": {
@@ -1322,7 +1333,9 @@
       "badge": "Open now",
       "body": "Company formation, licences, tax registrations and ongoing compliance are available today through the Bangladesh catalogue.",
       "cta": "Explore Bangladesh",
-      "pricingCta": "See packages and pricing"
+      "pricingCta": "See packages and pricing",
+      "previewBadge": "Accepting enquiries",
+      "previewBody": "Explore company formation, licences, tax registrations and ongoing compliance in the Bangladesh catalogue. Run the assessment and register your interest — the team confirms scope and pricing with you before any engagement."
     },
     "routesTitle": "International routes in preparation",
     "bangladeshPage": {
@@ -1350,7 +1363,9 @@
         "title": "Not sure which route fits?",
         "body": "Answer a short set of questions and receive a preliminary recommendation, always reviewed by a person before anything is quoted.",
         "cta": "Start the assessment"
-      }
+      },
+      "previewLede": "The flagship market: explore the catalogue, run the assessment and enquire today. Engagements open once the pre-launch legal review completes.",
+      "previewOpenTitle": "What bdoor coordinates"
     }
   }
 }

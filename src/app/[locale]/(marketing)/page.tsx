@@ -16,6 +16,8 @@ import { WorkspacePreview } from '@/components/marketing/workspace-preview';
 import { FaqList } from '@/components/marketing/faq-list';
 import { getGlobalFaqs } from '@/features/catalog/queries';
 import type { Locale } from '@/features/catalog/types';
+import { operationalClaimsAllowed } from '@/lib/launch/gates';
+import { packageUsdNotes } from '@/lib/fx/usd-notes';
 import { MARKETING_ROUTES } from '@/lib/navigation';
 import { localizedUrl } from '@/lib/site';
 
@@ -64,7 +66,14 @@ function Hero() {
 
   return (
     <section className="bg-surface-inverse text-ink-inverse relative overflow-hidden">
-      <div className="container-page grid items-center gap-12 py-16 md:py-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-14 lg:py-24">
+      {/*
+        The image column is deliberately wider than the copy column (1.2 vs
+        1.05 before): the illustration read visually small inside its
+        available area, and the master instructions ask for ~10–15% more
+        presence on desktop without cropping — the ratio change delivers it
+        while `contain` keeps the full composition.
+      */}
+      <div className="container-page grid items-center gap-12 py-16 md:py-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:gap-12 lg:py-24">
         <div className="flex flex-col justify-center">
           <p className="text-xs font-semibold tracking-[0.14em] text-[color:var(--bd-turquoise-500)] uppercase">
             {t('eyebrow')}
@@ -131,13 +140,19 @@ function TrustStrip() {
   );
 }
 
-function PackagesSection({ locale }: { locale: Locale }) {
+function PackagesSection({
+  locale,
+  usdNotes,
+}: {
+  locale: Locale;
+  usdNotes?: Record<string, string>;
+}) {
   const t = useTranslations('home.packages');
   return (
     <Section>
       <div className="container-page">
         <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
-        <PackageSelector locale={locale} />
+        <PackageSelector locale={locale} usdNotes={usdNotes} />
       </div>
     </Section>
   );
@@ -214,13 +229,13 @@ function Preview() {
  * The seven-country selector (spec §6.1): the Bangladesh card larger, six
  * international cards compact, each linking to its country page.
  */
-function CountriesSection({ locale }: { locale: Locale }) {
+function CountriesSection({ locale, operational }: { locale: Locale; operational: boolean }) {
   const t = useTranslations('home.countriesSection');
   return (
     <Section>
       <div className="container-page">
         <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
-        <CountrySelector locale={locale} />
+        <CountrySelector locale={locale} operational={operational} />
       </div>
     </Section>
   );
@@ -271,15 +286,16 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   setRequestLocale(locale);
   const typedLocale = locale as Locale;
+  const usdNotes = await packageUsdNotes(typedLocale);
 
   return (
     <>
       <Hero />
       <TrustStrip />
-      <PackagesSection locale={typedLocale} />
+      <PackagesSection locale={typedLocale} usdNotes={usdNotes} />
       {FOUNDER_IMAGE_EXISTS ? <Preview /> : null}
       <ProcessAndFees locale={typedLocale} />
-      <CountriesSection locale={typedLocale} />
+      <CountriesSection locale={typedLocale} operational={operationalClaimsAllowed()} />
       <FaqAndNextStep locale={typedLocale} />
     </>
   );

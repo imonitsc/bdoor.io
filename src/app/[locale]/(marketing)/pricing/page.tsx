@@ -7,6 +7,7 @@ import { Section } from '@/components/ui/section';
 import { PageHeader } from '@/components/marketing/page-header';
 import { IndependenceDisclosure } from '@/components/layout/disclosure';
 import { PackageSelector } from '@/components/marketing/package-selector';
+import { packageUsdNotes } from '@/lib/fx/usd-notes';
 import { FeeBreakdownExample } from '@/components/marketing/fee-breakdown-example';
 import { SpecialistServicesList } from '@/components/marketing/specialist-services-list';
 import { COMMERCIAL_REVIEW_DATE } from '@/content/packages/catalog';
@@ -48,7 +49,11 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
   setRequestLocale(locale);
   const loc = locale as Locale;
 
-  const [t, format] = await Promise.all([getTranslations('pricingPage'), getFormatter()]);
+  const [t, format, usdNotes] = await Promise.all([
+    getTranslations('pricingPage'),
+    getFormatter(),
+    packageUsdNotes(loc),
+  ]);
 
   const layers = [
     'platform_service_fee',
@@ -64,7 +69,7 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
       <Section className="py-12 md:py-16">
         <div className="container-page">
           <p className="text-muted max-w-2xl text-base leading-relaxed">{t('intro')}</p>
-          <PackageSelector locale={loc} />
+          <PackageSelector locale={loc} usdNotes={usdNotes} />
           <p className="text-muted mt-6 text-xs">
             {t('reviewedOn', {
               date: format.dateTime(new Date(COMMERCIAL_REVIEW_DATE), 'long'),

@@ -35,6 +35,12 @@ const FORBIDDEN = [
   /awaiting professional review/i,
   /checkout stays disabled/i,
   /খসড়া/,
+  // Operational claims that contradict the pre-launch legal notice. The e2e
+  // environment runs with the legal gate at its draft default, so these must
+  // not render anywhere on a sales page (master instructions §5.1/§8.1).
+  /\bopen now\b/i,
+  /available today/i,
+  /real customer workspace/i,
 ];
 
 test.describe('no internal language on sales pages', () => {
@@ -69,6 +75,16 @@ test.describe('one commercial source of truth', () => {
         await expect(page.getByText(label).first(), `${label} missing on ${path}`).toBeVisible();
       }
     }
+  });
+
+  test('package cards carry an approximate USD line with its rate-check date', async ({ page }) => {
+    // The e2e web server configures a reviewed display rate (123.07), so the
+    // cards must show the approximate equivalent and when it was checked —
+    // and the BDT figure stays primary.
+    await page.goto('/en/pricing');
+    await expect(page.getByText('BDT 24,900 + RJSC fees')).toBeVisible();
+    await expect(page.getByText(/About \$202 · Rate checked/).first()).toBeVisible();
+    await expect(page.getByText(/About \$80 · Rate checked/).first()).toBeVisible();
   });
 
   test('the existing-business tab carries the other three packages', async ({ page }) => {
@@ -152,6 +168,26 @@ test.describe('seven-country truthfulness', () => {
       expect(body).not.toMatch(/Buy now/i);
       expect(body).not.toMatch(/USD\s?\d|\$\d/);
     }
+  });
+
+  test('country interest survives into the contact form', async ({ page }) => {
+    await page.goto('/en/contact?interest=qatar');
+    await expect(page.getByText("You're asking about")).toBeVisible();
+    await expect(page.getByText('Qatar', { exact: true })).toBeVisible();
+    await expect(page.locator('select[name="topic"]')).toHaveValue('foreign');
+    await expect(page.locator('textarea[name="message"]')).toHaveValue(/interest in Qatar/);
+    await expect(page.locator('input[name="interestCountry"]')).toHaveValue('qatar');
+
+    // An unknown slug is a plain enquiry — nothing echoes the query string.
+    await page.goto('/en/contact?interest=mars');
+    await expect(page.getByText("You're asking about")).toHaveCount(0);
+    const body = await page.locator('body').innerText();
+    expect(body).not.toContain('mars');
+
+    // The Bangla route resolves and localises the same interest.
+    await page.goto('/bn/contact?interest=singapore');
+    await expect(page.getByText('আপনি জানতে চাইছেন')).toBeVisible();
+    await expect(page.getByText('সিঙ্গাপুর', { exact: true })).toBeVisible();
   });
 
   test('the old /international URLs redirect permanently to /countries', async ({ page }) => {

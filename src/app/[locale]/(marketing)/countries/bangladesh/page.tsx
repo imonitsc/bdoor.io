@@ -9,6 +9,7 @@ import { PageHeader } from '@/components/marketing/page-header';
 import { IndependenceDisclosure } from '@/components/layout/disclosure';
 import { BANGLADESH_COUNTRY, pickText } from '@/content/international';
 import type { Locale } from '@/features/catalog/types';
+import { operationalClaimsAllowed } from '@/lib/launch/gates';
 import { MARKETING_ROUTES } from '@/lib/navigation';
 import { localizedUrl } from '@/lib/site';
 
@@ -49,14 +50,22 @@ export default async function BangladeshCountryPage({
   const t = await getTranslations('countries.bangladeshPage');
   const loc = locale as Locale;
   const openItems = ['formation', 'licences', 'tax', 'compliance'] as const;
+  // Enquiry-led copy while the legal documents are drafts; the operational
+  // wording ("available today") returns when the owner flips the legal gate.
+  const operational = operationalClaimsAllowed();
 
   return (
     <>
-      <PageHeader title={pickText(BANGLADESH_COUNTRY.name, loc)} description={t('lede')} />
+      <PageHeader
+        title={pickText(BANGLADESH_COUNTRY.name, loc)}
+        description={operational ? t('lede') : t('previewLede')}
+      />
 
       <Section className="py-12 md:py-16">
         <div className="container-page">
-          <h2 className="text-ink text-xl font-semibold">{t('openTitle')}</h2>
+          <h2 className="text-ink text-xl font-semibold">
+            {operational ? t('openTitle') : t('previewOpenTitle')}
+          </h2>
           <ul className="mt-5 grid gap-3 sm:grid-cols-2">
             {openItems.map((item) => (
               <li key={item} className="flex items-start gap-2.5">

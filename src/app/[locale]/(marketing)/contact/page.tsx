@@ -7,6 +7,8 @@ import { PageHeader } from '@/components/marketing/page-header';
 import { ContactForm } from '@/components/marketing/contact-form';
 import { IndependenceDisclosure } from '@/components/layout/disclosure';
 import { CONTACT_TOPICS } from '@/features/contact/schema';
+import { resolveContactInterest } from '@/features/contact/interest';
+import { pickText } from '@/content/international';
 import { SITE, localizedUrl } from '@/lib/site';
 import type { Locale } from '@/features/catalog/types';
 
@@ -35,15 +37,23 @@ export default async function ContactPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ topic?: string }>;
+  searchParams: Promise<{ topic?: string; interest?: string; package?: string }>;
 }) {
-  const [{ locale }, { topic }] = await Promise.all([params, searchParams]);
+  const [{ locale }, { topic, interest: interestParam, package: packageParam }] = await Promise.all(
+    [params, searchParams],
+  );
   setRequestLocale(locale);
   const t = await getTranslations('contact');
+  const loc = locale as Locale;
+
+  // Country CTAs arrive as /contact?interest=<slug>. The slug is resolved
+  // against the commercial catalog — an unknown value is simply a general
+  // enquiry — and the visitor sees which country they are asking about.
+  const interest = resolveContactInterest(interestParam, packageParam);
 
   const defaultTopic = CONTACT_TOPICS.includes(topic as (typeof CONTACT_TOPICS)[number])
     ? topic
-    : undefined;
+    : (interest?.topic ?? undefined);
 
   return (
     <>
@@ -52,7 +62,34 @@ export default async function ContactPage({
       <Section className="py-12 md:py-16">
         <div className="container-page grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:gap-16">
           <div className="max-w-xl">
-            <ContactForm defaultTopic={defaultTopic} />
+            {interest ? (
+              <div className="border-border bg-surface mb-6 rounded-[var(--radius-card)] border p-4">
+                <p className="text-muted text-xs font-semibold tracking-wide uppercase">
+                  {t('interest.title')}
+                </p>
+                <p className="text-ink mt-1 text-base font-semibold">
+                  {pickText(interest.countryName, loc)}
+                  {interest.routeName ? (
+                    <span className="text-muted font-normal">
+                      {' — '}
+                      {pickText(interest.routeName, loc)}
+                    </span>
+                  ) : null}
+                </p>
+              </div>
+            ) : null}
+            <ContactForm
+              defaultTopic={defaultTopic}
+              interestCountry={interest?.countrySlug}
+              interestRoute={interest?.routeSlug}
+              defaultMessage={
+                interest && interest.topic === 'foreign'
+                  ? t('interest.defaultMessage', {
+                      country: pickText(interest.countryName, loc),
+                    })
+                  : undefined
+              }
+            />
           </div>
 
           <aside className="flex h-fit flex-col gap-6">
