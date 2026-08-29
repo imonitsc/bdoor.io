@@ -46,17 +46,17 @@ See `docs/product/65-35-packages-implementation-plan.md`. Checkpoints 1–9 larg
 
 ## 7. Quality gates (this revision)
 
-| Gate              | Result                                          |
-| ----------------- | ----------------------------------------------- |
-| format:check      | Pass (after prettier)                           |
-| lint              | Pass                                            |
-| typecheck         | Pass                                            |
-| unit tests        | 253 passed                                      |
-| production build  | Pass                                            |
-| integration / e2e | Run on CI for this PR                           |
-| Vercel preview    | Created by Vercel on PR push (URL on PR checks) |
+| Gate              | Result                                                                 |
+| ----------------- | ---------------------------------------------------------------------- |
+| format:check      | Pass (after prettier)                                                  |
+| lint              | Pass                                                                   |
+| typecheck         | Pass                                                                   |
+| unit tests        | 253 passed                                                             |
+| production build  | Pass                                                                   |
+| integration / e2e | Run on CI for this PR                                                  |
+| Vercel preview    | https://bdoor-io-git-feat-bdoor-65-35-packages-mik-partners.vercel.app |
 
-## 8. Known limitations
+Screenshots (local Playwright, 1440 / 390): `/opt/cursor/artifacts/screenshots/` — hero, packages new/existing, fee breakdown, international cards, USA country page, mobile hero/nav.
 
 - Claude Code master / pricing research / production / backend instruction files were not in the upload set — implemented from Cursor master + existing repo
 - Admin pricing remains catalog-backed (no approve/publish Server Actions yet)
