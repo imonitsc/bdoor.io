@@ -187,20 +187,20 @@
       "title": "Four steps, one transparent quote.",
       "steps": {
         "one": {
-          "title": "Complete the assessment",
-          "body": "Tell us what you want to do; the questionnaire works out which registrations apply."
+          "title": "Choose your country and apply",
+          "body": "Pick one of the seven countries and answer only what applies to you. Applying is free and creates no obligation."
         },
         "two": {
-          "title": "Receive an itemised quote",
-          "body": "The bdoor fee is separated from government, partner and third-party amounts."
+          "title": "bdoor reviews and appoints your provider",
+          "body": "A specialist reviews your application within one business day and sources the licensed provider responsible for any regulated work."
         },
         "three": {
-          "title": "Upload and track securely",
-          "body": "Documents go to a private vault; milestones show who owns each step."
+          "title": "Receive and accept an itemised quote",
+          "body": "The bdoor fee is separated from provider fees, government charges and third-party costs. Nothing is payable before you accept."
         },
         "four": {
-          "title": "Continue compliance after launch",
-          "body": "Renewals, filings and reminders stay organised in the same workspace."
+          "title": "Track formation and compliance",
+          "body": "Milestones, documents, renewals and filings stay organised in one secure workspace after launch."
         }
       },
       "standaloneTitle": "Standalone services",

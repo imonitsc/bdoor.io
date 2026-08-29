@@ -103,6 +103,31 @@ test.describe('marketing site', () => {
     expect(cta!.height).toBeGreaterThanOrEqual(44);
   });
 
+  test('renders no raw translation-key path on the key pages', async ({ page }) => {
+    // next-intl renders a missing message lookup as the key path itself
+    // ("home.process.steps.one.title"). That shipped once, on /how-it-works,
+    // because nothing asserted its absence; this sweep does, in both locales.
+    const RAW_KEY =
+      /\b(?:home|nav|start|packages|countries|international|contact|footer|legal|pricingPage|howItWorksPage|admin)\.[A-Za-z_]+(?:\.[A-Za-z_]+)+\b/;
+    const paths = ['', '/how-it-works', '/countries', '/countries/qatar', '/pricing', '/contact'];
+
+    for (const locale of ['en', 'bn'] as const) {
+      for (const path of paths) {
+        await page.goto(`/${locale}${path}`);
+        const text = await page.locator('body').innerText();
+        expect(text, `raw translation key rendered on /${locale}${path}`).not.toMatch(RAW_KEY);
+      }
+    }
+  });
+
+  test('how-it-works shows the four operational steps, not key paths', async ({ page }) => {
+    await page.goto('/en/how-it-works');
+    await expect(page.getByRole('heading', { name: 'Choose your country and apply' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Receive and accept an itemised quote' }),
+    ).toBeVisible();
+  });
+
   test('never promises approval', async ({ page }) => {
     await page.goto('/en');
     const body = (await page.locator('body').innerText()).toLowerCase();
