@@ -69,7 +69,14 @@ function Hero() {
           <p className="text-muted mt-6 text-sm">{t('trustLine')}</p>
         </div>
 
-        <HeroFounder alt={t('founderAlt')} />
+        {/*
+          The artwork is a cut-out whose subject runs to the very bottom of the
+          artboard (no transparent margin there), so the section's own bottom
+          padding read as a gap under the chair. Pulling the column down by
+          exactly that padding stands the figure on the section's bottom rule
+          instead, and leaves the text column's padding untouched.
+        */}
+        <HeroFounder alt={t('founderAlt')} className="-mb-14 self-end md:-mb-16 lg:-mb-[4.5rem]" />
       </div>
     </section>
   );
