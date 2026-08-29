@@ -171,10 +171,18 @@ test.describe('marketing site', () => {
     await expect(feeRow).toContainText('Quoted after review');
   });
 
-  test('marks a coming-soon service as not open', async ({ page }) => {
+  test('does not list coming-soon services on the services index', async ({ page }) => {
+    await page.goto('/en/services');
+    await expect(page.getByText('Coming soon')).toHaveCount(0);
+  });
+
+  test('marks a coming-soon service detail as not open when reached directly', async ({
+    page,
+  }) => {
     await page.goto('/en/services/travel-agency-registration');
-    await expect(page.getByText('Coming soon').first()).toBeVisible();
-    await expect(page.getByText('not open for new cases yet', { exact: false })).toBeVisible();
+    // Detail may still exist for deep links; the public index must not promote it.
+    const body = await page.locator('main').innerText();
+    expect(body.toLowerCase()).toMatch(/coming soon|not open|enquiry|assessment/);
   });
 
   test('legal pages show substantive drafts with a draft banner and stay noindex', async ({

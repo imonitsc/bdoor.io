@@ -47,9 +47,11 @@ export default async function ServicesPage({
   ]);
 
   const activeCategory = categories.some((c) => c.slug === category) ? category : undefined;
+  // Production-fix: do not display Coming soon services publicly.
+  const published = services.filter((s) => s.status === 'published');
   const visible = activeCategory
-    ? services.filter((s) => s.categorySlug === activeCategory)
-    : services;
+    ? published.filter((s) => s.categorySlug === activeCategory)
+    : published;
 
   return (
     <>
