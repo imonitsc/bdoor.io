@@ -9,6 +9,7 @@ import { PackageSelector } from '@/components/marketing/package-selector';
 import { FeeBreakdownExample } from '@/components/marketing/fee-breakdown-example';
 import { InternationalOfferCards } from '@/components/marketing/international-offer-cards';
 import { SpecialistServicesList } from '@/components/marketing/specialist-services-list';
+import { HeroFounder } from '@/components/marketing/hero-founder';
 import { WorkspacePreview } from '@/components/marketing/workspace-preview';
 import { FaqList } from '@/components/marketing/faq-list';
 import { getGlobalFaqs } from '@/features/catalog/queries';
@@ -36,16 +37,16 @@ export async function generateMetadata({
 }
 
 /**
- * Six sections before the footer, in the order a first-time visitor needs
- * them: what bdoor does (hero, with the real workspace as its visual), why to
- * trust the process, which package fits, how fees and delivery work, which
- * international routes are being prepared, and what to do next.
+ * Seven sections before the footer, in the order a first-time visitor needs
+ * them: what bdoor does (hero, with the founder photograph as its visual),
+ * why to trust the process, which package fits, what the workspace looks
+ * like, how fees and delivery work, which international routes are being
+ * prepared, and what to do next.
  *
- * The owner-approved founder photograph is still not in the repository, so
- * the hero's visual is the read-only workspace preview — a real product
- * surface with clearly fictional data — rather than stock imagery or a
- * generated person. Recorded in the final report; swapping the photograph in
- * later touches only the hero's right column.
+ * This branch swaps the hero's visual from the workspace preview to the
+ * founder photograph and moves the preview into its own section; the unit
+ * guard on the image file keeps the branch red until the photograph is
+ * actually committed, so this cannot merge with an empty hero.
  */
 
 function Hero() {
@@ -83,7 +84,7 @@ function Hero() {
           <p className="text-muted-inverse mt-8 text-sm">{t('operatorLine')}</p>
         </div>
 
-        <WorkspacePreview />
+        <HeroFounder alt={t('imageAlt')} className="lg:self-end" />
       </div>
     </section>
   );
@@ -181,6 +182,20 @@ function ProcessAndFees({ locale }: { locale: Locale }) {
   );
 }
 
+function Preview() {
+  const t = useTranslations('home.preview');
+  return (
+    <Section tone="sunken">
+      <div className="container-page">
+        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} align="center" />
+        <div className="mt-10">
+          <WorkspacePreview />
+        </div>
+      </div>
+    </Section>
+  );
+}
+
 function InternationalSection({ locale }: { locale: Locale }) {
   const t = useTranslations('home.internationalSection');
   return (
@@ -244,6 +259,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <Hero />
       <TrustStrip />
       <PackagesSection locale={typedLocale} />
+      <Preview />
       <ProcessAndFees locale={typedLocale} />
       <InternationalSection locale={typedLocale} />
       <FaqAndNextStep locale={typedLocale} />
