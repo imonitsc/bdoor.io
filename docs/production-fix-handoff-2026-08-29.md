@@ -2,15 +2,16 @@
 
 Branch: `cursor/premium-production-fix-f1f5`  
 PR: https://github.com/imonitsc/bdoor.io/pull/35  
-Status: preview-only — **do not deploy production**
+Preview: https://bdoor-io-git-cursor-premium-production-fix-f1f5-mik-partners.vercel.app  
+Status: CI green · preview-only — **do not deploy production**
 
 ## Done
 
-1. Start flow: Bangladesh / Outside order, truthful Step N of 6 progress, non-blocking save, submit answer sync, deep-link context.
+1. Start flow: Bangladesh / Outside order, truthful Step N of 6 progress, local-first Continue (background sync after email), submit answer sync, deep-link context.
 2. Homepage: five sections; no international sales grid; Start now CTA; Countries out of header.
-3. Legal: Aug 29 pack, draft banner + noindex, `/legal` index + four new policy routes, `LEGAL_LAUNCH_APPROVED`.
+3. Legal: Aug 29 pack, draft banner/`noindex`, `/legal` index + four new policy routes, `LEGAL_LAUNCH_APPROVED`.
 4. Bangladesh hub expanded; Services hides coming-soon + formation-documents slot.
-5. Unit/typecheck/lint/format/build green locally.
+5. Local verify + full GitHub CI (format/lint/types/unit/build, migrations/RLS, Playwright/a11y) green.
 
 ## Missing owner inputs
 
@@ -24,8 +25,7 @@ Status: preview-only — **do not deploy production**
 ## Known limitations
 
 - Bangla legal routes show the full English draft with a translation-review notice.
-- International country pages are still longer than ideal; further trim can follow once preview is reviewed.
-- E2E/integration results will land from CI on this PR.
+- International country pages can still be trimmed further after preview review.
 
 ## Env
 
