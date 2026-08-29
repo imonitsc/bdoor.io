@@ -50,6 +50,21 @@ async function chooseObjective(page: import('@playwright/test').Page, name: stri
   });
 }
 
+/**
+ * The business-category step. Typing into the search first is not incidental:
+ * with 141 options the list is only usable filtered, so the guard covers the
+ * search as well as the selection.
+ */
+async function chooseCategory(page: import('@playwright/test').Page, search: string, name: string) {
+  await expect(page.getByText('What kind of business is it?')).toBeVisible();
+  await answer(page, async () => {
+    await page.getByLabel('Search categories').fill(search);
+    const radio = page.getByRole('radio', { name, exact: true });
+    await radio.check();
+    await expect(radio).toBeChecked();
+  });
+}
+
 /** The shared contact + consent close of every branch. */
 async function completeContactStage(page: import('@playwright/test').Page) {
   await expect(page.getByText('Your full name')).toBeVisible();
@@ -130,7 +145,7 @@ test.describe('application flow', () => {
       await page.getByRole('combobox').selectOption('BD');
     });
 
-    await expect(page.getByText('What will the business actually do?')).toBeVisible();
+    await expect(page.getByText('What kind of business is it?')).toBeVisible();
     await expect(page.getByText('Which country do you currently live in?')).toHaveCount(0);
   });
 
@@ -174,7 +189,14 @@ test.describe('application flow', () => {
       await page.getByRole('combobox').selectOption('BD');
     });
 
-    // A one-word activity is rejected by the shared schema.
+    // The category is required, and nothing is selected yet.
+    await expect(page.getByText('What kind of business is it?')).toBeVisible();
+    await page.getByRole('button', { name: /^Continue$/ }).click();
+    await expect(page.getByText('What kind of business is it?')).toBeVisible();
+
+    // "Other" is the only route back to the free-text box, and a one-word
+    // description is still rejected by the shared schema.
+    await chooseCategory(page, 'other', 'Other — not listed here');
     await expect(page.getByText('What will the business actually do?')).toBeVisible();
     await page.getByRole('textbox').fill('shop');
     await page.getByRole('button', { name: /^Continue$/ }).click();
@@ -204,9 +226,7 @@ test.describe('application flow', () => {
 
     await answer(page, async () => page.getByRole('radio', { name: 'In Bangladesh' }).click());
     await answer(page, async () => page.getByRole('combobox').selectOption('BD'));
-    await answer(page, async () =>
-      page.getByRole('textbox').fill('Sell handmade leather bags from a shop in Dhaka.'),
-    );
+    await chooseCategory(page, 'leather', 'Leather goods and footwear manufacturing');
     await answer(page, async () => page.getByRole('textbox').fill('Dhaka'));
     await answer(page, async () =>
       page.getByRole('radio', { name: 'Sole proprietorship' }).click(),
@@ -253,9 +273,7 @@ test.describe('application flow', () => {
 
     await answer(page, async () => page.getByRole('combobox').selectOption('BD')); // nationality
     await answer(page, async () => page.getByRole('combobox').selectOption('BD')); // residence
-    await answer(page, async () =>
-      page.getByRole('textbox').fill('Sell software subscriptions to customers in the USA.'),
-    );
+    await chooseCategory(page, 'saas', 'SaaS or online product');
     await answer(page, async () => page.getByRole('spinbutton').fill('1')); // owners
     await answer(page, async () => page.getByRole('radio', { name: 'No', exact: true }).click()); // entity owner
     await answer(page, async () => page.getByRole('radio', { name: 'No', exact: true }).click()); // visa
@@ -284,9 +302,7 @@ test.describe('application flow', () => {
 
     await answer(page, async () => page.getByRole('combobox').selectOption('BD'));
     await answer(page, async () => page.getByRole('combobox').selectOption('BD'));
-    await answer(page, async () =>
-      page.getByRole('textbox').fill('Open an online store serving customers in the USA.'),
-    );
+    await chooseCategory(page, 'online store', 'Online store or e-commerce');
     await answer(page, async () => page.getByRole('spinbutton').fill('1'));
     await answer(page, async () => page.getByRole('radio', { name: 'No', exact: true }).click());
     await answer(page, async () => page.getByRole('radio', { name: 'No', exact: true }).click());
@@ -314,9 +330,7 @@ test.describe('application flow', () => {
     await answer(page, async () => page.getByRole('radio', { name: 'Outside Bangladesh' }).click());
     await answer(page, async () => page.getByRole('combobox').selectOption('SG'));
     await answer(page, async () => page.getByRole('combobox').selectOption('SG'));
-    await answer(page, async () =>
-      page.getByRole('textbox').fill('Provide software consulting services to local banks.'),
-    );
+    await chooseCategory(page, 'IT services', 'IT services and support');
     await answer(page, async () => page.getByRole('textbox').fill('Dhaka'));
     await answer(page, async () =>
       page.getByRole('radio', { name: 'Private limited company' }).click(),
