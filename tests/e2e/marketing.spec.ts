@@ -94,7 +94,7 @@ test.describe('marketing site', () => {
   test('how-it-works shows the four operational steps, not key paths', async ({ page }) => {
     await page.goto('/en/how-it-works');
     await expect(
-      page.getByRole('heading', { name: 'Choose your country and apply' }),
+      page.getByRole('heading', { name: 'Tell us what you need and apply' }),
     ).toBeVisible();
     await expect(
       page.getByRole('heading', { name: 'Receive and accept an itemised quote' }),
