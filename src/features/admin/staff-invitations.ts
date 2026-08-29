@@ -89,9 +89,9 @@ export async function inviteStaff(
 
   await getEmailProvider().send({
     to: parsed.data.email,
-    subject: 'You have been invited to the BDoor staff workspace',
+    subject: 'You have been invited to the bdoor staff workspace',
     text:
-      `${session.fullName} invited you to the BDoor staff workspace.\n\n` +
+      `${session.fullName} invited you to the bdoor staff workspace.\n\n` +
       `Accept the invitation: ${acceptUrl}\n\n` +
       `This link expires in ${INVITE_TTL_DAYS} days and can be used once. ` +
       `You will be asked to set up a second factor before you can use the workspace.\n\n` +

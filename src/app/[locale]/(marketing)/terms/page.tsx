@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { LegalPage } from '@/components/marketing/legal-page';
 import { LEGAL_DOCUMENTS } from '@/content/legal/documents';
 import { localizedUrl } from '@/lib/site';
+import { legalContentStatus } from '@/lib/launch/gates';
 import type { Locale } from '@/features/catalog/types';
 
 const DOCUMENT = LEGAL_DOCUMENTS['terms'];
@@ -19,6 +20,8 @@ export async function generateMetadata({
   return {
     title,
     description: title,
+    // Working drafts are not indexable legal text.
+    robots: legalContentStatus() === 'draft' ? { index: false, follow: true } : undefined,
     alternates: {
       canonical: localizedUrl(locale as Locale, '/terms'),
       languages: {

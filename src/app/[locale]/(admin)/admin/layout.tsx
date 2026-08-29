@@ -8,6 +8,7 @@ import {
   Handshake,
   LayoutDashboard,
   Newspaper,
+  Package,
   ScrollText,
   Settings,
   ShieldAlert,
@@ -78,7 +79,10 @@ export default async function AdminLayout({
         ]
       : []),
     ...(has('service.manage')
-      ? [{ href: ADMIN_ROUTES.services, label: t('services'), icon: <Tags className="size-4" /> }]
+      ? [
+          { href: ADMIN_ROUTES.services, label: t('services'), icon: <Tags className="size-4" /> },
+          { href: ADMIN_ROUTES.pricing, label: t('pricing'), icon: <Package className="size-4" /> },
+        ]
       : []),
     ...(has('payment.read')
       ? [{ href: ADMIN_ROUTES.finance, label: t('finance'), icon: <Banknote className="size-4" /> }]

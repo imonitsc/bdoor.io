@@ -47,7 +47,7 @@ export default async function AuthLayout({
         <PortalVisual className="pointer-events-none absolute -end-16 top-1/2 w-[28rem] -translate-y-1/2 opacity-70" />
         <div className="relative max-w-sm">
           <p className="text-xs font-semibold tracking-[0.14em] text-[color:var(--bd-turquoise-500)] uppercase">
-            BDoor
+            bdoor
           </p>
           <p className="text-ink-inverse mt-4 text-2xl leading-snug">
             Company formation, licences, tax setup and compliance — in one secure workspace.

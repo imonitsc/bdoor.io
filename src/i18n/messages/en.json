@@ -1,9 +1,9 @@
 {
   "brand": {
-    "name": "BDoor",
+    "name": "bdoor",
     "tagline": "Your door to business in Bangladesh",
     "promise": "Everything your business needs in Bangladesh. One door.",
-    "disclosure": "BDoor is an independent business setup and administrative-support platform. BDoor is not a government authority or law firm. Legal services, where required, are provided under a separate engagement by independent advocates or partner law firms. Government approval and processing times are not guaranteed."
+    "disclosure": "bdoor is an independent business setup and administrative-support platform. bdoor is not a government authority or law firm. Legal services, where required, are provided under a separate engagement by independent advocates or partner law firms. Government approval and processing times are not guaranteed."
   },
   "common": {
     "continue": "Continue",
@@ -78,10 +78,11 @@
     "mainNavigation": "Main navigation",
     "workspace": "Workspace",
     "adminArea": "Admin",
-    "partnerArea": "Partner"
+    "partnerArea": "Partner",
+    "bangladesh": "Bangladesh",
+    "packages": "Packages"
   },
   "footer": {
-    "servicesHeading": "Services",
     "companyHeading": "Company",
     "legalHeading": "Legal",
     "contactHeading": "Contact",
@@ -92,123 +93,37 @@
     "links": {
       "formation": "Company formation",
       "licences": "Trade licences",
-      "importExport": "Import and export",
       "tax": "Tax and VAT",
       "compliance": "Annual compliance",
-      "international": "International routes",
-      "technology": "Technology",
-      "ecommerce": "E-commerce",
-      "importExportIndustry": "Import and export",
-      "manufacturing": "Manufacturing"
+      "internationalOverview": "Overview",
+      "unitedStates": "United States",
+      "unitedKingdom": "United Kingdom",
+      "uae": "United Arab Emirates",
+      "singapore": "Singapore"
     },
-    "industriesHeading": "Industries",
-    "socialHeading": "Follow bdoor"
+    "socialHeading": "Follow bdoor",
+    "bangladeshHeading": "Bangladesh",
+    "internationalHeading": "International"
   },
   "home": {
     "hero": {
-      "eyebrow": "Your door to business in Bangladesh",
-      "headline": "Everything your business needs in Bangladesh. One door.",
-      "support": "Form your company, obtain licences, coordinate tax and manage compliance through one secure workspace.",
-      "primaryCta": "Find what you need",
-      "secondaryCta": "See how bdoor works",
+      "eyebrow": "Bangladesh business setup and compliance",
+      "headline": "Start and run your business in Bangladesh. Expand globally when you are ready.",
+      "support": "Form your company, complete essential registrations and manage ongoing compliance in one secure workspace. International formation routes are available only through approved country specialists.",
+      "primaryCta": "Start in Bangladesh",
+      "secondaryCta": "Explore international routes",
+      "operatorLine": "Operated by bdoor compliance ltd.",
       "imageAlt": "Bangladeshi entrepreneur managing a new business through bdoor"
     },
-    "trust": {
-      "pricing": "Itemised pricing",
-      "bilingual": "English and Bangla",
-      "workspace": "Secure workspace",
-      "coordination": "Professional coordination"
-    },
-    "advisor": {
-      "title": "What do you want to do in Bangladesh?",
-      "help": "Pick the closest option. You can change it later — nothing is final until you confirm.",
-      "continue": "Continue",
-      "options": {
-        "localCompany": "Start a local company",
-        "foreignFounder": "Start as a foreign founder",
-        "importExport": "Import or export",
-        "travelAgency": "Open a travel agency",
-        "existingCompany": "Manage an existing company"
-      }
-    },
-    "howItWorks": {
-      "eyebrow": "How it works",
-      "title": "Seven steps, one workspace.",
-      "steps": {
-        "one": {
-          "title": "Complete the assessment",
-          "body": "Answer a guided questionnaire about your activity, owners and plans. We use it to work out which registrations actually apply to you."
-        },
-        "two": {
-          "title": "Verify identity and business facts",
-          "body": "You complete KYC/KYB checks and confirm the facts we need before any filing work begins."
-        },
-        "three": {
-          "title": "Receive an itemised quotation",
-          "body": "Your quote separates our fee from government fees, partner fees and third-party costs — nothing hidden behind a dash."
-        },
-        "four": {
-          "title": "Approve and pay",
-          "body": "Pay the permitted amounts through a secure checkout. Government fees are never routed through bdoor unless explicitly stated."
-        },
-        "five": {
-          "title": "Upload required documents",
-          "body": "Everything goes to a private vault with a clear checklist — never email."
-        },
-        "six": {
-          "title": "Track preparation and authority milestones",
-          "body": "See who owns each step — you, bdoor, a partner or the authority — and what is blocking progress."
-        },
-        "seven": {
-          "title": "Receive records and compliance reminders",
-          "body": "Approved certificates land in your vault. Renewals, filings and tax dates become reminders instead of surprises."
-        }
-      }
-    },
-    "serviceFinder": {
-      "eyebrow": "Service discovery",
-      "title": "Find what you need",
-      "body": "Start with your goal. We map it to services in our catalogue — or a consultation when something is not yet available.",
-      "cta": "Continue",
-      "intents": {
-        "startCompany": "Start a company",
-        "getLicence": "Get a licence",
-        "registerTax": "Register tax/VAT",
-        "importExport": "Import or export",
-        "manageExisting": "Manage an existing company",
-        "hireForeign": "Hire foreign staff",
-        "protectBrand": "Protect a brand",
-        "governmentProcurement": "Prepare for government procurement",
-        "annualCompliance": "Maintain annual compliance",
-        "expandInternational": "Expand internationally"
-      },
-      "status": {
-        "available": "Available",
-        "pilot": "Pilot",
-        "coming_soon": "Coming soon",
-        "consultation": "Consultation"
-      }
-    },
-    "international": {
-      "eyebrow": "Bangladesh and beyond",
-      "title": "Bangladesh first. International when ready.",
-      "body": "Start and manage companies in Bangladesh, the USA, UK, UAE and Singapore through verified country specialists — not generic offshore registration.",
-      "cta": "Explore international routes"
-    },
-    "compliance": {
-      "eyebrow": "Continuing compliance",
-      "title": "Stay ahead of renewals and filings.",
-      "body": "Annual returns, licence renewals, tax dates and partner coordination — organised in one calendar with reminders you can act on."
-    },
-    "categories": {
-      "eyebrow": "What we help with",
-      "title": "Six areas that cover most founders.",
-      "body": "Every service page explains what is included, what is not, and which authority decides the outcome."
+    "packages": {
+      "eyebrow": "Bangladesh packages",
+      "title": "Choose a starting package.",
+      "body": "Three options for new businesses and three for companies already operating. Every price separates the bdoor fee from official costs."
     },
     "foreignFounders": {
       "eyebrow": "Foreign founders",
       "title": "Enter Bangladesh with a clear path.",
-      "body": "BDoor coordinates structure review, incorporation, investment registration, capital-remittance documentation and visa or work-permit support through appropriate professionals. We tell you which steps require a partner advocate and which we handle directly.",
+      "body": "bdoor coordinates structure review, incorporation, investment registration, capital-remittance documentation and visa or work-permit support through appropriate professionals. We tell you which steps require a partner advocate and which we handle directly.",
       "important": "Company incorporation does not itself grant residency or work authorisation. Those are separate applications decided by the relevant authorities.",
       "cta": "Explore foreign-founder services",
       "points": {
@@ -219,7 +134,7 @@
     },
     "preview": {
       "eyebrow": "Your workspace",
-      "title": "One place to see exactly where things stand.",
+      "title": "One workspace for the whole case.",
       "body": "This is the real customer workspace, shown here in read-only preview with sample data.",
       "sample": {
         "kyc": "Identity checks complete",
@@ -242,27 +157,62 @@
     "partners": {
       "eyebrow": "Partner model",
       "title": "We coordinate. Verified professionals do the regulated work.",
-      "body": "BDoor manages your case, your documents and your deadlines. Where a matter requires legal or specialist authority — drafting, representation, regulated filings — a verified partner advocate or firm is engaged separately and identified to you before any document is shared.",
+      "body": "bdoor manages your case, your documents and your deadlines. Where a matter requires legal or specialist authority — drafting, representation, regulated filings — a verified partner advocate or firm is engaged separately and identified to you before any document is shared.",
       "cta": "How partnering works"
     },
     "faq": {
-      "eyebrow": "Questions",
-      "title": "Straight answers before you start.",
-      "cta": "See all questions"
+      "eyebrow": "Questions founders ask",
+      "title": "The short answers first.",
+      "cta": "Read how the whole process works"
     },
     "finalCta": {
-      "title": "Open the door to your Bangladesh business.",
-      "body": "Start the questionnaire. It takes about five minutes and you can save and come back.",
-      "primary": "Start your business",
-      "secondary": "Talk to us first"
+      "title": "Ready when you are.",
+      "body": "Start the assessment, or talk to us first — either way you see an itemised quote before anything is payable.",
+      "primary": "Start in Bangladesh",
+      "secondary": "Contact us"
+    },
+    "trust": {
+      "quotes": "Transparent itemised quotes",
+      "workspace": "Secure document workspace",
+      "caseManagement": "Bangladesh-focused case management",
+      "specialists": "Specialists engaged separately when required"
+    },
+    "process": {
+      "eyebrow": "Process and fees",
+      "title": "Four steps, one transparent quote.",
+      "steps": {
+        "one": {
+          "title": "Complete the assessment",
+          "body": "Tell us what you want to do; the questionnaire works out which registrations apply."
+        },
+        "two": {
+          "title": "Receive an itemised quote",
+          "body": "The bdoor fee is separated from government, partner and third-party amounts."
+        },
+        "three": {
+          "title": "Upload and track securely",
+          "body": "Documents go to a private vault; milestones show who owns each step."
+        },
+        "four": {
+          "title": "Continue compliance after launch",
+          "body": "Renewals, filings and reminders stay organised in the same workspace."
+        }
+      },
+      "standaloneTitle": "Standalone services",
+      "standaloneSummary": "Published bdoor fees for common registrations"
+    },
+    "internationalSection": {
+      "eyebrow": "International routes",
+      "title": "Expanding beyond Bangladesh?",
+      "body": "USA, UK, UAE and Singapore routes are being prepared with licensed country specialists. Register interest and we will contact you when a route opens, with an itemised price."
     }
   },
   "howItWorksPage": {
-    "title": "How BDoor works",
+    "title": "How bdoor works",
     "description": "From your first question to your annual filings — what happens, who does it, and what it costs.",
     "responsibilities": {
       "title": "Who does what",
-      "bdoor": "BDoor",
+      "bdoor": "bdoor",
       "partner": "Partner professional",
       "authority": "Government authority",
       "customer": "You"
@@ -283,6 +233,27 @@
       "compliance": "Ongoing compliance"
     }
   },
+  "packages": {
+    "segmentLabel": "Business stage",
+    "segments": {
+      "newBusiness": "New business",
+      "existingBusiness": "Existing business"
+    },
+    "cardCta": "Start assessment",
+    "feeExample": {
+      "title": "Limited Company — what the quote separates",
+      "bdoor": "bdoor professional fee",
+      "variable": "Government, partner and third-party amounts",
+      "variableNote": "These vary with capital, location and filings. Your itemised quote confirms them before you accept anything.",
+      "taxNote": "Applicable taxes, if any, are confirmed in your itemised quote."
+    },
+    "specialist": {
+      "moreOnRequest": "Additional coordination services are available on request with itemised fees."
+    },
+    "seeDetails": "See full details",
+    "includes": "Included",
+    "excludes": "Not included"
+  },
   "services": {
     "indexTitle": "Services",
     "indexDescription": "Company formation, licences, registrations, tax setup and ongoing compliance in Bangladesh.",
@@ -301,13 +272,13 @@
     "milestones": "Process milestones",
     "fees": "How fees work",
     "authority": "Responsible authority",
-    "authorityNote": "BDoor is not affiliated with this authority and does not act on its behalf.",
+    "authorityNote": "bdoor is not affiliated with this authority and does not act on its behalf.",
     "faq": "Common questions",
     "emptyState": "No services match these filters yet.",
     "comingSoonNote": "This service is not open for new cases yet. Tell us you are interested and we will contact you when it opens.",
     "notifyMe": "Tell us you are interested",
     "feeCategories": {
-      "platform_service_fee": "BDoor service fee",
+      "platform_service_fee": "bdoor service fee",
       "government_fee_estimate": "Government fee (estimate)",
       "partner_professional_fee": "Partner professional fee",
       "third_party_cost": "Third-party cost",
@@ -317,24 +288,28 @@
     }
   },
   "pricingPage": {
-    "title": "Pricing",
-    "description": "What BDoor charges, what the government charges, and what is decided case by case.",
-    "intro": "We do not force every service into a fixed package, because official fees genuinely vary by capital, location and sector. Here is how we handle that.",
-    "standardTitle": "Standardised BDoor work",
-    "standardBody": "Where our work is predictable, we publish a starting service fee. It covers preparation, review, submission handling and case management.",
-    "quoteTitle": "Personalised quotes",
-    "quoteBody": "Foreign ownership, regulated sectors, complex structures and multi-licence projects get an itemised quote after review. You see the breakdown before you accept anything.",
-    "subscriptionTitle": "Ongoing compliance",
-    "subscriptionBody": "Annual filings, renewals and tax coordination can be handled as a recurring engagement. Pricing is being finalised and is not yet open for sign-up.",
-    "inclusionsTitle": "What is included in a displayed price",
-    "vatIncluded": "VAT/tax included",
-    "vatExcluded": "VAT/tax excluded",
-    "govIncluded": "Government fees included",
-    "govExcluded": "Government fees excluded",
-    "partnerExcluded": "Partner professional fees quoted separately",
-    "thirdPartyExcluded": "Third-party costs (notarisation, translation, courier) charged at cost",
-    "noPublishedFee": "Quoted after review",
-    "cta": "Get a personalised quote"
+    "title": "Packages and pricing",
+    "description": "Six Bangladesh packages with published bdoor fees, and what your itemised quote separates.",
+    "intro": "Every figure below is the bdoor professional fee. Government, partner and third-party amounts are always shown separately in your quote, and nothing is payable until you accept it.",
+    "feesTitle": "What an itemised quote separates",
+    "feesBody": "One example, using the Limited Company package. The same separation applies to every package and standalone service.",
+    "layersTitle": "The fee layers",
+    "layers": {
+      "platform_service_fee": "bdoor professional fee — the only line bdoor keeps",
+      "government_fee_estimate": "Government and authority fees — paid to the authority, passed through at cost",
+      "partner_professional_fee": "Partner professional fees — engaged separately, itemised before you accept",
+      "third_party_cost": "Third-party costs — notary, translation, certification and similar"
+    },
+    "standaloneTitle": "Standalone services",
+    "standaloneBody": "Common registrations with published bdoor fees. Anything not listed is quoted after a short assessment.",
+    "variableTitle": "Why some amounts are quoted, not listed",
+    "variableBody": "Statutory and partner costs depend on capital, location, sector and filings. We confirm them in your itemised quote before you accept anything — a fixed number printed here would be wrong for many businesses.",
+    "taxNote": "Applicable taxes, if any, are confirmed in your itemised quote.",
+    "reviewedOn": "Prices last reviewed on {date}.",
+    "browseServices": "Browse the full service catalogue",
+    "cta": "Get your itemised quote",
+    "ctaBody": "The assessment takes a few minutes and produces a quote that separates every fee layer.",
+    "noPublishedFee": "Quoted after review"
   },
   "foreignFoundersPage": {
     "title": "Foreign founders",
@@ -343,7 +318,7 @@
     "stepsBody": "Most delays come from doing the right things in the wrong order. This is the sequence banks and authorities expect.",
     "notTitle": "What this does not give you",
     "capitalTitle": "Where your investment capital goes",
-    "capitalBody": "Investment and share capital is remitted to a bank account in the company’s name through the proper channel, and the bank issues an encashment certificate. It is never paid to BDoor, and BDoor never holds it.",
+    "capitalBody": "Investment and share capital is remitted to a bank account in the company’s name through the proper channel, and the bank issues an encashment certificate. It is never paid to bdoor, and bdoor never holds it.",
     "servicesTitle": "Services for foreign founders",
     "cta": "Start with an eligibility review",
     "sequence": {
@@ -378,8 +353,8 @@
     }
   },
   "partnersPage": {
-    "title": "Partners",
-    "description": "How verified advocates and specialist firms work with BDoor.",
+    "title": "Join our specialist network",
+    "description": "How licensed advocates, chartered accountants and specialist firms work with bdoor — and how verification protects customers before any case is shared.",
     "applyTitle": "Work with us",
     "applyBody": "If you are a licensed advocate, chartered accountant or specialist consultancy in Bangladesh, tell us about your practice. Every partner is verified before receiving a case.",
     "applyCta": "Register interest",
@@ -387,17 +362,16 @@
     "canTitle": "What a partner can do",
     "cannotTitle": "What a partner cannot do",
     "directoryTitle": "Verified partners",
-    "directoryEmpty": "No partner organisation has completed verification yet. We will list them here once they have.",
     "can": {
       "assigned": "See only the cases assigned to their organisation.",
       "documents": "Receive case documents once the customer has authorised that specific sharing.",
       "tasks": "Update their own tasks and the milestones they own.",
       "upload": "Upload drafts, applications, official receipts and certificates.",
       "message": "Message the customer through a controlled, logged case thread.",
-      "notes": "Add confidential notes visible only to authorised BDoor and partner staff."
+      "notes": "Add confidential notes visible only to authorised bdoor and partner staff."
     },
     "cannot": {
-      "browse": "Browse BDoor customers they are not assigned to.",
+      "browse": "Browse bdoor customers they are not assigned to.",
       "finance": "Change financial records outside their own scope.",
       "selfVerify": "Approve their own organisation’s verification.",
       "aml": "View internal AML analysis unless specifically authorised.",
@@ -407,14 +381,36 @@
   },
   "international": {
     "title": "International",
-    "description": "Start and manage companies in Bangladesh, the USA, UK, UAE and Singapore through verified country specialists.",
-    "intro": "Bangladesh is our flagship market. International routes open only when a verified provider and operating process are ready — we do not present a country as available before then.",
+    "description": "Formation routes for the USA, UK, UAE and Singapore, opened only through approved country specialists.",
+    "intro": "Bangladesh is our flagship market. An international route opens only when an approved provider, operating process and price sheet are in place — until then the honest status is \"register interest\", and that is what we show.",
     "status": {
       "available": "Available",
-      "comingSoon": "Coming soon"
+      "request_quote": "Request a quote",
+      "register_interest": "Register interest",
+      "not_available": "Not currently available"
     },
+    "bangladeshTitle": "Bangladesh — open now",
+    "bangladeshBody": "Company formation, licences, tax registrations and ongoing compliance are available today through the Bangladesh catalogue.",
     "exploreBangladesh": "Explore Bangladesh services",
-    "notifyNote": "Register interest through contact — we will not advertise this route until it is operationally ready."
+    "routesTitle": "Country routes",
+    "viewRoute": "View {country}",
+    "notifyNote": "Registering interest costs nothing and commits you to nothing. We contact you when the route is operationally ready.",
+    "country": {
+      "metaTitle": "{country} company formation",
+      "metaDescription": "The {country} formation route bdoor is preparing: scope, provider model and how to register interest.",
+      "lede": "{route} — a route we are preparing with licensed local specialists for {country}.",
+      "statusLine": "This route is in preparation and not yet open for orders.",
+      "scopeTitle": "What this route covers",
+      "providerTitle": "Who performs the work",
+      "providerBody": "Regulated work in this country is performed by a licensed local provider, not by bdoor. We name the responsible provider, and what they receive, before any engagement or payment. bdoor coordinates the case and your documents in one workspace.",
+      "pricingTitle": "Pricing",
+      "pricingBody": "No price is published for this route yet. When the provider agreement and price sheet are approved, the page will show an itemised quote that separates the bdoor fee from official and provider costs — until then, anything we printed would be a guess.",
+      "registerTitle": "Register your interest",
+      "registerBody": "Tell us what you want to do in {country} and we will contact you when the route opens, with the full scope and an itemised price.",
+      "registerCta": "Register interest",
+      "noPaymentNote": "No payment is taken and no obligation is created by registering interest.",
+      "disclaimer": "bdoor is not affiliated with any government authority in {country} and does not provide legal or tax advice. Route details are confirmed with the responsible provider before any engagement."
+    }
   },
   "industries": {
     "title": "Industries",
@@ -444,17 +440,17 @@
     "empty": "No guides published yet."
   },
   "about": {
-    "title": "About BDoor",
+    "title": "About bdoor",
     "description": "Why we built a Bangladesh-focused company operating system, and how we work.",
     "missionTitle": "Why we built this",
     "howTitle": "How we work",
     "limitsTitle": "What we are not",
     "mission1": "Starting a business in Bangladesh is not hard because the rules are secret. It is hard because they are scattered: different authorities, different offices, different forms, and no single place that tells you what actually applies to you and in what order.",
-    "mission2": "BDoor exists to be that place. One workspace where you explain what you want to build, get a clear list of what it needs, upload your documents once, see a quote that separates our fee from everyone else’s, and watch each step move.",
+    "mission2": "bdoor exists to be that place. One workspace where you explain what you want to build, get a clear list of what it needs, upload your documents once, see a quote that separates our fee from everyone else’s, and watch each step move.",
     "how1": "We start by asking. The guided questionnaire branches on your answers, so a local founder with one shop is not asked about capital remittance, and a foreign investor is not left to guess about sector eligibility. From those answers we produce a preliminary recommendation using rules our operations team can inspect and change — not a black box.",
     "how2": "Then a person takes over. A case manager scopes the work, requests exactly the documents that are needed, and where the matter requires legal or specialist authority, engages a verified partner advocate under a separate agreement with you. Every status change, document view and fee is recorded.",
     "limits1": "We are not a government authority and we have no influence over any decision an authority makes. We do not present ourselves as a law firm, and we do not give legal advice. Where legal work is required it is done by independent advocates or partner firms under their own engagement with you, and we tell you who they are before anything is shared.",
-    "limits2": "We do not guarantee approval, a visa, a bank account, or a completion date. We give you an estimate, we tell you what it assumes, and we tell you when it changes. Investment and share capital never passes through BDoor.",
+    "limits2": "We do not guarantee approval, a visa, a bank account, or a completion date. We give you an estimate, we tell you what it assumes, and we tell you when it changes. Investment and share capital never passes through bdoor.",
     "cta": "Start your business"
   },
   "contact": {
@@ -465,7 +461,7 @@
     "phoneLabel": "Phone (optional)",
     "topicLabel": "What is this about?",
     "messageLabel": "Your message",
-    "consentLabel": "I agree that BDoor may use these details to reply to me, as described in the Privacy Policy.",
+    "consentLabel": "I agree that bdoor may use these details to reply to me, as described in the Privacy Policy.",
     "submit": "Send message",
     "successTitle": "Message received",
     "successBody": "Thank you. We have your message and will reply to the address you gave us.",
@@ -502,12 +498,16 @@
     "draftBanner": "Draft awaiting professional review",
     "draftBannerBody": "This document is a working draft prepared to support the platform. It has not yet been reviewed and approved by qualified Bangladesh counsel and must not be relied on as final terms.",
     "lastUpdated": "Last updated {date}",
-    "tableOfContents": "On this page"
+    "tableOfContents": "On this page",
+    "preLaunchTitle": "Under professional review",
+    "preLaunchBody": "bdoor's customer terms and privacy documentation are under professional review. Payments and identity-document collection are not yet enabled.",
+    "preLaunchDetail": "The approved document will be published here with its version and effective date. Until then, nothing on this platform is chargeable and no identity documents are collected, so there is no agreement you need to rely on today.",
+    "preLaunchOperator": "The bdoor platform is operated by {legalName}. Questions about this document are welcome by email."
   },
   "auth": {
     "signInTitle": "Sign in",
-    "signInSubtitle": "Continue to your BDoor workspace.",
-    "signUpTitle": "Create your BDoor account",
+    "signInSubtitle": "Continue to your bdoor workspace.",
+    "signUpTitle": "Create your bdoor account",
     "signUpSubtitle": "You can start the questionnaire first and create an account when you are ready.",
     "email": "Email address",
     "password": "Password",
@@ -546,7 +546,7 @@
       "removeCta": "Remove authenticator",
       "requiredForRole": "Your role requires two-factor authentication before you can continue.",
       "factorName": "Authenticator app",
-      "challengeSubtitle": "Open your authenticator app and enter the six-digit code for BDoor.",
+      "challengeSubtitle": "Open your authenticator app and enter the six-digit code for bdoor.",
       "challengeNoFactor": "You do not have a second factor set up yet. Set one up to continue.",
       "challengeEnrolCta": "Set up two-factor authentication"
     },
@@ -592,7 +592,6 @@
   "start": {
     "title": "Start your business",
     "description": "A short guided questionnaire. We only ask what applies to you, and you can save and resume.",
-    "progressLabel": "Step {current} of {total}",
     "sectionLabel": "Section",
     "whyWeAsk": "Why we ask",
     "saveAndExit": "Save and exit",
@@ -604,7 +603,7 @@
     "recommendation": {
       "title": "Your preliminary recommendation",
       "preliminaryBadge": "Preliminary — subject to review",
-      "disclaimer": "This is a preliminary, software-generated suggestion based on your answers. It is not legal advice and it is not a decision by any authority. A BDoor case manager, and a partner advocate where required, will confirm what actually applies to you.",
+      "disclaimer": "This is a preliminary, software-generated suggestion based on your answers. It is not legal advice and it is not a decision by any authority. A bdoor case manager, and a partner advocate where required, will confirm what actually applies to you.",
       "structureTitle": "Suggested structure",
       "servicesTitle": "Services that are likely to apply",
       "assumptionsTitle": "Assumptions we made",
@@ -617,6 +616,16 @@
       "noServices": "We could not match a service confidently. A case manager will review your answers."
     },
     "questions": {
+      "help_scope": {
+        "label": "Where do you want help?",
+        "why": "This routes you to the right package, questions and review path — Bangladesh setup, ongoing compliance or international formation.",
+        "options": {
+          "start_bangladesh": "Start a business in Bangladesh",
+          "manage_bangladesh": "Manage an existing Bangladesh business",
+          "form_abroad": "Form a company outside Bangladesh",
+          "unsure": "I am not sure"
+        }
+      },
       "founder_location": {
         "label": "Where are you based right now?",
         "help": "This changes which documents you need and whether foreign-investment rules apply.",
@@ -680,7 +689,7 @@
       "remit_capital": {
         "label": "Will investment capital be sent into Bangladesh from abroad?",
         "why": "Inward remittance needs a specific bank process and an encashment certificate. Getting the order wrong causes real delays.",
-        "note": "Investment or share capital is never paid to BDoor. It goes to a bank account in the company's name through the proper channel."
+        "note": "Investment or share capital is never paid to bdoor. It goes to a bank account in the company's name through the proper channel."
       },
       "founder_will_work": {
         "label": "Will you live or work in Bangladesh yourself?",
@@ -752,7 +761,9 @@
       "ownership": "Ownership",
       "operations": "Operations",
       "timing": "Timing"
-    }
+    },
+    "stageLabel": "Stage {current} of {total}: {name}",
+    "review": "Review"
   },
   "workspace": {
     "nav": {
@@ -841,7 +852,7 @@
       "relatedTo": "Related to",
       "expiresOn": "Expires on",
       "whoSeesThis": "Who can see this",
-      "whoSeesThisBody": "Your organisation's members, your assigned BDoor case team, and — only when you have authorised it — the partner working on this case."
+      "whoSeesThisBody": "Your organisation's members, your assigned bdoor case team, and — only when you have authorised it — the partner working on this case."
     },
     "billing": {
       "title": "Billing",
@@ -863,7 +874,7 @@
       "payableTo": "Payable to",
       "governmentNote": "Government fees are estimates until the authority issues a receipt. Any unused advance is returned to you.",
       "separateEngagementNote": "Partner professional fees are invoiced under a separate engagement with that firm.",
-      "capitalNote": "Share capital and investment funds are never paid to BDoor. They go directly to a bank account in the company's name.",
+      "capitalNote": "Share capital and investment funds are never paid to bdoor. They go directly to a bank account in the company's name.",
       "noQuotes": "No quote has been prepared yet.",
       "sandboxBanner": "Payments are running in sandbox mode. No real money moves.",
       "paymentSuccess": "Payment recorded. Your case team has been notified.",
@@ -968,7 +979,7 @@
     },
     "notes": {
       "title": "Partner notes",
-      "help": "Visible to authorised BDoor staff and your organisation only. Not visible to the customer.",
+      "help": "Visible to authorised bdoor staff and your organisation only. Not visible to the customer.",
       "add": "Add note"
     },
     "empty": "No cases are assigned to your organisation yet."
@@ -1050,6 +1061,27 @@
       "feeComponents": "Fee components",
       "milestoneTemplates": "Milestone template",
       "requirements": "Required documents"
+    },
+    "packages": {
+      "title": "Packages and pricing",
+      "description": "Bangladesh packages and international draft offers. Published rows are what anonymous visitors may read once synced to the database.",
+      "catalogNotice": "This screen reads the versioned catalog snapshot. Database publish workflow will replace the snapshot when package rows are seeded.",
+      "bangladeshHeading": "Bangladesh packages",
+      "internationalHeading": "International offers",
+      "name": "Package",
+      "segment": "Segment",
+      "status": "Status",
+      "bdoorFee": "bdoor fee",
+      "route": "Route",
+      "estimatedTotal": "Estimated total",
+      "checkout": "Checkout",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "empty": "No packages configured.",
+      "segments": {
+        "new_business": "New business",
+        "existing_business": "Existing business"
+      }
     },
     "finance": {
       "title": "Finance",
@@ -1187,7 +1219,7 @@
       "accepted": "You have joined the organisation."
     },
     "staffInvitation": {
-      "title": "Join the BDoor staff workspace",
+      "title": "Join the bdoor staff workspace",
       "invalid": "That invitation link is not valid.",
       "expired": "That invitation has expired. Ask an administrator for a new one.",
       "wrongEmail": "This invitation was sent to a different email address. Sign in with that address to accept it.",
@@ -1213,7 +1245,8 @@
         "unsupported_type": "We accept PDF, JPG, PNG and WebP files only.",
         "type_mismatch": "That file is not the type its name suggests. Please upload the original file.",
         "name_too_long": "That file name is too long. Please rename it and try again."
-      }
+      },
+      "kycNotOpen": "Identity documents are not being collected yet. We will ask for them inside your workspace once collection opens."
     }
   },
   "billing": {
@@ -1223,7 +1256,8 @@
       "expired": "That quote has expired. Ask your case team for a new version.",
       "alreadyAccepted": "This quote has already been accepted.",
       "alreadyPaid": "This invoice is already paid in full.",
-      "quoteAccepted": "Quote accepted. You can now pay the amount due."
+      "quoteAccepted": "Quote accepted. You can now pay the amount due.",
+      "paymentsNotOpen": "Payments are not yet open. Your quote and workspace are unaffected, and we will tell you before anything becomes payable."
     }
   },
   "messaging": {

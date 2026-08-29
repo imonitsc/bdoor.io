@@ -1752,6 +1752,66 @@ export type Database = {
         }
         Relationships: []
       }
+      "international_offers": {
+        Row: {
+          "id": string
+          "slug": string
+          "country_code": string
+          "route_en": string
+          "route_bn": string
+          "status": Database["public"]["Enums"]["publication_status"]
+          "checkout_enabled": boolean
+          "public_label_en": string
+          "public_label_bn": string
+          "summary_en": string
+          "summary_bn": string
+          "disclosures": Json
+          "fee_components": Json
+          "partner_agreement_id": string | null
+          "source_reviewed_at": string | null
+          "created_at": string
+          "updated_at": string
+        }
+        Insert: {
+          "id"?: string
+          "slug": string
+          "country_code": string
+          "route_en": string
+          "route_bn": string
+          "status"?: Database["public"]["Enums"]["publication_status"]
+          "checkout_enabled"?: boolean
+          "public_label_en": string
+          "public_label_bn": string
+          "summary_en": string
+          "summary_bn": string
+          "disclosures"?: Json
+          "fee_components"?: Json
+          "partner_agreement_id"?: string | null
+          "source_reviewed_at"?: string | null
+          "created_at"?: string
+          "updated_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "slug"?: string
+          "country_code"?: string
+          "route_en"?: string
+          "route_bn"?: string
+          "status"?: Database["public"]["Enums"]["publication_status"]
+          "checkout_enabled"?: boolean
+          "public_label_en"?: string
+          "public_label_bn"?: string
+          "summary_en"?: string
+          "summary_bn"?: string
+          "disclosures"?: Json
+          "fee_components"?: Json
+          "partner_agreement_id"?: string | null
+          "source_reviewed_at"?: string | null
+          "created_at"?: string
+          "updated_at"?: string
+        }
+        Relationships: []
+      }
       "invoice_items": {
         Row: {
           "id": string
@@ -2343,6 +2403,132 @@ export type Database = {
         }
         Relationships: []
       }
+      "package_fee_components": {
+        Row: {
+          "id": string
+          "package_version_id": string
+          "layer": Database["public"]["Enums"]["quote_item_category"]
+          "label_en": string
+          "label_bn": string
+          "amount_minor": number
+          "currency": Database["public"]["Enums"]["currency_code"]
+          "is_estimate": boolean
+          "is_refundable": boolean
+          "payee": Database["public"]["Enums"]["payee_type"]
+          "tax_treatment": Database["public"]["Enums"]["tax_treatment_status"]
+          "source_url": string | null
+          "reviewed_at": string | null
+          "sort_order": number
+          "created_at": string
+        }
+        Insert: {
+          "id"?: string
+          "package_version_id": string
+          "layer": Database["public"]["Enums"]["quote_item_category"]
+          "label_en": string
+          "label_bn": string
+          "amount_minor": number
+          "currency": Database["public"]["Enums"]["currency_code"]
+          "is_estimate"?: boolean
+          "is_refundable"?: boolean
+          "payee": Database["public"]["Enums"]["payee_type"]
+          "tax_treatment"?: Database["public"]["Enums"]["tax_treatment_status"]
+          "source_url"?: string | null
+          "reviewed_at"?: string | null
+          "sort_order"?: number
+          "created_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "package_version_id"?: string
+          "layer"?: Database["public"]["Enums"]["quote_item_category"]
+          "label_en"?: string
+          "label_bn"?: string
+          "amount_minor"?: number
+          "currency"?: Database["public"]["Enums"]["currency_code"]
+          "is_estimate"?: boolean
+          "is_refundable"?: boolean
+          "payee"?: Database["public"]["Enums"]["payee_type"]
+          "tax_treatment"?: Database["public"]["Enums"]["tax_treatment_status"]
+          "source_url"?: string | null
+          "reviewed_at"?: string | null
+          "sort_order"?: number
+          "created_at"?: string
+        }
+        Relationships: []
+      }
+      "package_versions": {
+        Row: {
+          "id": string
+          "package_id": string
+          "version_no": number
+          "status": Database["public"]["Enums"]["publication_status"]
+          "effective_from": string
+          "effective_to": string | null
+          "checkout_enabled": boolean
+          "public_label_en": string
+          "public_label_bn": string
+          "summary_en": string
+          "summary_bn": string
+          "inclusions": Json
+          "exclusions": Json
+          "limits": Json
+          "assumptions": Json
+          "approved_by": string | null
+          "approved_at": string | null
+          "source_reviewed_at": string | null
+          "source_url": string | null
+          "created_at": string
+          "updated_at": string
+        }
+        Insert: {
+          "id"?: string
+          "package_id": string
+          "version_no": number
+          "status"?: Database["public"]["Enums"]["publication_status"]
+          "effective_from": string
+          "effective_to"?: string | null
+          "checkout_enabled"?: boolean
+          "public_label_en": string
+          "public_label_bn": string
+          "summary_en": string
+          "summary_bn": string
+          "inclusions"?: Json
+          "exclusions"?: Json
+          "limits"?: Json
+          "assumptions"?: Json
+          "approved_by"?: string | null
+          "approved_at"?: string | null
+          "source_reviewed_at"?: string | null
+          "source_url"?: string | null
+          "created_at"?: string
+          "updated_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "package_id"?: string
+          "version_no"?: number
+          "status"?: Database["public"]["Enums"]["publication_status"]
+          "effective_from"?: string
+          "effective_to"?: string | null
+          "checkout_enabled"?: boolean
+          "public_label_en"?: string
+          "public_label_bn"?: string
+          "summary_en"?: string
+          "summary_bn"?: string
+          "inclusions"?: Json
+          "exclusions"?: Json
+          "limits"?: Json
+          "assumptions"?: Json
+          "approved_by"?: string | null
+          "approved_at"?: string | null
+          "source_reviewed_at"?: string | null
+          "source_url"?: string | null
+          "created_at"?: string
+          "updated_at"?: string
+        }
+        Relationships: []
+      }
       "partner_capabilities": {
         Row: {
           "id": string
@@ -2414,6 +2600,7 @@ export type Database = {
           "contact_email": string | null
           "contact_phone": string | null
           "verification_status": Database["public"]["Enums"]["partner_verification_status"]
+          "public_profile_approved": boolean
           "conflict_policy_accepted_at": string | null
           "dpa_accepted_at": string | null
           "insurance_expires_on": string | null
@@ -2435,6 +2622,7 @@ export type Database = {
           "contact_email"?: string | null
           "contact_phone"?: string | null
           "verification_status"?: Database["public"]["Enums"]["partner_verification_status"]
+          "public_profile_approved"?: boolean
           "conflict_policy_accepted_at"?: string | null
           "dpa_accepted_at"?: string | null
           "insurance_expires_on"?: string | null
@@ -2456,6 +2644,7 @@ export type Database = {
           "contact_email"?: string | null
           "contact_phone"?: string | null
           "verification_status"?: Database["public"]["Enums"]["partner_verification_status"]
+          "public_profile_approved"?: boolean
           "conflict_policy_accepted_at"?: string | null
           "dpa_accepted_at"?: string | null
           "insurance_expires_on"?: string | null
@@ -3465,6 +3654,42 @@ export type Database = {
         }
         Relationships: []
       }
+      "service_packages": {
+        Row: {
+          "id": string
+          "slug": string
+          "segment": Database["public"]["Enums"]["package_segment"]
+          "jurisdiction_code": string
+          "name_en": string
+          "name_bn": string
+          "sort_order": number
+          "created_at": string
+          "updated_at": string
+        }
+        Insert: {
+          "id"?: string
+          "slug": string
+          "segment": Database["public"]["Enums"]["package_segment"]
+          "jurisdiction_code"?: string
+          "name_en": string
+          "name_bn": string
+          "sort_order"?: number
+          "created_at"?: string
+          "updated_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "slug"?: string
+          "segment"?: Database["public"]["Enums"]["package_segment"]
+          "jurisdiction_code"?: string
+          "name_en"?: string
+          "name_bn"?: string
+          "sort_order"?: number
+          "created_at"?: string
+          "updated_at"?: string
+        }
+        Relationships: []
+      }
       "service_price_versions": {
         Row: {
           "id": string
@@ -3840,7 +4065,7 @@ export type Database = {
       "case_waiting_on": "none" | "customer" | "partner" | "authority" | "payment"
       "compliance_decision_type": "approved" | "rejected" | "escalated" | "more_information_required"
       "consent_type": "terms_of_service" | "privacy_policy" | "kyc_declaration" | "quote_acceptance" | "partner_engagement" | "partner_data_sharing" | "marketing"
-      "currency_code": "BDT" | "USD"
+      "currency_code": "BDT" | "USD" | "GBP" | "AED" | "SGD"
       "delivery_mode": "online" | "hybrid" | "in_person"
       "document_scan_status": "pending" | "clean" | "infected" | "quarantined" | "skipped"
       "document_status": "requested" | "uploaded" | "under_review" | "accepted" | "replacement_requested" | "expired" | "archived"
@@ -3858,6 +4083,7 @@ export type Database = {
       "obligation_status": "upcoming" | "due" | "overdue" | "in_progress" | "completed" | "waived"
       "organization_kind": "customer" | "partner"
       "organization_role": "customer_owner" | "customer_member" | "partner_owner" | "partner_staff"
+      "package_segment": "new_business" | "existing_business"
       "partner_verification_status": "unverified" | "in_review" | "verified" | "suspended" | "rejected"
       "payee_type": "bdoor" | "government_authority" | "partner_firm" | "third_party"
       "payment_status": "pending" | "paid" | "failed" | "cancelled" | "partially_refunded" | "refunded"
@@ -3868,6 +4094,7 @@ export type Database = {
       "risk_rating": "low" | "medium" | "high" | "prohibited"
       "task_status": "open" | "in_progress" | "blocked" | "done" | "cancelled"
       "task_visibility": "customer" | "internal" | "partner"
+      "tax_treatment_status": "pending_review" | "inclusive" | "exclusive" | "not_applicable"
     }
     CompositeTypes: Record<string, never>
   }

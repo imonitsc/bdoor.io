@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Menu, X } from 'lucide-react';
 import { Link, usePathname } from '@/i18n/navigation';
-import { HEADER_LINKS, MARKETING_ROUTES } from '@/lib/navigation';
+import { DRAWER_SECONDARY_LINKS, HEADER_LINKS, MARKETING_ROUTES } from '@/lib/navigation';
 import { BDoorLogo } from './logo';
 import { LocaleSwitcher } from './locale-switcher';
 import { Button } from '@/components/ui/button';
@@ -59,7 +59,7 @@ export function MarketingHeader() {
           <BDoorLogo />
         </Link>
 
-        <nav aria-label={t('nav.mainNavigation')} className="hidden lg:block">
+        <nav aria-label={t('nav.mainNavigation')} className="hidden xl:block">
           <ul className="flex items-center gap-1">
             {HEADER_LINKS.map((link) => {
               const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
@@ -82,7 +82,7 @@ export function MarketingHeader() {
           </ul>
         </nav>
 
-        <div className="hidden items-center gap-2 lg:flex">
+        <div className="hidden items-center gap-2 xl:flex">
           <LocaleSwitcher />
           {isSignedIn ? (
             <Button asChild variant="secondary" size="md">
@@ -98,7 +98,7 @@ export function MarketingHeader() {
           </Button>
         </div>
 
-        <div className="flex items-center gap-1 lg:hidden">
+        <div className="flex items-center gap-1 xl:hidden">
           <Button asChild size="sm">
             <Link href={MARKETING_ROUTES.start}>{t('nav.primaryCta')}</Link>
           </Button>
@@ -118,7 +118,7 @@ export function MarketingHeader() {
       {open ? (
         <div
           id="mobile-navigation"
-          className="border-border bg-surface fixed inset-x-0 top-16 bottom-0 z-40 overflow-y-auto border-t md:top-[4.5rem] lg:hidden"
+          className="border-border bg-surface fixed inset-x-0 top-16 bottom-0 z-40 overflow-y-auto border-t md:top-[4.5rem] xl:hidden"
         >
           <nav aria-label={t('nav.mainNavigation')} className="container-page py-6">
             <ul className="flex flex-col gap-1">
@@ -127,6 +127,16 @@ export function MarketingHeader() {
                   <Link
                     href={link.href}
                     className="text-ink hover:bg-surface-sunken flex min-h-[3rem] items-center rounded-[var(--radius-control)] px-3 text-base font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+                  >
+                    {t(link.labelKey)}
+                  </Link>
+                </li>
+              ))}
+              {DRAWER_SECONDARY_LINKS.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-muted hover:bg-surface-sunken hover:text-ink flex min-h-[3rem] items-center rounded-[var(--radius-control)] px-3 text-base focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
                   >
                     {t(link.labelKey)}
                   </Link>

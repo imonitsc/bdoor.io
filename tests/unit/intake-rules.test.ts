@@ -12,6 +12,7 @@ import { SNAPSHOT_RULES } from '@/content/rules-snapshot';
 import { expandWithPrerequisites } from '@/features/intake/guide';
 
 const LOCAL_SOLE_TRADER: PartialAnswers = {
+  help_scope: 'start_bangladesh',
   founder_location: 'bangladesh',
   nationality: 'BD',
   existing_business: false,
@@ -29,6 +30,19 @@ const LOCAL_SOLE_TRADER: PartialAnswers = {
 };
 
 describe('questionnaire branching', () => {
+  it('asks where you want help before anything else', () => {
+    const keys = applicableQuestions({}).map((q) => q.key);
+    expect(keys[0]).toBe('help_scope');
+  });
+
+  it('skips existing_business when help scope already answers it', () => {
+    const startKeys = applicableQuestions({ help_scope: 'start_bangladesh' }).map((q) => q.key);
+    expect(startKeys).not.toContain('existing_business');
+
+    const manageKeys = applicableQuestions({ help_scope: 'manage_bangladesh' }).map((q) => q.key);
+    expect(manageKeys).not.toContain('existing_business');
+  });
+
   it('does not ask a Bangladesh-based founder about their country of residence', () => {
     const keys = applicableQuestions(LOCAL_SOLE_TRADER).map((q) => q.key);
     expect(keys).not.toContain('residence');
@@ -176,8 +190,13 @@ describe('recommendation engine', () => {
     expect(recommend({ regulated_activity: true }, []).requiresManualReview).toBe(true);
     expect(recommend({ remit_capital: true }, []).requiresManualReview).toBe(true);
     expect(recommend({ structure: 'branch_office' }, []).requiresManualReview).toBe(true);
+    expect(recommend({ help_scope: 'form_abroad' }, []).requiresManualReview).toBe(true);
+    expect(recommend({ help_scope: 'unsure' }, []).requiresManualReview).toBe(true);
 
     expect(hardManualReviewReasons({ entity_owner: true })).toContain('corporate_or_trust_owner');
+    expect(hardManualReviewReasons({ help_scope: 'form_abroad' })).toContain(
+      'international_formation',
+    );
   });
 
   it('evaluates any/all/not groups', () => {

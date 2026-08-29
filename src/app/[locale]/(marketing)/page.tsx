@@ -1,28 +1,19 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { useTranslations } from 'next-intl';
-import {
-  ArrowRight,
-  Building2,
-  Check,
-  CalendarCheck,
-  FileBadge,
-  Globe,
-  Receipt,
-  Ship,
-} from 'lucide-react';
+import { ArrowRight, Check } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Section, SectionHeading } from '@/components/ui/section';
-import { Alert } from '@/components/ui/alert';
-import { ServiceFinder } from '@/components/marketing/service-finder';
+import { PackageSelector } from '@/components/marketing/package-selector';
+import { FeeBreakdownExample } from '@/components/marketing/fee-breakdown-example';
+import { InternationalOfferCards } from '@/components/marketing/international-offer-cards';
+import { SpecialistServicesList } from '@/components/marketing/specialist-services-list';
 import { HeroFounder } from '@/components/marketing/hero-founder';
-import { HeroAdvisor } from '@/components/marketing/hero-advisor';
 import { WorkspacePreview } from '@/components/marketing/workspace-preview';
 import { FaqList } from '@/components/marketing/faq-list';
-import { getCategories, getGlobalFaqs } from '@/features/catalog/queries';
-import { pick, type Locale } from '@/features/catalog/types';
+import { getGlobalFaqs } from '@/features/catalog/queries';
+import type { Locale } from '@/features/catalog/types';
 import { MARKETING_ROUTES } from '@/lib/navigation';
 import { localizedUrl } from '@/lib/site';
 
@@ -45,31 +36,30 @@ export async function generateMetadata({
   };
 }
 
-const CATEGORY_ICONS: Record<string, typeof Building2> = {
-  'company-formation': Building2,
-  licences: FileBadge,
-  'import-export': Ship,
-  'tax-vat': Receipt,
-  'foreign-founders': Globe,
-  compliance: CalendarCheck,
-};
+/**
+ * Seven sections before the footer, in the order a first-time visitor needs
+ * them: what bdoor does (hero, with the founder photograph as its visual),
+ * why to trust the process, which package fits, what the workspace looks
+ * like, how fees and delivery work, which international routes are being
+ * prepared, and what to do next.
+ *
+ * This branch swaps the hero's visual from the workspace preview to the
+ * founder photograph and moves the preview into its own section; the unit
+ * guard on the image file keeps the branch red until the photograph is
+ * actually committed, so this cannot merge with an empty hero.
+ */
 
 function Hero() {
   const t = useTranslations('home.hero');
 
   return (
     <section className="bg-surface-inverse text-ink-inverse relative overflow-hidden">
-      <div className="container-page grid items-center gap-10 py-16 md:py-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-14 lg:py-24">
-        {/*
-          z-10 on the copy, not a scrim over the photograph. The two columns do
-          not overlap at any breakpoint, so the headline never sits on top of
-          the image and no navy wash is needed to keep it readable.
-        */}
-        <div className="relative z-10 flex flex-col justify-center">
+      <div className="container-page grid items-center gap-12 py-16 md:py-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-14 lg:py-24">
+        <div className="flex flex-col justify-center">
           <p className="text-xs font-semibold tracking-[0.14em] text-[color:var(--bd-turquoise-500)] uppercase">
             {t('eyebrow')}
           </p>
-          <h1 className="text-ink-inverse mt-4 max-w-2xl text-4xl leading-[1.1] md:text-5xl lg:text-[3.4rem]">
+          <h1 className="text-ink-inverse mt-4 max-w-2xl text-4xl leading-[1.08] md:text-5xl">
             {t('headline')}
           </h1>
           <p className="text-muted-inverse mt-5 max-w-xl text-lg leading-relaxed">{t('support')}</p>
@@ -87,35 +77,31 @@ function Hero() {
               variant="ghost"
               className="border-border-inverse text-ink-inverse hover:bg-surface-inverse-soft border"
             >
-              <Link href={MARKETING_ROUTES.howItWorks}>{t('secondaryCta')}</Link>
+              <Link href={MARKETING_ROUTES.international}>{t('secondaryCta')}</Link>
             </Button>
           </div>
+
+          <p className="text-muted-inverse mt-8 text-sm">{t('operatorLine')}</p>
         </div>
 
-        {/*
-          Pulled down by exactly the section's bottom padding so the founder is
-          anchored on the hero floor rather than floating in a padded box. Only
-          at lg, where the grid is two columns; once it stacks the image is a
-          normal block below the buttons.
-        */}
-        <HeroFounder alt={t('imageAlt')} className="lg:-mb-24 lg:self-end" />
+        <HeroFounder alt={t('imageAlt')} className="lg:self-end" />
       </div>
     </section>
   );
 }
 
 /**
- * Four statements about how the product works. Each one is checkable against
- * the product itself — no counts, no logos, no affiliation.
+ * Four statements, each checkable against the product itself. No counts, no
+ * logos, no ratings, no affiliations — bdoor has none it could prove.
  */
-function TrustIndicators() {
+function TrustStrip() {
   const t = useTranslations('home.trust');
-  const items = ['pricing', 'bilingual', 'workspace', 'coordination'] as const;
+  const items = ['quotes', 'workspace', 'caseManagement', 'specialists'] as const;
 
   return (
     <section className="bg-surface-inverse text-ink-inverse border-border-inverse border-t">
       <div className="container-page">
-        <ul className="grid gap-x-8 gap-y-3 py-6 sm:grid-cols-2 lg:grid-cols-4">
+        <ul className="grid gap-x-8 gap-y-3 py-6 sm:grid-cols-2 xl:grid-cols-4">
           {items.map((item) => (
             <li key={item} className="flex items-center gap-2.5">
               <Check
@@ -131,180 +117,65 @@ function TrustIndicators() {
   );
 }
 
-function HowItWorks() {
-  const t = useTranslations('home.howItWorks');
-  const steps = ['one', 'two', 'three', 'four', 'five', 'six', 'seven'] as const;
+function PackagesSection({ locale }: { locale: Locale }) {
+  const t = useTranslations('home.packages');
+  return (
+    <Section>
+      <div className="container-page">
+        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
+        <PackageSelector locale={locale} />
+      </div>
+    </Section>
+  );
+}
+
+/** Process and fees in one section, with standalone services as a disclosure. */
+function ProcessAndFees({ locale }: { locale: Locale }) {
+  const t = useTranslations('home.process');
+  const steps = ['one', 'two', 'three', 'four'] as const;
 
   return (
     <Section tone="surface">
       <div className="container-page">
         <SectionHeading eyebrow={t('eyebrow')} title={t('title')} />
-        <ol className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {steps.map((step, index) => (
-            <li key={step} className="flex flex-col gap-3">
-              <span
-                className="bg-primary-soft text-info flex size-9 items-center justify-center rounded-full text-sm font-semibold"
-                aria-hidden="true"
-              >
-                {index + 1}
-              </span>
-              <h3 className="text-ink text-base font-semibold">{t(`steps.${step}.title`)}</h3>
-              <p className="text-muted text-sm leading-relaxed">{t(`steps.${step}.body`)}</p>
-            </li>
-          ))}
-        </ol>
-      </div>
-    </Section>
-  );
-}
-
-function ServiceFinderSection() {
-  const t = useTranslations('home.serviceFinder');
-  return (
-    <Section tone="sunken">
-      <div className="container-page">
-        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} align="center" />
-        <div className="mx-auto mt-10 max-w-3xl">
-          <ServiceFinder />
-        </div>
-      </div>
-    </Section>
-  );
-}
-
-/**
- * The questionnaire shortcut that used to sit in the hero, where the founder
- * image now goes. Same form, same intents, same /start hand-off.
- */
-function AdvisorSection() {
-  return (
-    <Section tone="surface">
-      <div className="container-page mx-auto max-w-2xl">
-        <HeroAdvisor />
-      </div>
-    </Section>
-  );
-}
-
-async function InternationalSection() {
-  const t = await getTranslations('home.international');
-  return (
-    <Section tone="surface">
-      <div className="container-page grid gap-8 lg:grid-cols-2 lg:items-center lg:gap-16">
-        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
-        <div className="flex flex-col gap-4">
-          <Button asChild size="lg" className="w-fit">
-            <Link href={MARKETING_ROUTES.international}>
-              {t('cta')}
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </Link>
-          </Button>
-        </div>
-      </div>
-    </Section>
-  );
-}
-
-function ComplianceSection() {
-  const t = useTranslations('home.compliance');
-  return (
-    <Section>
-      <div className="container-page max-w-3xl">
-        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
-        <Button asChild className="mt-7" size="lg" variant="secondary">
-          <Link href={MARKETING_ROUTES.howItWorks}>
-            {t('eyebrow')}
-            <ArrowRight className="size-4" aria-hidden="true" />
-          </Link>
-        </Button>
-      </div>
-    </Section>
-  );
-}
-
-async function Categories({ locale }: { locale: Locale }) {
-  const [{ data: categories }, t] = await Promise.all([
-    getCategories(),
-    getTranslations('home.categories'),
-  ]);
-  const tCommon = await getTranslations('common');
-
-  return (
-    <Section>
-      <div className="container-page">
-        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
-        <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {categories.map((category) => {
-            const Icon = CATEGORY_ICONS[category.slug] ?? Building2;
-            return (
-              <li key={category.id}>
-                <Card
-                  as="article"
-                  className="group relative h-full p-5 transition-shadow hover:shadow-md md:p-6"
-                >
-                  <span
-                    className="bg-accent-soft text-accent-strong flex size-10 items-center justify-center rounded-[12px]"
-                    aria-hidden="true"
-                  >
-                    <Icon className="size-5" />
-                  </span>
-                  <h3 className="text-ink mt-4 text-base font-semibold">
-                    <Link
-                      href={`/services?category=${category.slug}`}
-                      className="rounded before:absolute before:inset-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
-                    >
-                      {pick(category.name, locale)}
-                    </Link>
-                  </h3>
-                  <p className="text-muted mt-2 text-sm leading-relaxed">
-                    {pick(category.summary, locale)}
-                  </p>
-                  <p className="text-primary mt-4 flex items-center gap-1.5 text-sm font-medium">
-                    {tCommon('viewAll')}
-                    <ArrowRight
-                      className="size-4 transition-transform group-hover:translate-x-0.5"
-                      aria-hidden="true"
-                    />
-                  </p>
-                </Card>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-    </Section>
-  );
-}
-
-function ForeignFounders() {
-  const t = useTranslations('home.foreignFounders');
-  const points = ['one', 'two', 'three'] as const;
-
-  return (
-    <Section tone="surface">
-      <div className="container-page grid gap-10 lg:grid-cols-2 lg:gap-16">
-        <div>
-          <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
-          <Button asChild className="mt-7" size="lg">
-            <Link href={MARKETING_ROUTES.foreignFounders}>
-              {t('cta')}
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </Link>
-          </Button>
-        </div>
-        <div className="flex flex-col gap-5">
-          <ul className="flex flex-col gap-4">
-            {points.map((point) => (
-              <li key={point} className="flex gap-3">
+        <div className="mt-10 grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+          <ol className="flex flex-col gap-7">
+            {steps.map((step, index) => (
+              <li key={step} className="flex gap-4">
                 <span
-                  className="bg-accent mt-2 size-1.5 shrink-0 rounded-full"
+                  className="bg-primary-soft text-info flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
                   aria-hidden="true"
-                />
-                <p className="text-ink text-sm leading-relaxed">{t(`points.${point}`)}</p>
+                >
+                  {index + 1}
+                </span>
+                <div>
+                  <h3 className="text-ink text-base font-semibold">{t(`steps.${step}.title`)}</h3>
+                  <p className="text-muted mt-1 text-sm leading-relaxed">
+                    {t(`steps.${step}.body`)}
+                  </p>
+                </div>
               </li>
             ))}
-          </ul>
-          <Alert tone="warning" title={t('important')} />
+          </ol>
+
+          <div>
+            <FeeBreakdownExample locale={locale} />
+            <details className="border-border bg-surface group mt-4 rounded-[var(--radius-card)] border">
+              <summary className="text-ink flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-5 py-3 text-sm font-semibold [&::-webkit-details-marker]:hidden">
+                <span>
+                  {t('standaloneTitle')}
+                  <span className="text-muted ms-2 font-normal">{t('standaloneSummary')}</span>
+                </span>
+                <ArrowRight
+                  className="text-muted size-4 shrink-0 transition-transform group-open:rotate-90"
+                  aria-hidden="true"
+                />
+              </summary>
+              <div className="border-border border-t px-5 pb-5">
+                <SpecialistServicesList locale={locale} />
+              </div>
+            </details>
+          </div>
         </div>
       </div>
     </Section>
@@ -325,80 +196,31 @@ function Preview() {
   );
 }
 
-function Pricing() {
-  const t = useTranslations('home.pricing');
-  const tFees = useTranslations('services.feeCategories');
-  const categories = [
-    'platform_service_fee',
-    'government_fee_estimate',
-    'partner_professional_fee',
-    'third_party_cost',
-    'tax',
-  ] as const;
-
+function InternationalSection({ locale }: { locale: Locale }) {
+  const t = useTranslations('home.internationalSection');
   return (
     <Section>
-      <div className="container-page grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
-        <div>
-          <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
-          <Button asChild className="mt-7" size="lg" variant="secondary">
-            <Link href={MARKETING_ROUTES.pricing}>
-              {t('cta')}
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </Link>
-          </Button>
-        </div>
-        <Card className="p-5 md:p-6">
-          <ul className="divide-border divide-y">
-            {categories.map((category) => (
-              <li key={category} className="flex items-center justify-between gap-4 py-3.5">
-                <span className="text-ink text-sm font-medium">{tFees(category)}</span>
-                <span className="text-muted text-sm">
-                  {category === 'platform_service_fee' ? 'BDoor' : '—'}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </Card>
-      </div>
-    </Section>
-  );
-}
-
-function Partners() {
-  const t = useTranslations('home.partners');
-  return (
-    <Section tone="inverse">
       <div className="container-page">
-        <SectionHeading
-          eyebrow={t('eyebrow')}
-          title={t('title')}
-          body={t('body')}
-          inverse
-          align="center"
-        />
-        <div className="mt-8 flex justify-center">
-          <Button asChild variant="inverse" size="lg">
-            <Link href={MARKETING_ROUTES.partners}>
-              {t('cta')}
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </Link>
-          </Button>
-        </div>
+        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
+        <InternationalOfferCards locale={locale} />
       </div>
     </Section>
   );
 }
 
-async function Faqs({ locale }: { locale: Locale }) {
-  const [{ data: faqs }, t] = await Promise.all([getGlobalFaqs(), getTranslations('home.faq')]);
+async function FaqAndNextStep({ locale }: { locale: Locale }) {
+  const [{ data: faqs }, t, tCta] = await Promise.all([
+    getGlobalFaqs(),
+    getTranslations('home.faq'),
+    getTranslations('home.finalCta'),
+  ]);
 
   return (
-    <Section tone="surface">
+    <Section tone="sunken">
       <div className="container-page grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
         <SectionHeading eyebrow={t('eyebrow')} title={t('title')} />
         <div>
-          <FaqList faqs={faqs} locale={locale} limit={5} />
+          <FaqList faqs={faqs} locale={locale} limit={4} />
           <Button asChild variant="link" className="mt-5">
             <Link href={MARKETING_ROUTES.howItWorks}>
               {t('cta')}
@@ -407,26 +229,19 @@ async function Faqs({ locale }: { locale: Locale }) {
           </Button>
         </div>
       </div>
-    </Section>
-  );
-}
 
-function FinalCta() {
-  const t = useTranslations('home.finalCta');
-  return (
-    <Section tone="sunken">
-      <div className="container-page flex flex-col items-center gap-6 text-center">
-        <h2 className="text-ink max-w-2xl text-3xl leading-tight md:text-4xl">{t('title')}</h2>
-        <p className="text-muted max-w-xl text-base leading-relaxed">{t('body')}</p>
+      <div className="container-page mt-16 flex flex-col items-center gap-5 text-center">
+        <h2 className="text-ink max-w-2xl text-2xl leading-tight md:text-3xl">{tCta('title')}</h2>
+        <p className="text-muted max-w-xl text-base leading-relaxed">{tCta('body')}</p>
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button asChild size="lg">
             <Link href={MARKETING_ROUTES.start}>
-              {t('primary')}
+              {tCta('primary')}
               <ArrowRight className="size-4" aria-hidden="true" />
             </Link>
           </Button>
           <Button asChild size="lg" variant="secondary">
-            <Link href={MARKETING_ROUTES.contact}>{t('secondary')}</Link>
+            <Link href={MARKETING_ROUTES.contact}>{tCta('secondary')}</Link>
           </Button>
         </div>
       </div>
@@ -437,23 +252,17 @@ function FinalCta() {
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const typedLocale = locale as Locale;
 
   return (
     <>
       <Hero />
-      <TrustIndicators />
-      <ServiceFinderSection />
+      <TrustStrip />
+      <PackagesSection locale={typedLocale} />
       <Preview />
-      <HowItWorks />
-      <AdvisorSection />
-      <Categories locale={locale as Locale} />
-      <ForeignFounders />
-      <Pricing />
-      <InternationalSection />
-      <Partners />
-      <ComplianceSection />
-      <Faqs locale={locale as Locale} />
-      <FinalCta />
+      <ProcessAndFees locale={typedLocale} />
+      <InternationalSection locale={typedLocale} />
+      <FaqAndNextStep locale={typedLocale} />
     </>
   );
 }

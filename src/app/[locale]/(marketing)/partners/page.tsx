@@ -4,7 +4,6 @@ import { ArrowRight, Check, ShieldCheck, X } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { EmptyState } from '@/components/ui/empty-state';
 import { Section } from '@/components/ui/section';
 import { PageHeader } from '@/components/marketing/page-header';
 import { IndependenceDisclosure } from '@/components/layout/disclosure';
@@ -122,14 +121,19 @@ export default async function PartnersPage({ params }: { params: Promise<{ local
               </Button>
             </Card>
 
-            <div>
-              <h2 className="text-ink flex items-center gap-2 text-sm font-semibold">
-                <ShieldCheck className="text-accent size-4" aria-hidden="true" />
-                {t('directoryTitle')}
-              </h2>
-              {partners.length === 0 ? (
-                <EmptyState className="mt-3" title={t('directoryEmpty')} />
-              ) : (
+            {/*
+              The directory renders only once at least one organisation has
+              actually completed verification. Before that there is no
+              "verified partners" section at all: an empty catalogue under
+              that heading implies a network that does not yet exist, and a
+              placeholder implies it louder.
+            */}
+            {partners.length > 0 ? (
+              <div>
+                <h2 className="text-ink flex items-center gap-2 text-sm font-semibold">
+                  <ShieldCheck className="text-accent size-4" aria-hidden="true" />
+                  {t('directoryTitle')}
+                </h2>
                 <ul className="mt-3 flex flex-col gap-2">
                   {partners.map((partner) => (
                     <li
@@ -140,8 +144,8 @@ export default async function PartnersPage({ params }: { params: Promise<{ local
                     </li>
                   ))}
                 </ul>
-              )}
-            </div>
+              </div>
+            ) : null}
           </aside>
         </div>
       </Section>

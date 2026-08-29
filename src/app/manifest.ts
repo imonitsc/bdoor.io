@@ -2,8 +2,8 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'BDoor — Your door to business in Bangladesh',
-    short_name: 'BDoor',
+    name: 'bdoor — Your door to business in Bangladesh',
+    short_name: 'bdoor',
     description:
       'Company formation, licences, tax setup, compliance and official documents for Bangladesh, in one secure workspace.',
     start_url: '/en',

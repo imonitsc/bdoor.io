@@ -2,10 +2,10 @@ import { useTranslations } from 'next-intl';
 import { Mail } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import {
+  FOOTER_BANGLADESH_LINKS,
   FOOTER_COMPANY_LINKS,
-  FOOTER_INDUSTRY_LINKS,
+  FOOTER_INTERNATIONAL_LINKS,
   FOOTER_LEGAL_LINKS,
-  FOOTER_SERVICE_LINKS,
   MARKETING_ROUTES,
 } from '@/lib/navigation';
 import { activeSocialProfiles } from '@/lib/social/profiles';
@@ -13,6 +13,7 @@ import { BDoorLogo } from './logo';
 import { LocaleSwitcher } from './locale-switcher';
 import { IndependenceDisclosure } from './disclosure';
 import { SITE } from '@/lib/site';
+import { COMPANY } from '@/content/company';
 
 function FooterColumn({
   heading,
@@ -67,12 +68,12 @@ export function MarketingFooter() {
           </div>
 
           <FooterColumn
-            heading={t('footer.servicesHeading')}
-            links={FOOTER_SERVICE_LINKS.map((l) => ({ href: l.href, label: t(l.labelKey) }))}
+            heading={t('footer.bangladeshHeading')}
+            links={FOOTER_BANGLADESH_LINKS.map((l) => ({ href: l.href, label: t(l.labelKey) }))}
           />
           <FooterColumn
-            heading={t('footer.industriesHeading')}
-            links={FOOTER_INDUSTRY_LINKS.map((l) => ({ href: l.href, label: t(l.labelKey) }))}
+            heading={t('footer.internationalHeading')}
+            links={FOOTER_INTERNATIONAL_LINKS.map((l) => ({ href: l.href, label: t(l.labelKey) }))}
           />
           <FooterColumn
             heading={t('footer.companyHeading')}
@@ -127,7 +128,7 @@ export function MarketingFooter() {
         </div>
 
         <p className="text-muted-inverse mt-8 text-xs">
-          © {year} {t('brand.name')}. {t('footer.rights')}
+          © {year} {COMPANY.legalName}. {t('footer.rights')}
         </p>
       </div>
     </footer>
