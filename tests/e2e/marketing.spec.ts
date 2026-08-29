@@ -29,7 +29,7 @@ test.describe('marketing site', () => {
     await page.goto('/en');
 
     // §7.1: no generated person — a real product module, honestly labelled.
-    await expect(page.getByText('Product preview')).toBeVisible();
+    await expect(page.getByText('Product preview', { exact: true })).toBeVisible();
     await expect(page.getByText('Specialist reviewed').first()).toBeVisible();
     await expect(page.getByText('From ৳9,900').first()).toBeVisible();
     await expect(page.locator('img[src*="bdoor-home-hero-founder"]')).toHaveCount(0);
@@ -55,7 +55,7 @@ test.describe('marketing site', () => {
       .getByRole('link', { name: 'Start your application' })
       .first()
       .boundingBox();
-    const moduleBox = await page.getByText('Product preview').boundingBox();
+    const moduleBox = await page.getByText('Product preview', { exact: true }).boundingBox();
     expect(cta).not.toBeNull();
     expect(moduleBox).not.toBeNull();
     expect(cta!.y).toBeLessThan(moduleBox!.y);
