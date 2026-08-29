@@ -31,13 +31,27 @@ test.describe('marketing site', () => {
     ).toBeVisible();
   });
 
-  test('the hero uses the door image slot and has no founder photograph', async ({ page }) => {
+  test('the hero shows the founder photograph, uncropped', async ({ page }) => {
     await page.goto('/en');
 
-    // Production-fix §4/§6: open-door slot (or documented missing-asset), never a face.
     await expect(page.getByText('Product preview — sample data')).toBeVisible();
-    await expect(page.locator('img[src*="bdoor-home-hero-founder"]')).toHaveCount(0);
     await expect(page.locator('#international')).toHaveCount(0);
+
+    const hero = page.locator('img[src*="bdoor-home-hero-founder"]');
+    await expect(hero).toHaveCount(1);
+    await expect(hero).toBeVisible();
+
+    // `contain`, not `cover`: the subject reaches every edge of the artboard,
+    // so a crop cuts the raised hand, the laptop or the interface cards.
+    await expect(hero).toHaveCSS('object-fit', 'contain');
+    await expect(hero).toHaveAttribute('src', /_next\/image/);
+    expect(await hero.getAttribute('loading')).not.toBe('lazy');
+
+    // Markup-only assertions pass against a 404, so require a real decode.
+    const decoded = await hero.evaluate(
+      (img) => (img as HTMLImageElement).complete && (img as HTMLImageElement).naturalWidth > 0,
+    );
+    expect(decoded, 'the hero photograph did not decode').toBe(true);
   });
 
   test('the H1 is fully visible and the hero CTA precedes the image on a phone', async ({
@@ -58,7 +72,7 @@ test.describe('marketing site', () => {
     const main = page.locator('main');
     const cta = await main.getByTestId('home-hero-start').boundingBox();
     const imageSlot = await main
-      .locator('[data-missing-asset="open-door-dhaka.webp"], img[src*="open-door-dhaka"]')
+      .locator('img[src*="bdoor-home-hero-founder"]')
       .first()
       .boundingBox();
     expect(cta).not.toBeNull();
