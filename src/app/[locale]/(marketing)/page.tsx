@@ -6,7 +6,7 @@ import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { Section, SectionHeading } from '@/components/ui/section';
 import { PackageSelector } from '@/components/marketing/package-selector';
-import { HeroDoorImage } from '@/components/marketing/hero-door-image';
+import { HeroFounder } from '@/components/marketing/hero-founder';
 import { HowItWorksImage } from '@/components/marketing/how-it-works-image';
 import { WorkspacePreview } from '@/components/marketing/workspace-preview';
 import { FaqList } from '@/components/marketing/faq-list';
@@ -69,7 +69,7 @@ function Hero() {
           <p className="text-muted mt-6 text-sm">{t('trustLine')}</p>
         </div>
 
-        <HeroDoorImage alt={t('doorAlt')} />
+        <HeroFounder alt={t('founderAlt')} />
       </div>
     </section>
   );
