@@ -16,10 +16,10 @@ describe('stage-based progress', () => {
   it('reports a constant total whatever has been answered', () => {
     const answerSets: PartialAnswers[] = [
       {},
-      { business_location: 'bangladesh', objective: 'new' },
-      { business_location: 'bangladesh', objective: 'new', founder_location: 'outside' },
-      { business_location: 'bangladesh', objective: 'existing' },
-      { business_location: 'outside', target_country: 'usa' },
+      { target_country: 'bangladesh', objective: 'new' },
+      { target_country: 'bangladesh', objective: 'new', founder_location: 'outside' },
+      { target_country: 'bangladesh', objective: 'existing' },
+      { target_country: 'usa', objective: 'new' },
     ];
     for (const answers of answerSets) {
       for (let i = 0; i <= applicableQuestions(answers).length; i += 1) {

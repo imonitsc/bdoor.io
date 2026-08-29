@@ -22,7 +22,7 @@ describe('package pricing layers', () => {
   });
 
   it('sums Singapore government fees to SGD 315', () => {
-    const offer = INTERNATIONAL_OFFERS.find((o) => o.slug === 'singapore-pte-ltd');
+    const offer = INTERNATIONAL_OFFERS.find((o) => o.slug === 'singapore-resident-director');
     expect(offer).toBeDefined();
     const totals = computeLayerTotals(offer!.feeComponents);
     const gov = totals.governmentMinor;
@@ -34,6 +34,26 @@ describe('package pricing layers', () => {
     expect(offer).toBeDefined();
     const totals = computeLayerTotals(offer!.feeComponents);
     expect(totals.estimatedTotalMinor).toBe(449_00);
+  });
+
+  it('computes USA Delaware and Florida representative totals', () => {
+    const delaware = INTERNATIONAL_OFFERS.find((o) => o.slug === 'usa-delaware-llc')!;
+    const florida = INTERNATIONAL_OFFERS.find((o) => o.slug === 'usa-florida-llc')!;
+    expect(computeLayerTotals(delaware.feeComponents).estimatedTotalMinor).toBe(459_00);
+    expect(computeLayerTotals(florida.feeComponents).estimatedTotalMinor).toBe(474_00);
+  });
+
+  it('sums UAE Dubai route to AED 15,000', () => {
+    const offer = INTERNATIONAL_OFFERS.find((o) => o.slug === 'uae-dubai-route')!;
+    const totals = computeLayerTotals(offer.feeComponents);
+    expect(totals.bdoorMinor).toBe(PRICING_FIXTURES.uaeDubai.bdoor);
+    expect(totals.governmentMinor).toBe(PRICING_FIXTURES.uaeDubai.government);
+    expect(totals.estimatedTotalMinor).toBe(PRICING_FIXTURES.uaeDubai.total);
+  });
+
+  it('sums Singapore foreign-founder starting total to S$3,690', () => {
+    const offer = INTERNATIONAL_OFFERS.find((o) => o.slug === 'singapore-foreign-founder')!;
+    expect(computeLayerTotals(offer.feeComponents).estimatedTotalMinor).toBe(369_000);
   });
 
   it('keeps tax at zero when treatment is pending_review', () => {

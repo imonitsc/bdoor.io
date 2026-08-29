@@ -12,10 +12,12 @@ import { recommend } from './rules';
 import { submitApplication, type SubmittedApplication } from './application';
 import {
   applicableQuestions,
+  answersImpliedByMarketScope,
   asQuestionKey,
   firstUnansweredIndex,
   isComplete,
   validateAnswer,
+  type MarketScope,
   type PartialAnswers,
   type QuestionKey,
 } from './questions';
@@ -96,10 +98,30 @@ export async function intakeAction(
   }
 
   if (intent === 'submit') {
+    const rawAnswers = formData.get('answers');
+    if (typeof rawAnswers === 'string' && rawAnswers.length > 0) {
+      try {
+        const parsed = JSON.parse(rawAnswers) as Record<string, unknown>;
+        const clientAnswers: PartialAnswers = { ...previous.answers };
+        for (const [rawKey, rawValue] of Object.entries(parsed)) {
+          const qk = asQuestionKey(rawKey);
+          if (qk === undefined) continue;
+          const revalidated = validateAnswer(qk, rawValue);
+          if (!revalidated.success) continue;
+          (clientAnswers as Record<string, unknown>)[qk] = revalidated.data;
+        }
+        return submitIntakeApplication({
+          ...previous,
+          answers: clientAnswers,
+        });
+      } catch {
+        // Fall through to previous.answers if the client payload is malformed.
+      }
+    }
     return submitIntakeApplication(previous);
   }
 
-  const key = formData.get('questionKey') as QuestionKey | null;
+  const key = asQuestionKey(String(formData.get('questionKey') ?? ''));
   if (!key) return { ...previous, error: 'generic' };
 
   const raw = formData.getAll('value');
@@ -142,7 +164,10 @@ export async function intakeAction(
   if (!session) {
     // No service role configured: keep the flow usable in-memory so the
     // questionnaire can still be walked through, and say so.
-    const answers = { ...previous.answers, [key]: validation.data } as PartialAnswers;
+    let answers = { ...previous.answers, [key]: validation.data } as PartialAnswers;
+    if (key === 'market_scope') {
+      answers = { ...answers, ...answersImpliedByMarketScope(validation.data as MarketScope) };
+    }
     return {
       ...previous,
       answers,
@@ -155,6 +180,16 @@ export async function intakeAction(
   }
 
   let answers = await saveAnswer(session.id, key, validation.data);
+
+  // Production-fix: Bangladesh / Outside implies target_country when BD.
+  if (key === 'market_scope') {
+    const implied = answersImpliedByMarketScope(validation.data as MarketScope);
+    for (const [impliedKey, impliedValue] of Object.entries(implied)) {
+      const qk = asQuestionKey(impliedKey);
+      if (qk === undefined || qk === 'market_scope' || impliedValue === undefined) continue;
+      answers = await saveAnswer(session.id, qk, impliedValue);
+    }
+  }
 
   // Preset answers seeded from the /start URL live only in the action state
   // until now; persist any that are still applicable and unstored so a
@@ -215,7 +250,7 @@ async function submitIntakeApplication(previous: IntakeState): Promise<IntakeSta
     // operating market supports; an international one goes straight to the
     // specialist queue, so running the Bangladesh rules would only mislead.
     let recommendation: Recommendation | undefined;
-    if (previous.answers.business_location === 'bangladesh') {
+    if (previous.answers.target_country === 'bangladesh') {
       recommendation = session
         ? await generateRecommendation(session.id, previous.answers)
         : recommend(previous.answers, await loadRules());
@@ -228,4 +263,40 @@ async function submitIntakeApplication(previous: IntakeState): Promise<IntakeSta
     });
     return { ...previous, error: 'generic' };
   }
+}
+
+/**
+ * Non-blocking background persist for ordinary Next/Back navigation.
+ * Does not return navigation state — the client advances immediately and
+ * only uses this to keep the server draft in sync when a session exists.
+ */
+export async function persistAnswerBackground(
+  key: QuestionKey,
+  value: unknown,
+): Promise<{ ok: true } | { ok: false; reason: 'validation' | 'unavailable' | 'rateLimited' }> {
+  const validation = validateAnswer(key, value);
+  if (!validation.success) return { ok: false, reason: 'validation' };
+
+  try {
+    await enforceRateLimit('questionnaire.save', await rateLimitKey());
+  } catch (error) {
+    if (error instanceof RateLimitError) return { ok: false, reason: 'rateLimited' };
+    throw error;
+  }
+
+  const locale = (await getLocale()) === 'bn' ? 'bn' : 'en';
+  const session = await ensureDraftSession(locale);
+  if (!session) return { ok: false, reason: 'unavailable' };
+
+  let answers = await saveAnswer(session.id, key, validation.data);
+  if (key === 'market_scope') {
+    const implied = answersImpliedByMarketScope(validation.data as MarketScope);
+    for (const [impliedKey, impliedValue] of Object.entries(implied)) {
+      const qk = asQuestionKey(impliedKey);
+      if (qk === undefined || qk === 'market_scope' || impliedValue === undefined) continue;
+      answers = await saveAnswer(session.id, qk, impliedValue);
+    }
+  }
+  void answers;
+  return { ok: true };
 }

@@ -4,13 +4,7 @@ import { getTranslations } from 'next-intl/server';
 import { createAdminClient, hasServiceRole } from '@/lib/supabase/admin';
 import { getEmailProvider } from '@/lib/email';
 import { logger } from '@/lib/logger';
-import {
-  objectiveForFormationType,
-  targetCountrySlug,
-  type Answers,
-  type Objective,
-  type PartialAnswers,
-} from './questions';
+import { targetCountrySlug, type Answers, type Objective, type PartialAnswers } from './questions';
 
 /**
  * Application submission (immediate-operations instructions §4/§11).
@@ -36,13 +30,11 @@ export type SubmittedApplication = {
  * reference cannot be guessed and the sequence cannot leak volume; the
  * database's unique constraint catches the rare collision and the caller
  * retries with a fresh draw.
- *
- * Rejection sampling rather than a bare modulo: 2^32 is not a multiple of
- * 10^6, so `% 1_000_000` alone would slightly favour the low residues.
- * Draws at or above the largest multiple of 10^6 below 2^32 are redrawn
- * (~0.02% of draws), which keeps every reference equally likely.
  */
 export function newApplicationReference(now = new Date()): string {
+  // Rejection sampling: 2^32 is not a multiple of 10^6, so bare `%` would
+  // slightly favour low residues. Redraw values at or above the largest
+  // multiple of 10^6 below 2^32 (~0.02% of draws).
   const RANGE = 1_000_000;
   const LIMIT = Math.floor(2 ** 32 / RANGE) * RANGE;
   let draw: number;
@@ -63,14 +55,8 @@ export type SubmitInput = {
 export async function submitApplication(input: SubmitInput): Promise<SubmittedApplication | null> {
   const { answers, locale } = input;
   const complete = answers as Answers;
-  // The Bangladesh branch never asks for a country and the international
-  // branch never asks for an objective — each is derived from its branch,
-  // so `applications.country`/`objective` stay one vocabulary either way.
-  const bangladesh = complete.business_location === 'bangladesh';
-  const countrySlug = bangladesh ? 'bangladesh' : targetCountrySlug(complete.target_country);
-  const objective: Objective = bangladesh
-    ? complete.objective
-    : objectiveForFormationType(complete.formation_type);
+  const countrySlug = targetCountrySlug(complete.target_country);
+  const objective = complete.objective;
 
   if (!hasServiceRole()) {
     // Local development without a database: the flow stays walkable, the

@@ -12,24 +12,13 @@ import { z } from 'zod';
  */
 
 /**
- * The application opens with one question — Bangladesh, or outside it —
- * because bdoor is a Bangladesh-first platform and most applicants never
- * need to see a country list at all. Only the "outside" branch asks which
- * of the six international countries; every international case goes to
- * manual review (`hardManualReviewReasons`) and a specialist sources the
- * provider per case.
- */
-export const BUSINESS_LOCATIONS = ['bangladesh', 'outside'] as const;
-
-export type BusinessLocation = (typeof BUSINESS_LOCATIONS)[number];
-
-/**
- * All seven operating countries. `bangladesh` stays in the enum — stored
- * applications, the admin queue and the acknowledgement email all use these
- * keys — but the questionnaire only ever offers the six international ones
- * (`INTERNATIONAL_TARGETS`), because Bangladesh is chosen one question
- * earlier. Keys mirror the /countries slugs (snake-cased for the
- * translator); `targetCountrySlug` converts back.
+ * The application is country-first (immediate-operations instructions §4.1):
+ * the seven operating countries, Bangladesh first, no "not sure" — a visitor
+ * who has not chosen a country is choosing one here. Keys mirror the
+ * /countries slugs (snake-cased for the translator); `targetCountrySlug`
+ * converts back. Every international target goes to manual review — see
+ * `hardManualReviewReasons` — because a specialist reviews each case before
+ * a provider is appointed.
  */
 export const TARGET_COUNTRIES = [
   'bangladesh',
@@ -40,9 +29,6 @@ export const TARGET_COUNTRIES = [
   'qatar',
   'singapore',
 ] as const;
-
-/** The six countries the "outside Bangladesh" branch offers. */
-export const INTERNATIONAL_TARGETS = TARGET_COUNTRIES.filter((c) => c !== 'bangladesh');
 
 export type TargetCountry = (typeof TARGET_COUNTRIES)[number];
 
@@ -57,37 +43,35 @@ export function targetCountryFromSlug(slug: string): TargetCountry | undefined {
   return TARGET_COUNTRIES.find((c) => c === key);
 }
 
-/**
- * What the applicant wants to do. The Bangladesh branch offers only
- * `new`/`existing` (`BD_OBJECTIVES`); `expand` and `unsure` stay in the
- * enum because stored applications and the admin queue already carry them,
- * and the international branch's formation type maps onto them.
- */
+/** What the applicant wants to do in the chosen country (§4.1 step 2). */
 export const OBJECTIVES = ['new', 'existing', 'expand', 'unsure'] as const;
 
 export type Objective = (typeof OBJECTIVES)[number];
 
-/** The two objectives the Bangladesh branch offers. */
-export const BD_OBJECTIVES = ['new', 'existing'] as const;
+/**
+ * First assessment question (production-fix, 29 Aug 2026): Bangladesh or
+ * outside. Outside immediately opens the six-country selector; Bangladesh
+ * opens New / Existing business.
+ */
+export const MARKET_SCOPES = ['bangladesh', 'outside'] as const;
 
-/** What an international applicant wants to set up. */
-export const FORMATION_TYPES = ['new_company', 'branch_or_subsidiary', 'not_sure'] as const;
+export type MarketScope = (typeof MARKET_SCOPES)[number];
 
-export type FormationType = (typeof FORMATION_TYPES)[number];
+/** International countries offered after "Outside Bangladesh". */
+export const OUTSIDE_TARGET_COUNTRIES = [
+  'usa',
+  'uk',
+  'uae',
+  'saudi_arabia',
+  'qatar',
+  'singapore',
+] as const satisfies ReadonlyArray<TargetCountry>;
 
-/** `applications.objective` value for an international formation type. */
-export function objectiveForFormationType(type: FormationType): Objective {
-  return type === 'new_company' ? 'new' : type === 'branch_or_subsidiary' ? 'expand' : 'unsure';
-}
-
-/** The support an international applicant can ask for up front. */
-export const SUPPORT_OPTIONS = [
-  'formation',
-  'visa_residency',
-  'banking',
-  'tax_accounting',
-  'ongoing_compliance',
-] as const;
+/** Bangladesh business-stage options on the second screen. */
+export const BANGLADESH_OBJECTIVES = [
+  'new',
+  'existing',
+] as const satisfies ReadonlyArray<Objective>;
 
 export const FOUNDER_LOCATIONS = ['bangladesh', 'outside'] as const;
 export const STRUCTURES = [
@@ -119,13 +103,9 @@ const country = z
   .transform((v) => v.toUpperCase());
 
 export const answersSchema = z.object({
-  business_location: z.enum(BUSINESS_LOCATIONS, { message: 'requiredChoice' }),
+  market_scope: z.enum(MARKET_SCOPES, { message: 'requiredChoice' }),
   target_country: z.enum(TARGET_COUNTRIES, { message: 'requiredChoice' }),
   objective: z.enum(OBJECTIVES, { message: 'requiredChoice' }),
-  formation_type: z.enum(FORMATION_TYPES, { message: 'requiredChoice' }),
-  support_needed: z
-    .array(z.enum(SUPPORT_OPTIONS, { message: 'requiredChoice' }))
-    .min(1, 'requiredChoice'),
   founder_location: z.enum(FOUNDER_LOCATIONS, { message: 'requiredChoice' }),
   nationality: country,
   residence: country,
@@ -157,6 +137,8 @@ export const answersSchema = z.object({
   start_window: z.enum(START_WINDOWS, { message: 'requiredChoice' }),
   existing_business: z.boolean({ message: 'requiredChoice' }),
   existing_registrations: z.array(z.enum(EXISTING_REGISTRATIONS, { message: 'requiredChoice' })),
+  need_visa: z.boolean({ message: 'requiredChoice' }),
+  need_banking: z.boolean({ message: 'requiredChoice' }),
   notes: z.string().trim().max(1000, 'tooLong'),
   full_name: z.string().trim().min(2, 'requiredText').max(120, 'tooLong'),
   email: z.string().trim().toLowerCase().email('invalidEmail').max(254, 'tooLong'),
@@ -202,61 +184,74 @@ export type QuestionDefinition = {
 const always = () => true;
 
 /**
- * Branch predicates. Two paths after the opening location question:
+ * Branch predicates. The two paths after country + objective (§4.2/§4.5):
  * Bangladesh gets the full operating-market question set; an international
- * case gets a short specialist-review set (country, formation type,
- * support, activity, timing), because the appointed provider confirms the
- * rest per case and nothing beyond it is needed to review.
+ * target gets the shorter specialist-review subset, because the provider
+ * confirms the rest per case and nothing beyond it is needed to review.
  */
-const isBangladesh = (a: PartialAnswers) => a.business_location === 'bangladesh';
-const isInternational = (a: PartialAnswers) => a.business_location === 'outside';
-const managesExistingBusiness = (a: PartialAnswers) => a.objective === 'existing';
+const isBangladesh = (a: PartialAnswers) => a.target_country === 'bangladesh';
+const isInternational = (a: PartialAnswers) =>
+  a.target_country !== undefined && a.target_country !== 'bangladesh';
+/**
+ * "Managing an existing business" either directly (objective) or via the
+ * follow-up question a "not sure" answer triggers. "Expand" means forming
+ * something new in the target country, so it takes the new-business path.
+ */
+const managesExistingBusiness = (a: PartialAnswers) =>
+  a.objective === 'existing' || (a.objective === 'unsure' && a.existing_business === true);
+
+/** Derive answers implied by the Bangladesh / Outside first screen. */
+export function answersImpliedByMarketScope(scope: MarketScope): PartialAnswers {
+  if (scope === 'bangladesh') {
+    return { market_scope: scope, target_country: 'bangladesh' };
+  }
+  return { market_scope: scope };
+}
+
+/** Reverse mapping for URL presets (?country=). */
+export function marketScopeFromPreset(country?: TargetCountry): MarketScope | undefined {
+  if (!country) return undefined;
+  return country === 'bangladesh' ? 'bangladesh' : 'outside';
+}
 
 export const QUESTIONS: readonly QuestionDefinition[] = [
   {
-    key: 'business_location',
+    key: 'market_scope',
     section: 'about_you',
     kind: 'choice',
-    options: BUSINESS_LOCATIONS,
+    options: MARKET_SCOPES,
     showWhy: true,
     shouldAsk: always,
-    schema: answersSchema.shape.business_location,
-  },
-  {
-    key: 'objective',
-    section: 'about_you',
-    kind: 'choice',
-    options: BD_OBJECTIVES,
-    showWhy: true,
-    shouldAsk: isBangladesh,
-    schema: answersSchema.shape.objective,
+    schema: answersSchema.shape.market_scope,
   },
   {
     key: 'target_country',
     section: 'about_you',
     kind: 'choice',
-    options: INTERNATIONAL_TARGETS,
+    options: TARGET_COUNTRIES,
     showWhy: true,
-    shouldAsk: isInternational,
+    shouldAsk: (a) => {
+      if (a.target_country !== undefined) return true;
+      return a.market_scope === 'outside' || a.market_scope === undefined;
+    },
     schema: answersSchema.shape.target_country,
   },
   {
-    key: 'formation_type',
+    key: 'objective',
     section: 'about_you',
     kind: 'choice',
-    options: FORMATION_TYPES,
+    options: OBJECTIVES,
     showWhy: true,
-    shouldAsk: isInternational,
-    schema: answersSchema.shape.formation_type,
-  },
-  {
-    key: 'support_needed',
-    section: 'about_you',
-    kind: 'multi',
-    options: SUPPORT_OPTIONS,
-    showWhy: true,
-    shouldAsk: isInternational,
-    schema: answersSchema.shape.support_needed,
+    shouldAsk: (a) => {
+      if (a.objective !== undefined) return true;
+      // Bangladesh: New / Existing next. Outside: still ask after country.
+      return (
+        a.market_scope === 'bangladesh' ||
+        a.market_scope === 'outside' ||
+        a.market_scope === undefined
+      );
+    },
+    schema: answersSchema.shape.objective,
   },
   {
     key: 'founder_location',
@@ -273,7 +268,7 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     section: 'about_you',
     kind: 'country',
     showWhy: true,
-    shouldAsk: isBangladesh,
+    shouldAsk: always,
     schema: answersSchema.shape.nationality,
   },
   {
@@ -281,9 +276,18 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     section: 'about_you',
     kind: 'country',
     showWhy: true,
-    // Only worth asking separately when the founder is not in Bangladesh.
-    shouldAsk: (a) => isBangladesh(a) && a.founder_location === 'outside',
+    // In Bangladesh only worth asking separately when the founder is not
+    // there; for an international application it is always material.
+    shouldAsk: (a) => (isBangladesh(a) && a.founder_location === 'outside') || isInternational(a),
     schema: answersSchema.shape.residence,
+  },
+  {
+    key: 'existing_business',
+    section: 'the_business',
+    kind: 'boolean',
+    showWhy: true,
+    shouldAsk: (a) => isBangladesh(a) && a.objective === 'unsure',
+    schema: answersSchema.shape.existing_business,
   },
   {
     key: 'existing_registrations',
@@ -326,7 +330,7 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     section: 'ownership',
     kind: 'number',
     showWhy: true,
-    shouldAsk: (a) => isBangladesh(a) && !managesExistingBusiness(a),
+    shouldAsk: (a) => isInternational(a) || (isBangladesh(a) && !managesExistingBusiness(a)),
     schema: answersSchema.shape.owner_count,
   },
   {
@@ -355,7 +359,7 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     section: 'ownership',
     kind: 'boolean',
     showWhy: true,
-    shouldAsk: isBangladesh,
+    shouldAsk: always,
     schema: answersSchema.shape.entity_owner,
   },
   {
@@ -417,6 +421,22 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     showWhy: true,
     shouldAsk: (a) => isBangladesh(a) && !managesExistingBusiness(a),
     schema: answersSchema.shape.need_address,
+  },
+  {
+    key: 'need_visa',
+    section: 'operations',
+    kind: 'boolean',
+    showWhy: true,
+    shouldAsk: isInternational,
+    schema: answersSchema.shape.need_visa,
+  },
+  {
+    key: 'need_banking',
+    section: 'operations',
+    kind: 'boolean',
+    showWhy: true,
+    shouldAsk: isInternational,
+    schema: answersSchema.shape.need_banking,
   },
   {
     key: 'start_window',
@@ -517,6 +537,71 @@ export type StageProgress = {
 };
 
 /** Stable stage-based progress for the question at `index` (review beyond). */
+/**
+ * Visible questionnaire steps for the production-fix progress label.
+ * Conditional questions still live under stages; this is the truthful
+ * customer-facing counter (Location → Country/Business stage → …).
+ */
+export type VisibleStep = {
+  current: number;
+  total: number;
+  labelKey:
+    'location' | 'country' | 'business_stage' | 'structure' | 'support' | 'details' | 'contact';
+};
+
+export function visibleStep(answers: PartialAnswers, index: number): VisibleStep {
+  const total = 6;
+  const question = applicableQuestions(answers)[index];
+  if (!question) {
+    return { current: total, total, labelKey: 'contact' };
+  }
+  const key = question.key;
+  if (key === 'market_scope') return { current: 1, total, labelKey: 'location' };
+  if (key === 'target_country') return { current: 2, total, labelKey: 'country' };
+  if (key === 'objective' || key === 'existing_business') {
+    return {
+      current: 2,
+      total,
+      labelKey: answers.market_scope === 'bangladesh' ? 'business_stage' : 'country',
+    };
+  }
+  if (
+    key === 'structure' ||
+    key === 'founder_location' ||
+    key === 'nationality' ||
+    key === 'residence'
+  ) {
+    return { current: 3, total, labelKey: 'structure' };
+  }
+  if (
+    key === 'need_visa' ||
+    key === 'need_banking' ||
+    key === 'need_address' ||
+    key === 'import_export' ||
+    key === 'hire_employees' ||
+    key === 'regulated_activity' ||
+    key === 'start_window'
+  ) {
+    return { current: 4, total, labelKey: 'support' };
+  }
+  if (
+    key === 'activity' ||
+    key === 'location' ||
+    key === 'owner_count' ||
+    key === 'director_count' ||
+    key === 'foreign_owners' ||
+    key === 'entity_owner' ||
+    key === 'foreign_ownership_percent' ||
+    key === 'remit_capital' ||
+    key === 'founder_will_work' ||
+    key === 'existing_registrations' ||
+    key === 'notes'
+  ) {
+    return { current: 5, total, labelKey: 'details' };
+  }
+  return { current: 6, total, labelKey: 'contact' };
+}
+
 export function stageProgress(answers: PartialAnswers, index: number): StageProgress {
   const question = applicableQuestions(answers)[index];
   if (!question) {

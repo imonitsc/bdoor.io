@@ -3,6 +3,7 @@ import {
   bangladeshCheckoutStatus,
   kycUploadStatus,
   legalContentStatus,
+  legalLaunchApproved,
   paymentsStatus,
 } from '@/lib/launch/gates';
 
@@ -15,6 +16,7 @@ import {
 
 const NAMES = [
   'LEGAL_CONTENT_STATUS',
+  'LEGAL_LAUNCH_APPROVED',
   'BANGLADESH_CHECKOUT_STATUS',
   'KYC_UPLOAD_STATUS',
   'PAYMENTS_STATUS',
@@ -42,6 +44,7 @@ describe('defaults', () => {
   it('everything closed when nothing is configured', () => {
     set({});
     expect(legalContentStatus()).toBe('draft');
+    expect(legalLaunchApproved()).toBe(false);
     expect(bangladeshCheckoutStatus()).toBe('disabled');
     expect(kycUploadStatus()).toBe('disabled');
     expect(paymentsStatus()).toBe('disabled');
@@ -83,6 +86,16 @@ describe('approved legal content releases the configured values', () => {
   it('still defaults a gate that is unset', () => {
     set({ LEGAL_CONTENT_STATUS: 'approved' });
     expect(bangladeshCheckoutStatus()).toBe('disabled');
+    expect(paymentsStatus()).toBe('disabled');
+  });
+
+  it('LEGAL_LAUNCH_APPROVED=false keeps the product in draft mode', () => {
+    set({
+      LEGAL_CONTENT_STATUS: 'approved',
+      LEGAL_LAUNCH_APPROVED: 'false',
+      PAYMENTS_STATUS: 'enabled',
+    });
+    expect(legalContentStatus()).toBe('draft');
     expect(paymentsStatus()).toBe('disabled');
   });
 });

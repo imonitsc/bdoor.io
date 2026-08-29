@@ -1,5 +1,4 @@
 import { getFormatter, getTranslations } from 'next-intl/server';
-import { Mail } from 'lucide-react';
 import { Alert } from '@/components/ui/alert';
 import { Section } from '@/components/ui/section';
 import { Markdown } from '@/components/marketing/markdown';
@@ -11,46 +10,21 @@ import type { Locale } from '@/features/catalog/types';
 /**
  * Shared renderer for the legal documents.
  *
- * While LEGAL_CONTENT_STATUS is `draft` the public page carries a concise
- * pre-launch notice instead of the working draft: publishing thousands of
- * words of unreviewed terms under a "draft" banner reads as finished text to
- * most visitors, and nothing on the site is chargeable yet, so there is no
- * agreement a customer needs to study. The drafts stay in the repository
- * (src/content/legal/documents.ts) for the professional reviewers, and the
- * pages are noindexed until approval.
+ * While LEGAL_CONTENT_STATUS is `draft`, public pages show the substantive
+ * working draft with a clear draft banner and stay noindexed. Publishing a
+ * bare "under review" stub hid the owner-supplied policy pack and blocked
+ * counsel review of the live preview. Payment, KYC and identity uploads
+ * remain force-closed until the gate flips to `approved`.
  *
- * Once approved, the full document renders with its version stamp so a
- * customer can always tell which text they accepted.
+ * Bangla routes render the full English draft plus a translation-review
+ * notice until a professional Bangla translation is approved — never an
+ * abbreviated automatic summary.
  */
 export async function LegalPage({ document, locale }: { document: LegalDocument; locale: Locale }) {
   const [t, format] = await Promise.all([getTranslations('legal'), getFormatter()]);
   const title = await getTranslations();
-
-  if (legalContentStatus() === 'draft') {
-    return (
-      <Section className="py-12 md:py-16">
-        <div className="container-page max-w-2xl">
-          <h1 className="text-ink text-3xl leading-tight md:text-4xl">
-            {title(document.titleKey)}
-          </h1>
-          <Alert tone="info" title={t('preLaunchTitle')} className="mt-8">
-            {t('preLaunchBody')}
-          </Alert>
-          <p className="text-muted mt-6 text-sm leading-relaxed">{t('preLaunchDetail')}</p>
-          <p className="text-muted mt-4 text-sm leading-relaxed">
-            {t('preLaunchOperator', { legalName: COMPANY.legalName })}
-          </p>
-          <a
-            href={`mailto:${COMPANY.email}`}
-            className="text-primary mt-6 inline-flex min-h-11 items-center gap-2 rounded text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
-          >
-            <Mail className="size-4" aria-hidden="true" />
-            {COMPANY.email}
-          </a>
-        </div>
-      </Section>
-    );
-  }
+  const isDraft = legalContentStatus() === 'draft' || document.awaitingCounselReview;
+  const showEnglishOnBangla = locale === 'bn';
 
   return (
     <Section className="py-12 md:py-16">
@@ -67,7 +41,7 @@ export async function LegalPage({ document, locale }: { document: LegalDocument;
                     href={`#${section.id}`}
                     className="text-muted hover:text-ink rounded text-sm underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
                   >
-                    {locale === 'bn' ? section.heading.bn : section.heading.en}
+                    {section.heading.en}
                   </a>
                 </li>
               ))}
@@ -85,17 +59,27 @@ export async function LegalPage({ document, locale }: { document: LegalDocument;
               · {document.version}
             </p>
 
-            {document.awaitingCounselReview ? (
+            {isDraft ? (
               <Alert tone="warning" title={t('draftBanner')} className="mt-6">
                 {t('draftBannerBody')}
               </Alert>
             ) : null}
 
+            {showEnglishOnBangla ? (
+              <Alert tone="info" title={t('translationReviewTitle')} className="mt-4">
+                {t('translationReviewBody')}
+              </Alert>
+            ) : null}
+
+            <p className="text-muted mt-4 text-sm leading-relaxed">
+              {t('contactLine', { email: COMPANY.email, legalName: COMPANY.legalName })}
+            </p>
+
             <div className="prose-bdoor text-ink mt-8 max-w-none">
               {document.sections.map((section) => (
                 <section key={section.id} id={section.id} className="scroll-mt-24">
-                  <h2>{locale === 'bn' ? section.heading.bn : section.heading.en}</h2>
-                  <Markdown content={locale === 'bn' ? section.body.bn : section.body.en} />
+                  <h2>{section.heading.en}</h2>
+                  <Markdown content={section.body.en} />
                 </section>
               ))}
             </div>

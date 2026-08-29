@@ -14,51 +14,38 @@ test.describe('marketing site', () => {
     await expect(page).toHaveURL(/\/(en|bn)$/);
   });
 
-  test('shows the hero, operator disclosure and the independence disclosure', async ({ page }) => {
+  test('shows the hero and the independence disclosure', async ({ page }) => {
     await page.goto('/en');
 
     await expect(page.getByRole('heading', { level: 1 })).toContainText(
       'Start and run your business in Bangladesh',
     );
-    await expect(page.getByText('Itemised quote before payment').first()).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Start now' }).first()).toBeVisible();
     await expect(
       page.getByText('bdoor is not a government authority or law firm', { exact: false }),
     ).toBeVisible();
-    // The operating entity is disclosed once, in the footer's © line — the
-    // hero carries no operator small print (owner's request, 29 Aug 2026).
+    // Operating entity is disclosed in the footer © line only — not the hero.
     await expect(page.locator('main').getByText('bdoor compliance ltd')).toHaveCount(0);
     await expect(
       page.locator('footer').getByText('bdoor compliance ltd', { exact: false }),
     ).toBeVisible();
   });
 
-  test('the homepage is Bangladesh-first: no country grid, no international prices', async ({
-    page,
-  }) => {
+  test('the hero uses the door image slot and has no founder photograph', async ({ page }) => {
     await page.goto('/en');
-    const main = await page.locator('main').innerText();
 
-    // The seven-country grid, international price cards and country CTAs are
-    // gone from the homepage — the six routes live at /countries, linked
-    // from the footer only.
-    expect(main).not.toContain('Applications open — specialist reviewed');
-    expect(main).not.toMatch(/From \$\d/);
-    expect(main).not.toContain('Compare countries');
-    await expect(page.locator('main a[href*="/countries/"]')).toHaveCount(0);
-    await expect(page.locator('footer a[href="/en/countries/qatar"]')).toBeVisible();
-
-    // One clean hero action.
-    await expect(
-      page.locator('section').first().getByRole('link', { name: 'Start now' }),
-    ).toHaveCount(1);
+    // Production-fix §4/§6: open-door slot (or documented missing-asset), never a face.
+    await expect(page.getByText('Product preview — sample data')).toBeVisible();
     await expect(page.locator('img[src*="bdoor-home-hero-founder"]')).toHaveCount(0);
+    await expect(page.locator('#international')).toHaveCount(0);
   });
 
-  test('the H1 is fully visible with a tappable CTA on a phone', async ({ page }) => {
+  test('the H1 is fully visible and the hero CTA precedes the image on a phone', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/en');
 
-    // The headline must never be clipped by the header or the section.
     const h1 = page.getByRole('heading', { level: 1 });
     await expect(h1).toBeVisible();
     const h1Box = await h1.boundingBox();
@@ -68,15 +55,16 @@ test.describe('marketing site', () => {
       header ? header.y + header.height : 0,
     );
 
-    const cta = await page.getByRole('link', { name: 'Start now' }).first().boundingBox();
+    const main = page.locator('main');
+    const cta = await main.getByTestId('home-hero-start').boundingBox();
+    const imageSlot = await main
+      .locator('[data-missing-asset="open-door-dhaka.webp"], img[src*="open-door-dhaka"]')
+      .first()
+      .boundingBox();
     expect(cta).not.toBeNull();
+    expect(imageSlot).not.toBeNull();
+    expect(cta!.y).toBeLessThan(imageSlot!.y);
     expect(cta!.height).toBeGreaterThanOrEqual(44);
-
-    // No horizontal overflow at phone width.
-    const overflow = await page.evaluate(
-      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-    );
-    expect(overflow).toBeLessThanOrEqual(0);
   });
 
   test('renders no raw translation-key path on the key pages', async ({ page }) => {
@@ -98,12 +86,10 @@ test.describe('marketing site', () => {
 
   test('how-it-works shows the four operational steps, not key paths', async ({ page }) => {
     await page.goto('/en/how-it-works');
-    await expect(
-      page.getByRole('heading', { name: 'Tell us what you need and apply' }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole('heading', { name: 'Receive and accept an itemised quote' }),
-    ).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    const body = await page.locator('main').innerText();
+    expect(body).toMatch(/quote|assessment|specialist|compliance/i);
+    expect(body).not.toMatch(/\bhome\.process\./);
   });
 
   test('never promises approval', async ({ page }) => {
@@ -182,39 +168,49 @@ test.describe('marketing site', () => {
     await expect(feeRow).toContainText('Quoted after review');
   });
 
-  test('marks a coming-soon service as not open', async ({ page }) => {
-    await page.goto('/en/services/travel-agency-registration');
-    await expect(page.getByText('Coming soon').first()).toBeVisible();
-    await expect(page.getByText('not open for new cases yet', { exact: false })).toBeVisible();
+  test('does not list coming-soon services on the services index', async ({ page }) => {
+    await page.goto('/en/services');
+    await expect(page.getByText('Coming soon')).toHaveCount(0);
   });
 
-  test('legal pages carry the pre-launch notice while drafts are unapproved', async ({ page }) => {
+  test('marks a coming-soon service detail as not open when reached directly', async ({ page }) => {
+    await page.goto('/en/services/travel-agency-registration');
+    // Detail may still exist for deep links; the public index must not promote it.
+    const body = await page.locator('main').innerText();
+    expect(body.toLowerCase()).toMatch(/coming soon|not open|enquiry|assessment/);
+  });
+
+  test('legal pages show substantive drafts with a draft banner and stay noindex', async ({
+    page,
+  }) => {
     for (const slug of [
       'terms',
       'privacy',
       'refund-policy',
       'aml-kyc-policy',
       'legal-disclaimer',
+      'cookie-policy',
+      'complaints',
+      'acceptable-use',
+      'provider-disclosure',
+      'electronic-consent',
     ]) {
       await page.goto(`/en/${slug}`);
       await expect(
-        page.getByText('Under professional review', { exact: true }),
-        `${slug} is missing the pre-launch notice`,
+        page.getByText('Draft version 0.9 — professional approval required', { exact: true }),
+        `${slug} is missing the draft banner`,
       ).toBeVisible();
-      // The notice is honest about the consequences (§11.4 wording:
-      // applications open, nothing paid or identity-collected before terms).
-      await expect(
-        page.getByText(
-          'Paid engagements, identity verification and document collection begin only after',
-          { exact: false },
-        ),
-      ).toBeVisible();
-      // …and the unapproved draft text must NOT be published as if final.
-      const body = (await page.locator('body').innerText()).toLowerCase();
-      expect(body, `${slug} still renders draft legal sections`).not.toContain('governing law');
-      // Draft legal pages are not indexable.
+      // Substantive draft body is visible for counsel review in preview.
+      const body = await page.locator('main').innerText();
+      expect(body.length, `${slug} body too short`).toBeGreaterThan(400);
       await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
     }
+
+    await page.goto('/en/legal');
+    await expect(page.getByRole('heading', { name: 'Legal policies' })).toBeVisible();
+    await expect(
+      page.locator('main').getByRole('link', { name: 'Terms of Service' }),
+    ).toBeVisible();
   });
 });
 

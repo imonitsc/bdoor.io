@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { useTranslations } from 'next-intl';
-import { ArrowRight, Check } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { Section, SectionHeading } from '@/components/ui/section';
 import { PackageSelector } from '@/components/marketing/package-selector';
-import { FeeBreakdownExample } from '@/components/marketing/fee-breakdown-example';
-import { SpecialistServicesList } from '@/components/marketing/specialist-services-list';
+import { HeroDoorImage } from '@/components/marketing/hero-door-image';
+import { HowItWorksImage } from '@/components/marketing/how-it-works-image';
 import { WorkspacePreview } from '@/components/marketing/workspace-preview';
 import { FaqList } from '@/components/marketing/faq-list';
 import { getGlobalFaqs } from '@/features/catalog/queries';
@@ -36,48 +36,40 @@ export async function generateMetadata({
 }
 
 /**
- * A Bangladesh-first homepage in six focused sections: one clean hero, the
- * Bangladesh packages, the four-step process with the fee example, the
- * workspace preview, existing-business support with the partner model, and
- * the FAQ with a single closing call to action. No country grid and no
- * international pricing — the six international routes live at /countries,
- * reachable from the footer, and the application itself asks where.
+ * Homepage — five sections (production-fix 29 Aug 2026):
+ * hero → Bangladesh packages → how it works → workspace proof → FAQ + CTA.
+ * International country cards stay off this page; footer links remain.
  */
 function Hero() {
   const t = useTranslations('home.hero');
-  const trustItems = ['assessment', 'quote', 'specialists'] as const;
 
   return (
-    <section className="border-border border-b">
-      {/*
-        Deliberately quiet: one column, generous whitespace, no imagery, no
-        texture, no gradient, and exactly one action. The premium register
-        comes from restraint, not decoration.
-      */}
-      <div className="container-page max-w-4xl py-20 md:py-28 lg:py-32">
-        <p className="text-muted font-mono text-xs tracking-[0.15em] uppercase">{t('eyebrow')}</p>
-        <h1 className="text-ink mt-5 max-w-3xl text-4xl leading-[1.08] md:text-5xl md:leading-[1.05] lg:text-6xl lg:leading-[1.02]">
-          {t('headline')}
-        </h1>
-        <p className="text-muted mt-6 max-w-2xl text-lg leading-relaxed">{t('support')}</p>
+    <section className="bg-canvas border-border relative border-b">
+      <div className="container-page grid items-center gap-10 py-14 md:gap-12 md:py-16 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-16 lg:py-[4.5rem]">
+        <div className="flex max-w-[38.75rem] flex-col justify-center">
+          <p className="text-muted font-mono text-xs tracking-[0.14em] uppercase">{t('eyebrow')}</p>
+          <h1 className="text-ink mt-4 text-[2.5rem] leading-[1.04] font-semibold md:text-[3.5rem] lg:text-[3.75rem]">
+            {t('headline')}
+          </h1>
+          <p className="text-muted mt-5 max-w-xl text-lg leading-relaxed">{t('support')}</p>
 
-        <div className="mt-9">
-          <Button asChild size="lg">
-            <Link href={MARKETING_ROUTES.start}>
-              {t('primaryCta')}
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </Link>
-          </Button>
+          <div className="mt-8">
+            <Button asChild size="lg">
+              <Link
+                href={MARKETING_ROUTES.start}
+                data-testid="home-hero-start"
+                className="inline-flex min-h-11 items-center"
+              >
+                {t('primaryCta')}
+                <ArrowRight className="size-4" aria-hidden="true" />
+              </Link>
+            </Button>
+          </div>
+
+          <p className="text-muted mt-6 text-sm">{t('trustLine')}</p>
         </div>
 
-        <ul className="mt-9 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-x-8">
-          {trustItems.map((item) => (
-            <li key={item} className="text-muted flex items-center gap-2 text-sm">
-              <Check className="text-accent size-4 shrink-0" aria-hidden="true" />
-              {t(`trust.${item}`)}
-            </li>
-          ))}
-        </ul>
+        <HeroDoorImage alt={t('doorAlt')} />
       </div>
     </section>
   );
@@ -95,30 +87,29 @@ function PackagesSection({
     <Section tone="surface">
       <div className="container-page">
         <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
-        <PackageSelector locale={locale} usdNotes={usdNotes} />
+        <PackageSelector locale={locale} usdNotes={usdNotes} compact />
       </div>
     </Section>
   );
 }
 
-/** Process and fees in one section, with standalone services as a disclosure. */
-function ProcessAndFees({ locale }: { locale: Locale }) {
+function ProcessSection() {
   const t = useTranslations('home.process');
   const steps = ['one', 'two', 'three', 'four'] as const;
 
   return (
     <Section>
-      <div className="container-page">
-        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} />
-        <div className="mt-10 grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
-          <ol className="flex flex-col gap-7">
+      <div className="container-page grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:items-center lg:gap-16">
+        <div>
+          <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
+          <ol className="border-border mt-8 divide-y border-y">
             {steps.map((step, index) => (
-              <li key={step} className="flex gap-4">
+              <li key={step} className="flex gap-4 py-5">
                 <span
-                  className="bg-primary-soft text-info flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
+                  className="text-muted font-mono text-sm font-semibold tabular-nums"
                   aria-hidden="true"
                 >
-                  {index + 1}
+                  {String(index + 1).padStart(2, '0')}
                 </span>
                 <div>
                   <h3 className="text-ink text-base font-semibold">{t(`steps.${step}.title`)}</h3>
@@ -129,26 +120,8 @@ function ProcessAndFees({ locale }: { locale: Locale }) {
               </li>
             ))}
           </ol>
-
-          <div>
-            <FeeBreakdownExample locale={locale} />
-            <details className="border-border bg-surface group mt-4 rounded-[var(--radius-card)] border">
-              <summary className="text-ink flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-5 py-3 text-sm font-semibold [&::-webkit-details-marker]:hidden">
-                <span>
-                  {t('standaloneTitle')}
-                  <span className="text-muted ms-2 font-normal">{t('standaloneSummary')}</span>
-                </span>
-                <ArrowRight
-                  className="text-muted size-4 shrink-0 transition-transform group-open:rotate-90"
-                  aria-hidden="true"
-                />
-              </summary>
-              <div className="border-border border-t px-5 pb-5">
-                <SpecialistServicesList locale={locale} />
-              </div>
-            </details>
-          </div>
         </div>
+        <HowItWorksImage alt={t('imageAlt')} />
       </div>
     </Section>
   );
@@ -160,39 +133,9 @@ function Preview() {
     <Section tone="sunken">
       <div className="container-page">
         <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} align="center" />
+        <p className="text-muted mt-2 text-center text-xs">{t('productPreviewNotice')}</p>
         <div className="mt-10">
           <WorkspacePreview />
-        </div>
-      </div>
-    </Section>
-  );
-}
-
-/**
- * §7.4.7: what bdoor does for a business that already exists, and — in the
- * same breath — how the third-party partner model works. One statement of
- * each, not a disclaimer repeated per section.
- */
-function ExistingBusinessSection() {
-  const t = useTranslations('home.existing');
-
-  return (
-    <Section tone="surface">
-      <div className="container-page grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
-        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
-        <div className="flex flex-col justify-center gap-5">
-          <p className="text-muted text-sm leading-relaxed">{t('partnerModel')}</p>
-          <div className="flex flex-wrap gap-3">
-            <Button asChild variant="secondary">
-              <Link href={MARKETING_ROUTES.pricing}>
-                {t('cta')}
-                <ArrowRight className="size-4" aria-hidden="true" />
-              </Link>
-            </Button>
-            <Button asChild variant="link">
-              <Link href={MARKETING_ROUTES.partners}>{t('partnerCta')}</Link>
-            </Button>
-          </div>
         </div>
       </div>
     </Section>
@@ -207,21 +150,13 @@ async function FaqAndNextStep({ locale }: { locale: Locale }) {
   ]);
 
   return (
-    <Section tone="sunken">
+    <Section>
       <div className="container-page grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
         <SectionHeading eyebrow={t('eyebrow')} title={t('title')} />
-        <div>
-          <FaqList faqs={faqs} locale={locale} limit={4} />
-          <Button asChild variant="link" className="mt-5">
-            <Link href={MARKETING_ROUTES.howItWorks}>
-              {t('cta')}
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </Link>
-          </Button>
-        </div>
+        <FaqList faqs={faqs} locale={locale} limit={4} />
       </div>
 
-      <div className="container-page mt-16 flex flex-col items-center gap-5 text-center">
+      <div className="container-page border-border mt-16 flex flex-col items-center gap-5 border-t pt-16 text-center">
         <h2 className="text-ink max-w-2xl text-2xl leading-tight md:text-3xl">{tCta('title')}</h2>
         <p className="text-muted max-w-xl text-base leading-relaxed">{tCta('body')}</p>
         <Button asChild size="lg">
@@ -245,9 +180,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     <>
       <Hero />
       <PackagesSection locale={typedLocale} usdNotes={usdNotes} />
-      <ProcessAndFees locale={typedLocale} />
+      <ProcessSection />
       <Preview />
-      <ExistingBusinessSection />
       <FaqAndNextStep locale={typedLocale} />
     </>
   );

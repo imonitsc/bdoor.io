@@ -25,6 +25,11 @@ export const MARKETING_ROUTES = {
   amlKycPolicy: '/aml-kyc-policy',
   legalDisclaimer: '/legal-disclaimer',
   cookiePolicy: '/cookie-policy',
+  legal: '/legal',
+  complaints: '/complaints',
+  acceptableUse: '/acceptable-use',
+  providerDisclosure: '/provider-disclosure',
+  electronicConsent: '/electronic-consent',
 } as const;
 
 export const APP_ROUTES = {
@@ -72,11 +77,9 @@ export const ADMIN_ROUTES = {
 } as const;
 
 /**
- * The four primary destinations of the Bangladesh-first navigation: apply,
- * browse, price, learn. The platform leads with Bangladesh, so Countries
- * holds no top-level slot — the six international routes are small text
- * links in the footer (`FOOTER_COUNTRY_LINKS`), and the application asks
- * where. The overflow e2e test guards the current set.
+ * Primary destinations (production-fix 29 Aug 2026): Start, Services,
+ * Pricing, Resources. Countries stay in the footer only — not the header.
+ * Partners, how-it-works and company pages remain in the drawer and footer.
  */
 export const HEADER_LINKS = [
   { href: MARKETING_ROUTES.start, labelKey: 'nav.startShort' },
@@ -105,8 +108,8 @@ export const FOOTER_BANGLADESH_LINKS = [
   { href: MARKETING_ROUTES.industries, labelKey: 'nav.industries' },
 ] as const;
 
-/** The six international routes: small footer text links only, by design. */
 export const FOOTER_COUNTRY_LINKS = [
+  { href: MARKETING_ROUTES.countries, labelKey: 'footer.links.countriesOverview' },
   { href: '/countries/usa', labelKey: 'footer.links.unitedStates' },
   { href: '/countries/uk', labelKey: 'footer.links.unitedKingdom' },
   { href: '/countries/uae', labelKey: 'footer.links.uae' },
@@ -125,12 +128,17 @@ export const FOOTER_COMPANY_LINKS = [
 ] as const;
 
 export const FOOTER_LEGAL_LINKS = [
+  { href: MARKETING_ROUTES.legal, labelKey: 'legal.index' },
   { href: MARKETING_ROUTES.terms, labelKey: 'legal.terms' },
   { href: MARKETING_ROUTES.privacy, labelKey: 'legal.privacy' },
   { href: MARKETING_ROUTES.refundPolicy, labelKey: 'legal.refund' },
   { href: MARKETING_ROUTES.amlKycPolicy, labelKey: 'legal.amlKyc' },
   { href: MARKETING_ROUTES.legalDisclaimer, labelKey: 'legal.disclaimer' },
   { href: MARKETING_ROUTES.cookiePolicy, labelKey: 'legal.cookies' },
+  { href: MARKETING_ROUTES.complaints, labelKey: 'legal.complaints' },
+  { href: MARKETING_ROUTES.acceptableUse, labelKey: 'legal.acceptableUse' },
+  { href: MARKETING_ROUTES.providerDisclosure, labelKey: 'legal.providerDisclosure' },
+  { href: MARKETING_ROUTES.electronicConsent, labelKey: 'legal.electronicConsent' },
 ] as const;
 
 /** Public routes included in the sitemap, with their change priority. */
@@ -159,10 +167,15 @@ export const SITEMAP_ROUTES: ReadonlyArray<{
   { path: '/resources', priority: 0.7, changeFrequency: 'weekly' },
   { path: '/about', priority: 0.5, changeFrequency: 'yearly' },
   { path: '/contact', priority: 0.5, changeFrequency: 'yearly' },
+  { path: '/legal', priority: 0.4, changeFrequency: 'yearly' },
   { path: '/terms', priority: 0.3, changeFrequency: 'yearly' },
   { path: '/privacy', priority: 0.3, changeFrequency: 'yearly' },
   { path: '/refund-policy', priority: 0.3, changeFrequency: 'yearly' },
   { path: '/aml-kyc-policy', priority: 0.3, changeFrequency: 'yearly' },
   { path: '/legal-disclaimer', priority: 0.3, changeFrequency: 'yearly' },
   { path: '/cookie-policy', priority: 0.3, changeFrequency: 'yearly' },
+  { path: '/complaints', priority: 0.3, changeFrequency: 'yearly' },
+  { path: '/acceptable-use', priority: 0.3, changeFrequency: 'yearly' },
+  { path: '/provider-disclosure', priority: 0.3, changeFrequency: 'yearly' },
+  { path: '/electronic-consent', priority: 0.3, changeFrequency: 'yearly' },
 ];

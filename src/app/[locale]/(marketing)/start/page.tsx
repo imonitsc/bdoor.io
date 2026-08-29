@@ -5,7 +5,13 @@ import { Card } from '@/components/ui/card';
 import { Questionnaire } from '@/components/forms/questionnaire';
 import { IndependenceDisclosure } from '@/components/layout/disclosure';
 import { loadIntake, type IntakePreset } from '@/features/intake/actions';
-import { BD_OBJECTIVES, targetCountryFromSlug, type Objective } from '@/features/intake/questions';
+import {
+  BANGLADESH_OBJECTIVES,
+  OBJECTIVES,
+  marketScopeFromPreset,
+  targetCountryFromSlug,
+  type Objective,
+} from '@/features/intake/questions';
 import { BANGLADESH_PACKAGES } from '@/content/packages/catalog';
 import { localizedUrl } from '@/lib/site';
 import type { Locale } from '@/features/catalog/types';
@@ -23,34 +29,38 @@ function presetFromParams(params: { [key: string]: string | string[] | undefined
   const preset: IntakePreset = { answers: {} };
   const query: string[] = [];
 
-  // ?country= seeds the branch, not just a value: bangladesh answers the
-  // opening location question alone; an international slug answers it AND
-  // the country question the "outside" branch would ask next.
   const country = targetCountryFromSlug(first(params.country) ?? '');
-  if (country === 'bangladesh') {
-    preset.answers.business_location = 'bangladesh';
-    query.push('country=bangladesh');
-  } else if (country) {
-    preset.answers.business_location = 'outside';
+  if (country) {
     preset.answers.target_country = country;
     query.push(`country=${country.replace(/_/g, '-')}`);
   }
 
-  // The objective question exists only on the Bangladesh branch.
   const objective = first(params.objective);
-  if (
-    country === 'bangladesh' &&
-    objective &&
-    (BD_OBJECTIVES as readonly string[]).includes(objective)
-  ) {
+  if (objective && (OBJECTIVES as readonly string[]).includes(objective)) {
     preset.answers.objective = objective as Objective;
     query.push(`objective=${objective}`);
+  }
+
+  const scope = marketScopeFromPreset(country);
+  if (scope) {
+    preset.answers.market_scope = scope;
+    if (scope === 'bangladesh') {
+      preset.answers.target_country = 'bangladesh';
+      if (
+        preset.answers.objective &&
+        !(BANGLADESH_OBJECTIVES as readonly string[]).includes(preset.answers.objective)
+      ) {
+        delete preset.answers.objective;
+      }
+    }
   }
 
   const pkg = first(params.package);
   if (pkg && BANGLADESH_PACKAGES.some((p) => p.slug === pkg)) {
     preset.packageSlug = pkg;
     query.push(`package=${pkg}`);
+    preset.answers.market_scope = 'bangladesh';
+    preset.answers.target_country = 'bangladesh';
   }
 
   if (query.length > 0) preset.sourcePath = `/start?${query.join('&')}`;
