@@ -1,6 +1,8 @@
 import type { InternationalOffer, ServicePackage } from '@/features/packages/types';
 
-const REVIEW_DATE = '2026-08-28';
+/** The owner's last commercial review of every figure in this file. */
+export const COMMERCIAL_REVIEW_DATE = '2026-08-28';
+const REVIEW_DATE = COMMERCIAL_REVIEW_DATE;
 
 function bdFee(
   amountBdt: number,
