@@ -1,7 +1,7 @@
 'use client';
 
-import { useActionState, useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useActionState, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { ArrowLeft, ArrowRight, HelpCircle, Info, Save } from 'lucide-react';
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,10 @@ import { Field, FieldControl, FieldDescription, FieldLabel } from '@/components/
 import { Input, NativeSelect, Textarea } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { useAnnounce } from '@/components/ui/announcer';
+import {
+  BUSINESS_CATEGORY_GROUPS,
+  type BusinessCategory,
+} from '@/features/intake/business-categories';
 import { COUNTRIES } from '@/features/intake/countries';
 import {
   applicableQuestions,
@@ -46,6 +50,110 @@ function WhyWeAsk({ text }: { text: string }) {
           {text}
         </p>
       ) : null}
+    </div>
+  );
+}
+
+/**
+ * The business-category picker.
+ *
+ * A search box over a grouped list rather than a dropdown: 141 options in a
+ * `<select>` is unusable on a phone, and a combobox popover would hide the
+ * groups that make a long list scannable. Filtering matches the group name as
+ * well as the category, so "garment" surfaces the whole textiles group.
+ *
+ * The radios carry their own name and never submit; the selection lives in
+ * React state and is posted by a hidden input. That way filtering the list
+ * cannot drop the chosen option out of the DOM and lose the answer with it,
+ * and the browser is never asked to validate a control it cannot focus.
+ */
+function CategoryPicker({
+  questionKey,
+  value,
+  labelledBy,
+}: {
+  questionKey: string;
+  value: unknown;
+  labelledBy: string;
+}) {
+  const t = useTranslations('start.categoryPicker');
+  const locale = useLocale() === 'bn' ? 'bn' : 'en';
+  const [selected, setSelected] = useState(typeof value === 'string' ? value : '');
+  const [query, setQuery] = useState('');
+  const statusId = useId();
+
+  const needle = query.trim().toLowerCase();
+  const groups = useMemo(() => {
+    if (!needle)
+      return BUSINESS_CATEGORY_GROUPS.map((g) => ({ group: g, categories: g.categories }));
+    return BUSINESS_CATEGORY_GROUPS.map((group) => {
+      const groupMatches =
+        group.en.toLowerCase().includes(needle) || group.bn.toLowerCase().includes(needle);
+      const categories = groupMatches
+        ? group.categories
+        : group.categories.filter(
+            (c: BusinessCategory) =>
+              c.en.toLowerCase().includes(needle) || c.bn.toLowerCase().includes(needle),
+          );
+      return { group, categories };
+    }).filter((entry) => entry.categories.length > 0);
+  }, [needle]);
+
+  const matchCount = groups.reduce((total, entry) => total + entry.categories.length, 0);
+
+  return (
+    <div role="group" aria-labelledby={labelledBy} className="mt-4">
+      <input type="hidden" name="value" value={selected} />
+      <label className="text-ink block text-sm font-medium" htmlFor={`${questionKey}-search`}>
+        {t('searchLabel')}
+      </label>
+      <Input
+        id={`${questionKey}-search`}
+        type="search"
+        autoComplete="off"
+        className="mt-1.5"
+        placeholder={t('searchPlaceholder')}
+        value={query}
+        aria-describedby={statusId}
+        onChange={(event) => setQuery(event.target.value)}
+      />
+      <p id={statusId} role="status" className="text-muted mt-2 text-sm">
+        {matchCount === 0 ? t('noMatches') : t('matchCount', { count: matchCount })}
+      </p>
+
+      <div className="border-border bg-surface mt-2 max-h-[26rem] overflow-y-auto rounded-[var(--radius-control)] border">
+        {groups.map(({ group, categories }) => (
+          <fieldset key={group.slug} className="border-border border-b last:border-b-0">
+            <legend className="sr-only">{group[locale]}</legend>
+            <p
+              aria-hidden="true"
+              className="text-muted bg-surface-sunken px-4 py-2 text-xs font-semibold tracking-[0.08em] uppercase"
+            >
+              {group[locale]}
+            </p>
+            <div className="flex flex-col">
+              {categories.map((category) => (
+                <label
+                  key={category.slug}
+                  htmlFor={`${questionKey}-${category.slug}`}
+                  className="hover:bg-surface-sunken has-checked:bg-primary-soft flex min-h-11 cursor-pointer items-center gap-3 px-4 py-2.5 text-sm"
+                >
+                  <input
+                    type="radio"
+                    id={`${questionKey}-${category.slug}`}
+                    name={`${questionKey}-choice`}
+                    value={category.slug}
+                    checked={selected === category.slug}
+                    onChange={() => setSelected(category.slug)}
+                    className="size-4 shrink-0 accent-[var(--color-primary)]"
+                  />
+                  <span className="text-ink">{category[locale]}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        ))}
+      </div>
     </div>
   );
 }
@@ -140,6 +248,25 @@ function QuestionInput({
           </fieldset>
         </Field>
       );
+
+    case 'category': {
+      // Deliberately not <FieldLabel>: there is no single control to label —
+      // the answer is a group of radios — so a <label for> would point at an
+      // id nothing owns. A labelled group carries the same meaning correctly.
+      const labelId = `${key}-label`;
+      return (
+        <Field error={error}>
+          <p id={labelId} className="text-ink text-lg font-semibold">
+            {t(`${key}.label`)}
+            <span className="text-danger ms-1" aria-hidden="true">
+              *
+            </span>
+          </p>
+          {help ? <p className="text-muted mt-1.5 text-sm">{help}</p> : null}
+          <CategoryPicker questionKey={key} value={value} labelledBy={labelId} />
+        </Field>
+      );
+    }
 
     case 'multi':
       return (
