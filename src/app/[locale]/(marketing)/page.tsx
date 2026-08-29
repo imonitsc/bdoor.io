@@ -7,14 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Section, SectionHeading } from '@/components/ui/section';
 import { PackageSelector } from '@/components/marketing/package-selector';
 import { FeeBreakdownExample } from '@/components/marketing/fee-breakdown-example';
-import { CountrySelector } from '@/components/marketing/country-selector';
 import { SpecialistServicesList } from '@/components/marketing/specialist-services-list';
-import { HeroProductModule } from '@/components/marketing/hero-product-module';
 import { WorkspacePreview } from '@/components/marketing/workspace-preview';
 import { FaqList } from '@/components/marketing/faq-list';
 import { getGlobalFaqs } from '@/features/catalog/queries';
 import type { Locale } from '@/features/catalog/types';
-import { operationalClaimsAllowed } from '@/lib/launch/gates';
 import { packageUsdNotes } from '@/lib/fx/usd-notes';
 import { MARKETING_ROUTES } from '@/lib/navigation';
 import { localizedUrl } from '@/lib/site';
@@ -39,97 +36,49 @@ export async function generateMetadata({
 }
 
 /**
- * Eight sections before the footer (immediate-operations instructions §7.4):
- * the hero with its product module, the trust strip, the seven-country
- * comparison, the Bangladesh packages, the four-step process with the fee
- * example, the workspace preview, existing-business support with the
- * partner model, and the FAQ with the final call to action.
+ * A Bangladesh-first homepage in six focused sections: one clean hero, the
+ * Bangladesh packages, the four-step process with the fee example, the
+ * workspace preview, existing-business support with the partner model, and
+ * the FAQ with a single closing call to action. No country grid and no
+ * international pricing — the six international routes live at /countries,
+ * reachable from the footer, and the application itself asks where.
  */
-function Hero({ locale }: { locale: Locale }) {
+function Hero() {
   const t = useTranslations('home.hero');
+  const trustItems = ['assessment', 'quote', 'specialists'] as const;
 
   return (
-    <section className="bg-surface-inverse text-ink-inverse texture-dots relative overflow-hidden">
+    <section className="border-border border-b">
       {/*
-        Ambient depth: one large cobalt glow bleeding in from the top-right
-        corner, felt more than seen. Decorative only — the overflow clip
-        exists for this glow, and nothing textual can reach the clip edge.
+        Deliberately quiet: one column, generous whitespace, no imagery, no
+        texture, no gradient, and exactly one action. The premium register
+        comes from restraint, not decoration.
       */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-48 -right-48 size-[30rem] rounded-full bg-[color:var(--bd-cobalt-500)] opacity-[0.16] blur-[150px]"
-      />
-      {/*
-        §7.2: roughly a 7/5 column split, both columns centred on the same
-        visual axis, height following content — no fixed hero height, no
-        negative offsets, nothing that could clip the H1 at any zoom level.
-        The product module replaces the illustrated person (§7.1).
-      */}
-      <div className="container-page grid items-center gap-12 py-16 md:py-20 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-16 lg:py-24">
-        <div className="flex flex-col justify-center">
-          <p className="inline-flex w-fit items-center gap-2.5 rounded-[var(--radius-pill)] border border-[color:var(--bd-turquoise-500)]/35 bg-white/5 px-4 py-1.5 font-mono text-xs tracking-[0.15em] text-[color:var(--bd-turquoise-500)] uppercase">
-            <span
-              aria-hidden="true"
-              className="animate-pulse-dot size-1.5 rounded-full bg-[color:var(--bd-turquoise-500)]"
-            />
-            {t('eyebrow')}
-          </p>
-          <h1 className="text-ink-inverse mt-5 max-w-2xl text-[2.6rem] leading-[1.05] md:text-[3.4rem] md:leading-[1.02] lg:text-[4.25rem] lg:leading-[1.0]">
-            {t.rich('headline', {
-              g: (chunks) => <span className="gradient-text-inverse">{chunks}</span>,
-            })}
-          </h1>
-          <p className="text-muted-inverse mt-6 max-w-xl text-lg leading-relaxed">{t('support')}</p>
+      <div className="container-page max-w-4xl py-20 md:py-28 lg:py-32">
+        <p className="text-muted font-mono text-xs tracking-[0.15em] uppercase">{t('eyebrow')}</p>
+        <h1 className="text-ink mt-5 max-w-3xl text-4xl leading-[1.08] md:text-5xl md:leading-[1.05] lg:text-6xl lg:leading-[1.02]">
+          {t('headline')}
+        </h1>
+        <p className="text-muted mt-6 max-w-2xl text-lg leading-relaxed">{t('support')}</p>
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button asChild size="lg" variant="inverse">
-              <Link href={MARKETING_ROUTES.start}>
-                {t('primaryCta')}
-                <ArrowRight className="size-4" aria-hidden="true" />
-              </Link>
-            </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="ghost"
-              className="border-border-inverse text-ink-inverse hover:bg-surface-inverse-soft border"
-            >
-              <Link href={MARKETING_ROUTES.countries}>{t('secondaryCta')}</Link>
-            </Button>
-          </div>
-
-          <p className="text-muted-inverse mt-8 text-sm">{t('trustLine')}</p>
-          <p className="text-muted-inverse mt-2 text-xs">{t('operatorLine')}</p>
+        <div className="mt-9">
+          <Button asChild size="lg">
+            <Link href={MARKETING_ROUTES.start}>
+              {t('primaryCta')}
+              <ArrowRight className="size-4" aria-hidden="true" />
+            </Link>
+          </Button>
         </div>
 
-        <HeroProductModule locale={locale} />
-      </div>
-    </section>
-  );
-}
-
-/**
- * Four statements, each checkable against the product itself. No counts, no
- * logos, no ratings, no affiliations — bdoor has none it could prove.
- */
-function TrustStrip() {
-  const t = useTranslations('home.trust');
-  const items = ['quotes', 'workspace', 'caseManagement', 'specialists'] as const;
-
-  return (
-    <section className="bg-surface-inverse text-ink-inverse border-border-inverse border-t">
-      <div className="container-page">
-        <ul className="grid gap-x-8 gap-y-3 py-6 sm:grid-cols-2 xl:grid-cols-4">
-          {items.map((item) => (
-            <li key={item} className="flex items-center gap-2.5">
-              <Check
-                className="size-4 shrink-0 text-[color:var(--bd-turquoise-500)]"
-                aria-hidden="true"
-              />
-              <span className="text-ink-inverse text-sm">{t(item)}</span>
+        <ul className="mt-9 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-x-8">
+          {trustItems.map((item) => (
+            <li key={item} className="text-muted flex items-center gap-2 text-sm">
+              <Check className="text-accent size-4 shrink-0" aria-hidden="true" />
+              {t(`trust.${item}`)}
             </li>
           ))}
         </ul>
+        <p className="text-muted mt-6 text-xs">{t('operatorLine')}</p>
       </div>
     </section>
   );
@@ -221,22 +170,6 @@ function Preview() {
 }
 
 /**
- * The seven-country selector (spec §6.1): the Bangladesh card larger, six
- * international cards compact, each linking to its country page.
- */
-function CountriesSection({ locale, operational }: { locale: Locale; operational: boolean }) {
-  const t = useTranslations('home.countriesSection');
-  return (
-    <Section>
-      <div className="container-page">
-        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
-        <CountrySelector locale={locale} operational={operational} />
-      </div>
-    </Section>
-  );
-}
-
-/**
  * §7.4.7: what bdoor does for a business that already exists, and — in the
  * same breath — how the third-party partner model works. One statement of
  * each, not a disclaimer repeated per section.
@@ -292,17 +225,12 @@ async function FaqAndNextStep({ locale }: { locale: Locale }) {
       <div className="container-page mt-16 flex flex-col items-center gap-5 text-center">
         <h2 className="text-ink max-w-2xl text-2xl leading-tight md:text-3xl">{tCta('title')}</h2>
         <p className="text-muted max-w-xl text-base leading-relaxed">{tCta('body')}</p>
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <Button asChild size="lg">
-            <Link href={MARKETING_ROUTES.start}>
-              {tCta('primary')}
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </Link>
-          </Button>
-          <Button asChild size="lg" variant="secondary">
-            <Link href={MARKETING_ROUTES.contact}>{tCta('secondary')}</Link>
-          </Button>
-        </div>
+        <Button asChild size="lg">
+          <Link href={MARKETING_ROUTES.start}>
+            {tCta('primary')}
+            <ArrowRight className="size-4" aria-hidden="true" />
+          </Link>
+        </Button>
       </div>
     </Section>
   );
@@ -316,9 +244,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
   return (
     <>
-      <Hero locale={typedLocale} />
-      <TrustStrip />
-      <CountriesSection locale={typedLocale} operational={operationalClaimsAllowed()} />
+      <Hero />
       <PackagesSection locale={typedLocale} usdNotes={usdNotes} />
       <ProcessAndFees locale={typedLocale} />
       <Preview />

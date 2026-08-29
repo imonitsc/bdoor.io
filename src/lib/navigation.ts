@@ -72,15 +72,15 @@ export const ADMIN_ROUTES = {
 } as const;
 
 /**
- * The five primary destinations (immediate-operations instructions §7.3):
- * apply, browse, compare, price, learn. Partners, how-it-works and the
- * company pages move to the drawer and footer — not every destination gets
- * top-level weight. The overflow e2e test guards the current set.
+ * The four primary destinations of the Bangladesh-first navigation: apply,
+ * browse, price, learn. The platform leads with Bangladesh, so Countries
+ * holds no top-level slot — the six international routes are small text
+ * links in the footer (`FOOTER_COUNTRY_LINKS`), and the application asks
+ * where. The overflow e2e test guards the current set.
  */
 export const HEADER_LINKS = [
   { href: MARKETING_ROUTES.start, labelKey: 'nav.startShort' },
   { href: MARKETING_ROUTES.services, labelKey: 'nav.services' },
-  { href: MARKETING_ROUTES.countries, labelKey: 'nav.countries' },
   { href: MARKETING_ROUTES.pricing, labelKey: 'nav.pricing' },
   { href: MARKETING_ROUTES.resources, labelKey: 'nav.resources' },
 ] as const;
@@ -105,8 +105,8 @@ export const FOOTER_BANGLADESH_LINKS = [
   { href: MARKETING_ROUTES.industries, labelKey: 'nav.industries' },
 ] as const;
 
+/** The six international routes: small footer text links only, by design. */
 export const FOOTER_COUNTRY_LINKS = [
-  { href: MARKETING_ROUTES.countries, labelKey: 'footer.links.countriesOverview' },
   { href: '/countries/usa', labelKey: 'footer.links.unitedStates' },
   { href: '/countries/uk', labelKey: 'footer.links.unitedKingdom' },
   { href: '/countries/uae', labelKey: 'footer.links.uae' },

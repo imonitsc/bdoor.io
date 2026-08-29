@@ -1,8 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
-  OBJECTIVES,
+  BD_OBJECTIVES,
+  BUSINESS_LOCATIONS,
+  FORMATION_TYPES,
+  INTERNATIONAL_TARGETS,
+  SUPPORT_OPTIONS,
   TARGET_COUNTRIES,
   applicableQuestions,
+  objectiveForFormationType,
   stageProgress,
   targetCountryFromSlug,
   targetCountrySlug,
@@ -12,23 +17,35 @@ import { hardManualReviewReasons } from '@/features/intake/rules';
 import { newApplicationReference } from '@/features/intake/application';
 
 /**
- * The country-first opening of the application (immediate-operations
- * instructions §4.1): all seven countries, Bangladesh first, no "not sure";
- * then the objective. An international target must never bypass manual
- * review — a specialist reviews every such case before a provider is
- * appointed.
+ * The Bangladesh-first opening of the application: one location question
+ * (Bangladesh / outside), then either the operating-market set or the short
+ * international set (country, formation type, support). An international
+ * case must never bypass manual review — a specialist reviews every such
+ * case before a provider is appointed.
  */
-describe('target_country', () => {
-  it('is the very first question, followed by the objective', () => {
+describe('the branching opening', () => {
+  it('asks where first, and only that', () => {
     const keys = applicableQuestions({}).map((q) => q.key);
-    expect(keys[0]).toBe('target_country');
-    expect(keys[1]).toBe('objective');
+    expect(keys[0]).toBe('business_location');
+    expect([...BUSINESS_LOCATIONS]).toEqual(['bangladesh', 'outside']);
   });
 
-  it('offers exactly the seven countries, Bangladesh first, with no "unsure"', () => {
-    expect(TARGET_COUNTRIES[0]).toBe('bangladesh');
-    expect([...TARGET_COUNTRIES].sort()).toEqual([
-      'bangladesh',
+  it('Bangladesh asks new-or-existing next; outside asks the country', () => {
+    const bd = applicableQuestions({ business_location: 'bangladesh' }).map((q) => q.key);
+    expect(bd[1]).toBe('objective');
+    expect(bd).not.toContain('target_country');
+
+    const abroad = applicableQuestions({ business_location: 'outside' }).map((q) => q.key);
+    expect(abroad[1]).toBe('target_country');
+    expect(abroad).not.toContain('objective');
+  });
+
+  it('offers exactly new and existing for Bangladesh', () => {
+    expect([...BD_OBJECTIVES]).toEqual(['new', 'existing']);
+  });
+
+  it('offers exactly the six international countries, never Bangladesh', () => {
+    expect([...INTERNATIONAL_TARGETS].sort()).toEqual([
       'qatar',
       'saudi_arabia',
       'singapore',
@@ -36,15 +53,8 @@ describe('target_country', () => {
       'uk',
       'usa',
     ]);
-  });
-
-  it('accepts each country and rejects anything else', () => {
-    for (const country of TARGET_COUNTRIES) {
-      expect(validateAnswer('target_country', country).success).toBe(true);
-    }
-    const invalid = validateAnswer('target_country', 'mars');
-    expect(invalid.success).toBe(false);
-    if (!invalid.success) expect(invalid.error).toBe('requiredChoice');
+    // The full enum keeps bangladesh for stored data and the admin queue.
+    expect(TARGET_COUNTRIES).toContain('bangladesh');
   });
 
   it('round-trips between answer keys and /countries slugs', () => {
@@ -59,45 +69,59 @@ describe('target_country', () => {
   it('stays in the about_you stage, so stage progress does not jump', () => {
     expect(stageProgress({}, 0)).toMatchObject({ current: 1, stage: 'about_you' });
   });
+});
 
-  it('never lets an international target skip manual review', () => {
-    for (const country of TARGET_COUNTRIES) {
-      const reasons = hardManualReviewReasons({ target_country: country });
-      if (country === 'bangladesh') {
-        expect(reasons).not.toContain('international_formation');
-      } else {
-        expect(reasons, country).toContain('international_formation');
-      }
-    }
-  });
-
-  it('asks the international subset abroad and the operating-market set at home', () => {
-    const home = applicableQuestions({ target_country: 'bangladesh', objective: 'new' }).map(
-      (q) => q.key,
-    );
-    const abroad = applicableQuestions({ target_country: 'usa', objective: 'new' }).map(
+describe('the international branch', () => {
+  it('asks formation type and required support, then stays short', () => {
+    const abroad = applicableQuestions({ business_location: 'outside', target_country: 'usa' }).map(
       (q) => q.key,
     );
 
-    for (const key of ['need_visa', 'need_banking', 'notes', 'residence'] as const) {
+    for (const key of ['formation_type', 'support_needed', 'activity', 'start_window', 'notes']) {
       expect(abroad, key).toContain(key);
-      if (key !== 'residence') expect(home, key).not.toContain(key);
     }
-    for (const key of ['location', 'structure', 'import_export', 'regulated_activity'] as const) {
-      expect(home, key).toContain(key);
+    // The operating-market set stays on the Bangladesh branch; the appointed
+    // provider confirms the rest per case.
+    for (const key of ['location', 'structure', 'owner_count', 'regulated_activity']) {
       expect(abroad, key).not.toContain(key);
     }
-    // Both branches end with the same contact stage, and no branch asks for
-    // an identity document — none exists in the question set at all.
-    for (const keys of [home, abroad]) {
-      expect(keys.slice(-4)).toEqual(['full_name', 'email', 'phone', 'consent']);
-    }
   });
 
-  it('exposes every objective and requires one', () => {
-    expect([...OBJECTIVES]).toEqual(['new', 'existing', 'expand', 'unsure']);
-    expect(validateAnswer('objective', 'expand').success).toBe(true);
-    expect(validateAnswer('objective', '').success).toBe(false);
+  it('requires at least one kind of support', () => {
+    expect(validateAnswer('support_needed', []).success).toBe(false);
+    expect(validateAnswer('support_needed', ['formation']).success).toBe(true);
+    expect([...SUPPORT_OPTIONS]).toContain('visa_residency');
+    expect([...SUPPORT_OPTIONS]).toContain('banking');
+  });
+
+  it('maps every formation type onto a stored objective', () => {
+    expect([...FORMATION_TYPES]).toEqual(['new_company', 'branch_or_subsidiary', 'not_sure']);
+    expect(objectiveForFormationType('new_company')).toBe('new');
+    expect(objectiveForFormationType('branch_or_subsidiary')).toBe('expand');
+    expect(objectiveForFormationType('not_sure')).toBe('unsure');
+  });
+
+  it('never lets an international case skip manual review', () => {
+    expect(hardManualReviewReasons({ business_location: 'outside' })).toContain(
+      'international_formation',
+    );
+    expect(hardManualReviewReasons({ business_location: 'bangladesh' })).not.toContain(
+      'international_formation',
+    );
+    expect(hardManualReviewReasons({ formation_type: 'not_sure' })).toContain('scope_unclear');
+  });
+
+  it('both branches end with the same contact stage and never ask for a document', () => {
+    const bd = applicableQuestions({ business_location: 'bangladesh', objective: 'new' }).map(
+      (q) => q.key,
+    );
+    const abroad = applicableQuestions({
+      business_location: 'outside',
+      target_country: 'qatar',
+    }).map((q) => q.key);
+    for (const keys of [bd, abroad]) {
+      expect(keys.slice(-4)).toEqual(['full_name', 'email', 'phone', 'consent']);
+    }
   });
 });
 

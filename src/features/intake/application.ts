@@ -4,7 +4,13 @@ import { getTranslations } from 'next-intl/server';
 import { createAdminClient, hasServiceRole } from '@/lib/supabase/admin';
 import { getEmailProvider } from '@/lib/email';
 import { logger } from '@/lib/logger';
-import { targetCountrySlug, type Answers, type Objective, type PartialAnswers } from './questions';
+import {
+  objectiveForFormationType,
+  targetCountrySlug,
+  type Answers,
+  type Objective,
+  type PartialAnswers,
+} from './questions';
 
 /**
  * Application submission (immediate-operations instructions §4/§11).
@@ -57,8 +63,14 @@ export type SubmitInput = {
 export async function submitApplication(input: SubmitInput): Promise<SubmittedApplication | null> {
   const { answers, locale } = input;
   const complete = answers as Answers;
-  const countrySlug = targetCountrySlug(complete.target_country);
-  const objective = complete.objective;
+  // The Bangladesh branch never asks for a country and the international
+  // branch never asks for an objective — each is derived from its branch,
+  // so `applications.country`/`objective` stay one vocabulary either way.
+  const bangladesh = complete.business_location === 'bangladesh';
+  const countrySlug = bangladesh ? 'bangladesh' : targetCountrySlug(complete.target_country);
+  const objective: Objective = bangladesh
+    ? complete.objective
+    : objectiveForFormationType(complete.formation_type);
 
   if (!hasServiceRole()) {
     // Local development without a database: the flow stays walkable, the

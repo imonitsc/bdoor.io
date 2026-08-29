@@ -215,7 +215,7 @@ async function submitIntakeApplication(previous: IntakeState): Promise<IntakeSta
     // operating market supports; an international one goes straight to the
     // specialist queue, so running the Bangladesh rules would only mislead.
     let recommendation: Recommendation | undefined;
-    if (previous.answers.target_country === 'bangladesh') {
+    if (previous.answers.business_location === 'bangladesh') {
       recommendation = session
         ? await generateRecommendation(session.id, previous.answers)
         : recommend(previous.answers, await loadRules());

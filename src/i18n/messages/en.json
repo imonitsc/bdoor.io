@@ -114,26 +114,15 @@
   "home": {
     "hero": {
       "eyebrow": "Business formation and compliance",
-      "headline": "Start in Bangladesh. <g>Build anywhere.</g>",
-      "support": "Form and manage businesses in Bangladesh, the USA, UK, UAE, Saudi Arabia, Qatar and Singapore through one secure platform and an appointed network of country specialists.",
-      "primaryCta": "Start your application",
-      "secondaryCta": "Compare countries",
-      "trustLine": "Free initial assessment · Itemised quote before payment · Third-party specialists disclosed before engagement",
-      "operatorLine": "Operated by bdoor compliance ltd.",
-      "module": {
-        "previewLabel": "Product preview",
-        "reviewed": "Specialist reviewed",
-        "countriesLabel": "Countries you can apply for",
-        "routeLabel": "Featured route",
-        "routeName": "Company formation — Bangladesh",
-        "stepsLabel": "How an application progresses",
-        "steps": {
-          "apply": "Apply",
-          "review": "Review",
-          "quote": "Quote"
-        },
-        "readiness": "No identity documents are needed to apply — collection begins only after you accept a quote."
-      }
+      "headline": "Start and run your business in Bangladesh.",
+      "support": "Company formation, licences, tax registrations and ongoing compliance — coordinated in one secure workspace, with an itemised quote before any payment.",
+      "primaryCta": "Start now",
+      "trust": {
+        "assessment": "Free initial assessment",
+        "quote": "Itemised quote before payment",
+        "specialists": "Third-party specialists disclosed before engagement"
+      },
+      "operatorLine": "Operated by bdoor compliance ltd."
     },
     "packages": {
       "eyebrow": "Bangladesh packages",
@@ -188,22 +177,15 @@
     "finalCta": {
       "title": "Ready when you are.",
       "body": "Start the assessment, or talk to us first — either way you see an itemised quote before anything is payable.",
-      "primary": "Start in Bangladesh",
-      "secondary": "Contact us"
-    },
-    "trust": {
-      "quotes": "Transparent itemised quotes",
-      "workspace": "Secure document workspace",
-      "caseManagement": "Bangladesh-focused case management",
-      "specialists": "Specialists engaged separately when required"
+      "primary": "Start in Bangladesh"
     },
     "process": {
       "eyebrow": "Process and fees",
       "title": "Four steps, one transparent quote.",
       "steps": {
         "one": {
-          "title": "Choose your country and apply",
-          "body": "Pick one of the seven countries and answer only what applies to you. Applying is free and creates no obligation."
+          "title": "Tell us what you need and apply",
+          "body": "Answer only what applies to you. Applying is free and creates no obligation."
         },
         "two": {
           "title": "bdoor reviews and appoints your provider",
@@ -220,11 +202,6 @@
       },
       "standaloneTitle": "Standalone services",
       "standaloneSummary": "Published bdoor fees for common registrations"
-    },
-    "countriesSection": {
-      "eyebrow": "Countries",
-      "title": "Seven countries. Applications open in all of them.",
-      "body": "Start or manage a business in any of the seven countries. Applications are specialist-reviewed, providers are appointed per case, and every quote is itemised before engagement."
     },
     "existing": {
       "eyebrow": "Already trading?",
@@ -633,7 +610,7 @@
   },
   "start": {
     "title": "Start your business",
-    "description": "Choose your country, answer only what applies to you, and submit your application. It is free, you can save and resume, and a specialist reviews every application.",
+    "description": "A few short questions — in Bangladesh or abroad — then submit your application. It is free, you can save and resume, and a specialist reviews every application.",
     "sectionLabel": "Section",
     "whyWeAsk": "Why we ask",
     "saveAndExit": "Save and exit",
@@ -759,10 +736,6 @@
           "exploring": "Just exploring"
         }
       },
-      "existing_business": {
-        "label": "Does this business already exist?",
-        "why": "Existing companies need different documents — we work from your current registrations rather than starting fresh."
-      },
       "existing_registrations": {
         "label": "Which registrations do you already have?",
         "why": "Knowing what exists avoids duplicate applications and tells us what needs renewal.",
@@ -777,8 +750,8 @@
         }
       },
       "target_country": {
-        "label": "Where do you want to start or run your business?",
-        "why": "The application is country-first: your answer routes your case to the right question set, the right specialist and the right provider.",
+        "label": "Which country?",
+        "why": "Each of the six international routes has its own requirements and its own responsible specialists.",
         "options": {
           "bangladesh": "Bangladesh",
           "usa": "United States",
@@ -790,7 +763,7 @@
         }
       },
       "objective": {
-        "label": "What do you want to do there?",
+        "label": "What do you want to do in Bangladesh?",
         "why": "Starting a new business, managing an existing one and expanding into a new country follow different routes and different reviews.",
         "options": {
           "new": "Start a new business",
@@ -798,14 +771,6 @@
           "expand": "Expand an existing business into this country",
           "unsure": "I am not sure yet"
         }
-      },
-      "need_visa": {
-        "label": "Will anyone need a visa or residence permit for this country?",
-        "why": "Visa and residency work is regulated and performed by licensed providers, and it changes which provider we source for your case. Answering yes is not a promise of a visa — eligibility is always assessed."
-      },
-      "need_banking": {
-        "label": "Will the business need a bank account in this country?",
-        "why": "Account opening is always subject to the bank’s own checks — it can never be promised — but knowing early lets the specialist plan the route around it."
       },
       "notes": {
         "label": "Anything else we should know? (optional)"
@@ -824,6 +789,34 @@
       "consent": {
         "label": "Consent",
         "statement": "I agree that bdoor may store these answers and contact me about this application, as described in the privacy policy."
+      },
+      "business_location": {
+        "label": "Where do you want to start or manage a business?",
+        "why": "This routes you to the right question set and the right specialist — the Bangladesh catalogue, or one of the six international routes.",
+        "options": {
+          "bangladesh": "Bangladesh",
+          "outside": "Outside Bangladesh"
+        }
+      },
+      "formation_type": {
+        "label": "What do you want to set up?",
+        "why": "A fresh company, and a branch or subsidiary of one you already run, follow different routes and reviews.",
+        "options": {
+          "new_company": "A new company",
+          "branch_or_subsidiary": "A branch or subsidiary of my existing company",
+          "not_sure": "Not sure yet"
+        }
+      },
+      "support_needed": {
+        "label": "What support will you need?",
+        "why": "Your answer shapes which providers we source for your case. Choosing an option is not a promise of an outcome — visas and bank accounts are always decided by the authority or the bank.",
+        "options": {
+          "formation": "Company formation",
+          "visa_residency": "Visa or residency",
+          "banking": "Business bank account",
+          "tax_accounting": "Tax and accounting",
+          "ongoing_compliance": "Ongoing compliance"
+        }
       }
     },
     "validation": {

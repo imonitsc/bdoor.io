@@ -12,7 +12,7 @@ import { SNAPSHOT_RULES } from '@/content/rules-snapshot';
 import { expandWithPrerequisites } from '@/features/intake/guide';
 
 const LOCAL_SOLE_TRADER: PartialAnswers = {
-  target_country: 'bangladesh',
+  business_location: 'bangladesh',
   objective: 'new',
   founder_location: 'bangladesh',
   nationality: 'BD',
@@ -34,24 +34,9 @@ const LOCAL_SOLE_TRADER: PartialAnswers = {
 };
 
 describe('questionnaire branching', () => {
-  it('asks for the country before anything else', () => {
+  it('asks for the location before anything else', () => {
     const keys = applicableQuestions({}).map((q) => q.key);
-    expect(keys[0]).toBe('target_country');
-    expect(keys[1]).toBe('objective');
-  });
-
-  it('asks existing_business only when the objective is unsure', () => {
-    for (const objective of ['new', 'existing', 'expand'] as const) {
-      const keys = applicableQuestions({ target_country: 'bangladesh', objective }).map(
-        (q) => q.key,
-      );
-      expect(keys, objective).not.toContain('existing_business');
-    }
-    const unsureKeys = applicableQuestions({
-      target_country: 'bangladesh',
-      objective: 'unsure',
-    }).map((q) => q.key);
-    expect(unsureKeys).toContain('existing_business');
+    expect(keys[0]).toBe('business_location');
   });
 
   it('does not ask a Bangladesh-based founder about their country of residence', () => {
@@ -201,11 +186,11 @@ describe('recommendation engine', () => {
     expect(recommend({ regulated_activity: true }, []).requiresManualReview).toBe(true);
     expect(recommend({ remit_capital: true }, []).requiresManualReview).toBe(true);
     expect(recommend({ structure: 'branch_office' }, []).requiresManualReview).toBe(true);
-    expect(recommend({ target_country: 'usa' }, []).requiresManualReview).toBe(true);
+    expect(recommend({ business_location: 'outside' }, []).requiresManualReview).toBe(true);
     expect(recommend({ objective: 'unsure' }, []).requiresManualReview).toBe(true);
 
     expect(hardManualReviewReasons({ entity_owner: true })).toContain('corporate_or_trust_owner');
-    expect(hardManualReviewReasons({ target_country: 'qatar' })).toContain(
+    expect(hardManualReviewReasons({ business_location: 'outside' })).toContain(
       'international_formation',
     );
   });
