@@ -233,7 +233,7 @@ export const SNAPSHOT_RULES: Rule[] = [
     },
     outcome: {
       assumptions: [
-        "Investment capital is remitted to a bank account in the company's name and evidenced by an encashment certificate. It is never paid to BDoor.",
+        "Investment capital is remitted to a bank account in the company's name and evidenced by an encashment certificate. It is never paid to bdoor.",
       ],
     },
     priority: 61,

@@ -8,10 +8,16 @@ import { Card } from '@/components/ui/card';
 import { Section } from '@/components/ui/section';
 import { PageHeader } from '@/components/marketing/page-header';
 import { IndependenceDisclosure } from '@/components/layout/disclosure';
-import { getCountries, pickCountryName } from '@/features/countries/queries';
-import { pick, type Locale } from '@/features/catalog/types';
+import { internationalCountries, pickText } from '@/content/international';
+import type { Locale } from '@/features/catalog/types';
 import { MARKETING_ROUTES } from '@/lib/navigation';
 import { localizedUrl } from '@/lib/site';
+
+/**
+ * The international overview reads the commercial catalog, not the countries
+ * table: the honest public status of each route is configuration the owner
+ * controls in code review, and the page must not be able to drift from it.
+ */
 
 export async function generateMetadata({
   params,
@@ -40,8 +46,9 @@ export default async function InternationalPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const [t, countries] = await Promise.all([getTranslations('international'), getCountries()]);
+  const t = await getTranslations('international');
   const loc = locale as Locale;
+  const countries = internationalCountries();
 
   return (
     <>
@@ -51,40 +58,48 @@ export default async function InternationalPage({
         <div className="container-page">
           <p className="text-muted max-w-3xl text-base leading-relaxed">{t('intro')}</p>
 
-          <ul className="mt-10 grid gap-4 md:grid-cols-2">
+          <div className="border-border bg-surface mt-10 flex flex-col gap-4 rounded-[var(--radius-panel)] border p-6 sm:flex-row sm:items-center sm:justify-between md:p-8">
+            <div>
+              <h2 className="text-ink text-lg font-semibold">{t('bangladeshTitle')}</h2>
+              <p className="text-muted mt-1 max-w-xl text-sm leading-relaxed">
+                {t('bangladeshBody')}
+              </p>
+            </div>
+            <Button asChild size="lg" className="shrink-0">
+              <Link href={MARKETING_ROUTES.services}>
+                {t('exploreBangladesh')}
+                <ArrowRight className="size-4" aria-hidden="true" />
+              </Link>
+            </Button>
+          </div>
+
+          <h2 className="text-ink mt-14 text-xl font-semibold">{t('routesTitle')}</h2>
+          <ul className="mt-6 grid gap-4 sm:grid-cols-2">
             {countries.map((country) => {
-              const isAvailable = country.status === 'published';
+              const name = pickText(country.name, loc);
               return (
-                <li key={country.code}>
-                  <Card as="article" className="flex h-full flex-col gap-4 p-5 md:p-6">
+                <li key={country.slug}>
+                  <Card as="article" className="flex h-full flex-col gap-3 p-5 md:p-6">
                     <div className="flex items-start justify-between gap-3">
-                      <h2 className="text-ink text-lg font-semibold">
-                        {pickCountryName(country, loc)}
-                      </h2>
-                      <Badge tone={isAvailable ? 'success' : 'neutral'}>
-                        {isAvailable ? t('status.available') : t('status.comingSoon')}
-                      </Badge>
+                      <h3 className="text-ink text-lg font-semibold">{name}</h3>
+                      <Badge tone="neutral">{t(`status.${country.offer.publicStatus}`)}</Badge>
                     </div>
-                    {country.summary ? (
-                      <p className="text-muted text-sm leading-relaxed">
-                        {pick(country.summary, loc)}
-                      </p>
-                    ) : null}
-                    {isAvailable ? (
-                      <Button asChild variant="secondary" size="sm" className="mt-auto w-fit">
-                        <Link href={MARKETING_ROUTES.services}>
-                          {t('exploreBangladesh')}
-                          <ArrowRight className="size-4" aria-hidden="true" />
-                        </Link>
-                      </Button>
-                    ) : (
-                      <p className="text-muted mt-auto text-xs">{t('notifyNote')}</p>
-                    )}
+                    <p className="text-muted flex-1 text-sm leading-relaxed">
+                      {pickText(country.offer.summary, loc)}
+                    </p>
+                    <Button asChild variant="secondary" size="sm" className="w-fit">
+                      <Link href={`/international/${country.slug}`}>
+                        {t('viewRoute', { country: name })}
+                        <ArrowRight className="size-4" aria-hidden="true" />
+                      </Link>
+                    </Button>
                   </Card>
                 </li>
               );
             })}
           </ul>
+
+          <p className="text-muted mt-8 max-w-2xl text-sm leading-relaxed">{t('notifyNote')}</p>
 
           <div className="mt-12 max-w-prose">
             <IndependenceDisclosure />

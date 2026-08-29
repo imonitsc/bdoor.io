@@ -2,7 +2,7 @@ import type { Recommendation } from './rules';
 import type { PartialAnswers } from './questions';
 
 /**
- * The deterministic half of "BDoor Guide".
+ * The deterministic half of "bdoor Guide".
  *
  * This produces the preliminary checklist and the answer-summary the customer
  * sees. It runs with AI_PROVIDER=disabled and is the only path that can reach

@@ -73,7 +73,13 @@ export default async function AdminPackagesPage({
       route: locale === 'bn' ? offer.route.bn : offer.route.en,
       countryCode: offer.countryCode,
       status: offer.status,
-      publicLabel: locale === 'bn' ? offer.publicLabel.bn : offer.publicLabel.en,
+      // Register-interest routes have no approved public price yet; the
+      // admin view shows the public status instead of inventing a label.
+      publicLabel: offer.publicLabel
+        ? locale === 'bn'
+          ? offer.publicLabel.bn
+          : offer.publicLabel.en
+        : offer.publicStatus,
       totalMinor: totals.estimatedTotalMinor,
       currency,
       checkoutEnabled: offer.checkoutEnabled,

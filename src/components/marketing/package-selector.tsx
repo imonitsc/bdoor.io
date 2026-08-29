@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Check, ChevronDown } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -17,11 +17,14 @@ function PackageCards({ segment, locale }: { segment: PackageSegment; locale: Lo
   const packages = publishedPackages(segment).slice(0, 3);
 
   return (
-    <ul className="mt-8 grid gap-4 lg:grid-cols-3">
+    <ul className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {packages.map((pkg) => {
         const version = activePackageVersion(pkg);
         if (!version) return null;
-        const displayInclusions = version.inclusions.slice(0, 5);
+        // Three visible inclusions; the rest live behind the disclosure so the
+        // cards stay comparable at a glance instead of becoming spec sheets.
+        const visible = version.inclusions.slice(0, 3);
+        const remaining = version.inclusions.slice(3);
         return (
           <li key={pkg.slug}>
             <Card as="article" className="flex h-full flex-col p-5 md:p-6">
@@ -32,14 +35,53 @@ function PackageCards({ segment, locale }: { segment: PackageSegment; locale: Lo
               <p className="text-muted mt-3 text-sm leading-relaxed">
                 {pick(version.summary, locale)}
               </p>
-              <ul className="mt-4 flex flex-1 flex-col gap-2">
-                {displayInclusions.map((item) => (
-                  <li key={item.en} className="text-ink text-sm leading-relaxed">
+              <ul className="mt-4 flex flex-col gap-2">
+                {visible.map((item) => (
+                  <li key={item.en} className="text-ink flex items-start gap-2 text-sm">
+                    <Check className="text-accent mt-0.5 size-4 shrink-0" aria-hidden="true" />
                     {pick(item, locale)}
                   </li>
                 ))}
               </ul>
-              <Button asChild className="mt-6 w-full" variant="secondary">
+              <details className="group mt-3 flex-1">
+                <summary className="text-primary hover:text-primary-hover inline-flex min-h-11 cursor-pointer list-none items-center gap-1 rounded text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)] [&::-webkit-details-marker]:hidden">
+                  {t('seeDetails')}
+                  <ChevronDown
+                    className="size-4 transition-transform group-open:rotate-180"
+                    aria-hidden="true"
+                  />
+                </summary>
+                <div className="text-sm">
+                  {remaining.length > 0 ? (
+                    <ul className="mt-1 flex flex-col gap-2">
+                      {remaining.map((item) => (
+                        <li key={item.en} className="text-ink flex items-start gap-2">
+                          <Check
+                            className="text-accent mt-0.5 size-4 shrink-0"
+                            aria-hidden="true"
+                          />
+                          {pick(item, locale)}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                  {version.exclusions.length > 0 ? (
+                    <>
+                      <p className="text-muted mt-3 text-xs font-semibold tracking-wide uppercase">
+                        {t('excludes')}
+                      </p>
+                      <ul className="mt-1 flex flex-col gap-1.5">
+                        {version.exclusions.map((item) => (
+                          <li key={item.en} className="text-muted">
+                            {pick(item, locale)}
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  ) : null}
+                </div>
+              </details>
+              <Button asChild className="mt-5 w-full" variant="secondary">
                 <Link href={`${MARKETING_ROUTES.start}?package=${pkg.slug}`}>
                   {t('cardCta')}
                   <ArrowRight className="size-4" aria-hidden="true" />
@@ -71,7 +113,6 @@ export function PackageSelector({ locale }: { locale: Locale }) {
           <PackageCards segment="existing_business" locale={locale} />
         </TabsContent>
       </Tabs>
-      <p className="text-muted mt-4 text-xs">{t('taxPendingReview')}</p>
     </div>
   );
 }

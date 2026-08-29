@@ -30,8 +30,8 @@ const SNAPSHOT_COUNTRIES: Country[] = [
     code: 'US',
     name: { en: 'United States', bn: 'যুক্তরাষ্ট্র' },
     summary: {
-      en: 'LLC and corporation routes through verified specialists. Coming soon.',
-      bn: 'যাচাইকৃত বিশেষজ্ঞদের মাধ্যমে LLC ও কর্পোরেশন রুট। শীঘ্রই আসছে।',
+      en: 'LLC and corporation routes prepared with licensed US providers.',
+      bn: 'লাইসেন্সপ্রাপ্ত মার্কিন প্রদানকারীদের সঙ্গে প্রস্তুত হওয়া LLC ও কর্পোরেশন রুট।',
     },
     status: 'coming_soon',
     isFlagship: false,
@@ -41,8 +41,8 @@ const SNAPSHOT_COUNTRIES: Country[] = [
     code: 'GB',
     name: { en: 'United Kingdom', bn: 'যুক্তরাজ্য' },
     summary: {
-      en: 'Private limited company formation and filings. Coming soon.',
-      bn: 'প্রাইভেট লিমিটেড কোম্পানি গঠন ও ফাইলিং। শীঘ্রই আসছে।',
+      en: 'Private limited company formation for non-resident founders, in preparation.',
+      bn: 'অনাবাসী প্রতিষ্ঠাতাদের জন্য প্রাইভেট লিমিটেড কোম্পানি গঠন — প্রস্তুতি চলছে।',
     },
     status: 'coming_soon',
     isFlagship: false,
@@ -52,8 +52,8 @@ const SNAPSHOT_COUNTRIES: Country[] = [
     code: 'AE',
     name: { en: 'United Arab Emirates', bn: 'সংযুক্ত আরব আমিরাত' },
     summary: {
-      en: 'Free-zone and mainland options through verified providers. Coming soon.',
-      bn: 'যাচাইকৃত প্রদানকারীদের মাধ্যমে ফ্রি-জোন ও মেইনল্যান্ড বিকল্প। শীঘ্রই আসছে।',
+      en: 'Free-zone and mainland options scoped with licensed providers, in preparation.',
+      bn: 'লাইসেন্সপ্রাপ্ত প্রদানকারীদের সঙ্গে নির্ধারিত ফ্রি-জোন ও মেইনল্যান্ড বিকল্প — প্রস্তুতি চলছে।',
     },
     status: 'coming_soon',
     isFlagship: false,
@@ -63,8 +63,8 @@ const SNAPSHOT_COUNTRIES: Country[] = [
     code: 'SG',
     name: { en: 'Singapore', bn: 'সিঙ্গাপুর' },
     summary: {
-      en: 'Pte Ltd formation and ACRA filings. Coming soon.',
-      bn: 'Pte Ltd গঠন ও ACRA ফাইলিং। শীঘ্রই আসছে।',
+      en: 'Pte Ltd formation through a licensed corporate service provider, in preparation.',
+      bn: 'লাইসেন্সপ্রাপ্ত কর্পোরেট সেবা প্রদানকারীর মাধ্যমে Pte Ltd গঠন — প্রস্তুতি চলছে।',
     },
     status: 'coming_soon',
     isFlagship: false,

@@ -13,25 +13,78 @@ async function answer(
   // values), so this is deliberately not Promise<void>.
   action: () => Promise<unknown>,
 ) {
-  // Each step swaps the input out for the next question's. Without waiting for
-  // the progress indicator to move, the next `action()` can run against the
-  // control that is about to be replaced and the answer is lost.
-  const progress = page.getByRole('progressbar');
-  const before = await progress.getAttribute('aria-valuenow');
+  // Each step swaps the input out for the next question's. Without waiting
+  // for the step to actually advance, the next `action()` can run against the
+  // control that is about to be replaced and the answer is lost. Progress is
+  // now reported per stage, so the progressbar often does NOT move between
+  // consecutive questions — the hidden questionKey input is the reliable
+  // signal: it changes on every step and disappears at review.
+  const keyInput = page.locator('input[name="questionKey"]');
+  // count() does not auto-wait, so the read is instant even once the input is
+  // gone (review and recommendation have no question form at all).
+  const readKey = async () => ((await keyInput.count()) === 0 ? null : await keyInput.inputValue());
+  const before = await readKey();
   await action();
   await page.getByRole('button', { name: /^Continue$/ }).click();
-  await expect(progress).not.toHaveAttribute('aria-valuenow', before ?? '');
+  await expect(async () => {
+    expect(await readKey()).not.toBe(before);
+  }).toPass();
 }
 
-async function startBangladeshAssessment(
-  page: import('@playwright/test').Page,
-) {
+async function startBangladeshAssessment(page: import('@playwright/test').Page) {
   await answer(page, async () => {
     await page.getByRole('radio', { name: 'Start a business in Bangladesh' }).click();
   });
 }
 
 test.describe('questionnaire', () => {
+  test('progress is stage-based and never jumps unpredictably', async ({ page }) => {
+    await page.goto('/en/start');
+
+    const progress = page.getByRole('progressbar');
+    // The announcer mirrors the label into a live region, so scope to the
+    // visible paragraph rather than any text node.
+    const stageText = () =>
+      page
+        .locator('p', { hasText: /^Stage \d of \d/ })
+        .first()
+        .textContent();
+
+    await expect(page.getByText('Stage 1 of 5', { exact: false })).toBeVisible();
+    const totals = new Set<string>();
+    const seen: number[] = [];
+
+    const record = async () => {
+      const text = (await stageText()) ?? '';
+      const match = text.match(/^Stage (\d) of (\d)/);
+      expect(match, `unparseable stage label: ${text}`).not.toBeNull();
+      seen.push(Number(match![1]));
+      totals.add(match![2]!);
+    };
+
+    await record();
+    await answer(page, async () => {
+      await page.getByRole('radio', { name: 'Start a business in Bangladesh' }).click();
+    });
+    await record();
+    await answer(page, async () => {
+      await page.getByRole('radio', { name: 'In Bangladesh' }).click();
+    });
+    await record();
+    await answer(page, async () => {
+      await page.getByRole('combobox').selectOption('BD');
+    });
+    await record();
+
+    // The denominator never changes, and the stage number never decreases —
+    // the two properties the old "Step 1 of 16 → Step 3 of 15" model broke.
+    expect([...totals]).toEqual(['5']);
+    for (let i = 1; i < seen.length; i += 1) {
+      expect(seen[i]!, `stage decreased at step ${i}`).toBeGreaterThanOrEqual(seen[i - 1]!);
+    }
+    await expect(progress).toBeVisible();
+  });
+
   test('branches on the answers given', async ({ page }) => {
     await page.goto('/en/start');
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Start your business');
@@ -100,6 +153,9 @@ test.describe('questionnaire', () => {
   });
 
   test('reaches a preliminary recommendation and labels it as preliminary', async ({ page }) => {
+    // A full walk is ~14 server-action round trips; under parallel-suite
+    // load that legitimately exceeds the default budget.
+    test.slow();
     await page.goto('/en/start');
     await startBangladeshAssessment(page);
 
@@ -139,6 +195,9 @@ test.describe('questionnaire', () => {
   });
 
   test('sends a foreign founder to manual review', async ({ page }) => {
+    // A full walk is ~14 server-action round trips; under parallel-suite
+    // load that legitimately exceeds the default budget.
+    test.slow();
     await page.goto('/en/start');
     await startBangladeshAssessment(page);
 

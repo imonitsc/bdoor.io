@@ -24,12 +24,12 @@ export const TERMS: LegalDocument = {
       id: 'who-we-are',
       heading: { en: 'Who you are contracting with', bn: 'আপনি কার সঙ্গে চুক্তি করছেন' },
       body: {
-        en: `BDoor is an independent business setup and administrative-support platform operating at bdoor.io. These terms govern your use of the platform and the administrative services we provide.
+        en: `These terms are between you and **bdoor compliance ltd**, the company that operates the bdoor platform at bdoor.io. bdoor is an independent business setup and administrative-support platform, and these terms govern your use of the platform and the administrative services we provide.
 
-BDoor is **not** a government authority. BDoor is **not** a law firm and does not provide legal advice or legal representation. Where a matter requires legal or specialist professional authority, that work is performed by an independent advocate or partner firm under a separate engagement between you and that professional.`,
-        bn: `BDoor একটি স্বাধীন ব্যবসা-গঠন ও প্রশাসনিক সহায়তা প্ল্যাটফর্ম, যা bdoor.io ঠিকানায় পরিচালিত। এই শর্তাবলি প্ল্যাটফর্মের ব্যবহার এবং আমাদের দেওয়া প্রশাসনিক সেবার ক্ষেত্রে প্রযোজ্য।
+bdoor is **not** a government authority. bdoor is **not** a law firm and does not provide legal advice or legal representation. Where a matter requires legal or specialist professional authority, that work is performed by an independent advocate or partner firm under a separate engagement between you and that professional.`,
+        bn: `এই শর্তাবলি আপনার এবং **bdoor compliance ltd**-এর মধ্যে — যে কোম্পানি bdoor.io ঠিকানায় bdoor প্ল্যাটফর্ম পরিচালনা করে। bdoor একটি স্বাধীন ব্যবসা-গঠন ও প্রশাসনিক সহায়তা প্ল্যাটফর্ম, এবং এই শর্তাবলি প্ল্যাটফর্মের ব্যবহার এবং আমাদের দেওয়া প্রশাসনিক সেবার ক্ষেত্রে প্রযোজ্য।
 
-BDoor কোনো সরকারি কর্তৃপক্ষ **নয়**। BDoor কোনো আইনি প্রতিষ্ঠান **নয়** এবং আইনি পরামর্শ বা আইনি প্রতিনিধিত্ব দেয় না। যেখানে বিষয়টিতে আইনি বা বিশেষায়িত পেশাগত কর্তৃত্ব প্রয়োজন, সেই কাজ করেন একজন স্বাধীন আইনজীবী বা অংশীদার প্রতিষ্ঠান — আপনার সঙ্গে তাঁদের আলাদা চুক্তির অধীনে।`,
+bdoor কোনো সরকারি কর্তৃপক্ষ **নয়**। bdoor কোনো আইনি প্রতিষ্ঠান **নয়** এবং আইনি পরামর্শ বা আইনি প্রতিনিধিত্ব দেয় না। যেখানে বিষয়টিতে আইনি বা বিশেষায়িত পেশাগত কর্তৃত্ব প্রয়োজন, সেই কাজ করেন একজন স্বাধীন আইনজীবী বা অংশীদার প্রতিষ্ঠান — আপনার সঙ্গে তাঁদের আলাদা চুক্তির অধীনে।`,
       },
     },
     {
@@ -81,7 +81,7 @@ You must not use the platform to conceal ownership, to disguise the source of fu
       heading: { en: 'Quotes, fees and payments', bn: 'কোটেশন, ফি ও পেমেন্ট' },
       body: {
         en: `Every quote is itemised and separates:
-- the BDoor service fee,
+- the bdoor service fee,
 - government fees or estimated government fees,
 - partner professional fees, where applicable,
 - third-party costs such as notarisation, translation or courier,
@@ -91,9 +91,9 @@ A quote is valid until the date shown on it and may be reissued as a new version
 
 Government fees are estimates until the authority issues a receipt. Where you advance money for a government fee, that money is held for that purpose, the official receipt or challan is attached to your case, and any unused balance is returned to you.
 
-**Investment and share capital is never paid to BDoor.** It is remitted to a bank account in the company's name through the proper banking channel.`,
+**Investment and share capital is never paid to bdoor.** It is remitted to a bank account in the company's name through the proper banking channel.`,
         bn: `প্রতিটি কোটেশন আইটেম ধরে সাজানো এবং আলাদা করে দেখায়:
-- BDoor সেবা ফি,
+- bdoor সেবা ফি,
 - সরকারি ফি বা আনুমানিক সরকারি ফি,
 - প্রযোজ্য ক্ষেত্রে অংশীদার পেশাজীবীর ফি,
 - নোটারি, অনুবাদ বা কুরিয়ারের মতো তৃতীয় পক্ষের খরচ,
@@ -103,7 +103,7 @@ Government fees are estimates until the authority issues a receipt. Where you ad
 
 কর্তৃপক্ষ রসিদ না দেওয়া পর্যন্ত সরকারি ফি আনুমানিক। আপনি সরকারি ফির জন্য অগ্রিম দিলে সেই অর্থ ওই উদ্দেশ্যেই রাখা হয়, সরকারি রসিদ বা চালান আপনার কেসে সংযুক্ত করা হয়, আর অব্যবহৃত অংশ ফেরত দেওয়া হয়।
 
-**বিনিয়োগ ও শেয়ার মূলধন কখনোই BDoor-কে দেওয়া হয় না।** তা যথাযথ ব্যাংকিং চ্যানেলে কোম্পানির নামে খোলা হিসাবে পাঠানো হয়।`,
+**বিনিয়োগ ও শেয়ার মূলধন কখনোই bdoor-কে দেওয়া হয় না।** তা যথাযথ ব্যাংকিং চ্যানেলে কোম্পানির নামে খোলা হিসাবে পাঠানো হয়।`,
       },
     },
     {
@@ -112,12 +112,12 @@ Government fees are estimates until the authority issues a receipt. Where you ad
       body: {
         en: `Where a matter requires an advocate, a chartered accountant or another regulated professional, we identify a verified partner and tell you who they are, what they will receive and why, before anything is shared with them.
 
-Your engagement with that professional is separate from your agreement with BDoor. Their fees are theirs, their professional obligations are theirs, and their advice is theirs. We coordinate; we do not supervise their professional judgement and we do not share in their professional fee in any way that would breach the rules that apply to them.
+Your engagement with that professional is separate from your agreement with bdoor. Their fees are theirs, their professional obligations are theirs, and their advice is theirs. We coordinate; we do not supervise their professional judgement and we do not share in their professional fee in any way that would breach the rules that apply to them.
 
 We share your documents with a partner only after you have authorised that specific sharing.`,
         bn: `যেখানে একজন আইনজীবী, চার্টার্ড অ্যাকাউন্ট্যান্ট বা অন্য নিয়ন্ত্রিত পেশাজীবী প্রয়োজন, সেখানে আমরা একজন যাচাইকৃত অংশীদার নির্ধারণ করি এবং কিছু শেয়ার করার আগেই আপনাকে জানাই তাঁরা কারা, কী পাবেন এবং কেন।
 
-ওই পেশাজীবীর সঙ্গে আপনার চুক্তি BDoor-এর সঙ্গে আপনার চুক্তি থেকে আলাদা। তাঁদের ফি তাঁদের, পেশাগত দায়বদ্ধতা তাঁদের, পরামর্শও তাঁদের। আমরা সমন্বয় করি; তাঁদের পেশাগত বিচারবুদ্ধি তদারকি করি না, এবং তাঁদের ফির ভাগ এমনভাবে নিই না যা তাঁদের ক্ষেত্রে প্রযোজ্য বিধি লঙ্ঘন করে।
+ওই পেশাজীবীর সঙ্গে আপনার চুক্তি bdoor-এর সঙ্গে আপনার চুক্তি থেকে আলাদা। তাঁদের ফি তাঁদের, পেশাগত দায়বদ্ধতা তাঁদের, পরামর্শও তাঁদের। আমরা সমন্বয় করি; তাঁদের পেশাগত বিচারবুদ্ধি তদারকি করি না, এবং তাঁদের ফির ভাগ এমনভাবে নিই না যা তাঁদের ক্ষেত্রে প্রযোজ্য বিধি লঙ্ঘন করে।
 
 আপনি ওই নির্দিষ্ট শেয়ারিং অনুমোদন করার পরই আমরা কোনো অংশীদারের সঙ্গে আপনার কাগজপত্র শেয়ার করি।`,
       },
@@ -192,7 +192,9 @@ export const PRIVACY: LegalDocument = {
       id: 'what-we-collect',
       heading: { en: 'What we collect and why', bn: 'আমরা কী সংগ্রহ করি এবং কেন' },
       body: {
-        en: `We collect only what a specific purpose requires:
+        en: `**bdoor compliance ltd** is the data controller for the personal data described in this policy.
+
+We collect only what a specific purpose requires:
 - **Account data** — name, email, phone, language. To create and secure your account.
 - **Business data** — your intended activity, structure, ownership and location. To work out which registrations apply.
 - **Identity data** — national ID or passport details, date of birth, nationality, address evidence. Because we are required to identify our customers and their beneficial owners.
@@ -201,7 +203,9 @@ export const PRIVACY: LegalDocument = {
 - **Technical data** — IP address and device information, kept in hashed form in security and audit records.
 
 Every question in the questionnaire that touches on identity, ownership or funding carries a "Why we ask" explanation on the page itself.`,
-        bn: `একটি নির্দিষ্ট উদ্দেশ্যে যতটুকু প্রয়োজন, আমরা কেবল ততটুকুই সংগ্রহ করি:
+        bn: `এই নীতিতে বর্ণিত ব্যক্তিগত তথ্যের ডেটা কন্ট্রোলার **bdoor compliance ltd**।
+
+একটি নির্দিষ্ট উদ্দেশ্যে যতটুকু প্রয়োজন, আমরা কেবল ততটুকুই সংগ্রহ করি:
 - **অ্যাকাউন্ট তথ্য** — নাম, ইমেইল, ফোন, ভাষা। আপনার অ্যাকাউন্ট তৈরি ও সুরক্ষিত রাখতে।
 - **ব্যবসার তথ্য** — আপনার পরিকল্পিত কার্যক্রম, কাঠামো, মালিকানা ও অবস্থান। কোন নিবন্ধন প্রযোজ্য তা নির্ধারণ করতে।
 - **পরিচয় তথ্য** — জাতীয় পরিচয়পত্র বা পাসপোর্টের তথ্য, জন্মতারিখ, নাগরিকত্ব, ঠিকানার প্রমাণ। কারণ গ্রাহক ও তাঁদের প্রকৃত মালিকদের শনাক্ত করা আমাদের বাধ্যবাধকতা।
@@ -314,7 +318,7 @@ export const REFUND_POLICY: LegalDocument = {
     },
     {
       id: 'service-fee',
-      heading: { en: 'BDoor service fees', bn: 'BDoor সেবা ফি' },
+      heading: { en: 'bdoor service fees', bn: 'bdoor সেবা ফি' },
       body: {
         en: `Our service fee covers work we perform. If you cancel before we have started, it is refunded in full. If you cancel part-way, we refund the portion for work not yet performed, and we tell you what that is before you decide.
 
@@ -450,10 +454,10 @@ export const LEGAL_DISCLAIMER: LegalDocument = {
   sections: [
     {
       id: 'not-a-law-firm',
-      heading: { en: 'BDoor is not a law firm', bn: 'BDoor কোনো আইনি প্রতিষ্ঠান নয়' },
+      heading: { en: 'bdoor is not a law firm', bn: 'bdoor কোনো আইনি প্রতিষ্ঠান নয়' },
       body: {
-        en: `Nothing on this website, in the questionnaire, in a recommendation, or in any message from BDoor is legal advice. We are an administrative-support platform. If you need advice on your rights, obligations or exposure, you need a lawyer, and we will introduce you to a verified partner advocate under a separate engagement.`,
-        bn: `এই ওয়েবসাইটে, প্রশ্নমালায়, কোনো সুপারিশে বা BDoor থেকে আসা কোনো বার্তায় থাকা কিছুই আইনি পরামর্শ নয়। আমরা একটি প্রশাসনিক সহায়তা প্ল্যাটফর্ম। আপনার অধিকার, দায়িত্ব বা ঝুঁকি নিয়ে পরামর্শ দরকার হলে আপনার আইনজীবী প্রয়োজন, এবং আমরা আলাদা চুক্তির অধীনে একজন যাচাইকৃত অংশীদার আইনজীবীর সঙ্গে পরিচয় করিয়ে দেব।`,
+        en: `Nothing on this website, in the questionnaire, in a recommendation, or in any message from bdoor is legal advice. We are an administrative-support platform. If you need advice on your rights, obligations or exposure, you need a lawyer, and we will introduce you to a verified partner advocate under a separate engagement.`,
+        bn: `এই ওয়েবসাইটে, প্রশ্নমালায়, কোনো সুপারিশে বা bdoor থেকে আসা কোনো বার্তায় থাকা কিছুই আইনি পরামর্শ নয়। আমরা একটি প্রশাসনিক সহায়তা প্ল্যাটফর্ম। আপনার অধিকার, দায়িত্ব বা ঝুঁকি নিয়ে পরামর্শ দরকার হলে আপনার আইনজীবী প্রয়োজন, এবং আমরা আলাদা চুক্তির অধীনে একজন যাচাইকৃত অংশীদার আইনজীবীর সঙ্গে পরিচয় করিয়ে দেব।`,
       },
     },
     {
@@ -463,8 +467,8 @@ export const LEGAL_DISCLAIMER: LegalDocument = {
         bn: 'কোনো কর্তৃপক্ষের সঙ্গে সংযুক্তি নেই',
       },
       body: {
-        en: `BDoor is not affiliated with, endorsed by, or acting on behalf of RJSC, BIDA, NBR, CCI&E, any city corporation, any ministry or any other authority. Where we name an authority it is to tell you who decides your application, nothing more.`,
-        bn: `BDoor RJSC, BIDA, NBR, CCI&E, কোনো সিটি কর্পোরেশন, কোনো মন্ত্রণালয় বা অন্য কোনো কর্তৃপক্ষের সঙ্গে সংযুক্ত নয়, তাদের অনুমোদনপ্রাপ্ত নয়, এবং তাদের পক্ষে কাজ করে না। আমরা যেখানে কোনো কর্তৃপক্ষের নাম উল্লেখ করি, তা কেবল আপনার আবেদনের সিদ্ধান্ত কে নেয় সেটি জানাতে — এর বেশি কিছু নয়।`,
+        en: `bdoor is not affiliated with, endorsed by, or acting on behalf of RJSC, BIDA, NBR, CCI&E, any city corporation, any ministry or any other authority. Where we name an authority it is to tell you who decides your application, nothing more.`,
+        bn: `bdoor RJSC, BIDA, NBR, CCI&E, কোনো সিটি কর্পোরেশন, কোনো মন্ত্রণালয় বা অন্য কোনো কর্তৃপক্ষের সঙ্গে সংযুক্ত নয়, তাদের অনুমোদনপ্রাপ্ত নয়, এবং তাদের পক্ষে কাজ করে না। আমরা যেখানে কোনো কর্তৃপক্ষের নাম উল্লেখ করি, তা কেবল আপনার আবেদনের সিদ্ধান্ত কে নেয় সেটি জানাতে — এর বেশি কিছু নয়।`,
       },
     },
     {

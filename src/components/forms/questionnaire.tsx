@@ -13,6 +13,7 @@ import { useAnnounce } from '@/components/ui/announcer';
 import { COUNTRIES } from '@/features/intake/countries';
 import {
   applicableQuestions,
+  stageProgress,
   type PartialAnswers,
   type QuestionDefinition,
 } from '@/features/intake/questions';
@@ -253,15 +254,20 @@ export function Questionnaire({ initial }: { initial: IntakeState }) {
   const index = Math.min(state.index, questions.length);
   const question = questions[index];
   const atReview = !question;
+  const progress = stageProgress(state.answers, index);
+  const stageName = atReview ? t('review') : t(`sections.${progress.stage}`);
+  const stageLabel = t('stageLabel', {
+    current: Math.min(progress.current, progress.total),
+    total: progress.total,
+    name: stageName,
+  });
 
   // Move focus to the new question so keyboard and screen-reader users are not
   // left at the bottom of the previous step.
   useEffect(() => {
     headingRef.current?.focus();
-    if (question) {
-      announce(t('progressLabel', { current: index + 1, total: questions.length }));
-    }
-  }, [index, question, questions.length, announce, t]);
+    if (question) announce(stageLabel);
+  }, [index, question, stageLabel, announce]);
 
   useEffect(() => {
     if (state.fieldError) announce(tErrors('form'), true);
@@ -279,25 +285,20 @@ export function Questionnaire({ initial }: { initial: IntakeState }) {
         </Alert>
       ) : null}
 
+      {/*
+        Stage-based progress, deliberately not "question X of Y": conditional
+        questions change the count as answers arrive, which made the label
+        jump (Step 1 of 16 → Step 3 of 15) and look broken. The stage of a
+        question never changes, so this only moves at real boundaries; the
+        bar fills a whole stage at a time and reaches full at review.
+      */}
       <div>
-        <div className="flex items-baseline justify-between gap-4">
-          <p className="text-muted text-sm font-medium">
-            {t('progressLabel', {
-              current: Math.min(index + 1, questions.length),
-              total: questions.length,
-            })}
-          </p>
-          {question ? (
-            <p className="text-muted text-xs tracking-wide uppercase">
-              {t(`sections.${question.section}`)}
-            </p>
-          ) : null}
-        </div>
+        <p className="text-muted text-sm font-medium">{stageLabel}</p>
         <Progress
           className="mt-2"
-          value={atReview ? questions.length : index}
-          max={questions.length}
-          label={t('progressLabel', { current: index + 1, total: questions.length })}
+          value={atReview ? progress.total : progress.current - 1}
+          max={progress.total}
+          label={stageLabel}
         />
       </div>
 
