@@ -62,7 +62,10 @@ test.describe('questionnaire', () => {
         .first()
         .textContent();
 
-    await expect(page.getByText('Stage 1 of 5', { exact: false })).toBeVisible();
+    // Scoped to the visible paragraph: the sr-only live-region announcer
+    // mirrors the same text once an announcement fires, and an unscoped
+    // getByText then hits a strict-mode violation (timing-dependent).
+    await expect(page.locator('p', { hasText: /^Stage 1 of 5/ })).toBeVisible();
     const totals = new Set<string>();
     const seen: number[] = [];
 
