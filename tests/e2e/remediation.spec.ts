@@ -112,7 +112,7 @@ test.describe('one commercial source of truth', () => {
 });
 
 test.describe('seven-country truthfulness', () => {
-  test('the homepage selector: Bangladesh first, six country cards, no prices', async ({
+  test('the homepage selector: Bangladesh first, applications open, honest prices', async ({
     page,
   }) => {
     await page.goto('/en');
@@ -133,28 +133,47 @@ test.describe('seven-country truthfulness', () => {
       await expect(link).toHaveAttribute('href', href);
     }
 
-    // Register interest, and no currency figure anywhere near the cards.
-    await expect(page.getByText('Register interest').first()).toBeVisible();
+    // Every route runs as a managed application — never register-interest,
+    // never coming-soon — and each published price travels with its
+    // qualifier (immediate-operations instructions §3/§5).
     const section = page.getByRole('heading', {
-      name: 'Bangladesh first. Six more markets in preparation.',
+      name: 'Seven countries. Applications open in all of them.',
     });
     await expect(section).toBeVisible();
-    const cardsText = await page.locator('section', { has: section }).first().innerText();
-    expect(cardsText).not.toMatch(/USD|GBP|AED|SAR|QAR|SGD|\$|£/);
+    const cards = page.locator('section', { has: section }).first();
+    await expect(cards.getByText('Applications open — specialist reviewed').first()).toBeVisible();
+    await expect(cards.getByText('From ৳9,900')).toBeVisible();
+    await expect(cards.getByText('From $499')).toBeVisible();
+    await expect(cards.getByText('Wyoming LLC estimated first-year package')).toBeVisible();
+    const cardsText = await cards.innerText();
+    expect(cardsText).not.toMatch(/register interest|coming soon|in preparation/i);
   });
 
-  test('a country page registers interest and publishes no price', async ({ page }) => {
+  test('a country page opens applications with the published starting estimate', async ({
+    page,
+  }) => {
     await page.goto('/en/countries/usa');
     await expect(page.getByRole('heading', { level: 1 })).toContainText('United States');
-    await expect(page.getByText('No price is published for this route yet')).toBeVisible();
+
+    await expect(page.getByText('Applications open — specialist reviewed').first()).toBeVisible();
+    await expect(page.getByText('From $499').first()).toBeVisible();
+    await expect(page.getByText('About ৳61,400').first()).toBeVisible();
+    await expect(page.getByText('Wyoming LLC estimated first-year package').first()).toBeVisible();
+    // The figure is a starting estimate, never a checkout total.
+    await expect(page.getByText('starting estimate', { exact: false }).first()).toBeVisible();
+
     await expect(
-      page.locator('main').getByRole('link', { name: /Register interest/ }),
-    ).toHaveAttribute('href', /\/en\/contact\?interest=usa/);
+      page.locator('main').getByRole('link', { name: 'Start United States application' }),
+    ).toHaveAttribute('href', '/en/start?country=usa');
+    // §3 disclosure: bdoor coordinates, appointed third parties fulfil.
+    await expect(
+      page.getByText('fulfilled by appointed third-party providers', { exact: false }),
+    ).toBeVisible();
     const body = await page.locator('body').innerText();
-    expect(body).not.toMatch(/USD\s?\d|\$\d/);
+    expect(body).not.toMatch(/register interest|coming soon|buy now/i);
   });
 
-  test('Saudi Arabia and Qatar are eligibility-led, never buy-now', async ({ page }) => {
+  test('Saudi Arabia and Qatar open as assessments, never buy-now', async ({ page }) => {
     for (const [slug, name] of [
       ['saudi-arabia', 'Saudi Arabia'],
       ['qatar', 'Qatar'],
@@ -162,11 +181,10 @@ test.describe('seven-country truthfulness', () => {
       await page.goto(`/en/countries/${slug}`);
       await expect(page.getByRole('heading', { level: 1 })).toContainText(name);
       await expect(
-        page.locator('main').getByRole('link', { name: /Check eligibility/ }),
-      ).toHaveAttribute('href', new RegExp(`/en/contact\\?interest=${slug}`));
+        page.locator('main').getByRole('link', { name: `Start ${name} assessment` }),
+      ).toHaveAttribute('href', `/en/start?country=${slug}`);
       const body = await page.locator('body').innerText();
       expect(body).not.toMatch(/Buy now/i);
-      expect(body).not.toMatch(/USD\s?\d|\$\d/);
     }
   });
 
@@ -231,17 +249,16 @@ test.describe('responsive composition', () => {
   test('the desktop nav appears at xl and the drawer below it', async ({ page }) => {
     await page.goto('/en');
 
-    // 1280px: the six primary groups visible, menu button absent, and the
-    // bar itself must not overflow its row.
+    // 1280px: the five §7.3 destinations visible, menu button absent, and
+    // the bar itself must not overflow its row.
     await page.setViewportSize({ width: 1280, height: 800 });
     const nav = page.locator('header nav');
-    await expect(nav.getByRole('link', { name: 'Start a business' })).toBeVisible();
-    await expect(nav.getByRole('link', { name: 'Manage a business' })).toBeVisible();
+    await expect(nav.getByRole('link', { name: 'Start', exact: true })).toBeVisible();
+    await expect(nav.getByRole('link', { name: 'Services', exact: true })).toBeVisible();
     await expect(nav.getByRole('link', { name: 'Countries' })).toBeVisible();
     await expect(nav.getByRole('link', { name: 'Pricing' })).toBeVisible();
     await expect(nav.getByRole('link', { name: 'Resources' })).toBeVisible();
-    await expect(nav.getByRole('link', { name: 'Partners' })).toBeVisible();
-    expect(await nav.first().getByRole('link').count()).toBe(6);
+    expect(await nav.first().getByRole('link').count()).toBe(5);
     await expect(page.locator('button[aria-controls="mobile-navigation"]')).toBeHidden();
     const headerOverflow = await page
       .locator('header')

@@ -74,13 +74,27 @@ export default async function CountriesPage({ params }: { params: Promise<{ loca
                 <p className="text-muted mt-2 max-w-xl text-sm leading-relaxed">
                   {operational ? t('bangladesh.body') : t('bangladesh.previewBody')}
                 </p>
+                <p className="text-ink mt-4 text-xl font-semibold">
+                  {pickText(BANGLADESH_COUNTRY.featured.label, loc)}
+                  <span className="text-muted ml-2 text-sm font-normal">
+                    {pickText(BANGLADESH_COUNTRY.featured.alt, loc)}
+                  </span>
+                </p>
+                <p className="text-muted mt-1 text-xs">
+                  {pickText(BANGLADESH_COUNTRY.featured.qualifier, loc)}
+                </p>
               </div>
               <div className="flex shrink-0 flex-col gap-2 sm:items-end">
                 <Button asChild size="lg">
-                  <Link href={`/countries/${BANGLADESH_COUNTRY.slug}`}>
-                    {t('bangladesh.cta')}
+                  <Link href={`${MARKETING_ROUTES.start}?country=${BANGLADESH_COUNTRY.slug}`}>
+                    {tIntl('country.applyCta', {
+                      country: pickText(BANGLADESH_COUNTRY.name, loc),
+                    })}
                     <ArrowRight className="size-4" aria-hidden="true" />
                   </Link>
+                </Button>
+                <Button asChild variant="link" size="sm">
+                  <Link href={`/countries/${BANGLADESH_COUNTRY.slug}`}>{t('bangladesh.cta')}</Link>
                 </Button>
                 <Button asChild variant="link" size="sm">
                   <Link href={MARKETING_ROUTES.pricing}>{t('bangladesh.pricingCta')}</Link>
@@ -103,12 +117,38 @@ export default async function CountriesPage({ params }: { params: Promise<{ loca
                     <p className="text-muted flex-1 text-sm leading-relaxed">
                       {pickText(country.offer.summary, loc)}
                     </p>
-                    <Button asChild variant="secondary" size="sm" className="w-fit">
-                      <Link href={`/countries/${country.slug}`}>
-                        {tIntl('viewRoute', { country: name })}
-                        <ArrowRight className="size-4" aria-hidden="true" />
-                      </Link>
-                    </Button>
+                    {country.offer.publicLabel ? (
+                      <div>
+                        <p className="text-ink text-base font-semibold">
+                          {pickText(country.offer.publicLabel, loc)}
+                          {country.offer.publicLabelAlt ? (
+                            <span className="text-muted ml-2 text-sm font-normal">
+                              {pickText(country.offer.publicLabelAlt, loc)}
+                            </span>
+                          ) : null}
+                        </p>
+                        {country.offer.publicQualifier ? (
+                          <p className="text-muted mt-0.5 text-xs">
+                            {pickText(country.offer.publicQualifier, loc)}
+                          </p>
+                        ) : null}
+                      </div>
+                    ) : null}
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Button asChild size="sm" className="w-fit">
+                        <Link href={`${MARKETING_ROUTES.start}?country=${country.slug}`}>
+                          {country.offer.eligibilityLed
+                            ? tIntl('country.assessCta', { country: name })
+                            : tIntl('country.applyCta', { country: name })}
+                          <ArrowRight className="size-4" aria-hidden="true" />
+                        </Link>
+                      </Button>
+                      <Button asChild variant="link" size="sm">
+                        <Link href={`/countries/${country.slug}`}>
+                          {tIntl('viewRoute', { country: name })}
+                        </Link>
+                      </Button>
+                    </div>
                   </Card>
                 </li>
               );

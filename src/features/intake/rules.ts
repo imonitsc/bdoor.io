@@ -111,11 +111,18 @@ function pushUnique(target: string[], values: readonly string[] | undefined) {
  * that names a structure wins, so a high-priority "this needs review" rule can
  * pre-empt a lower-priority default without the default overwriting it.
  */
-/** Map the first assessment answer onto fields the rule engine already understands. */
+/** Map the country-first opening answers onto fields the rule engine already understands. */
 function normalizeAnswers(answers: PartialAnswers): PartialAnswers {
   const out = { ...answers };
-  if (answers.help_scope === 'start_bangladesh') out.existing_business = false;
-  if (answers.help_scope === 'manage_bangladesh') out.existing_business = true;
+  // "Expand" means forming something new in the target country, so both
+  // 'new' and 'expand' take the new-business rules; an explicit follow-up
+  // answer (asked when the objective was 'unsure') is never overridden.
+  if (answers.existing_business === undefined) {
+    if (answers.objective === 'new' || answers.objective === 'expand') {
+      out.existing_business = false;
+    }
+    if (answers.objective === 'existing') out.existing_business = true;
+  }
   return out;
 }
 
@@ -182,10 +189,10 @@ export function recommend(answers: PartialAnswers, rules: readonly Rule[]): Reco
 export function hardManualReviewReasons(answers: PartialAnswers): string[] {
   const reasons: string[] = [];
 
-  if (answers.help_scope === 'form_abroad') {
+  if (answers.target_country !== undefined && answers.target_country !== 'bangladesh') {
     reasons.push('international_formation');
   }
-  if (answers.help_scope === 'unsure') {
+  if (answers.objective === 'unsure') {
     reasons.push('scope_unclear');
   }
   if (answers.entity_owner === true) {

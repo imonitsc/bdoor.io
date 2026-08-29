@@ -10,10 +10,10 @@ import type { Locale } from '@/features/catalog/types';
  * The homepage seven-country selector: Bangladesh first and visually larger
  * (it is the operating market and 65% of the positioning), six international
  * cards compact after it. Each card links to its country page and shows the
- * route's honest public status. No price and no internal status word appears
- * here: while a route has no approved provider and price sheet there is no
- * figure that would be true, and "draft" is a workflow state, not a message
- * to a customer.
+ * route's honest public status plus the owner-published starting estimate —
+ * always with its qualifier, because the figure is a starting estimate, not
+ * a checkout total. No internal status word appears here: "draft" is a
+ * workflow state, not a message to a customer.
  */
 export function CountrySelector({
   locale,
@@ -56,6 +56,15 @@ export function CountrySelector({
             <p className="text-muted mt-2 flex-1 text-sm leading-relaxed">
               {tCountries(operational ? 'bangladesh.body' : 'bangladesh.previewBody')}
             </p>
+            <p className="text-ink mt-3 text-base font-semibold">
+              {pickText(BANGLADESH_COUNTRY.featured.label, locale)}
+              <span className="text-muted ml-2 text-sm font-normal">
+                {pickText(BANGLADESH_COUNTRY.featured.alt, locale)}
+              </span>
+            </p>
+            <p className="text-muted mt-0.5 text-xs">
+              {pickText(BANGLADESH_COUNTRY.featured.qualifier, locale)}
+            </p>
             <p className="text-primary mt-4 inline-flex items-center gap-1 text-sm font-medium">
               {t('viewRoute', { country: pickText(BANGLADESH_COUNTRY.name, locale) })}
               <ArrowRight
@@ -88,6 +97,23 @@ export function CountrySelector({
               <p className="text-muted mt-2 flex-1 text-sm leading-relaxed">
                 {pickText(country.offer.summary, locale)}
               </p>
+              {country.offer.publicLabel ? (
+                <>
+                  <p className="text-ink mt-3 text-sm font-semibold">
+                    {pickText(country.offer.publicLabel, locale)}
+                    {country.offer.publicLabelAlt ? (
+                      <span className="text-muted ml-2 font-normal">
+                        {pickText(country.offer.publicLabelAlt, locale)}
+                      </span>
+                    ) : null}
+                  </p>
+                  {country.offer.publicQualifier ? (
+                    <p className="text-muted mt-0.5 text-xs">
+                      {pickText(country.offer.publicQualifier, locale)}
+                    </p>
+                  ) : null}
+                </>
+              ) : null}
               <p className="text-primary mt-4 inline-flex items-center gap-1 text-sm font-medium">
                 {t('viewRoute', { country: name })}
                 <ArrowRight

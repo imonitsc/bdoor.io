@@ -1,11 +1,12 @@
 import { expect, test } from '@playwright/test';
 
 /**
- * The guided questionnaire.
+ * The country-first application flow.
  *
- * No Supabase is configured in the test environment, so the draft is not
- * persisted — which is exactly the degraded mode the flow has to survive. The
- * branching, validation and recommendation must all still work.
+ * No Supabase is configured in the test environment, so neither the draft
+ * nor the submitted application is persisted — which is exactly the degraded
+ * mode the flow has to survive. The branching, validation, contact stage,
+ * submission confirmation and recommendation must all still work.
  */
 async function answer(
   page: import('@playwright/test').Page,
@@ -16,12 +17,12 @@ async function answer(
   // Each step swaps the input out for the next question's. Without waiting
   // for the step to actually advance, the next `action()` can run against the
   // control that is about to be replaced and the answer is lost. Progress is
-  // now reported per stage, so the progressbar often does NOT move between
+  // reported per stage, so the progressbar often does NOT move between
   // consecutive questions — the hidden questionKey input is the reliable
   // signal: it changes on every step and disappears at review.
   const keyInput = page.locator('input[name="questionKey"]');
   // count() does not auto-wait, so the read is instant even once the input is
-  // gone (review and recommendation have no question form at all). The read
+  // gone (review and the confirmation have no question form at all). The read
   // itself must ALSO be bounded: the input can be removed between count()
   // and inputValue() when the last answer swaps the form for the review
   // screen, and with no actionTimeout configured inputValue() would then
@@ -43,13 +44,28 @@ async function answer(
   }).toPass();
 }
 
-async function startBangladeshAssessment(page: import('@playwright/test').Page) {
+async function chooseCountry(page: import('@playwright/test').Page, name: string) {
   await answer(page, async () => {
-    await page.getByRole('radio', { name: 'Start a business in Bangladesh' }).click();
+    await page.getByRole('radio', { name, exact: true }).click();
   });
 }
 
-test.describe('questionnaire', () => {
+async function chooseObjective(page: import('@playwright/test').Page, name: string) {
+  await answer(page, async () => {
+    await page.getByRole('radio', { name }).click();
+  });
+}
+
+/** The shared contact + consent close of every branch. */
+async function completeContactStage(page: import('@playwright/test').Page) {
+  await expect(page.getByText('Your full name')).toBeVisible();
+  await answer(page, async () => page.getByRole('textbox').fill('Test Founder (sample)'));
+  await answer(page, async () => page.getByRole('textbox').fill('founder@example.com'));
+  await answer(page, async () => Promise.resolve()); // phone is optional
+  await answer(page, async () => page.getByRole('checkbox').check());
+}
+
+test.describe('application flow', () => {
   test('progress is stage-based and never jumps unpredictably', async ({ page }) => {
     await page.goto('/en/start');
 
@@ -62,10 +78,7 @@ test.describe('questionnaire', () => {
         .first()
         .textContent();
 
-    // Scoped to the visible paragraph: the sr-only live-region announcer
-    // mirrors the same text once an announcement fires, and an unscoped
-    // getByText then hits a strict-mode violation (timing-dependent).
-    await expect(page.locator('p', { hasText: /^Stage 1 of 5/ })).toBeVisible();
+    await expect(page.locator('p', { hasText: /^Stage 1 of 6/ })).toBeVisible();
     const totals = new Set<string>();
     const seen: number[] = [];
 
@@ -78,34 +91,45 @@ test.describe('questionnaire', () => {
     };
 
     await record();
-    await answer(page, async () => {
-      await page.getByRole('radio', { name: 'Start a business in Bangladesh' }).click();
-    });
+    await chooseCountry(page, 'Bangladesh');
+    await record();
+    await chooseObjective(page, 'Start a new business');
     await record();
     await answer(page, async () => {
       await page.getByRole('radio', { name: 'In Bangladesh' }).click();
     });
     await record();
-    await answer(page, async () => {
-      await page.getByRole('combobox').selectOption('BD');
-    });
-    await record();
 
     // The denominator never changes, and the stage number never decreases —
     // the two properties the old "Step 1 of 16 → Step 3 of 15" model broke.
-    expect([...totals]).toEqual(['5']);
+    expect([...totals]).toEqual(['6']);
     for (let i = 1; i < seen.length; i += 1) {
       expect(seen[i]!, `stage decreased at step ${i}`).toBeGreaterThanOrEqual(seen[i - 1]!);
     }
     await expect(progress).toBeVisible();
   });
 
-  test('branches on the answers given', async ({ page }) => {
+  test('opens with the seven countries and branches on the answers given', async ({ page }) => {
     await page.goto('/en/start');
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Start your business');
 
-    await expect(page.getByText('Where do you want help?')).toBeVisible();
-    await startBangladeshAssessment(page);
+    // Country first (§4.1): all seven, no "not sure".
+    await expect(page.getByText('Where do you want to start or run your business?')).toBeVisible();
+    for (const name of [
+      'Bangladesh',
+      'United States',
+      'United Kingdom',
+      'United Arab Emirates',
+      'Saudi Arabia',
+      'Qatar',
+      'Singapore',
+    ]) {
+      await expect(page.getByRole('radio', { name, exact: true })).toBeVisible();
+    }
+    await chooseCountry(page, 'Bangladesh');
+
+    await expect(page.getByText('What do you want to do there?')).toBeVisible();
+    await chooseObjective(page, 'Start a new business');
 
     // Founder inside Bangladesh.
     await expect(page.getByText('Where are you based right now?')).toBeVisible();
@@ -123,9 +147,23 @@ test.describe('questionnaire', () => {
     await expect(page.getByText('Which country do you currently live in?')).toHaveCount(0);
   });
 
+  test('preselects a validated ?country= and ?objective=, skipping those steps', async ({
+    page,
+  }) => {
+    await page.goto('/en/start?country=usa&objective=new');
+    // Both preset answers hold, so the flow opens on the next question.
+    await expect(page.getByText('What is your nationality?')).toBeVisible();
+  });
+
+  test('ignores an invalid ?country= parameter', async ({ page }) => {
+    await page.goto('/en/start?country=mars&objective=teleport');
+    await expect(page.getByText('Where do you want to start or run your business?')).toBeVisible();
+  });
+
   test('asks a foreign founder the questions a local founder is spared', async ({ page }) => {
     await page.goto('/en/start');
-    await startBangladeshAssessment(page);
+    await chooseCountry(page, 'Bangladesh');
+    await chooseObjective(page, 'Start a new business');
 
     await answer(page, async () => {
       await page.getByRole('radio', { name: 'Outside Bangladesh' }).click();
@@ -141,8 +179,7 @@ test.describe('questionnaire', () => {
   });
 
   test('validates before it advances', async ({ page }) => {
-    await page.goto('/en/start');
-    await startBangladeshAssessment(page);
+    await page.goto('/en/start?country=bangladesh&objective=new');
     await answer(page, async () => {
       await page.getByRole('radio', { name: 'In Bangladesh' }).click();
     });
@@ -163,17 +200,20 @@ test.describe('questionnaire', () => {
     await page.goto('/en/start');
     await page.getByRole('button', { name: 'Why we ask' }).click();
     await expect(
-      page.getByText('This routes you to the right package', { exact: false }),
+      page.getByText('The application is country-first', { exact: false }),
     ).toBeVisible();
   });
 
-  test('reaches a preliminary recommendation and labels it as preliminary', async ({ page }) => {
-    // A full walk is ~14 server-action round trips; the budget is explicit
+  test('submits a Bangladesh application and shows the preliminary recommendation', async ({
+    page,
+  }) => {
+    // A full walk is ~18 server-action round trips; the budget is explicit
     // and generous so genuine slowness never masquerades as the readKey
     // race documented in answer().
     test.setTimeout(420_000);
     await page.goto('/en/start');
-    await startBangladeshAssessment(page);
+    await chooseCountry(page, 'Bangladesh');
+    await chooseObjective(page, 'Start a new business');
 
     await answer(page, async () => page.getByRole('radio', { name: 'In Bangladesh' }).click());
     await answer(page, async () => page.getByRole('combobox').selectOption('BD'));
@@ -194,69 +234,95 @@ test.describe('questionnaire', () => {
     await answer(page, async () =>
       page.getByRole('radio', { name: 'As soon as possible' }).click(),
     );
+    await completeContactStage(page);
 
-    // Review step, then generate.
+    // Review, then submit — the CTA is an application, not a checkout.
     await expect(page.getByRole('heading', { name: 'Review your answers' })).toBeVisible();
-    await page.getByRole('button', { name: 'See my preliminary recommendation' }).click();
+    await page.getByRole('button', { name: 'Submit application' }).click();
 
+    await expect(page.getByRole('heading', { name: 'Application received' })).toBeVisible();
+    await expect(page.getByText(/^BD-\d{4}-\d{6}$/)).toBeVisible();
+    await expect(
+      page.getByText('specialist reviews your application', { exact: false }),
+    ).toBeVisible();
+
+    // Bangladesh keeps its preliminary guidance, beneath the confirmation.
     await expect(
       page.getByRole('heading', { name: 'Your preliminary recommendation' }),
     ).toBeVisible();
     await expect(page.getByText('Preliminary — subject to review')).toBeVisible();
-    await expect(
-      page.getByText('This is a preliminary, software-generated suggestion', { exact: false }),
-    ).toBeVisible();
     await expect(page.getByText('Sole proprietorship', { exact: true })).toBeVisible();
     await expect(page.locator('a[href$="/services/trade-licence"]')).toBeVisible();
   });
 
-  test('sends a foreign founder to manual review', async ({ page }) => {
-    // A full walk is ~14 server-action round trips; the budget is explicit
-    // and generous so genuine slowness never masquerades as the readKey
-    // race documented in answer().
+  test('submits an international application without a Bangladesh recommendation', async ({
+    page,
+  }) => {
     test.setTimeout(420_000);
     await page.goto('/en/start');
-    await startBangladeshAssessment(page);
+    await chooseCountry(page, 'United States');
+    await chooseObjective(page, 'Start a new business');
 
-    await answer(page, async () => page.getByRole('radio', { name: 'Outside Bangladesh' }).click());
-    await answer(page, async () => page.getByRole('combobox').selectOption('GB'));
-    await answer(page, async () => page.getByRole('combobox').selectOption('GB')); // residence
+    await answer(page, async () => page.getByRole('combobox').selectOption('BD')); // nationality
+    await answer(page, async () => page.getByRole('combobox').selectOption('BD')); // residence
     await answer(page, async () =>
-      page.getByRole('textbox').fill('Import cotton fabric and sell to local garment factories.'),
+      page.getByRole('textbox').fill('Sell software subscriptions to customers in the USA.'),
     );
-    await answer(page, async () => page.getByRole('textbox').fill('Chattogram'));
-    await answer(page, async () =>
-      page.getByRole('radio', { name: 'Private limited company' }).click(),
-    );
-    await answer(page, async () => page.getByRole('spinbutton').fill('2')); // owners
-    await answer(page, async () => page.getByRole('spinbutton').fill('2')); // directors
-    await answer(page, async () => page.getByRole('radio', { name: 'Yes', exact: true }).click()); // foreign owners
+    await answer(page, async () => page.getByRole('spinbutton').fill('1')); // owners
     await answer(page, async () => page.getByRole('radio', { name: 'No', exact: true }).click()); // entity owner
-    await answer(page, async () => page.getByRole('spinbutton').fill('100')); // foreign %
-    await answer(page, async () => page.getByRole('radio', { name: 'Yes', exact: true }).click()); // remit capital
-    await answer(page, async () => page.getByRole('radio', { name: 'Yes', exact: true }).click()); // will work
-    await answer(page, async () => page.getByRole('radio', { name: 'Both' }).click()); // import/export
-    await answer(page, async () => page.getByRole('radio', { name: 'Yes', exact: true }).click()); // employees
-    await answer(page, async () => page.getByRole('radio', { name: 'No', exact: true }).click()); // regulated
-    await answer(page, async () => page.getByRole('radio', { name: 'Yes', exact: true }).click()); // address
+    await answer(page, async () => page.getByRole('radio', { name: 'No', exact: true }).click()); // visa
+    await answer(page, async () => page.getByRole('radio', { name: 'Yes', exact: true }).click()); // banking
     await answer(page, async () =>
       page.getByRole('radio', { name: 'As soon as possible' }).click(),
     );
+    await answer(page, async () => Promise.resolve()); // notes are optional
+    await completeContactStage(page);
 
-    await page.getByRole('button', { name: 'See my preliminary recommendation' }).click();
+    await page.getByRole('button', { name: 'Submit application' }).click();
 
+    await expect(page.getByRole('heading', { name: 'Application received' })).toBeVisible();
+    await expect(page.getByText(/^BD-\d{4}-\d{6}$/)).toBeVisible();
+    await expect(page.getByText('United States', { exact: false }).first()).toBeVisible();
+    // The Bangladesh rules engine must not run for an international case.
     await expect(
-      page.getByRole('heading', { name: 'This case needs manual review' }),
-    ).toBeVisible();
-    await expect(page.getByText('There is foreign ownership', { exact: false })).toBeVisible();
+      page.getByRole('heading', { name: 'Your preliminary recommendation' }),
+    ).toHaveCount(0);
+    await expect(page.getByText('No payment has been taken', { exact: false })).toBeVisible();
+  });
+
+  test('requires consent before an application can be submitted', async ({ page }) => {
+    test.setTimeout(420_000);
+    await page.goto('/en/start?country=usa&objective=new');
+
+    await answer(page, async () => page.getByRole('combobox').selectOption('BD'));
+    await answer(page, async () => page.getByRole('combobox').selectOption('BD'));
+    await answer(page, async () =>
+      page.getByRole('textbox').fill('Open an online store serving customers in the USA.'),
+    );
+    await answer(page, async () => page.getByRole('spinbutton').fill('1'));
+    await answer(page, async () => page.getByRole('radio', { name: 'No', exact: true }).click());
+    await answer(page, async () => page.getByRole('radio', { name: 'No', exact: true }).click());
+    await answer(page, async () => page.getByRole('radio', { name: 'No', exact: true }).click());
+    await answer(page, async () =>
+      page.getByRole('radio', { name: 'As soon as possible' }).click(),
+    );
+    await answer(page, async () => Promise.resolve()); // notes
+    await answer(page, async () => page.getByRole('textbox').fill('Test Founder (sample)'));
+    await answer(page, async () => page.getByRole('textbox').fill('founder@example.com'));
+    await answer(page, async () => Promise.resolve()); // phone
+
+    // Submitting the consent step unchecked must not advance.
+    await expect(page.getByRole('checkbox')).toBeVisible();
+    await page.getByRole('button', { name: /^Continue$/ }).click();
     await expect(
-      page.locator('a[href$="/services/foreign-ownership-eligibility-review"]'),
+      page.getByText('Please tick the consent box to submit your application.'),
     ).toBeVisible();
+    await expect(page.getByRole('checkbox')).toBeVisible();
   });
 
   test('warns that capital never comes to BDoor', async ({ page }) => {
-    await page.goto('/en/start');
-    await startBangladeshAssessment(page);
+    test.setTimeout(420_000);
+    await page.goto('/en/start?country=bangladesh&objective=new');
     await answer(page, async () => page.getByRole('radio', { name: 'Outside Bangladesh' }).click());
     await answer(page, async () => page.getByRole('combobox').selectOption('SG'));
     await answer(page, async () => page.getByRole('combobox').selectOption('SG'));
@@ -280,7 +346,8 @@ test.describe('questionnaire', () => {
 
   test('can step back and change an answer', async ({ page }) => {
     await page.goto('/en/start');
-    await startBangladeshAssessment(page);
+    await chooseCountry(page, 'Bangladesh');
+    await chooseObjective(page, 'Start a new business');
     await answer(page, async () => page.getByRole('radio', { name: 'In Bangladesh' }).click());
     await expect(page.getByText('What is your nationality?')).toBeVisible();
 

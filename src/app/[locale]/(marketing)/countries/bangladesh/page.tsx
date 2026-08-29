@@ -108,7 +108,7 @@ export default async function BangladeshCountryPage({
               </p>
             </div>
             <Button asChild size="lg" className="shrink-0">
-              <Link href={MARKETING_ROUTES.start}>
+              <Link href={`${MARKETING_ROUTES.start}?country=${BANGLADESH_COUNTRY.slug}`}>
                 {t('assessment.cta')}
                 <ArrowRight className="size-4" aria-hidden="true" />
               </Link>

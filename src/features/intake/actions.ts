@@ -9,6 +9,7 @@ import { logger } from '@/lib/logger';
 import { ensureDraftSession, getDraftSession, saveAnswer } from './session';
 import { generateRecommendation, loadRules } from './recommendation';
 import { recommend } from './rules';
+import { submitApplication, type SubmittedApplication } from './application';
 import {
   applicableQuestions,
   firstUnansweredIndex,
@@ -26,7 +27,19 @@ export type IntakeState = {
   error?: string;
   fieldError?: string;
   recommendation?: Recommendation;
+  submitted?: SubmittedApplication;
   unavailable?: boolean;
+  /** Validated ?package= slug the visitor arrived from, if any. */
+  packageSlug?: string;
+  /** Path (with query) of the /start URL that seeded any preset answers. */
+  sourcePath?: string;
+};
+
+/** Pre-seeded answers from validated /start query parameters. */
+export type IntakePreset = {
+  answers: PartialAnswers;
+  packageSlug?: string;
+  sourcePath?: string;
 };
 
 async function rateLimitKey(): Promise<string> {
@@ -36,14 +49,26 @@ async function rateLimitKey(): Promise<string> {
 }
 
 /** Reads the current draft for the initial render. */
-export async function loadIntake(): Promise<IntakeState> {
+export async function loadIntake(preset?: IntakePreset): Promise<IntakeState> {
   const session = await getDraftSession();
-  const answers = session?.answers ?? {};
+  const answers = { ...session?.answers } as PartialAnswers;
+
+  // Preset answers (a validated ?country=/&objective=) fill gaps only: a
+  // saved draft answer always wins over a link parameter, so following a
+  // country CTA never silently rewrites an application in progress.
+  for (const [key, value] of Object.entries(preset?.answers ?? {})) {
+    if (answers[key as QuestionKey] === undefined) {
+      (answers as Record<string, unknown>)[key] = value;
+    }
+  }
+
   return {
     answers,
     index: firstUnansweredIndex(answers),
     total: applicableQuestions(answers).length,
     unavailable: session === null,
+    packageSlug: preset?.packageSlug,
+    sourcePath: preset?.sourcePath,
   };
 }
 
@@ -66,8 +91,8 @@ export async function intakeAction(
     return { ...previous, index, fieldError: undefined, error: undefined };
   }
 
-  if (intent === 'generate') {
-    return generateIntakeRecommendation(previous);
+  if (intent === 'submit') {
+    return submitIntakeApplication(previous);
   }
 
   const key = formData.get('questionKey') as QuestionKey | null;
@@ -80,6 +105,10 @@ export async function intakeAction(
   switch (kind) {
     case 'boolean':
       value = raw[0] === 'true';
+      break;
+    case 'consent':
+      // An unchecked checkbox submits nothing at all.
+      value = raw.includes('true');
       break;
     case 'number':
       value = raw[0] === '' || raw[0] === undefined ? Number.NaN : Number(raw[0]);
@@ -111,39 +140,78 @@ export async function intakeAction(
     // questionnaire can still be walked through, and say so.
     const answers = { ...previous.answers, [key]: validation.data } as PartialAnswers;
     return {
+      ...previous,
       answers,
       index: firstUnansweredIndex(answers),
       total: applicableQuestions(answers).length,
       unavailable: true,
+      fieldError: undefined,
+      error: undefined,
     };
   }
 
-  const answers = await saveAnswer(session.id, key, validation.data);
+  let answers = await saveAnswer(session.id, key, validation.data);
+
+  // Preset answers seeded from the /start URL live only in the action state
+  // until now; persist any that are still applicable and unstored so a
+  // reload keeps the chosen country. The applicability check matters: after
+  // an earlier answer changes, `saveAnswer` prunes answers that stopped
+  // applying, and this loop must not quietly resurrect them.
+  const applicable = new Set(applicableQuestions(answers).map((q) => q.key));
+  for (const [presetKey, presetValue] of Object.entries(previous.answers)) {
+    const qk = presetKey as QuestionKey;
+    if (qk === key || answers[qk] !== undefined || !applicable.has(qk)) continue;
+    answers = await saveAnswer(session.id, qk, presetValue);
+  }
 
   return {
+    ...previous,
     answers,
     index: firstUnansweredIndex(answers),
     total: applicableQuestions(answers).length,
+    fieldError: undefined,
+    error: undefined,
   };
 }
 
-async function generateIntakeRecommendation(previous: IntakeState): Promise<IntakeState> {
+async function submitIntakeApplication(previous: IntakeState): Promise<IntakeState> {
   if (!isComplete(previous.answers)) {
     return { ...previous, index: firstUnansweredIndex(previous.answers), error: 'incomplete' };
   }
 
+  try {
+    await enforceRateLimit('application.submit', await rateLimitKey());
+  } catch (error) {
+    if (error instanceof RateLimitError) return { ...previous, error: 'rateLimited' };
+    throw error;
+  }
+
   const session = await getDraftSession();
+  const locale = (await getLocale()) === 'bn' ? 'bn' : 'en';
 
   try {
-    // Without a stored session we still run the engine — only the audit
-    // record is missing, and the customer sees exactly the same guidance.
-    const recommendation = session
-      ? await generateRecommendation(session.id, previous.answers)
-      : recommend(previous.answers, await loadRules());
+    const submitted = await submitApplication({
+      answers: previous.answers,
+      locale,
+      packageSlug: previous.packageSlug,
+      sourcePath: previous.sourcePath,
+      sessionId: session?.id,
+    });
+    if (!submitted) return { ...previous, error: 'generic' };
 
-    return { ...previous, recommendation };
+    // A Bangladesh application still gets the preliminary recommendation the
+    // operating market supports; an international one goes straight to the
+    // specialist queue, so running the Bangladesh rules would only mislead.
+    let recommendation: Recommendation | undefined;
+    if (previous.answers.target_country === 'bangladesh') {
+      recommendation = session
+        ? await generateRecommendation(session.id, previous.answers)
+        : recommend(previous.answers, await loadRules());
+    }
+
+    return { ...previous, submitted, recommendation, error: undefined, fieldError: undefined };
   } catch (error) {
-    logger.error('intake.recommendation_failed', {
+    logger.error('intake.submit_failed', {
       message: error instanceof Error ? error.message : 'unknown',
     });
     return { ...previous, error: 'generic' };

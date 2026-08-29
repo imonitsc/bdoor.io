@@ -37,6 +37,12 @@ export const BANGLADESH_COUNTRY = {
   slug: 'bangladesh',
   code: 'BD',
   name: { en: 'Bangladesh', bn: 'বাংলাদেশ' },
+  /** The owner-published featured starting price (29 Aug 2026 table). */
+  featured: {
+    label: { en: 'From ৳9,900', bn: '৳৯,৯০০ থেকে' },
+    alt: { en: 'About $80', bn: 'আনুমানিক $৮০' },
+    qualifier: { en: 'bdoor fee; official costs separate', bn: 'bdoor ফি; সরকারি খরচ আলাদা' },
+  },
 } as const;
 
 /** Every public country slug, Bangladesh first — the /countries page tree. */

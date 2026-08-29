@@ -12,6 +12,63 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      "applications": {
+        Row: {
+          "id": string
+          "reference": string
+          "country": string
+          "objective": string
+          "locale": Database["public"]["Enums"]["locale_code"]
+          "full_name": string
+          "email": string
+          "phone": string | null
+          "package_slug": string | null
+          "source_path": string | null
+          "answers": Json
+          "status": string
+          "consent_given": boolean
+          "session_id": string | null
+          "created_at": string
+          "updated_at": string
+        }
+        Insert: {
+          "id"?: string
+          "reference": string
+          "country": string
+          "objective": string
+          "locale"?: Database["public"]["Enums"]["locale_code"]
+          "full_name": string
+          "email": string
+          "phone"?: string | null
+          "package_slug"?: string | null
+          "source_path"?: string | null
+          "answers"?: Json
+          "status"?: string
+          "consent_given"?: boolean
+          "session_id"?: string | null
+          "created_at"?: string
+          "updated_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "reference"?: string
+          "country"?: string
+          "objective"?: string
+          "locale"?: Database["public"]["Enums"]["locale_code"]
+          "full_name"?: string
+          "email"?: string
+          "phone"?: string | null
+          "package_slug"?: string | null
+          "source_path"?: string | null
+          "answers"?: Json
+          "status"?: string
+          "consent_given"?: boolean
+          "session_id"?: string | null
+          "created_at"?: string
+          "updated_at"?: string
+        }
+        Relationships: []
+      }
       "audit_logs": {
         Row: {
           "id": number

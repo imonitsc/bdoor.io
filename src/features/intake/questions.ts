@@ -11,30 +11,44 @@ import { z } from 'zod';
  * Nothing here is customer-facing copy: labels come from `start.questions.*`.
  */
 
-export const HELP_SCOPES = [
-  'start_bangladesh',
-  'manage_bangladesh',
-  'form_abroad',
-  'unsure',
-] as const;
-
-export const FOUNDER_LOCATIONS = ['bangladesh', 'outside'] as const;
 /**
- * The six countries bdoor is preparing routes for, plus "not sure". Keys
- * mirror the /countries slugs (snake-cased for the translator). Every
- * destination outside Bangladesh goes to manual review — see
- * `hardManualReviewReasons` — because no international route has a
- * contracted partner yet.
+ * The application is country-first (immediate-operations instructions §4.1):
+ * the seven operating countries, Bangladesh first, no "not sure" — a visitor
+ * who has not chosen a country is choosing one here. Keys mirror the
+ * /countries slugs (snake-cased for the translator); `targetCountrySlug`
+ * converts back. Every international target goes to manual review — see
+ * `hardManualReviewReasons` — because a specialist reviews each case before
+ * a provider is appointed.
  */
-export const DESTINATIONS = [
+export const TARGET_COUNTRIES = [
+  'bangladesh',
   'usa',
   'uk',
   'uae',
   'saudi_arabia',
   'qatar',
   'singapore',
-  'unsure',
 ] as const;
+
+export type TargetCountry = (typeof TARGET_COUNTRIES)[number];
+
+/** The /countries path segment for a `target_country` answer. */
+export function targetCountrySlug(key: TargetCountry): string {
+  return key.replace(/_/g, '-');
+}
+
+/** Reverse of `targetCountrySlug`, for validating a ?country= parameter. */
+export function targetCountryFromSlug(slug: string): TargetCountry | undefined {
+  const key = slug.replace(/-/g, '_');
+  return TARGET_COUNTRIES.find((c) => c === key);
+}
+
+/** What the applicant wants to do in the chosen country (§4.1 step 2). */
+export const OBJECTIVES = ['new', 'existing', 'expand', 'unsure'] as const;
+
+export type Objective = (typeof OBJECTIVES)[number];
+
+export const FOUNDER_LOCATIONS = ['bangladesh', 'outside'] as const;
 export const STRUCTURES = [
   'private_limited',
   'one_person',
@@ -64,8 +78,8 @@ const country = z
   .transform((v) => v.toUpperCase());
 
 export const answersSchema = z.object({
-  help_scope: z.enum(HELP_SCOPES, { message: 'requiredChoice' }),
-  destination_country: z.enum(DESTINATIONS, { message: 'requiredChoice' }),
+  target_country: z.enum(TARGET_COUNTRIES, { message: 'requiredChoice' }),
+  objective: z.enum(OBJECTIVES, { message: 'requiredChoice' }),
   founder_location: z.enum(FOUNDER_LOCATIONS, { message: 'requiredChoice' }),
   nationality: country,
   residence: country,
@@ -97,6 +111,13 @@ export const answersSchema = z.object({
   start_window: z.enum(START_WINDOWS, { message: 'requiredChoice' }),
   existing_business: z.boolean({ message: 'requiredChoice' }),
   existing_registrations: z.array(z.enum(EXISTING_REGISTRATIONS, { message: 'requiredChoice' })),
+  need_visa: z.boolean({ message: 'requiredChoice' }),
+  need_banking: z.boolean({ message: 'requiredChoice' }),
+  notes: z.string().trim().max(1000, 'tooLong'),
+  full_name: z.string().trim().min(2, 'requiredText').max(120, 'tooLong'),
+  email: z.string().trim().toLowerCase().email('invalidEmail').max(254, 'tooLong'),
+  phone: z.string().trim().max(32, 'tooLong'),
+  consent: z.literal(true, { message: 'consentRequired' }),
 });
 
 export type Answers = z.infer<typeof answersSchema>;
@@ -104,11 +125,20 @@ export type PartialAnswers = Partial<Answers>;
 export type QuestionKey = keyof Answers;
 
 export type QuestionKind =
-  'choice' | 'boolean' | 'text' | 'textarea' | 'number' | 'country' | 'multi';
+  | 'choice'
+  | 'boolean'
+  | 'text'
+  | 'textarea'
+  | 'number'
+  | 'country'
+  | 'multi'
+  | 'email'
+  | 'phone'
+  | 'consent';
 
 export type QuestionDefinition = {
   key: QuestionKey;
-  section: 'about_you' | 'the_business' | 'ownership' | 'operations' | 'timing';
+  section: 'about_you' | 'the_business' | 'ownership' | 'operations' | 'timing' | 'contact';
   kind: QuestionKind;
   options?: readonly string[];
   /** Renders the "Why we ask" disclosure. Required for anything sensitive. */
@@ -119,30 +149,49 @@ export type QuestionDefinition = {
    * render the raw key path into the page.
    */
   hasHelp?: boolean;
+  /** May be submitted empty; the input renders without `required`. */
+  optional?: boolean;
   shouldAsk: (answers: PartialAnswers) => boolean;
   schema: z.ZodTypeAny;
 };
 
 const always = () => true;
 
+/**
+ * Branch predicates. The two paths after country + objective (§4.2/§4.5):
+ * Bangladesh gets the full operating-market question set; an international
+ * target gets the shorter specialist-review subset, because the provider
+ * confirms the rest per case and nothing beyond it is needed to review.
+ */
+const isBangladesh = (a: PartialAnswers) => a.target_country === 'bangladesh';
+const isInternational = (a: PartialAnswers) =>
+  a.target_country !== undefined && a.target_country !== 'bangladesh';
+/**
+ * "Managing an existing business" either directly (objective) or via the
+ * follow-up question a "not sure" answer triggers. "Expand" means forming
+ * something new in the target country, so it takes the new-business path.
+ */
+const managesExistingBusiness = (a: PartialAnswers) =>
+  a.objective === 'existing' || (a.objective === 'unsure' && a.existing_business === true);
+
 export const QUESTIONS: readonly QuestionDefinition[] = [
   {
-    key: 'help_scope',
+    key: 'target_country',
     section: 'about_you',
     kind: 'choice',
-    options: HELP_SCOPES,
+    options: TARGET_COUNTRIES,
     showWhy: true,
     shouldAsk: always,
-    schema: answersSchema.shape.help_scope,
+    schema: answersSchema.shape.target_country,
   },
   {
-    key: 'destination_country',
+    key: 'objective',
     section: 'about_you',
     kind: 'choice',
-    options: DESTINATIONS,
+    options: OBJECTIVES,
     showWhy: true,
-    shouldAsk: (a) => a.help_scope === 'form_abroad',
-    schema: answersSchema.shape.destination_country,
+    shouldAsk: always,
+    schema: answersSchema.shape.objective,
   },
   {
     key: 'founder_location',
@@ -151,7 +200,7 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     options: FOUNDER_LOCATIONS,
     hasHelp: true,
     showWhy: true,
-    shouldAsk: (a) => a.help_scope !== 'form_abroad',
+    shouldAsk: isBangladesh,
     schema: answersSchema.shape.founder_location,
   },
   {
@@ -167,8 +216,9 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     section: 'about_you',
     kind: 'country',
     showWhy: true,
-    // Only worth asking separately when the founder is not in Bangladesh.
-    shouldAsk: (a) => a.founder_location === 'outside',
+    // In Bangladesh only worth asking separately when the founder is not
+    // there; for an international application it is always material.
+    shouldAsk: (a) => (isBangladesh(a) && a.founder_location === 'outside') || isInternational(a),
     schema: answersSchema.shape.residence,
   },
   {
@@ -176,11 +226,7 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     section: 'the_business',
     kind: 'boolean',
     showWhy: true,
-    shouldAsk: (a) =>
-      !a.help_scope ||
-      (a.help_scope !== 'start_bangladesh' &&
-        a.help_scope !== 'manage_bangladesh' &&
-        a.help_scope !== 'form_abroad'),
+    shouldAsk: (a) => isBangladesh(a) && a.objective === 'unsure',
     schema: answersSchema.shape.existing_business,
   },
   {
@@ -189,7 +235,7 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     kind: 'multi',
     options: EXISTING_REGISTRATIONS,
     showWhy: true,
-    shouldAsk: (a) => a.existing_business === true,
+    shouldAsk: (a) => isBangladesh(a) && managesExistingBusiness(a),
     schema: answersSchema.shape.existing_registrations,
   },
   {
@@ -207,7 +253,7 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     kind: 'text',
     hasHelp: true,
     showWhy: true,
-    shouldAsk: always,
+    shouldAsk: isBangladesh,
     schema: answersSchema.shape.location,
   },
   {
@@ -216,7 +262,7 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     kind: 'choice',
     options: STRUCTURES,
     showWhy: true,
-    shouldAsk: (a) => a.existing_business !== true,
+    shouldAsk: (a) => isBangladesh(a) && !managesExistingBusiness(a),
     schema: answersSchema.shape.structure,
   },
   {
@@ -224,7 +270,7 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     section: 'ownership',
     kind: 'number',
     showWhy: true,
-    shouldAsk: (a) => a.existing_business !== true,
+    shouldAsk: (a) => isInternational(a) || (isBangladesh(a) && !managesExistingBusiness(a)),
     schema: answersSchema.shape.owner_count,
   },
   {
@@ -234,7 +280,8 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     showWhy: true,
     // Directors are a company concept; a proprietorship has none.
     shouldAsk: (a) =>
-      a.existing_business !== true &&
+      isBangladesh(a) &&
+      !managesExistingBusiness(a) &&
       a.structure !== 'sole_proprietorship' &&
       a.structure !== 'partnership',
     schema: answersSchema.shape.director_count,
@@ -244,7 +291,7 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     section: 'ownership',
     kind: 'boolean',
     showWhy: true,
-    shouldAsk: always,
+    shouldAsk: isBangladesh,
     schema: answersSchema.shape.foreign_owners,
   },
   {
@@ -260,7 +307,8 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     section: 'ownership',
     kind: 'number',
     showWhy: true,
-    shouldAsk: (a) => a.foreign_owners === true || a.founder_location === 'outside',
+    shouldAsk: (a) =>
+      isBangladesh(a) && (a.foreign_owners === true || a.founder_location === 'outside'),
     schema: answersSchema.shape.foreign_ownership_percent,
   },
   {
@@ -268,7 +316,8 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     section: 'ownership',
     kind: 'boolean',
     showWhy: true,
-    shouldAsk: (a) => a.foreign_owners === true || a.founder_location === 'outside',
+    shouldAsk: (a) =>
+      isBangladesh(a) && (a.foreign_owners === true || a.founder_location === 'outside'),
     schema: answersSchema.shape.remit_capital,
   },
   {
@@ -276,7 +325,7 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     section: 'operations',
     kind: 'boolean',
     showWhy: true,
-    shouldAsk: (a) => a.founder_location === 'outside',
+    shouldAsk: (a) => isBangladesh(a) && a.founder_location === 'outside',
     schema: answersSchema.shape.founder_will_work,
   },
   {
@@ -285,7 +334,7 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     kind: 'choice',
     options: IMPORT_EXPORT,
     showWhy: true,
-    shouldAsk: always,
+    shouldAsk: isBangladesh,
     schema: answersSchema.shape.import_export,
   },
   {
@@ -293,7 +342,7 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     section: 'operations',
     kind: 'boolean',
     showWhy: true,
-    shouldAsk: always,
+    shouldAsk: isBangladesh,
     schema: answersSchema.shape.hire_employees,
   },
   {
@@ -302,7 +351,7 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     kind: 'boolean',
     hasHelp: true,
     showWhy: true,
-    shouldAsk: always,
+    shouldAsk: isBangladesh,
     schema: answersSchema.shape.regulated_activity,
   },
   {
@@ -310,8 +359,24 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     section: 'operations',
     kind: 'boolean',
     showWhy: true,
-    shouldAsk: (a) => a.existing_business !== true,
+    shouldAsk: (a) => isBangladesh(a) && !managesExistingBusiness(a),
     schema: answersSchema.shape.need_address,
+  },
+  {
+    key: 'need_visa',
+    section: 'operations',
+    kind: 'boolean',
+    showWhy: true,
+    shouldAsk: isInternational,
+    schema: answersSchema.shape.need_visa,
+  },
+  {
+    key: 'need_banking',
+    section: 'operations',
+    kind: 'boolean',
+    showWhy: true,
+    shouldAsk: isInternational,
+    schema: answersSchema.shape.need_banking,
   },
   {
     key: 'start_window',
@@ -321,6 +386,52 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     showWhy: true,
     shouldAsk: always,
     schema: answersSchema.shape.start_window,
+  },
+  {
+    key: 'notes',
+    section: 'timing',
+    kind: 'textarea',
+    showWhy: false,
+    optional: true,
+    shouldAsk: isInternational,
+    schema: answersSchema.shape.notes,
+  },
+  // The contact stage (§4.5): who the acknowledgement and specialist review
+  // go to. Deliberately the last stage — everything before it works without
+  // any personal detail — and deliberately NO identity documents: passports,
+  // NIDs and the like are never collected at application time.
+  {
+    key: 'full_name',
+    section: 'contact',
+    kind: 'text',
+    showWhy: true,
+    shouldAsk: always,
+    schema: answersSchema.shape.full_name,
+  },
+  {
+    key: 'email',
+    section: 'contact',
+    kind: 'email',
+    showWhy: true,
+    shouldAsk: always,
+    schema: answersSchema.shape.email,
+  },
+  {
+    key: 'phone',
+    section: 'contact',
+    kind: 'phone',
+    showWhy: false,
+    optional: true,
+    shouldAsk: always,
+    schema: answersSchema.shape.phone,
+  },
+  {
+    key: 'consent',
+    section: 'contact',
+    kind: 'consent',
+    showWhy: false,
+    shouldAsk: always,
+    schema: answersSchema.shape.consent,
   },
 ] as const;
 
@@ -337,7 +448,14 @@ export function applicableQuestions(answers: PartialAnswers): QuestionDefinition
  * stage a question belongs to never changes, so the stage indicator only
  * ever moves when the founder actually crosses a stage boundary.
  */
-export const STAGES = ['about_you', 'the_business', 'ownership', 'operations', 'timing'] as const;
+export const STAGES = [
+  'about_you',
+  'the_business',
+  'ownership',
+  'operations',
+  'timing',
+  'contact',
+] as const;
 
 export type Stage = (typeof STAGES)[number];
 
@@ -403,6 +521,8 @@ const VALIDATION_KEYS = new Set([
   'invalidNumber',
   'percentRange',
   'minOwners',
+  'invalidEmail',
+  'consentRequired',
 ]);
 
 export function validateAnswer(key: QuestionKey, value: unknown) {
@@ -414,9 +534,11 @@ export function validateAnswer(key: QuestionKey, value: unknown) {
 
   const message = result.error.issues[0]?.message ?? '';
   const fallback =
-    question.kind === 'choice' || question.kind === 'boolean' || question.kind === 'multi'
-      ? 'requiredChoice'
-      : 'requiredText';
+    question.kind === 'consent'
+      ? 'consentRequired'
+      : question.kind === 'choice' || question.kind === 'boolean' || question.kind === 'multi'
+        ? 'requiredChoice'
+        : 'requiredText';
 
   return { success: false as const, error: VALIDATION_KEYS.has(message) ? message : fallback };
 }

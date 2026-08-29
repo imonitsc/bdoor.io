@@ -49,9 +49,13 @@ export default async function HowItWorksPage({ params }: { params: Promise<{ loc
   const { locale } = await params;
   setRequestLocale(locale);
 
+  // 'home.process.steps' — the namespace the homepage renders. This page
+  // once pointed at a namespace that did not exist, and next-intl renders a
+  // missing lookup as the raw key path; the marketing e2e suite now greps
+  // rendered pages for exactly that pattern.
   const [t, tSteps, { data: faqs }] = await Promise.all([
     getTranslations('howItWorksPage'),
-    getTranslations('home.howItWorks.steps'),
+    getTranslations('home.process.steps'),
     getGlobalFaqs(),
   ]);
 

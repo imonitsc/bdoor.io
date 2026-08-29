@@ -21,11 +21,12 @@ import { localizedUrl } from '@/lib/site';
 /**
  * One page per international country.
  *
- * Everything here has to stay true while the route has no approved provider
- * or price sheet: the page says what the route will cover, that it is in
- * preparation, and how to register interest. No price, no timeline, no
- * government-fee figure and no legal or tax claim appears until the
- * corresponding approval flips in the commercial catalog.
+ * Every route runs as a managed application: the page shows the owner-
+ * published starting estimate with its mandatory qualifier, and the call to
+ * action starts an application (an assessment for the screened markets),
+ * never a checkout. The figures, status and CTA style all come from the
+ * commercial catalog, so what the page claims cannot drift from what the
+ * owner approved.
  */
 
 export function generateStaticParams() {
@@ -110,6 +111,21 @@ export default async function InternationalCountryPage({
             <p className="text-muted mt-3 text-sm leading-relaxed">{t('providerBody')}</p>
 
             <h2 className="text-ink mt-10 text-xl font-semibold">{t('pricingTitle')}</h2>
+            {offer.publicLabel ? (
+              <div className="mt-3">
+                <p className="text-ink text-2xl font-semibold">
+                  {pickText(offer.publicLabel, loc)}
+                  {offer.publicLabelAlt ? (
+                    <span className="text-muted ml-2 text-base font-normal">
+                      {pickText(offer.publicLabelAlt, loc)}
+                    </span>
+                  ) : null}
+                </p>
+                {offer.publicQualifier ? (
+                  <p className="text-muted mt-1 text-sm">{pickText(offer.publicQualifier, loc)}</p>
+                ) : null}
+              </div>
+            ) : null}
             <p className="text-muted mt-3 text-sm leading-relaxed">{t('pricingBody')}</p>
 
             {guide ? (
@@ -171,24 +187,23 @@ export default async function InternationalCountryPage({
 
           <div>
             <div className="border-border bg-surface rounded-[var(--radius-panel)] border p-6 lg:sticky lg:top-24">
-              <h2 className="text-ink text-lg font-semibold">
-                {offer.eligibilityLed ? t('eligibilityTitle') : t('registerTitle')}
-              </h2>
+              <h2 className="text-ink text-lg font-semibold">{t('applyTitle')}</h2>
               <p className="text-muted mt-2 text-sm leading-relaxed">
-                {offer.eligibilityLed
-                  ? t('eligibilityBody', { country: name })
-                  : t('registerBody', { country: name })}
+                {t('applyBody', { country: name })}
               </p>
               <Button asChild size="lg" className="mt-5 w-full">
-                <Link href={`${MARKETING_ROUTES.contact}?interest=${country.slug}`}>
-                  {offer.eligibilityLed ? t('eligibilityCta') : t('registerCta')}
+                <Link href={`${MARKETING_ROUTES.start}?country=${country.slug}`}>
+                  {offer.eligibilityLed
+                    ? t('assessCta', { country: name })
+                    : t('applyCta', { country: name })}
                   <ArrowRight className="size-4" aria-hidden="true" />
                 </Link>
               </Button>
-              <p className="text-muted mt-3 text-xs leading-relaxed">{t('noPaymentNote')}</p>
+              <p className="text-muted mt-3 text-xs leading-relaxed">{t('sla')}</p>
             </div>
 
-            <p className="text-muted mt-6 text-xs leading-relaxed">
+            <p className="text-muted mt-6 text-xs leading-relaxed">{t('disclosure')}</p>
+            <p className="text-muted mt-3 text-xs leading-relaxed">
               {t('disclaimer', { country: name })}
             </p>
           </div>
