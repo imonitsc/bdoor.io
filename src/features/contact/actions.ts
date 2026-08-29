@@ -88,20 +88,37 @@ export async function submitContactRequest(
     }
   }
 
-  const { error } = await createAdminClient()
-    .from('contact_requests')
-    .insert({
-      full_name: parsed.data.fullName,
-      email: parsed.data.email,
-      phone: parsed.data.phone || null,
-      topic: parsed.data.topic,
-      message: parsed.data.message,
-      locale: locale === 'bn' ? 'bn' : 'en',
-      consent_given: true,
-      interest_country: interest?.countrySlug ?? null,
-      interest_route: interest?.routeSlug ?? null,
-      source_path: sourcePath,
-    });
+  const client = createAdminClient();
+  const baseRow = {
+    full_name: parsed.data.fullName,
+    email: parsed.data.email,
+    phone: parsed.data.phone || null,
+    topic: parsed.data.topic,
+    message: parsed.data.message,
+    locale: (locale === 'bn' ? 'bn' : 'en') as 'bn' | 'en',
+    consent_given: true,
+  };
+
+  let { error } = await client.from('contact_requests').insert({
+    ...baseRow,
+    interest_country: interest?.countrySlug ?? null,
+    interest_route: interest?.routeSlug ?? null,
+    source_path: sourcePath,
+  });
+
+  // The attribution columns arrived in migration 20260101002000, which the
+  // owner applies to the production database on their own schedule. A lead
+  // must never be lost to a schema lag: when PostgREST rejects exactly those
+  // columns (PGRST204: column not found in schema cache), store the lead
+  // without attribution and say so in the log — the enquiry itself is the
+  // thing that cannot fail.
+  if (
+    error &&
+    (error.code === 'PGRST204' || /interest_country|interest_route|source_path/.test(error.message))
+  ) {
+    logger.warn('contact.attribution_columns_missing', { message: error.message });
+    ({ error } = await client.from('contact_requests').insert(baseRow));
+  }
 
   if (error) {
     logger.error('contact.insert_failed', { message: error.message });
