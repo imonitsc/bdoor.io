@@ -21,8 +21,20 @@ async function answer(
   // signal: it changes on every step and disappears at review.
   const keyInput = page.locator('input[name="questionKey"]');
   // count() does not auto-wait, so the read is instant even once the input is
-  // gone (review and recommendation have no question form at all).
-  const readKey = async () => ((await keyInput.count()) === 0 ? null : await keyInput.inputValue());
+  // gone (review and recommendation have no question form at all). The read
+  // itself must ALSO be bounded: the input can be removed between count()
+  // and inputValue() when the last answer swaps the form for the review
+  // screen, and with no actionTimeout configured inputValue() would then
+  // auto-wait forever — toPass cannot retry an attempt that never returns,
+  // so the walk hung on its final step until the test budget died.
+  const readKey = async () => {
+    if ((await keyInput.count()) === 0) return null;
+    try {
+      return await keyInput.inputValue({ timeout: 1_000 });
+    } catch {
+      return null; // removed mid-read: the form is gone, same as count() === 0
+    }
+  };
   const before = await readKey();
   await action();
   await page.getByRole('button', { name: /^Continue$/ }).click();
@@ -153,10 +165,9 @@ test.describe('questionnaire', () => {
   });
 
   test('reaches a preliminary recommendation and labels it as preliminary', async ({ page }) => {
-    // A full walk is ~14 server-action round trips, and in the DB-less test
-    // environment each one also waits out failing Supabase fetches. test.slow()
-    // (3× = 180s) has proven borderline — walks were observed reaching review
-    // correctly at just over the budget — so the budget is explicit.
+    // A full walk is ~14 server-action round trips; the budget is explicit
+    // and generous so genuine slowness never masquerades as the readKey
+    // race documented in answer().
     test.setTimeout(420_000);
     await page.goto('/en/start');
     await startBangladeshAssessment(page);
@@ -197,10 +208,9 @@ test.describe('questionnaire', () => {
   });
 
   test('sends a foreign founder to manual review', async ({ page }) => {
-    // A full walk is ~14 server-action round trips, and in the DB-less test
-    // environment each one also waits out failing Supabase fetches. test.slow()
-    // (3× = 180s) has proven borderline — walks were observed reaching review
-    // correctly at just over the budget — so the budget is explicit.
+    // A full walk is ~14 server-action round trips; the budget is explicit
+    // and generous so genuine slowness never masquerades as the readKey
+    // race documented in answer().
     test.setTimeout(420_000);
     await page.goto('/en/start');
     await startBangladeshAssessment(page);
