@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { useTranslations } from 'next-intl';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Check } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { Section, SectionHeading } from '@/components/ui/section';
@@ -35,17 +35,30 @@ export async function generateMetadata({
   };
 }
 
+/**
+ * Six sections before the footer, in the order a first-time visitor needs
+ * them: what bdoor does (hero, with the real workspace as its visual), why to
+ * trust the process, which package fits, how fees and delivery work, which
+ * international routes are being prepared, and what to do next.
+ *
+ * The owner-approved founder photograph is still not in the repository, so
+ * the hero's visual is the read-only workspace preview — a real product
+ * surface with clearly fictional data — rather than stock imagery or a
+ * generated person. Recorded in the final report; swapping the photograph in
+ * later touches only the hero's right column.
+ */
+
 function Hero() {
   const t = useTranslations('home.hero');
 
   return (
     <section className="bg-surface-inverse text-ink-inverse relative overflow-hidden">
-      <div className="container-page grid gap-12 py-16 md:py-20 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16 lg:py-24">
+      <div className="container-page grid items-center gap-12 py-16 md:py-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-14 lg:py-24">
         <div className="flex flex-col justify-center">
           <p className="text-xs font-semibold tracking-[0.14em] text-[color:var(--bd-turquoise-500)] uppercase">
             {t('eyebrow')}
           </p>
-          <h1 className="text-ink-inverse mt-4 max-w-2xl text-4xl leading-[1.1] md:text-5xl lg:text-[3.4rem]">
+          <h1 className="text-ink-inverse mt-4 max-w-2xl text-4xl leading-[1.08] md:text-5xl">
             {t('headline')}
           </h1>
           <p className="text-muted-inverse mt-5 max-w-xl text-lg leading-relaxed">{t('support')}</p>
@@ -70,47 +83,36 @@ function Hero() {
           <p className="text-muted-inverse mt-8 text-sm">{t('operatorLine')}</p>
         </div>
 
-        <div className="lg:pt-4">
-          <div className="border-border bg-surface flex flex-col gap-4 rounded-[var(--radius-panel)] border p-5 shadow-md md:p-6">
-            <h2 className="text-ink text-base font-semibold">{t('advisorTitle')}</h2>
-            <p className="text-muted text-sm leading-relaxed">{t('advisorBody')}</p>
-            <Button asChild size="lg" className="mt-2 w-full">
-              <Link href={MARKETING_ROUTES.start}>
-                {t('primaryCta')}
-                <ArrowRight className="size-4" aria-hidden="true" />
-              </Link>
-            </Button>
-          </div>
-        </div>
+        <WorkspacePreview />
       </div>
     </section>
   );
 }
 
-function HowItWorks() {
-  const t = useTranslations('home.howItWorks');
-  const steps = ['one', 'two', 'three', 'four'] as const;
+/**
+ * Four statements, each checkable against the product itself. No counts, no
+ * logos, no ratings, no affiliations — bdoor has none it could prove.
+ */
+function TrustStrip() {
+  const t = useTranslations('home.trust');
+  const items = ['quotes', 'workspace', 'caseManagement', 'specialists'] as const;
 
   return (
-    <Section tone="surface">
+    <section className="bg-surface-inverse text-ink-inverse border-border-inverse border-t">
       <div className="container-page">
-        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} />
-        <ol className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {steps.map((step, index) => (
-            <li key={step} className="flex flex-col gap-3">
-              <span
-                className="bg-primary-soft text-info flex size-9 items-center justify-center rounded-full text-sm font-semibold"
+        <ul className="grid gap-x-8 gap-y-3 py-6 sm:grid-cols-2 xl:grid-cols-4">
+          {items.map((item) => (
+            <li key={item} className="flex items-center gap-2.5">
+              <Check
+                className="size-4 shrink-0 text-[color:var(--bd-turquoise-500)]"
                 aria-hidden="true"
-              >
-                {index + 1}
-              </span>
-              <h3 className="text-ink text-base font-semibold">{t(`steps.${step}.title`)}</h3>
-              <p className="text-muted text-sm leading-relaxed">{t(`steps.${step}.body`)}</p>
+              />
+              <span className="text-ink-inverse text-sm">{t(item)}</span>
             </li>
           ))}
-        </ol>
+        </ul>
       </div>
-    </Section>
+    </section>
   );
 }
 
@@ -126,48 +128,63 @@ function PackagesSection({ locale }: { locale: Locale }) {
   );
 }
 
-function FeeExampleSection({ locale }: { locale: Locale }) {
-  const t = useTranslations('home.feeExample');
+/** Process and fees in one section, with standalone services as a disclosure. */
+function ProcessAndFees({ locale }: { locale: Locale }) {
+  const t = useTranslations('home.process');
+  const steps = ['one', 'two', 'three', 'four'] as const;
+
   return (
     <Section tone="surface">
-      <div className="container-page grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
-        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
-        <FeeBreakdownExample locale={locale} />
-      </div>
-    </Section>
-  );
-}
-
-function Preview() {
-  const t = useTranslations('home.preview');
-  return (
-    <Section tone="sunken">
       <div className="container-page">
-        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} align="center" />
-        <div className="mt-10">
-          <WorkspacePreview />
+        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} />
+        <div className="mt-10 grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+          <ol className="flex flex-col gap-7">
+            {steps.map((step, index) => (
+              <li key={step} className="flex gap-4">
+                <span
+                  className="bg-primary-soft text-info flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
+                  aria-hidden="true"
+                >
+                  {index + 1}
+                </span>
+                <div>
+                  <h3 className="text-ink text-base font-semibold">{t(`steps.${step}.title`)}</h3>
+                  <p className="text-muted mt-1 text-sm leading-relaxed">
+                    {t(`steps.${step}.body`)}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ol>
+
+          <div>
+            <FeeBreakdownExample locale={locale} />
+            <details className="border-border bg-surface group mt-4 rounded-[var(--radius-card)] border">
+              <summary className="text-ink flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-5 py-3 text-sm font-semibold [&::-webkit-details-marker]:hidden">
+                <span>
+                  {t('standaloneTitle')}
+                  <span className="text-muted ms-2 font-normal">{t('standaloneSummary')}</span>
+                </span>
+                <ArrowRight
+                  className="text-muted size-4 shrink-0 transition-transform group-open:rotate-90"
+                  aria-hidden="true"
+                />
+              </summary>
+              <div className="border-border border-t px-5 pb-5">
+                <SpecialistServicesList locale={locale} />
+              </div>
+            </details>
+          </div>
         </div>
       </div>
     </Section>
   );
 }
 
-function SpecialistSection({ locale }: { locale: Locale }) {
-  const t = useTranslations('home.specialist');
+function InternationalSection({ locale }: { locale: Locale }) {
+  const t = useTranslations('home.internationalSection');
   return (
     <Section>
-      <div className="container-page max-w-3xl">
-        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
-        <SpecialistServicesList locale={locale} />
-      </div>
-    </Section>
-  );
-}
-
-function InternationalSection({ locale }: { locale: Locale }) {
-  const t = useTranslations('home.international');
-  return (
-    <Section tone="surface">
       <div className="container-page">
         <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
         <InternationalOfferCards locale={locale} />
@@ -176,32 +193,19 @@ function InternationalSection({ locale }: { locale: Locale }) {
   );
 }
 
-function ComplianceSection() {
-  const t = useTranslations('home.compliance');
-  return (
-    <Section>
-      <div className="container-page max-w-3xl">
-        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
-        <Button asChild className="mt-7" size="lg" variant="secondary">
-          <Link href={MARKETING_ROUTES.start}>
-            {t('cta')}
-            <ArrowRight className="size-4" aria-hidden="true" />
-          </Link>
-        </Button>
-      </div>
-    </Section>
-  );
-}
-
-async function Faqs({ locale }: { locale: Locale }) {
-  const [{ data: faqs }, t] = await Promise.all([getGlobalFaqs(), getTranslations('home.faq')]);
+async function FaqAndNextStep({ locale }: { locale: Locale }) {
+  const [{ data: faqs }, t, tCta] = await Promise.all([
+    getGlobalFaqs(),
+    getTranslations('home.faq'),
+    getTranslations('home.finalCta'),
+  ]);
 
   return (
-    <Section tone="surface">
+    <Section tone="sunken">
       <div className="container-page grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
         <SectionHeading eyebrow={t('eyebrow')} title={t('title')} />
         <div>
-          <FaqList faqs={faqs} locale={locale} limit={6} />
+          <FaqList faqs={faqs} locale={locale} limit={4} />
           <Button asChild variant="link" className="mt-5">
             <Link href={MARKETING_ROUTES.howItWorks}>
               {t('cta')}
@@ -210,26 +214,19 @@ async function Faqs({ locale }: { locale: Locale }) {
           </Button>
         </div>
       </div>
-    </Section>
-  );
-}
 
-function FinalCta() {
-  const t = useTranslations('home.finalCta');
-  return (
-    <Section tone="sunken">
-      <div className="container-page flex flex-col items-center gap-6 text-center">
-        <h2 className="text-ink max-w-2xl text-3xl leading-tight md:text-4xl">{t('title')}</h2>
-        <p className="text-muted max-w-xl text-base leading-relaxed">{t('body')}</p>
+      <div className="container-page mt-16 flex flex-col items-center gap-5 text-center">
+        <h2 className="text-ink max-w-2xl text-2xl leading-tight md:text-3xl">{tCta('title')}</h2>
+        <p className="text-muted max-w-xl text-base leading-relaxed">{tCta('body')}</p>
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button asChild size="lg">
             <Link href={MARKETING_ROUTES.start}>
-              {t('primary')}
+              {tCta('primary')}
               <ArrowRight className="size-4" aria-hidden="true" />
             </Link>
           </Button>
           <Button asChild size="lg" variant="secondary">
-            <Link href={MARKETING_ROUTES.contact}>{t('secondary')}</Link>
+            <Link href={MARKETING_ROUTES.contact}>{tCta('secondary')}</Link>
           </Button>
         </div>
       </div>
@@ -245,15 +242,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   return (
     <>
       <Hero />
-      <HowItWorks />
+      <TrustStrip />
       <PackagesSection locale={typedLocale} />
-      <FeeExampleSection locale={typedLocale} />
-      <Preview />
-      <SpecialistSection locale={typedLocale} />
+      <ProcessAndFees locale={typedLocale} />
       <InternationalSection locale={typedLocale} />
-      <ComplianceSection />
-      <Faqs locale={typedLocale} />
-      <FinalCta />
+      <FaqAndNextStep locale={typedLocale} />
     </>
   );
 }

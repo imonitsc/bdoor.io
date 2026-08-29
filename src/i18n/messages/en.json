@@ -108,114 +108,16 @@
   "home": {
     "hero": {
       "eyebrow": "Bangladesh business setup and compliance",
-      "headline": "Start your business in Bangladesh. Grow beyond borders.",
-      "support": "Form your company, complete essential registrations and manage ongoing compliance in one secure workspace. When you are ready, bdoor also supports formation in the USA, UK, UAE and Singapore.",
+      "headline": "Start and run your business in Bangladesh. Expand globally when you are ready.",
+      "support": "Form your company, complete essential registrations and manage ongoing compliance in one secure workspace. International formation routes are available only through approved country specialists.",
       "primaryCta": "Start in Bangladesh",
-      "secondaryCta": "Explore international formation",
-      "operatorLine": "bdoor is operated by bdoor compliance ltd.",
-      "advisorTitle": "Not sure where to begin?",
-      "advisorBody": "Answer a short assessment. We suggest a package, show what is included and flag anything that needs review before you pay."
-    },
-    "advisor": {
-      "title": "What do you want to do in Bangladesh?",
-      "help": "Pick the closest option. You can change it later — nothing is final until you confirm.",
-      "continue": "Continue",
-      "options": {
-        "localCompany": "Start a local company",
-        "foreignFounder": "Start as a foreign founder",
-        "importExport": "Import or export",
-        "travelAgency": "Open a travel agency",
-        "existingCompany": "Manage an existing company"
-      }
-    },
-    "howItWorks": {
-      "eyebrow": "How it works",
-      "title": "Four steps to a clear path.",
-      "steps": {
-        "one": {
-          "title": "Complete the assessment",
-          "body": "Tell us where you want help — Bangladesh setup, ongoing compliance or international formation."
-        },
-        "two": {
-          "title": "Receive a transparent quote",
-          "body": "Your quote separates the bdoor fee from government, partner and third-party costs."
-        },
-        "three": {
-          "title": "Work in one secure workspace",
-          "body": "Upload documents, track milestones and see who owns each step — you, bdoor, a partner or the authority."
-        },
-        "four": {
-          "title": "Stay compliant after launch",
-          "body": "Renewals, filings and reminders stay organised so nothing is missed."
-        },
-        "five": {
-          "title": "Upload required documents",
-          "body": "Everything goes to a private vault with a clear checklist — never email."
-        },
-        "six": {
-          "title": "Track preparation and authority milestones",
-          "body": "See who owns each step — you, bdoor, a partner or the authority — and what is blocking progress."
-        },
-        "seven": {
-          "title": "Receive records and compliance reminders",
-          "body": "Approved certificates land in your vault. Renewals, filings and tax dates become reminders instead of surprises."
-        }
-      }
+      "secondaryCta": "Explore international routes",
+      "operatorLine": "Operated by bdoor compliance ltd."
     },
     "packages": {
       "eyebrow": "Bangladesh packages",
       "title": "Choose a starting package.",
-      "body": "Three options for new businesses and three for existing companies. Every price shows what bdoor charges separately from official fees."
-    },
-    "feeExample": {
-      "eyebrow": "Transparent fees",
-      "title": "See how we split the costs.",
-      "body": "Example for a Limited Company package — government and partner lines are quoted after review when they vary."
-    },
-    "specialist": {
-      "eyebrow": "Standalone services",
-      "title": "Add specialist steps when you need them.",
-      "body": "Common registrations and coordination services with published bdoor fees. Government application fees are shown separately."
-    },
-    "serviceFinder": {
-      "eyebrow": "Service discovery",
-      "title": "Find what you need",
-      "body": "Start with your goal. We map it to services in our catalogue — or a consultation when something is not yet available.",
-      "cta": "Continue",
-      "intents": {
-        "startCompany": "Start a company",
-        "getLicence": "Get a licence",
-        "registerTax": "Register tax/VAT",
-        "importExport": "Import or export",
-        "manageExisting": "Manage an existing company",
-        "hireForeign": "Hire foreign staff",
-        "protectBrand": "Protect a brand",
-        "governmentProcurement": "Prepare for government procurement",
-        "annualCompliance": "Maintain annual compliance",
-        "expandInternational": "Expand internationally"
-      },
-      "status": {
-        "available": "Available",
-        "pilot": "Pilot",
-        "coming_soon": "Coming soon",
-        "consultation": "Consultation"
-      }
-    },
-    "international": {
-      "eyebrow": "International routes",
-      "title": "Expanding beyond Bangladesh?",
-      "body": "USA, UK, UAE and Singapore routes are being prepared with licensed country specialists. Register interest and we will contact you when a route opens, with an itemised price."
-    },
-    "compliance": {
-      "eyebrow": "Existing businesses",
-      "title": "Compliance without guesswork.",
-      "body": "Structured reviews, annual filings coordination and managed finance options for companies already operating in Bangladesh.",
-      "cta": "Start a compliance assessment"
-    },
-    "categories": {
-      "eyebrow": "What we help with",
-      "title": "Six areas that cover most founders.",
-      "body": "Every service page explains what is included, what is not, and which authority decides the outcome."
+      "body": "Three options for new businesses and three for companies already operating. Every price separates the bdoor fee from official costs."
     },
     "foreignFounders": {
       "eyebrow": "Foreign founders",
@@ -231,7 +133,7 @@
     },
     "preview": {
       "eyebrow": "Your workspace",
-      "title": "One place to see exactly where things stand.",
+      "title": "One workspace for the whole case.",
       "body": "This is the real customer workspace, shown here in read-only preview with sample data.",
       "sample": {
         "kyc": "Identity checks complete",
@@ -258,15 +160,50 @@
       "cta": "How partnering works"
     },
     "faq": {
-      "eyebrow": "Questions",
-      "title": "Straight answers before you start.",
-      "cta": "See all questions"
+      "eyebrow": "Questions founders ask",
+      "title": "The short answers first.",
+      "cta": "Read how the whole process works"
     },
     "finalCta": {
-      "title": "Open the door to your Bangladesh business.",
-      "body": "Start the questionnaire. It takes about five minutes and you can save and come back.",
-      "primary": "Start your business",
-      "secondary": "Talk to us first"
+      "title": "Ready when you are.",
+      "body": "Start the assessment, or talk to us first — either way you see an itemised quote before anything is payable.",
+      "primary": "Start in Bangladesh",
+      "secondary": "Contact us"
+    },
+    "trust": {
+      "quotes": "Transparent itemised quotes",
+      "workspace": "Secure document workspace",
+      "caseManagement": "Bangladesh-focused case management",
+      "specialists": "Specialists engaged separately when required"
+    },
+    "process": {
+      "eyebrow": "Process and fees",
+      "title": "Four steps, one transparent quote.",
+      "steps": {
+        "one": {
+          "title": "Complete the assessment",
+          "body": "Tell us what you want to do; the questionnaire works out which registrations apply."
+        },
+        "two": {
+          "title": "Receive an itemised quote",
+          "body": "The bdoor fee is separated from government, partner and third-party amounts."
+        },
+        "three": {
+          "title": "Upload and track securely",
+          "body": "Documents go to a private vault; milestones show who owns each step."
+        },
+        "four": {
+          "title": "Continue compliance after launch",
+          "body": "Renewals, filings and reminders stay organised in the same workspace."
+        }
+      },
+      "standaloneTitle": "Standalone services",
+      "standaloneSummary": "Published bdoor fees for common registrations"
+    },
+    "internationalSection": {
+      "eyebrow": "International routes",
+      "title": "Expanding beyond Bangladesh?",
+      "body": "USA, UK, UAE and Singapore routes are being prepared with licensed country specialists. Register interest and we will contact you when a route opens, with an itemised price."
     }
   },
   "howItWorksPage": {
@@ -302,21 +239,19 @@
       "existingBusiness": "Existing business"
     },
     "cardCta": "Start assessment",
-    "taxPendingReview": "Whether bdoor's professional fee includes VAT is pending review by qualified counsel.",
     "feeExample": {
-      "title": "Limited Company — fee layers",
+      "title": "Limited Company — what the quote separates",
       "bdoor": "bdoor professional fee",
-      "government": "Government / statutory fees",
-      "partner": "Partner professional fee",
-      "thirdParty": "Third-party costs",
-      "tax": "Tax / VAT",
-      "taxPending": "Pending review",
-      "quotedAfterReview": "Quoted after review",
-      "footnote": "RJSC and other authority fees depend on capital, location and filings. We quote them separately before checkout."
+      "variable": "Government, partner and third-party amounts",
+      "variableNote": "These vary with capital, location and filings. Your itemised quote confirms them before you accept anything.",
+      "taxNote": "Applicable taxes, if any, are confirmed in your itemised quote."
     },
     "specialist": {
       "moreOnRequest": "Additional coordination services are available on request with itemised fees."
-    }
+    },
+    "seeDetails": "See full details",
+    "includes": "Included",
+    "excludes": "Not included"
   },
   "services": {
     "indexTitle": "Services",
