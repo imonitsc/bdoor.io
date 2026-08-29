@@ -202,10 +202,9 @@
       }
     },
     "international": {
-      "eyebrow": "International formation",
-      "title": "USA, UK, UAE and Singapore.",
-      "body": "Conditional starting prices with partner-dependent routes. Information pages are available; checkout stays disabled until agreements are approved.",
-      "cta": "Explore international routes"
+      "eyebrow": "International routes",
+      "title": "Expanding beyond Bangladesh?",
+      "body": "USA, UK, UAE and Singapore routes are being prepared with licensed country specialists. Register interest and we will contact you when a route opens, with an itemised price."
     },
     "compliance": {
       "eyebrow": "Existing businesses",
@@ -314,11 +313,6 @@
       "taxPending": "Pending review",
       "quotedAfterReview": "Quoted after review",
       "footnote": "RJSC and other authority fees depend on capital, location and filings. We quote them separately before checkout."
-    },
-    "international": {
-      "draft": "Draft",
-      "comingSoon": "Route details coming soon",
-      "cta": "View routes"
     },
     "specialist": {
       "moreOnRequest": "Additional coordination services are available on request with itemised fees."
@@ -448,14 +442,36 @@
   },
   "international": {
     "title": "International",
-    "description": "Start and manage companies in Bangladesh, the USA, UK, UAE and Singapore through verified country specialists.",
-    "intro": "Bangladesh is our flagship market. International routes open only when a verified provider and operating process are ready — we do not present a country as available before then.",
+    "description": "Formation routes for the USA, UK, UAE and Singapore, opened only through approved country specialists.",
+    "intro": "Bangladesh is our flagship market. An international route opens only when an approved provider, operating process and price sheet are in place — until then the honest status is \"register interest\", and that is what we show.",
     "status": {
       "available": "Available",
-      "comingSoon": "Coming soon"
+      "request_quote": "Request a quote",
+      "register_interest": "Register interest",
+      "not_available": "Not currently available"
     },
+    "bangladeshTitle": "Bangladesh — open now",
+    "bangladeshBody": "Company formation, licences, tax registrations and ongoing compliance are available today through the Bangladesh catalogue.",
     "exploreBangladesh": "Explore Bangladesh services",
-    "notifyNote": "Register interest through contact — we will not advertise this route until it is operationally ready."
+    "routesTitle": "Country routes",
+    "viewRoute": "View {country}",
+    "notifyNote": "Registering interest costs nothing and commits you to nothing. We contact you when the route is operationally ready.",
+    "country": {
+      "metaTitle": "{country} company formation",
+      "metaDescription": "The {country} formation route bdoor is preparing: scope, provider model and how to register interest.",
+      "lede": "{route} — a route we are preparing with licensed local specialists for {country}.",
+      "statusLine": "This route is in preparation and not yet open for orders.",
+      "scopeTitle": "What this route covers",
+      "providerTitle": "Who performs the work",
+      "providerBody": "Regulated work in this country is performed by a licensed local provider, not by bdoor. We name the responsible provider, and what they receive, before any engagement or payment. bdoor coordinates the case and your documents in one workspace.",
+      "pricingTitle": "Pricing",
+      "pricingBody": "No price is published for this route yet. When the provider agreement and price sheet are approved, the page will show an itemised quote that separates the bdoor fee from official and provider costs — until then, anything we printed would be a guess.",
+      "registerTitle": "Register your interest",
+      "registerBody": "Tell us what you want to do in {country} and we will contact you when the route opens, with the full scope and an itemised price.",
+      "registerCta": "Register interest",
+      "noPaymentNote": "No payment is taken and no obligation is created by registering interest.",
+      "disclaimer": "bdoor is not affiliated with any government authority in {country} and does not provide legal or tax advice. Route details are confirmed with the responsible provider before any engagement."
+    }
   },
   "industries": {
     "title": "Industries",
