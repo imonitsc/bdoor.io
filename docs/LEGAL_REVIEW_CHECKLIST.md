@@ -58,6 +58,17 @@ AML/KYC
       and reporting.
 - [ ] The AML policy's risk-based approach against actual BFIU guidance.
 
+Seven-country expansion (added 2026-08-29)
+
+- [ ] Whether the country pages' register-interest / check-eligibility
+      copy creates any regulated-activity exposure in the destination
+      countries before a local partner is appointed.
+- [ ] Cross-border data-transfer wording once international KYC collection
+      begins (spec §5.6); currently no international route collects
+      anything beyond a contact request.
+- [ ] Review of the partner-disclosure wording planned for quotes and
+      engagements when the first route reaches `available_by_quote`.
+
 Sign-off evidence
 
 - [ ] Written approval from counsel for each document, filed by the owner,

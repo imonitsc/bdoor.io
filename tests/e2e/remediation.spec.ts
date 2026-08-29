@@ -11,11 +11,14 @@ const SALES_PAGES = [
   '/en',
   '/bn',
   '/en/pricing',
-  '/en/international',
-  '/en/international/united-states',
-  '/en/international/united-kingdom',
-  '/en/international/uae',
-  '/en/international/singapore',
+  '/en/countries',
+  '/en/countries/bangladesh',
+  '/en/countries/usa',
+  '/en/countries/uk',
+  '/en/countries/uae',
+  '/en/countries/saudi-arabia',
+  '/en/countries/qatar',
+  '/en/countries/singapore',
   '/en/partners',
   '/en/about',
 ];
@@ -92,15 +95,20 @@ test.describe('one commercial source of truth', () => {
   });
 });
 
-test.describe('international truthfulness', () => {
-  test('every homepage country card links to its own route, without a price', async ({ page }) => {
+test.describe('seven-country truthfulness', () => {
+  test('the homepage selector: Bangladesh first, six country cards, no prices', async ({
+    page,
+  }) => {
     await page.goto('/en');
 
     const expected: Array<[string, string]> = [
-      ['United States', '/en/international/united-states'],
-      ['United Kingdom', '/en/international/united-kingdom'],
-      ['United Arab Emirates', '/en/international/uae'],
-      ['Singapore', '/en/international/singapore'],
+      ['Bangladesh', '/en/countries/bangladesh'],
+      ['United States', '/en/countries/usa'],
+      ['United Kingdom', '/en/countries/uk'],
+      ['United Arab Emirates', '/en/countries/uae'],
+      ['Saudi Arabia', '/en/countries/saudi-arabia'],
+      ['Qatar', '/en/countries/qatar'],
+      ['Singapore', '/en/countries/singapore'],
     ];
 
     for (const [name, href] of expected) {
@@ -111,21 +119,52 @@ test.describe('international truthfulness', () => {
 
     // Register interest, and no currency figure anywhere near the cards.
     await expect(page.getByText('Register interest').first()).toBeVisible();
-    const section = page.getByRole('heading', { name: 'Expanding beyond Bangladesh?' });
+    const section = page.getByRole('heading', {
+      name: 'Bangladesh first. Six more markets in preparation.',
+    });
     await expect(section).toBeVisible();
     const cardsText = await page.locator('section', { has: section }).first().innerText();
-    expect(cardsText).not.toMatch(/USD|GBP|AED|SGD|\$|£/);
+    expect(cardsText).not.toMatch(/USD|GBP|AED|SAR|QAR|SGD|\$|£/);
   });
 
   test('a country page registers interest and publishes no price', async ({ page }) => {
-    await page.goto('/en/international/united-states');
+    await page.goto('/en/countries/usa');
     await expect(page.getByRole('heading', { level: 1 })).toContainText('United States');
     await expect(page.getByText('No price is published for this route yet')).toBeVisible();
     await expect(
       page.locator('main').getByRole('link', { name: /Register interest/ }),
-    ).toHaveAttribute('href', /\/en\/contact\?interest=united-states/);
+    ).toHaveAttribute('href', /\/en\/contact\?interest=usa/);
     const body = await page.locator('body').innerText();
     expect(body).not.toMatch(/USD\s?\d|\$\d/);
+  });
+
+  test('Saudi Arabia and Qatar are eligibility-led, never buy-now', async ({ page }) => {
+    for (const [slug, name] of [
+      ['saudi-arabia', 'Saudi Arabia'],
+      ['qatar', 'Qatar'],
+    ] as const) {
+      await page.goto(`/en/countries/${slug}`);
+      await expect(page.getByRole('heading', { level: 1 })).toContainText(name);
+      await expect(
+        page.locator('main').getByRole('link', { name: /Check eligibility/ }),
+      ).toHaveAttribute('href', new RegExp(`/en/contact\\?interest=${slug}`));
+      const body = await page.locator('body').innerText();
+      expect(body).not.toMatch(/Buy now/i);
+      expect(body).not.toMatch(/USD\s?\d|\$\d/);
+    }
+  });
+
+  test('the old /international URLs redirect permanently to /countries', async ({ page }) => {
+    const cases: Array<[string, string]> = [
+      ['/en/international', '/en/countries'],
+      ['/en/international/united-states', '/en/countries/usa'],
+      ['/en/international/united-kingdom', '/en/countries/uk'],
+      ['/en/international/singapore', '/en/countries/singapore'],
+    ];
+    for (const [from, to] of cases) {
+      await page.goto(from);
+      await expect(page).toHaveURL(new RegExp(`${to}$`));
+    }
   });
 });
 
@@ -143,7 +182,7 @@ test.describe('responsive composition', () => {
   for (const [width, height] of VIEWPORTS) {
     test(`no horizontal overflow at ${width}×${height}`, async ({ page }) => {
       await page.setViewportSize({ width, height });
-      for (const path of ['/en', '/en/pricing', '/en/international/united-states']) {
+      for (const path of ['/en', '/en/pricing', '/en/countries', '/en/countries/usa']) {
         await page.goto(path);
         const overflow = await page.evaluate(
           () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -156,15 +195,22 @@ test.describe('responsive composition', () => {
   test('the desktop nav appears at xl and the drawer below it', async ({ page }) => {
     await page.goto('/en');
 
-    // 1280px: four primary groups visible, menu button absent.
+    // 1280px: the six primary groups visible, menu button absent, and the
+    // bar itself must not overflow its row.
     await page.setViewportSize({ width: 1280, height: 800 });
     const nav = page.locator('header nav');
-    await expect(nav.getByRole('link', { name: 'Bangladesh' })).toBeVisible();
-    await expect(nav.getByRole('link', { name: 'International' })).toBeVisible();
-    await expect(nav.getByRole('link', { name: 'Packages' })).toBeVisible();
+    await expect(nav.getByRole('link', { name: 'Start a business' })).toBeVisible();
+    await expect(nav.getByRole('link', { name: 'Manage a business' })).toBeVisible();
+    await expect(nav.getByRole('link', { name: 'Countries' })).toBeVisible();
+    await expect(nav.getByRole('link', { name: 'Pricing' })).toBeVisible();
     await expect(nav.getByRole('link', { name: 'Resources' })).toBeVisible();
-    expect(await nav.first().getByRole('link').count()).toBe(4);
+    await expect(nav.getByRole('link', { name: 'Partners' })).toBeVisible();
+    expect(await nav.first().getByRole('link').count()).toBe(6);
     await expect(page.locator('button[aria-controls="mobile-navigation"]')).toBeHidden();
+    const headerOverflow = await page
+      .locator('header')
+      .evaluate((el) => el.scrollWidth - el.clientWidth);
+    expect(headerOverflow).toBeLessThanOrEqual(0);
 
     // 1024px (below xl): the bar hides, the drawer carries everything.
     await page.setViewportSize({ width: 1024, height: 768 });
@@ -172,7 +218,7 @@ test.describe('responsive composition', () => {
     await expect(toggle).toBeVisible();
     await toggle.click();
     const drawer = page.locator('#mobile-navigation');
-    await expect(drawer.getByRole('link', { name: 'Bangladesh' })).toBeVisible();
+    await expect(drawer.getByRole('link', { name: 'Countries' })).toBeVisible();
     await expect(drawer.getByRole('link', { name: 'Partners' })).toBeVisible();
     await expect(drawer.getByRole('link', { name: 'Contact' })).toBeVisible();
   });

@@ -53,6 +53,33 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
+  async redirects() {
+    // The /international tree became /countries when Saudi Arabia and Qatar
+    // joined and Bangladesh got a country page of its own (seven-country
+    // spec §6.3). Old links keep working; two country slugs also changed.
+    return [
+      {
+        source: '/:locale(en|bn)/international/united-states',
+        destination: '/:locale/countries/usa',
+        permanent: true,
+      },
+      {
+        source: '/:locale(en|bn)/international/united-kingdom',
+        destination: '/:locale/countries/uk',
+        permanent: true,
+      },
+      {
+        source: '/:locale(en|bn)/international/:slug',
+        destination: '/:locale/countries/:slug',
+        permanent: true,
+      },
+      {
+        source: '/:locale(en|bn)/international',
+        destination: '/:locale/countries',
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       { source: '/:path*', headers: securityHeaders },

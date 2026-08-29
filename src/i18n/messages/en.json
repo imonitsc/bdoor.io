@@ -80,7 +80,10 @@
     "adminArea": "Admin",
     "partnerArea": "Partner",
     "bangladesh": "Bangladesh",
-    "packages": "Packages"
+    "packages": "Packages",
+    "startBusiness": "Start a business",
+    "manageBusiness": "Manage a business",
+    "countries": "Countries"
   },
   "footer": {
     "companyHeading": "Company",
@@ -95,15 +98,17 @@
       "licences": "Trade licences",
       "tax": "Tax and VAT",
       "compliance": "Annual compliance",
-      "internationalOverview": "Overview",
       "unitedStates": "United States",
       "unitedKingdom": "United Kingdom",
       "uae": "United Arab Emirates",
-      "singapore": "Singapore"
+      "singapore": "Singapore",
+      "countriesOverview": "All countries",
+      "saudiArabia": "Saudi Arabia",
+      "qatar": "Qatar"
     },
     "socialHeading": "Follow bdoor",
     "bangladeshHeading": "Bangladesh",
-    "internationalHeading": "International"
+    "countriesHeading": "Countries"
   },
   "home": {
     "hero": {
@@ -111,7 +116,7 @@
       "headline": "Start and run your business in Bangladesh. Expand globally when you are ready.",
       "support": "Form your company, complete essential registrations and manage ongoing compliance in one secure workspace. International formation routes are available only through approved country specialists.",
       "primaryCta": "Start in Bangladesh",
-      "secondaryCta": "Explore international routes",
+      "secondaryCta": "Explore countries",
       "operatorLine": "Operated by bdoor compliance ltd.",
       "imageAlt": "Founder managing business formation and compliance through bdoor"
     },
@@ -201,10 +206,10 @@
       "standaloneTitle": "Standalone services",
       "standaloneSummary": "Published bdoor fees for common registrations"
     },
-    "internationalSection": {
-      "eyebrow": "International routes",
-      "title": "Expanding beyond Bangladesh?",
-      "body": "USA, UK, UAE and Singapore routes are being prepared with licensed country specialists. Register interest and we will contact you when a route opens, with an itemised price."
+    "countriesSection": {
+      "eyebrow": "Countries",
+      "title": "Bangladesh first. Six more markets in preparation.",
+      "body": "Start and manage your business in Bangladesh today, and prepare your expansion to the USA, UK, UAE, Saudi Arabia, Qatar and Singapore from the same secure workspace."
     }
   },
   "howItWorksPage": {
@@ -380,19 +385,12 @@
     }
   },
   "international": {
-    "title": "International",
-    "description": "Formation routes for the USA, UK, UAE and Singapore, opened only through approved country specialists.",
-    "intro": "Bangladesh is our flagship market. An international route opens only when an approved provider, operating process and price sheet are in place — until then the honest status is \"register interest\", and that is what we show.",
     "status": {
       "available": "Available",
       "request_quote": "Request a quote",
       "register_interest": "Register interest",
       "not_available": "Not currently available"
     },
-    "bangladeshTitle": "Bangladesh — open now",
-    "bangladeshBody": "Company formation, licences, tax registrations and ongoing compliance are available today through the Bangladesh catalogue.",
-    "exploreBangladesh": "Explore Bangladesh services",
-    "routesTitle": "Country routes",
     "viewRoute": "View {country}",
     "notifyNote": "Registering interest costs nothing and commits you to nothing. We contact you when the route is operationally ready.",
     "country": {
@@ -409,7 +407,10 @@
       "registerBody": "Tell us what you want to do in {country} and we will contact you when the route opens, with the full scope and an itemised price.",
       "registerCta": "Register interest",
       "noPaymentNote": "No payment is taken and no obligation is created by registering interest.",
-      "disclaimer": "bdoor is not affiliated with any government authority in {country} and does not provide legal or tax advice. Route details are confirmed with the responsible provider before any engagement."
+      "disclaimer": "bdoor is not affiliated with any government authority in {country} and does not provide legal or tax advice. Route details are confirmed with the responsible provider before any engagement.",
+      "eligibilityTitle": "Check your eligibility",
+      "eligibilityBody": "Tell us what you want to do in {country}. A specialist reviews eligibility first; a quotation follows only after that review.",
+      "eligibilityCta": "Check eligibility"
     }
   },
   "industries": {
@@ -624,6 +625,19 @@
           "manage_bangladesh": "Manage an existing Bangladesh business",
           "form_abroad": "Form a company outside Bangladesh",
           "unsure": "I am not sure"
+        }
+      },
+      "destination_country": {
+        "label": "Where do you want to form the company?",
+        "why": "Each country has its own route, provider model and requirements. Routes outside Bangladesh are in preparation, so a specialist reviews every international request personally.",
+        "options": {
+          "usa": "United States",
+          "uk": "United Kingdom",
+          "uae": "United Arab Emirates",
+          "saudi_arabia": "Saudi Arabia",
+          "qatar": "Qatar",
+          "singapore": "Singapore",
+          "unsure": "I am not sure yet"
         }
       },
       "founder_location": {
@@ -1298,6 +1312,45 @@
       "accepted": "Assignment accepted.",
       "declined": "Assignment declined.",
       "saved": "Saved."
+    }
+  },
+  "countries": {
+    "title": "Countries",
+    "description": "Bangladesh today, with formation routes for the USA, UK, UAE, Saudi Arabia, Qatar and Singapore in preparation through appointed local providers.",
+    "intro": "Bangladesh is our flagship market and the most complete part of the platform. An international route opens only when an appointed local provider, operating process and price sheet are in place — until then the honest status is \"register interest\", and that is what we show.",
+    "bangladesh": {
+      "badge": "Open now",
+      "body": "Company formation, licences, tax registrations and ongoing compliance are available today through the Bangladesh catalogue.",
+      "cta": "Explore Bangladesh",
+      "pricingCta": "See packages and pricing"
+    },
+    "routesTitle": "International routes in preparation",
+    "bangladeshPage": {
+      "metaTitle": "Start and run a business in Bangladesh",
+      "metaDescription": "Company formation, trade licences, tax registrations and ongoing compliance in Bangladesh, coordinated in one secure workspace.",
+      "lede": "The operating market: formation, registrations and ongoing compliance are available today, with itemised pricing and a named case manager.",
+      "openTitle": "Open today",
+      "open": {
+        "formation": "Company formation and structure guidance",
+        "licences": "Trade-licence coordination",
+        "tax": "e-TIN and BIN/VAT registration assistance",
+        "compliance": "Annual returns and ongoing compliance management"
+      },
+      "newBusiness": {
+        "title": "Start a new business",
+        "body": "From sole proprietorship to private limited company: choose a route, see what it includes and what official fees stay separate.",
+        "cta": "Browse services"
+      },
+      "existingBusiness": {
+        "title": "Manage an existing business",
+        "body": "Compliance checks, annual returns and managed finance for companies already trading in Bangladesh.",
+        "cta": "See packages and pricing"
+      },
+      "assessment": {
+        "title": "Not sure which route fits?",
+        "body": "Answer a short set of questions and receive a preliminary recommendation, always reviewed by a person before anything is quoted.",
+        "cta": "Start the assessment"
+      }
     }
   }
 }

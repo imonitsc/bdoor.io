@@ -153,9 +153,11 @@ test.describe('questionnaire', () => {
   });
 
   test('reaches a preliminary recommendation and labels it as preliminary', async ({ page }) => {
-    // A full walk is ~14 server-action round trips; under parallel-suite
-    // load that legitimately exceeds the default budget.
-    test.slow();
+    // A full walk is ~14 server-action round trips, and in the DB-less test
+    // environment each one also waits out failing Supabase fetches. test.slow()
+    // (3× = 180s) has proven borderline — walks were observed reaching review
+    // correctly at just over the budget — so the budget is explicit.
+    test.setTimeout(420_000);
     await page.goto('/en/start');
     await startBangladeshAssessment(page);
 
@@ -195,9 +197,11 @@ test.describe('questionnaire', () => {
   });
 
   test('sends a foreign founder to manual review', async ({ page }) => {
-    // A full walk is ~14 server-action round trips; under parallel-suite
-    // load that legitimately exceeds the default budget.
-    test.slow();
+    // A full walk is ~14 server-action round trips, and in the DB-less test
+    // environment each one also waits out failing Supabase fetches. test.slow()
+    // (3× = 180s) has proven borderline — walks were observed reaching review
+    // correctly at just over the budget — so the budget is explicit.
+    test.setTimeout(420_000);
     await page.goto('/en/start');
     await startBangladeshAssessment(page);
 

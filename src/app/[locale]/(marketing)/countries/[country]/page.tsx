@@ -48,10 +48,10 @@ export async function generateMetadata({
     title: t('metaTitle', { country: name }),
     description: t('metaDescription', { country: name }),
     alternates: {
-      canonical: localizedUrl(locale as Locale, `/international/${slug}`),
+      canonical: localizedUrl(locale as Locale, `/countries/${slug}`),
       languages: {
-        en: localizedUrl('en', `/international/${slug}`),
-        'bn-BD': localizedUrl('bn', `/international/${slug}`),
+        en: localizedUrl('en', `/countries/${slug}`),
+        'bn-BD': localizedUrl('bn', `/countries/${slug}`),
       },
     },
   };
@@ -113,13 +113,17 @@ export default async function InternationalCountryPage({
 
           <div>
             <div className="border-border bg-surface rounded-[var(--radius-panel)] border p-6 lg:sticky lg:top-24">
-              <h2 className="text-ink text-lg font-semibold">{t('registerTitle')}</h2>
+              <h2 className="text-ink text-lg font-semibold">
+                {offer.eligibilityLed ? t('eligibilityTitle') : t('registerTitle')}
+              </h2>
               <p className="text-muted mt-2 text-sm leading-relaxed">
-                {t('registerBody', { country: name })}
+                {offer.eligibilityLed
+                  ? t('eligibilityBody', { country: name })
+                  : t('registerBody', { country: name })}
               </p>
               <Button asChild size="lg" className="mt-5 w-full">
                 <Link href={`${MARKETING_ROUTES.contact}?interest=${country.slug}`}>
-                  {t('registerCta')}
+                  {offer.eligibilityLed ? t('eligibilityCta') : t('registerCta')}
                   <ArrowRight className="size-4" aria-hidden="true" />
                 </Link>
               </Button>

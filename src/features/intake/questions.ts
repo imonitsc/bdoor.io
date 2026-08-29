@@ -19,6 +19,22 @@ export const HELP_SCOPES = [
 ] as const;
 
 export const FOUNDER_LOCATIONS = ['bangladesh', 'outside'] as const;
+/**
+ * The six countries bdoor is preparing routes for, plus "not sure". Keys
+ * mirror the /countries slugs (snake-cased for the translator). Every
+ * destination outside Bangladesh goes to manual review — see
+ * `hardManualReviewReasons` — because no international route has a
+ * contracted partner yet.
+ */
+export const DESTINATIONS = [
+  'usa',
+  'uk',
+  'uae',
+  'saudi_arabia',
+  'qatar',
+  'singapore',
+  'unsure',
+] as const;
 export const STRUCTURES = [
   'private_limited',
   'one_person',
@@ -49,6 +65,7 @@ const country = z
 
 export const answersSchema = z.object({
   help_scope: z.enum(HELP_SCOPES, { message: 'requiredChoice' }),
+  destination_country: z.enum(DESTINATIONS, { message: 'requiredChoice' }),
   founder_location: z.enum(FOUNDER_LOCATIONS, { message: 'requiredChoice' }),
   nationality: country,
   residence: country,
@@ -117,6 +134,15 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     showWhy: true,
     shouldAsk: always,
     schema: answersSchema.shape.help_scope,
+  },
+  {
+    key: 'destination_country',
+    section: 'about_you',
+    kind: 'choice',
+    options: DESTINATIONS,
+    showWhy: true,
+    shouldAsk: (a) => a.help_scope === 'form_abroad',
+    schema: answersSchema.shape.destination_country,
   },
   {
     key: 'founder_location',

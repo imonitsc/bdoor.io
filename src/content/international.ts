@@ -2,7 +2,7 @@ import { INTERNATIONAL_OFFERS } from '@/content/packages/catalog';
 import type { InternationalOffer } from '@/features/packages/types';
 
 /**
- * The four international countries as the public site presents them. Derived
+ * The six international countries as the public site presents them. Derived
  * from the commercial catalog so a status change there is the only edit —
  * the overview page, the country pages, the homepage cards and the footer all
  * read this shape.
@@ -23,8 +23,26 @@ const COUNTRY_NAMES: Record<string, { en: string; bn: string }> = {
   US: { en: 'United States', bn: 'যুক্তরাষ্ট্র' },
   GB: { en: 'United Kingdom', bn: 'যুক্তরাজ্য' },
   AE: { en: 'United Arab Emirates', bn: 'সংযুক্ত আরব আমিরাত' },
+  SA: { en: 'Saudi Arabia', bn: 'সৌদি আরব' },
+  QA: { en: 'Qatar', bn: 'কাতার' },
   SG: { en: 'Singapore', bn: 'সিঙ্গাপুর' },
 };
+
+/**
+ * Bangladesh on the countries index. It is not an `InternationalOffer` —
+ * it is the operating market with its own packages — but the countries page
+ * needs its slug and name from the same place as everything else.
+ */
+export const BANGLADESH_COUNTRY = {
+  slug: 'bangladesh',
+  code: 'BD',
+  name: { en: 'Bangladesh', bn: 'বাংলাদেশ' },
+} as const;
+
+/** Every public country slug, Bangladesh first — the /countries page tree. */
+export function allCountrySlugs(): string[] {
+  return [BANGLADESH_COUNTRY.slug, ...internationalCountries().map((c) => c.slug)];
+}
 
 export function internationalCountries(): InternationalCountry[] {
   return INTERNATIONAL_OFFERS.map((offer) => ({

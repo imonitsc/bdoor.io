@@ -8,15 +8,16 @@ import { Card } from '@/components/ui/card';
 import { Section } from '@/components/ui/section';
 import { PageHeader } from '@/components/marketing/page-header';
 import { IndependenceDisclosure } from '@/components/layout/disclosure';
-import { internationalCountries, pickText } from '@/content/international';
+import { BANGLADESH_COUNTRY, internationalCountries, pickText } from '@/content/international';
 import type { Locale } from '@/features/catalog/types';
 import { MARKETING_ROUTES } from '@/lib/navigation';
 import { localizedUrl } from '@/lib/site';
 
 /**
- * The international overview reads the commercial catalog, not the countries
- * table: the honest public status of each route is configuration the owner
- * controls in code review, and the page must not be able to drift from it.
+ * The countries index: Bangladesh first and largest, six international
+ * routes after it. Everything reads the commercial catalog, so the honest
+ * public status of each route is configuration the owner controls in code
+ * review, and the page cannot drift from it.
  */
 
 export async function generateMetadata({
@@ -25,28 +26,25 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'international' });
+  const t = await getTranslations({ locale, namespace: 'countries' });
   return {
     title: t('title'),
     description: t('description'),
     alternates: {
-      canonical: localizedUrl(locale as Locale, '/international'),
+      canonical: localizedUrl(locale as Locale, '/countries'),
       languages: {
-        en: localizedUrl('en', '/international'),
-        'bn-BD': localizedUrl('bn', '/international'),
+        en: localizedUrl('en', '/countries'),
+        'bn-BD': localizedUrl('bn', '/countries'),
       },
     },
   };
 }
 
-export default async function InternationalPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function CountriesPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations('international');
+  const t = await getTranslations('countries');
+  const tIntl = await getTranslations('international');
   const loc = locale as Locale;
   const countries = internationalCountries();
 
@@ -58,23 +56,35 @@ export default async function InternationalPage({
         <div className="container-page">
           <p className="text-muted max-w-3xl text-base leading-relaxed">{t('intro')}</p>
 
-          <div className="border-border bg-surface mt-10 flex flex-col gap-4 rounded-[var(--radius-panel)] border p-6 sm:flex-row sm:items-center sm:justify-between md:p-8">
-            <div>
-              <h2 className="text-ink text-lg font-semibold">{t('bangladeshTitle')}</h2>
-              <p className="text-muted mt-1 max-w-xl text-sm leading-relaxed">
-                {t('bangladeshBody')}
-              </p>
+          <div className="border-border bg-surface mt-10 rounded-[var(--radius-panel)] border p-6 md:p-8">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <div className="flex items-center gap-3">
+                  <h2 className="text-ink text-xl font-semibold">
+                    {pickText(BANGLADESH_COUNTRY.name, loc)}
+                  </h2>
+                  <Badge tone="success">{t('bangladesh.badge')}</Badge>
+                </div>
+                <p className="text-muted mt-2 max-w-xl text-sm leading-relaxed">
+                  {t('bangladesh.body')}
+                </p>
+              </div>
+              <div className="flex shrink-0 flex-col gap-2 sm:items-end">
+                <Button asChild size="lg">
+                  <Link href={`/countries/${BANGLADESH_COUNTRY.slug}`}>
+                    {t('bangladesh.cta')}
+                    <ArrowRight className="size-4" aria-hidden="true" />
+                  </Link>
+                </Button>
+                <Button asChild variant="link" size="sm">
+                  <Link href={MARKETING_ROUTES.pricing}>{t('bangladesh.pricingCta')}</Link>
+                </Button>
+              </div>
             </div>
-            <Button asChild size="lg" className="shrink-0">
-              <Link href={MARKETING_ROUTES.services}>
-                {t('exploreBangladesh')}
-                <ArrowRight className="size-4" aria-hidden="true" />
-              </Link>
-            </Button>
           </div>
 
           <h2 className="text-ink mt-14 text-xl font-semibold">{t('routesTitle')}</h2>
-          <ul className="mt-6 grid gap-4 sm:grid-cols-2">
+          <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {countries.map((country) => {
               const name = pickText(country.name, loc);
               return (
@@ -82,14 +92,14 @@ export default async function InternationalPage({
                   <Card as="article" className="flex h-full flex-col gap-3 p-5 md:p-6">
                     <div className="flex items-start justify-between gap-3">
                       <h3 className="text-ink text-lg font-semibold">{name}</h3>
-                      <Badge tone="neutral">{t(`status.${country.offer.publicStatus}`)}</Badge>
+                      <Badge tone="neutral">{tIntl(`status.${country.offer.publicStatus}`)}</Badge>
                     </div>
                     <p className="text-muted flex-1 text-sm leading-relaxed">
                       {pickText(country.offer.summary, loc)}
                     </p>
                     <Button asChild variant="secondary" size="sm" className="w-fit">
-                      <Link href={`/international/${country.slug}`}>
-                        {t('viewRoute', { country: name })}
+                      <Link href={`/countries/${country.slug}`}>
+                        {tIntl('viewRoute', { country: name })}
                         <ArrowRight className="size-4" aria-hidden="true" />
                       </Link>
                     </Button>
@@ -99,7 +109,7 @@ export default async function InternationalPage({
             })}
           </ul>
 
-          <p className="text-muted mt-8 max-w-2xl text-sm leading-relaxed">{t('notifyNote')}</p>
+          <p className="text-muted mt-8 max-w-2xl text-sm leading-relaxed">{tIntl('notifyNote')}</p>
 
           <div className="mt-12 max-w-prose">
             <IndependenceDisclosure />

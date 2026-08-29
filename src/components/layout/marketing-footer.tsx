@@ -4,7 +4,7 @@ import { Link } from '@/i18n/navigation';
 import {
   FOOTER_BANGLADESH_LINKS,
   FOOTER_COMPANY_LINKS,
-  FOOTER_INTERNATIONAL_LINKS,
+  FOOTER_COUNTRY_LINKS,
   FOOTER_LEGAL_LINKS,
   MARKETING_ROUTES,
 } from '@/lib/navigation';
@@ -72,8 +72,8 @@ export function MarketingFooter() {
             links={FOOTER_BANGLADESH_LINKS.map((l) => ({ href: l.href, label: t(l.labelKey) }))}
           />
           <FooterColumn
-            heading={t('footer.internationalHeading')}
-            links={FOOTER_INTERNATIONAL_LINKS.map((l) => ({ href: l.href, label: t(l.labelKey) }))}
+            heading={t('footer.countriesHeading')}
+            links={FOOTER_COUNTRY_LINKS.map((l) => ({ href: l.href, label: t(l.labelKey) }))}
           />
           <FooterColumn
             heading={t('footer.companyHeading')}

@@ -6,6 +6,7 @@ import {
   activePackageVersion,
 } from '@/content/packages/catalog';
 import { SNAPSHOT_SERVICES } from '@/content/catalog-snapshot';
+import { SELLABLE_AVAILABILITY } from '@/features/packages/types';
 import { computeLayerTotals } from '@/features/packages/pricing';
 
 /**
@@ -110,6 +111,37 @@ describe('international offers', () => {
     const slugs = INTERNATIONAL_OFFERS.map((o) => o.countrySlug);
     expect(new Set(slugs).size).toBe(slugs.length);
     for (const slug of slugs) expect(slug).toMatch(/^[a-z][a-z-]+$/);
+  });
+
+  it('covers exactly the six international countries of the seven-country spec', () => {
+    expect(INTERNATIONAL_OFFERS.map((o) => o.countrySlug).sort()).toEqual([
+      'qatar',
+      'saudi-arabia',
+      'singapore',
+      'uae',
+      'uk',
+      'usa',
+    ]);
+  });
+
+  it('never says "available" outside the sellable availability states', () => {
+    for (const offer of INTERNATIONAL_OFFERS) {
+      if (!SELLABLE_AVAILABILITY.includes(offer.availability)) {
+        expect(offer.publicStatus, offer.slug).not.toBe('available');
+        expect(offer.checkoutEnabled, offer.slug).toBe(false);
+      }
+      if (offer.checkoutEnabled) {
+        // Checkout is the top of the ladder: a signed partner AND a pilot.
+        expect(offer.availability, offer.slug).toBe('available_online');
+      }
+    }
+  });
+
+  it('keeps Saudi Arabia and Qatar eligibility-led', () => {
+    for (const slug of ['saudi-arabia', 'qatar']) {
+      const offer = INTERNATIONAL_OFFERS.find((o) => o.countrySlug === slug)!;
+      expect(offer.eligibilityLed, slug).toBe(true);
+    }
   });
 
   it('keeps internal status words out of every public string', () => {

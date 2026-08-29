@@ -8,7 +8,7 @@ export const MARKETING_ROUTES = {
   start: '/start',
   services: '/services',
   industries: '/industries',
-  international: '/international',
+  countries: '/countries',
   authorities: '/authorities',
   foreignFounders: '/foreign-founders',
   pricing: '/pricing',
@@ -71,26 +71,26 @@ export const ADMIN_ROUTES = {
 } as const;
 
 /**
- * Four primary groups, not seven equal links. Bangladesh is the operating
- * market and leads; Services, Industries and Partners live on their
- * destination pages, in the drawer's secondary list and in the footer
- * instead of the top bar. The desktop bar renders from `xl` (the seven-item
- * bar overflowed at `lg` once account actions were counted); below that the
- * drawer carries everything.
+ * The six primary groups of the seven-country spec (§6.2): what a founder
+ * wants to do, where, and what it costs. The desktop bar renders from `xl`
+ * (a seven-item bar overflowed at `lg` once account actions were counted;
+ * the overflow e2e test guards the current set); below that the drawer
+ * carries everything.
  */
 export const HEADER_LINKS = [
-  { href: MARKETING_ROUTES.services, labelKey: 'nav.bangladesh' },
-  { href: MARKETING_ROUTES.international, labelKey: 'nav.international' },
-  { href: MARKETING_ROUTES.pricing, labelKey: 'nav.packages' },
+  { href: MARKETING_ROUTES.services, labelKey: 'nav.startBusiness' },
+  { href: '/services?category=compliance', labelKey: 'nav.manageBusiness' },
+  { href: MARKETING_ROUTES.countries, labelKey: 'nav.countries' },
+  { href: MARKETING_ROUTES.pricing, labelKey: 'nav.pricing' },
   { href: MARKETING_ROUTES.resources, labelKey: 'nav.resources' },
+  { href: MARKETING_ROUTES.partners, labelKey: 'nav.partners' },
 ] as const;
 
-/** Shown in the mobile/tablet drawer under the four primary groups. */
+/** Shown in the mobile/tablet drawer under the six primary groups. */
 export const DRAWER_SECONDARY_LINKS = [
   { href: MARKETING_ROUTES.howItWorks, labelKey: 'nav.howItWorks' },
   { href: MARKETING_ROUTES.foreignFounders, labelKey: 'nav.foreignFounders' },
   { href: MARKETING_ROUTES.industries, labelKey: 'nav.industries' },
-  { href: MARKETING_ROUTES.partners, labelKey: 'nav.partners' },
   { href: MARKETING_ROUTES.about, labelKey: 'nav.about' },
   { href: MARKETING_ROUTES.contact, labelKey: 'nav.contact' },
 ] as const;
@@ -105,12 +105,14 @@ export const FOOTER_BANGLADESH_LINKS = [
   { href: MARKETING_ROUTES.industries, labelKey: 'nav.industries' },
 ] as const;
 
-export const FOOTER_INTERNATIONAL_LINKS = [
-  { href: MARKETING_ROUTES.international, labelKey: 'footer.links.internationalOverview' },
-  { href: '/international/united-states', labelKey: 'footer.links.unitedStates' },
-  { href: '/international/united-kingdom', labelKey: 'footer.links.unitedKingdom' },
-  { href: '/international/uae', labelKey: 'footer.links.uae' },
-  { href: '/international/singapore', labelKey: 'footer.links.singapore' },
+export const FOOTER_COUNTRY_LINKS = [
+  { href: MARKETING_ROUTES.countries, labelKey: 'footer.links.countriesOverview' },
+  { href: '/countries/usa', labelKey: 'footer.links.unitedStates' },
+  { href: '/countries/uk', labelKey: 'footer.links.unitedKingdom' },
+  { href: '/countries/uae', labelKey: 'footer.links.uae' },
+  { href: '/countries/saudi-arabia', labelKey: 'footer.links.saudiArabia' },
+  { href: '/countries/qatar', labelKey: 'footer.links.qatar' },
+  { href: '/countries/singapore', labelKey: 'footer.links.singapore' },
 ] as const;
 
 export const FOOTER_COMPANY_LINKS = [
@@ -141,11 +143,14 @@ export const SITEMAP_ROUTES: ReadonlyArray<{
   { path: '/start', priority: 0.9, changeFrequency: 'monthly' },
   { path: '/services', priority: 0.9, changeFrequency: 'weekly' },
   { path: '/industries', priority: 0.8, changeFrequency: 'monthly' },
-  { path: '/international', priority: 0.7, changeFrequency: 'monthly' },
-  { path: '/international/united-states', priority: 0.6, changeFrequency: 'monthly' },
-  { path: '/international/united-kingdom', priority: 0.6, changeFrequency: 'monthly' },
-  { path: '/international/uae', priority: 0.6, changeFrequency: 'monthly' },
-  { path: '/international/singapore', priority: 0.6, changeFrequency: 'monthly' },
+  { path: '/countries', priority: 0.7, changeFrequency: 'monthly' },
+  { path: '/countries/bangladesh', priority: 0.7, changeFrequency: 'monthly' },
+  { path: '/countries/usa', priority: 0.6, changeFrequency: 'monthly' },
+  { path: '/countries/uk', priority: 0.6, changeFrequency: 'monthly' },
+  { path: '/countries/uae', priority: 0.6, changeFrequency: 'monthly' },
+  { path: '/countries/saudi-arabia', priority: 0.6, changeFrequency: 'monthly' },
+  { path: '/countries/qatar', priority: 0.6, changeFrequency: 'monthly' },
+  { path: '/countries/singapore', priority: 0.6, changeFrequency: 'monthly' },
   { path: '/authorities', priority: 0.6, changeFrequency: 'monthly' },
   { path: '/foreign-founders', priority: 0.8, changeFrequency: 'monthly' },
   { path: '/pricing', priority: 0.8, changeFrequency: 'monthly' },
