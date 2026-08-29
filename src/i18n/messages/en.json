@@ -73,7 +73,7 @@
     "partners": "Partners",
     "about": "About",
     "contact": "Contact",
-    "primaryCta": "Start now",
+    "primaryCta": "Start application",
     "talkToSpecialist": "Talk to a specialist",
     "mainNavigation": "Main navigation",
     "workspace": "Workspace",
@@ -83,7 +83,8 @@
     "packages": "Packages",
     "startBusiness": "Start a business",
     "manageBusiness": "Manage a business",
-    "countries": "Countries"
+    "countries": "Countries",
+    "startShort": "Start"
   },
   "footer": {
     "companyHeading": "Company",
@@ -112,13 +113,27 @@
   },
   "home": {
     "hero": {
-      "eyebrow": "Bangladesh business setup and compliance",
-      "headline": "Start and run your business in Bangladesh. <g>Expand globally</g> when you are ready.",
-      "support": "Form your company, complete essential registrations and manage ongoing compliance in one secure workspace. International formation routes are available only through approved country specialists.",
-      "primaryCta": "Start in Bangladesh",
-      "secondaryCta": "Explore countries",
+      "eyebrow": "Business formation and compliance",
+      "headline": "Start in Bangladesh. <g>Build anywhere.</g>",
+      "support": "Form and manage businesses in Bangladesh, the USA, UK, UAE, Saudi Arabia, Qatar and Singapore through one secure platform and an appointed network of country specialists.",
+      "primaryCta": "Start your application",
+      "secondaryCta": "Compare countries",
+      "trustLine": "Free initial assessment · Itemised quote before payment · Third-party specialists disclosed before engagement",
       "operatorLine": "Operated by bdoor compliance ltd.",
-      "imageAlt": "Founder managing business formation and compliance through bdoor."
+      "module": {
+        "previewLabel": "Product preview",
+        "reviewed": "Specialist reviewed",
+        "countriesLabel": "Countries you can apply for",
+        "routeLabel": "Featured route",
+        "routeName": "Company formation — Bangladesh",
+        "stepsLabel": "How an application progresses",
+        "steps": {
+          "apply": "Apply",
+          "review": "Review",
+          "quote": "Quote"
+        },
+        "readiness": "No identity documents are needed to apply — collection begins only after you accept a quote."
+      }
     },
     "packages": {
       "eyebrow": "Bangladesh packages",
@@ -210,6 +225,14 @@
       "eyebrow": "Countries",
       "title": "Seven countries. Applications open in all of them.",
       "body": "Start or manage a business in any of the seven countries. Applications are specialist-reviewed, providers are appointed per case, and every quote is itemised before engagement."
+    },
+    "existing": {
+      "eyebrow": "Already trading?",
+      "title": "Support for existing businesses.",
+      "body": "Compliance checks, annual returns, tax registrations and managed finance for companies already trading in Bangladesh — with the same itemised quoting as a new formation.",
+      "partnerModel": "Regulated work is performed by appointed third-party providers — law and accountancy firms and licensed local specialists. Your provider, their scope and their fees are disclosed before any engagement or payment.",
+      "cta": "See compliance packages",
+      "partnerCta": "How the partner model works"
     }
   },
   "howItWorksPage": {

@@ -72,24 +72,23 @@ export const ADMIN_ROUTES = {
 } as const;
 
 /**
- * The six primary groups of the seven-country spec (§6.2): what a founder
- * wants to do, where, and what it costs. The desktop bar renders from `xl`
- * (a seven-item bar overflowed at `lg` once account actions were counted;
- * the overflow e2e test guards the current set); below that the drawer
- * carries everything.
+ * The five primary destinations (immediate-operations instructions §7.3):
+ * apply, browse, compare, price, learn. Partners, how-it-works and the
+ * company pages move to the drawer and footer — not every destination gets
+ * top-level weight. The overflow e2e test guards the current set.
  */
 export const HEADER_LINKS = [
-  { href: MARKETING_ROUTES.services, labelKey: 'nav.startBusiness' },
-  { href: '/services?category=compliance', labelKey: 'nav.manageBusiness' },
+  { href: MARKETING_ROUTES.start, labelKey: 'nav.startShort' },
+  { href: MARKETING_ROUTES.services, labelKey: 'nav.services' },
   { href: MARKETING_ROUTES.countries, labelKey: 'nav.countries' },
   { href: MARKETING_ROUTES.pricing, labelKey: 'nav.pricing' },
   { href: MARKETING_ROUTES.resources, labelKey: 'nav.resources' },
-  { href: MARKETING_ROUTES.partners, labelKey: 'nav.partners' },
 ] as const;
 
-/** Shown in the mobile/tablet drawer under the six primary groups. */
+/** Shown in the mobile/tablet drawer under the five primary destinations. */
 export const DRAWER_SECONDARY_LINKS = [
   { href: MARKETING_ROUTES.howItWorks, labelKey: 'nav.howItWorks' },
+  { href: MARKETING_ROUTES.partners, labelKey: 'nav.partners' },
   { href: MARKETING_ROUTES.foreignFounders, labelKey: 'nav.foreignFounders' },
   { href: MARKETING_ROUTES.industries, labelKey: 'nav.industries' },
   { href: MARKETING_ROUTES.about, labelKey: 'nav.about' },

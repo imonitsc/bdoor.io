@@ -1,5 +1,3 @@
-import { existsSync } from 'node:fs';
-import { join } from 'node:path';
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { useTranslations } from 'next-intl';
@@ -11,7 +9,7 @@ import { PackageSelector } from '@/components/marketing/package-selector';
 import { FeeBreakdownExample } from '@/components/marketing/fee-breakdown-example';
 import { CountrySelector } from '@/components/marketing/country-selector';
 import { SpecialistServicesList } from '@/components/marketing/specialist-services-list';
-import { HeroFounder } from '@/components/marketing/hero-founder';
+import { HeroProductModule } from '@/components/marketing/hero-product-module';
 import { WorkspacePreview } from '@/components/marketing/workspace-preview';
 import { FaqList } from '@/components/marketing/faq-list';
 import { getGlobalFaqs } from '@/features/catalog/queries';
@@ -41,47 +39,33 @@ export async function generateMetadata({
 }
 
 /**
- * Seven sections before the footer, in the order a first-time visitor needs
- * them: what bdoor does (hero, with the founder photograph as its visual),
- * why to trust the process, which package fits, what the workspace looks
- * like, how fees and delivery work, which international routes are being
- * prepared, and what to do next.
- *
- * The founder photograph is the intended hero visual, but the file has not
- * been supplied to the repository yet, and the branch carrying the hero was
- * merged anyway — which shipped a hero whose image 404s. So the visual is
- * now a build-time switch on the file's existence: while
- * public/images/bdoor-home-hero-founder.png is absent the hero renders the
- * workspace preview (the pre-photograph layout, six sections); the moment
- * the file is committed the founder hero and the standalone preview section
- * both appear, with no code change. Every push rebuilds, so the switch can
- * never be stale in a deployment.
+ * Eight sections before the footer (immediate-operations instructions §7.4):
+ * the hero with its product module, the trust strip, the seven-country
+ * comparison, the Bangladesh packages, the four-step process with the fee
+ * example, the workspace preview, existing-business support with the
+ * partner model, and the FAQ with the final call to action.
  */
-const FOUNDER_IMAGE_EXISTS = existsSync(
-  join(process.cwd(), 'public/images/bdoor-home-hero-founder.png'),
-);
-
-function Hero() {
+function Hero({ locale }: { locale: Locale }) {
   const t = useTranslations('home.hero');
 
   return (
     <section className="bg-surface-inverse text-ink-inverse texture-dots relative overflow-hidden">
       {/*
         Ambient depth: one large cobalt glow bleeding in from the top-right
-        corner, felt more than seen. Decorative only, clipped by the section.
+        corner, felt more than seen. Decorative only — the overflow clip
+        exists for this glow, and nothing textual can reach the clip edge.
       */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -top-48 -right-48 size-[30rem] rounded-full bg-[color:var(--bd-cobalt-500)] opacity-[0.16] blur-[150px]"
       />
       {/*
-        The image column is deliberately wider than the copy column (1.2 vs
-        1.05 before): the illustration read visually small inside its
-        available area, and the master instructions ask for ~10–15% more
-        presence on desktop without cropping — the ratio change delivers it
-        while `contain` keeps the full composition.
+        §7.2: roughly a 7/5 column split, both columns centred on the same
+        visual axis, height following content — no fixed hero height, no
+        negative offsets, nothing that could clip the H1 at any zoom level.
+        The product module replaces the illustrated person (§7.1).
       */}
-      <div className="container-page grid items-center gap-12 py-16 md:py-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:gap-12 lg:py-24">
+      <div className="container-page grid items-center gap-12 py-16 md:py-20 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-16 lg:py-24">
         <div className="flex flex-col justify-center">
           <p className="inline-flex w-fit items-center gap-2.5 rounded-[var(--radius-pill)] border border-[color:var(--bd-turquoise-500)]/35 bg-white/5 px-4 py-1.5 font-mono text-xs tracking-[0.15em] text-[color:var(--bd-turquoise-500)] uppercase">
             <span
@@ -90,12 +74,12 @@ function Hero() {
             />
             {t('eyebrow')}
           </p>
-          <h1 className="text-ink-inverse mt-5 max-w-2xl text-4xl leading-[1.08] md:text-5xl">
+          <h1 className="text-ink-inverse mt-5 max-w-2xl text-[2.6rem] leading-[1.05] md:text-[3.4rem] md:leading-[1.02] lg:text-[4.25rem] lg:leading-[1.0]">
             {t.rich('headline', {
               g: (chunks) => <span className="gradient-text-inverse">{chunks}</span>,
             })}
           </h1>
-          <p className="text-muted-inverse mt-5 max-w-xl text-lg leading-relaxed">{t('support')}</p>
+          <p className="text-muted-inverse mt-6 max-w-xl text-lg leading-relaxed">{t('support')}</p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button asChild size="lg" variant="inverse">
@@ -114,14 +98,11 @@ function Hero() {
             </Button>
           </div>
 
-          <p className="text-muted-inverse mt-8 text-sm">{t('operatorLine')}</p>
+          <p className="text-muted-inverse mt-8 text-sm">{t('trustLine')}</p>
+          <p className="text-muted-inverse mt-2 text-xs">{t('operatorLine')}</p>
         </div>
 
-        {FOUNDER_IMAGE_EXISTS ? (
-          <HeroFounder alt={t('imageAlt')} className="lg:self-end" />
-        ) : (
-          <WorkspacePreview />
-        )}
+        <HeroProductModule locale={locale} />
       </div>
     </section>
   );
@@ -163,7 +144,7 @@ function PackagesSection({
 }) {
   const t = useTranslations('home.packages');
   return (
-    <Section>
+    <Section tone="surface">
       <div className="container-page">
         <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
         <PackageSelector locale={locale} usdNotes={usdNotes} />
@@ -178,7 +159,7 @@ function ProcessAndFees({ locale }: { locale: Locale }) {
   const steps = ['one', 'two', 'three', 'four'] as const;
 
   return (
-    <Section tone="surface">
+    <Section>
       <div className="container-page">
         <SectionHeading eyebrow={t('eyebrow')} title={t('title')} />
         <div className="mt-10 grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
@@ -255,6 +236,37 @@ function CountriesSection({ locale, operational }: { locale: Locale; operational
   );
 }
 
+/**
+ * §7.4.7: what bdoor does for a business that already exists, and — in the
+ * same breath — how the third-party partner model works. One statement of
+ * each, not a disclaimer repeated per section.
+ */
+function ExistingBusinessSection() {
+  const t = useTranslations('home.existing');
+
+  return (
+    <Section tone="surface">
+      <div className="container-page grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
+        <div className="flex flex-col justify-center gap-5">
+          <p className="text-muted text-sm leading-relaxed">{t('partnerModel')}</p>
+          <div className="flex flex-wrap gap-3">
+            <Button asChild variant="secondary">
+              <Link href={MARKETING_ROUTES.pricing}>
+                {t('cta')}
+                <ArrowRight className="size-4" aria-hidden="true" />
+              </Link>
+            </Button>
+            <Button asChild variant="link">
+              <Link href={MARKETING_ROUTES.partners}>{t('partnerCta')}</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    </Section>
+  );
+}
+
 async function FaqAndNextStep({ locale }: { locale: Locale }) {
   const [{ data: faqs }, t, tCta] = await Promise.all([
     getGlobalFaqs(),
@@ -304,12 +316,13 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
   return (
     <>
-      <Hero />
+      <Hero locale={typedLocale} />
       <TrustStrip />
-      <PackagesSection locale={typedLocale} usdNotes={usdNotes} />
-      {FOUNDER_IMAGE_EXISTS ? <Preview /> : null}
-      <ProcessAndFees locale={typedLocale} />
       <CountriesSection locale={typedLocale} operational={operationalClaimsAllowed()} />
+      <PackagesSection locale={typedLocale} usdNotes={usdNotes} />
+      <ProcessAndFees locale={typedLocale} />
+      <Preview />
+      <ExistingBusinessSection />
       <FaqAndNextStep locale={typedLocale} />
     </>
   );
