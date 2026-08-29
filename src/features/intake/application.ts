@@ -30,10 +30,20 @@ export type SubmittedApplication = {
  * reference cannot be guessed and the sequence cannot leak volume; the
  * database's unique constraint catches the rare collision and the caller
  * retries with a fresh draw.
+ *
+ * Rejection sampling rather than a bare modulo: 2^32 is not a multiple of
+ * 10^6, so `% 1_000_000` alone would slightly favour the low residues.
+ * Draws at or above the largest multiple of 10^6 below 2^32 are redrawn
+ * (~0.02% of draws), which keeps every reference equally likely.
  */
 export function newApplicationReference(now = new Date()): string {
-  const draw = crypto.getRandomValues(new Uint32Array(1))[0]! % 1_000_000;
-  return `BD-${now.getUTCFullYear()}-${String(draw).padStart(6, '0')}`;
+  const RANGE = 1_000_000;
+  const LIMIT = Math.floor(2 ** 32 / RANGE) * RANGE;
+  let draw: number;
+  do {
+    draw = crypto.getRandomValues(new Uint32Array(1))[0]!;
+  } while (draw >= LIMIT);
+  return `BD-${now.getUTCFullYear()}-${String(draw % RANGE).padStart(6, '0')}`;
 }
 
 export type SubmitInput = {
