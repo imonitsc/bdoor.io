@@ -1,7 +1,7 @@
 import { useTranslations } from 'next-intl';
 import { computeLayerTotals } from '@/features/packages/pricing';
 import { activePackageVersion, packageBySlug } from '@/content/packages/catalog';
-import { pick, type Locale } from '@/features/catalog/types';
+import type { Locale } from '@/features/catalog/types';
 
 /**
  * One worked example of how a quote separates costs. The bdoor fee is a real

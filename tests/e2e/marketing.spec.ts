@@ -18,11 +18,12 @@ test.describe('marketing site', () => {
     await page.goto('/en');
 
     await expect(page.getByRole('heading', { level: 1 })).toContainText(
-      'Start your business in Bangladesh',
+      'Start and run your business in Bangladesh',
     );
-    await expect(page.getByText('bdoor is operated by bdoor compliance ltd')).toBeVisible();
+    await expect(page.getByText('Operated by bdoor compliance ltd')).toBeVisible();
+    await expect(page.getByText('Transparent itemised quotes')).toBeVisible();
     await expect(
-      page.getByText('BDoor is not a government authority or law firm', { exact: false }),
+      page.getByText('bdoor is not a government authority or law firm', { exact: false }),
     ).toBeVisible();
   });
 
@@ -92,7 +93,7 @@ test.describe('marketing site', () => {
     await expect(page.getByRole('heading', { name: 'What is not included' })).toBeVisible();
     await expect(page.getByText('Time estimate reviewed')).toBeVisible();
     await expect(
-      page.getByText('BDoor is not affiliated with this authority', { exact: false }),
+      page.getByText('bdoor is not affiliated with this authority', { exact: false }),
     ).toBeVisible();
   });
 
@@ -108,7 +109,7 @@ test.describe('marketing site', () => {
     await expect(page.getByText('not open for new cases yet', { exact: false })).toBeVisible();
   });
 
-  test('legal drafts say they are awaiting review', async ({ page }) => {
+  test('legal pages carry the pre-launch notice while drafts are unapproved', async ({ page }) => {
     for (const slug of [
       'terms',
       'privacy',
@@ -118,9 +119,18 @@ test.describe('marketing site', () => {
     ]) {
       await page.goto(`/en/${slug}`);
       await expect(
-        page.getByText('Draft awaiting professional review'),
-        `${slug} is missing its draft banner`,
+        page.getByText('Under professional review', { exact: true }),
+        `${slug} is missing the pre-launch notice`,
       ).toBeVisible();
+      // The notice is honest about the consequences…
+      await expect(
+        page.getByText('Payments and identity-document collection are not yet enabled'),
+      ).toBeVisible();
+      // …and the unapproved draft text must NOT be published as if final.
+      const body = (await page.locator('body').innerText()).toLowerCase();
+      expect(body, `${slug} still renders draft legal sections`).not.toContain('governing law');
+      // Draft legal pages are not indexable.
+      await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
     }
   });
 });
@@ -143,7 +153,7 @@ test.describe('language', () => {
 
     await expect(page).toHaveURL(/\/bn\/pricing$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'bn-BD');
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('ফি ও মূল্য');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('প্যাকেজ ও মূল্য');
   });
 
   test('serves Bangla content, not English with a Bangla URL', async ({ page }) => {

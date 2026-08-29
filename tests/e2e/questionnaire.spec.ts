@@ -153,6 +153,9 @@ test.describe('questionnaire', () => {
   });
 
   test('reaches a preliminary recommendation and labels it as preliminary', async ({ page }) => {
+    // A full walk is ~14 server-action round trips; under parallel-suite
+    // load that legitimately exceeds the default budget.
+    test.slow();
     await page.goto('/en/start');
     await startBangladeshAssessment(page);
 
@@ -192,6 +195,9 @@ test.describe('questionnaire', () => {
   });
 
   test('sends a foreign founder to manual review', async ({ page }) => {
+    // A full walk is ~14 server-action round trips; under parallel-suite
+    // load that legitimately exceeds the default budget.
+    test.slow();
     await page.goto('/en/start');
     await startBangladeshAssessment(page);
 

@@ -307,7 +307,8 @@
     "reviewedOn": "Prices last reviewed on {date}.",
     "browseServices": "Browse the full service catalogue",
     "cta": "Get your itemised quote",
-    "ctaBody": "The assessment takes a few minutes and produces a quote that separates every fee layer."
+    "ctaBody": "The assessment takes a few minutes and produces a quote that separates every fee layer.",
+    "noPublishedFee": "Quoted after review"
   },
   "foreignFoundersPage": {
     "title": "Foreign founders",
