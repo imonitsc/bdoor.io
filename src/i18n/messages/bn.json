@@ -331,7 +331,8 @@
       "tax": "কর",
       "payment_processing_fee": "পেমেন্ট প্রসেসিং",
       "discount": "ছাড়"
-    }
+    },
+    "documentsAlt": "সাজানো ব্যবসা-গঠন সংক্রান্ত কাগজপত্রের কর্মপরিসর"
   },
   "pricingPage": {
     "title": "প্যাকেজ ও মূল্য",

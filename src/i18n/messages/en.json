@@ -331,7 +331,8 @@
       "tax": "Tax",
       "payment_processing_fee": "Payment processing",
       "discount": "Discount"
-    }
+    },
+    "documentsAlt": "An organised business-formation document workspace"
   },
   "pricingPage": {
     "title": "Packages and pricing",

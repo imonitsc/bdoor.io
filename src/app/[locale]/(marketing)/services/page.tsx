@@ -5,6 +5,7 @@ import { Link } from '@/i18n/navigation';
 import { Section } from '@/components/ui/section';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ServiceCard } from '@/components/marketing/service-card';
+import { FormationDocumentsImage } from '@/components/marketing/formation-documents-image';
 import { getCategories, getServices } from '@/features/catalog/queries';
 import { pick, type Locale } from '@/features/catalog/types';
 import { localizedUrl } from '@/lib/site';
@@ -56,11 +57,14 @@ export default async function ServicesPage({
   return (
     <>
       <Section tone="surface" className="border-border border-b py-12 md:py-16">
-        <div className="container-page">
-          <h1 className="text-ink text-3xl leading-tight md:text-4xl">{t('indexTitle')}</h1>
-          <p className="text-muted mt-3 max-w-2xl text-base leading-relaxed">
-            {t('indexDescription')}
-          </p>
+        <div className="container-page grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-end lg:gap-16">
+          <div>
+            <h1 className="text-ink text-3xl leading-tight md:text-4xl">{t('indexTitle')}</h1>
+            <p className="text-muted mt-3 max-w-2xl text-base leading-relaxed">
+              {t('indexDescription')}
+            </p>
+          </div>
+          <FormationDocumentsImage alt={t('documentsAlt')} />
         </div>
       </Section>
 
@@ -117,7 +121,7 @@ export default async function ServicesPage({
               title={t('emptyState')}
             />
           ) : (
-            <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <ul className="mt-6 grid gap-3 lg:grid-cols-2">
               {visible.map((service) => (
                 <li key={service.id}>
                   <ServiceCard service={service} locale={locale as Locale} />
