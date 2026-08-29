@@ -23,9 +23,7 @@ async function answer(
   await expect(progress).not.toHaveAttribute('aria-valuenow', before ?? '');
 }
 
-async function startBangladeshAssessment(
-  page: import('@playwright/test').Page,
-) {
+async function startBangladeshAssessment(page: import('@playwright/test').Page) {
   await answer(page, async () => {
     await page.getByRole('radio', { name: 'Start a business in Bangladesh' }).click();
   });
