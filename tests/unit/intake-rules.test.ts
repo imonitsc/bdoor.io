@@ -17,7 +17,7 @@ const LOCAL_SOLE_TRADER: PartialAnswers = {
   objective: 'new',
   founder_location: 'bangladesh',
   nationality: 'BD',
-  activity: 'Sell handmade leather bags from a shop in Dhaka.',
+  business_category: 'leather-goods',
   location: 'Dhaka',
   structure: 'sole_proprietorship',
   owner_count: 1,
@@ -104,7 +104,24 @@ describe('questionnaire branching', () => {
 
     expect(pruned).not.toHaveProperty('residence');
     expect(pruned).not.toHaveProperty('founder_will_work');
-    expect(pruned.activity).toBe(answered.activity);
+    expect(pruned.business_category).toBe(answered.business_category);
+  });
+
+  it('asks for a written description only when the category is "other"', () => {
+    const picked = applicableQuestions(LOCAL_SOLE_TRADER).map((q) => q.key);
+    expect(picked).toContain('business_category');
+    expect(picked).not.toContain('activity');
+
+    const unlisted = { ...LOCAL_SOLE_TRADER, business_category: 'other' };
+    expect(applicableQuestions(unlisted).map((q) => q.key)).toContain('activity');
+
+    // Correcting the category back to a listed one drops the now-pointless text.
+    const pruned = pruneInapplicable({
+      ...unlisted,
+      activity: 'Something the list does not cover at all.',
+      business_category: 'leather-goods',
+    });
+    expect(pruned).not.toHaveProperty('activity');
   });
 
   it('reports the first gap, and completeness once there are none', () => {
