@@ -3,6 +3,7 @@
 import { headers } from 'next/headers';
 import { getLocale } from 'next-intl/server';
 import { contactSchema } from './schema';
+import { resolveContactInterest } from './interest';
 import { createAdminClient, hasServiceRole } from '@/lib/supabase/admin';
 import { enforceRateLimit } from '@/lib/rate-limit';
 import { hashIdentifier } from '@/lib/utils/hash';
@@ -68,6 +69,25 @@ export async function submitContactRequest(
 
   const locale = await getLocale();
 
+  // Interest attribution: hidden fields carry catalog slugs, but they are
+  // re-resolved against the catalog here — what gets stored can never be an
+  // arbitrary client string, only a slug the catalog actually knows.
+  const interest = resolveContactInterest(
+    String(formData.get('interestCountry') ?? '') || undefined,
+    String(formData.get('interestRoute') ?? '') || undefined,
+  );
+
+  // The linking page, for lead routing only: same-origin pathname or nothing.
+  const referer = headerList.get('referer');
+  let sourcePath: string | null = null;
+  if (referer) {
+    try {
+      sourcePath = new URL(referer).pathname.slice(0, 200);
+    } catch {
+      sourcePath = null;
+    }
+  }
+
   const { error } = await createAdminClient()
     .from('contact_requests')
     .insert({
@@ -78,6 +98,9 @@ export async function submitContactRequest(
       message: parsed.data.message,
       locale: locale === 'bn' ? 'bn' : 'en',
       consent_given: true,
+      interest_country: interest?.countrySlug ?? null,
+      interest_route: interest?.routeSlug ?? null,
+      source_path: sourcePath,
     });
 
   if (error) {

@@ -37,11 +37,12 @@ export function HeroFounder({ alt, className }: { alt: string; className?: strin
             `sizes` that overstates makes the browser fetch a larger variant
             for no visible gain: a plain `55vw` pulled the 1920w file onto a
             1440px desktop where 1280w is already beyond 2x. Above 1440 the
-            container stops growing, so the box is a fixed 620px; between
-            1024 and 1440 it tracks the container at ~47vw; below that it is
-            the max-w-lg cap, then very nearly the full viewport on a phone.
+            container stops growing, so the box is a fixed ~690px (the image
+            column now takes 1.2fr of the hero grid); between 1024 and 1440
+            it tracks the container at ~52vw; below that it is the max-w-lg
+            cap, then very nearly the full viewport on a phone.
           */
-          sizes="(min-width: 1440px) 620px, (min-width: 1024px) 47vw, (min-width: 640px) 512px, 92vw"
+          sizes="(min-width: 1440px) 690px, (min-width: 1024px) 52vw, (min-width: 640px) 512px, 92vw"
           className="object-contain object-bottom lg:object-right-bottom"
         />
       </div>

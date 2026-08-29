@@ -13,6 +13,7 @@ import {
   internationalCountryBySlug,
   pickText,
 } from '@/content/international';
+import { countryGuideBySlug } from '@/content/countries/guides';
 import type { Locale } from '@/features/catalog/types';
 import { MARKETING_ROUTES } from '@/lib/navigation';
 import { localizedUrl } from '@/lib/site';
@@ -72,6 +73,7 @@ export default async function InternationalCountryPage({
   const loc = locale as Locale;
   const name = pickText(country.name, loc);
   const { offer } = country;
+  const guide = countryGuideBySlug(country.slug);
 
   return (
     <>
@@ -109,6 +111,62 @@ export default async function InternationalCountryPage({
 
             <h2 className="text-ink mt-10 text-xl font-semibold">{t('pricingTitle')}</h2>
             <p className="text-muted mt-3 text-sm leading-relaxed">{t('pricingBody')}</p>
+
+            {guide ? (
+              <>
+                <h2 className="text-ink mt-10 text-xl font-semibold">{t('requirementsTitle')}</h2>
+                <ul className="mt-3 flex flex-col gap-2.5">
+                  {guide.requirements.map((item) => (
+                    <li key={item.en} className="text-ink flex items-start gap-2.5 text-sm">
+                      <Check className="text-accent mt-1 size-4 shrink-0" aria-hidden="true" />
+                      <span className="leading-relaxed">{pickText(item, loc)}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <h2 className="text-ink mt-10 text-xl font-semibold">{t('documentsTitle')}</h2>
+                <ul className="mt-3 flex flex-col gap-2.5">
+                  {guide.documents.map((item) => (
+                    <li key={item.en} className="text-ink flex items-start gap-2.5 text-sm">
+                      <Check className="text-accent mt-1 size-4 shrink-0" aria-hidden="true" />
+                      <span className="leading-relaxed">{pickText(item, loc)}</span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-muted mt-3 text-xs leading-relaxed">{t('documentsNote')}</p>
+
+                <h2 className="text-ink mt-10 text-xl font-semibold">{t('obligationsTitle')}</h2>
+                <ul className="mt-3 flex flex-col gap-2.5">
+                  {guide.obligations.map((item) => (
+                    <li key={item.en} className="text-ink flex items-start gap-2.5 text-sm">
+                      <Check className="text-accent mt-1 size-4 shrink-0" aria-hidden="true" />
+                      <span className="leading-relaxed">{pickText(item, loc)}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <h2 className="text-ink mt-10 text-xl font-semibold">{t('faqTitle')}</h2>
+                <div className="mt-3 flex flex-col gap-2">
+                  {guide.faq.map((entry) => (
+                    <details
+                      key={entry.q.en}
+                      className="border-border bg-surface group rounded-[var(--radius-card)] border"
+                    >
+                      <summary className="text-ink flex min-h-11 cursor-pointer list-none items-center px-4 py-2.5 text-sm font-semibold [&::-webkit-details-marker]:hidden">
+                        {pickText(entry.q, loc)}
+                      </summary>
+                      <p className="text-muted border-border border-t px-4 py-3 text-sm leading-relaxed">
+                        {pickText(entry.a, loc)}
+                      </p>
+                    </details>
+                  ))}
+                </div>
+
+                <p className="text-muted mt-8 text-xs">
+                  {t('guideReviewed', { date: guide.reviewedAt })}
+                </p>
+              </>
+            ) : null}
           </div>
 
           <div>

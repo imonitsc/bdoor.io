@@ -57,3 +57,17 @@ export function paymentsStatus(): Toggle {
   const configured = read('PAYMENTS_STATUS', TOGGLES, 'disabled');
   return legalContentStatus() === 'draft' ? 'disabled' : configured;
 }
+
+/**
+ * Whether the public site may make operational claims — "Open now",
+ * "available today" and their kin. While the legal documents are drafts the
+ * platform takes no payments and collects no identity documents, so a page
+ * saying a service is available today would contradict the legal pages'
+ * own pre-launch notice. Pages read this and render enquiry-led copy
+ * ("accepting enquiries", assessment, register interest) instead; the
+ * operational copy returns automatically when the owner flips the legal
+ * gate after documented review.
+ */
+export function operationalClaimsAllowed(): boolean {
+  return legalContentStatus() === 'approved';
+}

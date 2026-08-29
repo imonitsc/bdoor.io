@@ -15,7 +15,14 @@ import type { Locale } from '@/features/catalog/types';
  * figure that would be true, and "draft" is a workflow state, not a message
  * to a customer.
  */
-export function CountrySelector({ locale }: { locale: Locale }) {
+export function CountrySelector({
+  locale,
+  operational,
+}: {
+  locale: Locale;
+  /** From `operationalClaimsAllowed()` — false renders enquiry-led copy. */
+  operational: boolean;
+}) {
   const t = useTranslations('international');
   const tCountries = useTranslations('countries');
 
@@ -35,10 +42,12 @@ export function CountrySelector({ locale }: { locale: Locale }) {
                 {pickText(BANGLADESH_COUNTRY.name, locale)}
               </Link>
             </h3>
-            <Badge tone="success">{tCountries('bangladesh.badge')}</Badge>
+            <Badge tone="success">
+              {tCountries(operational ? 'bangladesh.badge' : 'bangladesh.previewBadge')}
+            </Badge>
           </div>
           <p className="text-muted mt-2 flex-1 text-sm leading-relaxed">
-            {tCountries('bangladesh.body')}
+            {tCountries(operational ? 'bangladesh.body' : 'bangladesh.previewBody')}
           </p>
           <p className="text-primary mt-4 inline-flex items-center gap-1 text-sm font-medium">
             {t('viewRoute', { country: pickText(BANGLADESH_COUNTRY.name, locale) })}

@@ -10,6 +10,7 @@ import { PageHeader } from '@/components/marketing/page-header';
 import { IndependenceDisclosure } from '@/components/layout/disclosure';
 import { BANGLADESH_COUNTRY, internationalCountries, pickText } from '@/content/international';
 import type { Locale } from '@/features/catalog/types';
+import { operationalClaimsAllowed } from '@/lib/launch/gates';
 import { MARKETING_ROUTES } from '@/lib/navigation';
 import { localizedUrl } from '@/lib/site';
 
@@ -47,6 +48,9 @@ export default async function CountriesPage({ params }: { params: Promise<{ loca
   const tIntl = await getTranslations('international');
   const loc = locale as Locale;
   const countries = internationalCountries();
+  // While the legal documents are drafts nothing is chargeable, so the page
+  // must not say Bangladesh is "open now" — enquiry-led copy renders instead.
+  const operational = operationalClaimsAllowed();
 
   return (
     <>
@@ -63,10 +67,12 @@ export default async function CountriesPage({ params }: { params: Promise<{ loca
                   <h2 className="text-ink text-xl font-semibold">
                     {pickText(BANGLADESH_COUNTRY.name, loc)}
                   </h2>
-                  <Badge tone="success">{t('bangladesh.badge')}</Badge>
+                  <Badge tone="success">
+                    {operational ? t('bangladesh.badge') : t('bangladesh.previewBadge')}
+                  </Badge>
                 </div>
                 <p className="text-muted mt-2 max-w-xl text-sm leading-relaxed">
-                  {t('bangladesh.body')}
+                  {operational ? t('bangladesh.body') : t('bangladesh.previewBody')}
                 </p>
               </div>
               <div className="flex shrink-0 flex-col gap-2 sm:items-end">

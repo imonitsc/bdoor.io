@@ -12,7 +12,15 @@ import type { PackageSegment } from '@/features/packages/types';
 import { pick, type Locale } from '@/features/catalog/types';
 import { MARKETING_ROUTES } from '@/lib/navigation';
 
-function PackageCards({ segment, locale }: { segment: PackageSegment; locale: Locale }) {
+function PackageCards({
+  segment,
+  locale,
+  usdNotes,
+}: {
+  segment: PackageSegment;
+  locale: Locale;
+  usdNotes?: Record<string, string>;
+}) {
   const t = useTranslations('packages');
   const packages = publishedPackages(segment).slice(0, 3);
 
@@ -32,6 +40,9 @@ function PackageCards({ segment, locale }: { segment: PackageSegment; locale: Lo
               <p className="text-primary mt-2 text-base font-semibold">
                 {pick(version.publicLabel, locale)}
               </p>
+              {usdNotes?.[pkg.slug] ? (
+                <p className="text-muted mt-1 text-xs">{usdNotes[pkg.slug]}</p>
+              ) : null}
               <p className="text-muted mt-3 text-sm leading-relaxed">
                 {pick(version.summary, locale)}
               </p>
@@ -95,7 +106,14 @@ function PackageCards({ segment, locale }: { segment: PackageSegment; locale: Lo
   );
 }
 
-export function PackageSelector({ locale }: { locale: Locale }) {
+export function PackageSelector({
+  locale,
+  usdNotes,
+}: {
+  locale: Locale;
+  /** From `packageUsdNotes()` — absent when no reviewed FX rate exists. */
+  usdNotes?: Record<string, string>;
+}) {
   const t = useTranslations('packages');
   const [segment, setSegment] = useState<PackageSegment>('new_business');
 
@@ -107,10 +125,10 @@ export function PackageSelector({ locale }: { locale: Locale }) {
           <TabsTrigger value="existing_business">{t('segments.existingBusiness')}</TabsTrigger>
         </TabsList>
         <TabsContent value="new_business">
-          <PackageCards segment="new_business" locale={locale} />
+          <PackageCards segment="new_business" locale={locale} usdNotes={usdNotes} />
         </TabsContent>
         <TabsContent value="existing_business">
-          <PackageCards segment="existing_business" locale={locale} />
+          <PackageCards segment="existing_business" locale={locale} usdNotes={usdNotes} />
         </TabsContent>
       </Tabs>
     </div>

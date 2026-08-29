@@ -52,6 +52,10 @@ export default defineConfig({
           // The suite walks the questionnaire end to end several times from one
           // address, which is exactly the shape the limiter is there to stop.
           RATE_LIMIT_DISABLED: 'true',
+          // A reviewed display rate so the approximate-USD lines render and
+          // can be asserted. Synthetic: display-only, never a ledger input.
+          FX_USD_BDT_RATE: '123.07',
+          FX_USD_BDT_REVIEWED_AT: '2026-08-29',
           // E2E runs without Supabase credentials; the app degrades gracefully
           // and the boot-time completeness check would otherwise refuse to start.
           STRICT_ENV: 'false',

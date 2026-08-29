@@ -14,7 +14,18 @@ import { CONTACT_TOPICS } from '@/features/contact/schema';
 
 const INITIAL: ContactState = { status: 'idle' };
 
-export function ContactForm({ defaultTopic }: { defaultTopic?: string }) {
+export function ContactForm({
+  defaultTopic,
+  interestCountry,
+  interestRoute,
+  defaultMessage,
+}: {
+  defaultTopic?: string;
+  /** Catalog slugs resolved server-side by the page; re-validated on submit. */
+  interestCountry?: string;
+  interestRoute?: string;
+  defaultMessage?: string;
+}) {
   const t = useTranslations('contact');
   const tCommon = useTranslations('common');
   const tErrors = useTranslations('contact.errors');
@@ -90,9 +101,21 @@ export function ContactForm({ defaultTopic }: { defaultTopic?: string }) {
       <Field error={error('message')}>
         <FieldLabel required>{t('messageLabel')}</FieldLabel>
         <FieldControl hasDescription={false}>
-          <Textarea name="message" rows={6} required minLength={10} maxLength={5000} />
+          <Textarea
+            name="message"
+            rows={6}
+            required
+            minLength={10}
+            maxLength={5000}
+            defaultValue={defaultMessage}
+          />
         </FieldControl>
       </Field>
+
+      {interestCountry ? (
+        <input type="hidden" name="interestCountry" value={interestCountry} />
+      ) : null}
+      {interestRoute ? <input type="hidden" name="interestRoute" value={interestRoute} /> : null}
 
       {/* Honeypot. Hidden from everyone, including screen readers. */}
       <div hidden aria-hidden="true">

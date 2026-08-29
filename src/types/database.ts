@@ -874,6 +874,9 @@ export type Database = {
           "message": string
           "locale": Database["public"]["Enums"]["locale_code"]
           "consent_given": boolean
+          "interest_country": string | null
+          "interest_route": string | null
+          "source_path": string | null
           "handled_by": string | null
           "handled_at": string | null
           "created_at": string
@@ -887,6 +890,9 @@ export type Database = {
           "message": string
           "locale"?: Database["public"]["Enums"]["locale_code"]
           "consent_given"?: boolean
+          "interest_country"?: string | null
+          "interest_route"?: string | null
+          "source_path"?: string | null
           "handled_by"?: string | null
           "handled_at"?: string | null
           "created_at"?: string
@@ -900,6 +906,9 @@ export type Database = {
           "message"?: string
           "locale"?: Database["public"]["Enums"]["locale_code"]
           "consent_given"?: boolean
+          "interest_country"?: string | null
+          "interest_route"?: string | null
+          "source_path"?: string | null
           "handled_by"?: string | null
           "handled_at"?: string | null
           "created_at"?: string
