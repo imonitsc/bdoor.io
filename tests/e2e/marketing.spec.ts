@@ -52,7 +52,7 @@ test.describe('marketing site', () => {
     );
 
     const main = page.locator('main');
-    const cta = await main.getByRole('link', { name: 'Start now' }).first().boundingBox();
+    const cta = await main.getByTestId('home-hero-start').boundingBox();
     const imageSlot = await main
       .locator('[data-missing-asset="open-door-dhaka.webp"], img[src*="open-door-dhaka"]')
       .first()
@@ -60,8 +60,7 @@ test.describe('marketing site', () => {
     expect(cta).not.toBeNull();
     expect(imageSlot).not.toBeNull();
     expect(cta!.y).toBeLessThan(imageSlot!.y);
-    // Allow sub-pixel rounding on mobile Chromium (lg button is 48px).
-    expect(cta!.height).toBeGreaterThanOrEqual(43);
+    expect(cta!.height).toBeGreaterThanOrEqual(44);
   });
 
   test('renders no raw translation-key path on the key pages', async ({ page }) => {

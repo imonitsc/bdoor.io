@@ -55,7 +55,11 @@ function Hero() {
 
           <div className="mt-8">
             <Button asChild size="lg">
-              <Link href={MARKETING_ROUTES.start}>
+              <Link
+                href={MARKETING_ROUTES.start}
+                data-testid="home-hero-start"
+                className="inline-flex min-h-11 items-center"
+              >
                 {t('primaryCta')}
                 <ArrowRight className="size-4" aria-hidden="true" />
               </Link>
