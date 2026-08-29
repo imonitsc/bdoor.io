@@ -187,7 +187,7 @@ test.describe('application flow', () => {
     await page.goto('/en/start');
     await page.getByRole('button', { name: 'Why we ask' }).click();
     await expect(
-      page.getByText('The application is country-first', { exact: false }),
+      page.getByText('Bangladesh is our operating market', { exact: false }),
     ).toBeVisible();
   });
 

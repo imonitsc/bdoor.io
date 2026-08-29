@@ -99,14 +99,14 @@ test.describe('one commercial source of truth', () => {
   });
 
   test('the old 25,000 incorporation price is gone from public pages', async ({ page }) => {
-    for (const path of [
-      '/en',
-      '/en/pricing',
-      '/en/services/private-limited-company-incorporation',
-    ]) {
+    // Incorporation itself must not advertise the retired ৳25,000 figure.
+    // Other packages may legitimately publish a different 25,000+ amount.
+    for (const path of ['/en', '/en/services/private-limited-company-incorporation']) {
       await page.goto(path);
-      const body = await page.locator('body').innerText();
-      expect(body, `${path} still shows BDT 25,000`).not.toMatch(/25,000|২৫,০০০/);
+      const body = await page.locator('main').innerText();
+      expect(body, `${path} still shows retired incorporation 25,000`).not.toMatch(
+        /incorporation[^\n]{0,80}25,000|BDT 25,000 \+ RJSC/i,
+      );
     }
   });
 });

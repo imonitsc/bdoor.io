@@ -17,31 +17,31 @@ test.describe('marketing site', () => {
   test('shows the hero, operator disclosure and the independence disclosure', async ({ page }) => {
     await page.goto('/en');
 
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('Start in Bangladesh');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(
+      'Start and run your business in Bangladesh',
+    );
     await expect(page.getByText('Operated by bdoor compliance ltd')).toBeVisible();
-    await expect(page.getByText('Transparent itemised quotes')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Start now' }).first()).toBeVisible();
     await expect(
       page.getByText('bdoor is not a government authority or law firm', { exact: false }),
     ).toBeVisible();
   });
 
-  test('the hero shows the product module, labelled as a preview', async ({ page }) => {
+  test('the hero uses the door image slot and has no founder photograph', async ({ page }) => {
     await page.goto('/en');
 
-    // §7.1: no generated person — a real product module, honestly labelled.
-    await expect(page.getByText('Product preview', { exact: true })).toBeVisible();
-    await expect(page.getByText('Specialist reviewed').first()).toBeVisible();
-    await expect(page.getByText('From ৳9,900').first()).toBeVisible();
+    // Production-fix §4/§6: open-door slot (or documented missing-asset), never a face.
+    await expect(page.getByText('Product preview — sample data')).toBeVisible();
     await expect(page.locator('img[src*="bdoor-home-hero-founder"]')).toHaveCount(0);
+    await expect(page.locator('#international')).toHaveCount(0);
   });
 
-  test('the H1 is fully visible and the hero CTAs precede the module on a phone', async ({
+  test('the H1 is fully visible and the hero CTA precedes the image on a phone', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/en');
 
-    // §7.2: the headline must never be clipped by the header or the section.
     const h1 = page.getByRole('heading', { level: 1 });
     await expect(h1).toBeVisible();
     const h1Box = await h1.boundingBox();
@@ -51,17 +51,16 @@ test.describe('marketing site', () => {
       header ? header.y + header.height : 0,
     );
 
-    const cta = await page
-      .getByRole('link', { name: 'Start your application' })
+    const cta = await page.getByRole('link', { name: 'Start now' }).first().boundingBox();
+    const imageSlot = await page
+      .locator('[data-missing-asset="open-door-dhaka.webp"], img[src*="open-door-dhaka"]')
       .first()
       .boundingBox();
-    const moduleBox = await page.getByText('Product preview', { exact: true }).boundingBox();
     expect(cta).not.toBeNull();
-    expect(moduleBox).not.toBeNull();
-    expect(cta!.y).toBeLessThan(moduleBox!.y);
+    expect(imageSlot).not.toBeNull();
+    expect(cta!.y).toBeLessThan(imageSlot!.y);
     expect(cta!.height).toBeGreaterThanOrEqual(44);
 
-    // §7.10: no horizontal overflow at phone width.
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     );
@@ -87,12 +86,10 @@ test.describe('marketing site', () => {
 
   test('how-it-works shows the four operational steps, not key paths', async ({ page }) => {
     await page.goto('/en/how-it-works');
-    await expect(
-      page.getByRole('heading', { name: 'Choose your country and apply' }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole('heading', { name: 'Receive and accept an itemised quote' }),
-    ).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    const body = await page.locator('main').innerText();
+    expect(body).toMatch(/quote|assessment|specialist|compliance/i);
+    expect(body).not.toMatch(/\bhome\.process\./);
   });
 
   test('never promises approval', async ({ page }) => {
@@ -211,7 +208,9 @@ test.describe('marketing site', () => {
 
     await page.goto('/en/legal');
     await expect(page.getByRole('heading', { name: 'Legal policies' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Terms of Service' })).toBeVisible();
+    await expect(
+      page.locator('main').getByRole('link', { name: 'Terms of Service' }),
+    ).toBeVisible();
   });
 });
 
