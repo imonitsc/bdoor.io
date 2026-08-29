@@ -590,7 +590,6 @@
   "start": {
     "title": "Start your business",
     "description": "A short guided questionnaire. We only ask what applies to you, and you can save and resume.",
-    "progressLabel": "Step {current} of {total}",
     "sectionLabel": "Section",
     "whyWeAsk": "Why we ask",
     "saveAndExit": "Save and exit",
@@ -760,7 +759,9 @@
       "ownership": "Ownership",
       "operations": "Operations",
       "timing": "Timing"
-    }
+    },
+    "stageLabel": "Stage {current} of {total}: {name}",
+    "review": "Review"
   },
   "workspace": {
     "nav": {

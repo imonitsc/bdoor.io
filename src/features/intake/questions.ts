@@ -303,6 +303,35 @@ export function applicableQuestions(answers: PartialAnswers): QuestionDefinition
   return QUESTIONS.filter((q) => q.shouldAsk(answers));
 }
 
+/**
+ * The five stages of the questionnaire, in order. Progress is presented per
+ * stage, never as "question X of Y": conditional questions legitimately
+ * appear and disappear as answers arrive, so a question count makes the
+ * visible progress jump (Step 1 of 16 → Step 3 of 15) and look broken. The
+ * stage a question belongs to never changes, so the stage indicator only
+ * ever moves when the founder actually crosses a stage boundary.
+ */
+export const STAGES = ['about_you', 'the_business', 'ownership', 'operations', 'timing'] as const;
+
+export type Stage = (typeof STAGES)[number];
+
+export type StageProgress = {
+  /** 1-based stage number; at review this is STAGES.length + 1. */
+  current: number;
+  total: number;
+  stage: Stage | 'review';
+};
+
+/** Stable stage-based progress for the question at `index` (review beyond). */
+export function stageProgress(answers: PartialAnswers, index: number): StageProgress {
+  const question = applicableQuestions(answers)[index];
+  if (!question) {
+    return { current: STAGES.length + 1, total: STAGES.length, stage: 'review' };
+  }
+  const stageIndex = STAGES.indexOf(question.section);
+  return { current: stageIndex + 1, total: STAGES.length, stage: question.section };
+}
+
 export function questionAt(answers: PartialAnswers, index: number): QuestionDefinition | undefined {
   return applicableQuestions(answers)[index];
 }

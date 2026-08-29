@@ -590,7 +590,6 @@
   "start": {
     "title": "ব্যবসা শুরু করুন",
     "description": "সংক্ষিপ্ত একটি প্রশ্নমালা। যা আপনার ক্ষেত্রে প্রযোজ্য কেবল সেটুকুই জিজ্ঞাসা করি, আর সংরক্ষণ করে পরে ফেরা যায়।",
-    "progressLabel": "ধাপ {current} / {total}",
     "sectionLabel": "অংশ",
     "whyWeAsk": "কেন জিজ্ঞাসা করছি",
     "saveAndExit": "সংরক্ষণ করে বের হন",
@@ -760,7 +759,9 @@
       "ownership": "মালিকানা",
       "operations": "পরিচালনা",
       "timing": "সময়"
-    }
+    },
+    "stageLabel": "পর্যায় {current} / {total}: {name}",
+    "review": "পর্যালোচনা"
   },
   "workspace": {
     "nav": {
