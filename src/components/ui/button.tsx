@@ -14,17 +14,28 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary:
-          'bg-primary text-on-primary hover:bg-primary-hover active:bg-primary-active shadow-xs',
+        // The signature-gradient action. bg-primary stays underneath as the
+        // paint-order fallback; hover lifts with a cobalt-tinted shadow and a
+        // slight brightness shift (the gradient itself never changes), and
+        // active presses back down for tactile feedback. Trailing arrow
+        // icons nudge forward with the hover.
+        primary: [
+          'gradient-primary bg-primary text-on-primary shadow-xs',
+          'transition-all duration-200 ease-out',
+          'hover:-translate-y-0.5 hover:shadow-primary hover:brightness-110',
+          'active:translate-y-0 active:scale-[0.98] active:brightness-100',
+          '[&_svg:last-child]:transition-transform [&_svg:last-child]:duration-200',
+          'hover:[&_svg:last-child]:translate-x-0.5',
+        ].join(' '),
         secondary:
-          'bg-surface text-ink border border-border-strong hover:bg-surface-sunken active:bg-surface-sunken shadow-xs',
+          'bg-surface text-ink border border-border-strong hover:bg-surface-sunken active:bg-surface-sunken shadow-xs transition-all duration-200 hover:border-[color:var(--bd-cobalt-200)] hover:shadow-sm',
         ghost: 'bg-transparent text-ink hover:bg-surface-sunken',
         subtle:
           'bg-primary-soft text-info hover:bg-[color-mix(in_srgb,var(--color-primary-soft)_80%,var(--color-primary)_20%)]',
         danger:
           'bg-danger text-white hover:bg-[color-mix(in_srgb,var(--color-danger)_85%,black)] shadow-xs',
         inverse:
-          'bg-surface text-ink hover:bg-[color-mix(in_srgb,white_90%,var(--color-primary))] shadow-sm',
+          'bg-surface text-ink hover:bg-[color-mix(in_srgb,white_90%,var(--color-primary))] shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:scale-[0.98]',
         link: 'bg-transparent text-primary underline underline-offset-4 hover:text-primary-hover',
       },
       size: {

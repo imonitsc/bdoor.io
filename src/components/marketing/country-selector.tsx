@@ -28,41 +28,52 @@ export function CountrySelector({
 
   return (
     <ul className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      {/*
+        The flagship card wears the featured treatment: a 2px signature-
+        gradient stroke (nested-div technique) with a cobalt-tinted shadow.
+        This is the one "featured" the catalogue can prove — Bangladesh is
+        the operating market — so the emphasis is factual, not decorative.
+      */}
       <li className="sm:col-span-2">
-        <Card
-          as="article"
-          className="group border-accent/40 relative flex h-full flex-col p-5 md:p-6"
-        >
-          <div className="flex items-start justify-between gap-2">
-            <h3 className="text-ink text-lg font-semibold">
-              <Link
-                href={`/countries/${BANGLADESH_COUNTRY.slug}`}
-                className="rounded before:absolute before:inset-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
-              >
-                {pickText(BANGLADESH_COUNTRY.name, locale)}
-              </Link>
-            </h3>
-            <Badge tone="success">
-              {tCountries(operational ? 'bangladesh.badge' : 'bangladesh.previewBadge')}
-            </Badge>
-          </div>
-          <p className="text-muted mt-2 flex-1 text-sm leading-relaxed">
-            {tCountries(operational ? 'bangladesh.body' : 'bangladesh.previewBody')}
-          </p>
-          <p className="text-primary mt-4 inline-flex items-center gap-1 text-sm font-medium">
-            {t('viewRoute', { country: pickText(BANGLADESH_COUNTRY.name, locale) })}
-            <ArrowRight
-              className="size-4 transition-transform group-hover:translate-x-0.5"
-              aria-hidden="true"
-            />
-          </p>
-        </Card>
+        <div className="gradient-primary shadow-primary h-full rounded-[calc(var(--radius-card)+2px)] p-[2px]">
+          <Card
+            as="article"
+            className="group relative flex h-full flex-col border-transparent p-5 md:p-6"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <h3 className="text-ink text-lg font-semibold">
+                <Link
+                  href={`/countries/${BANGLADESH_COUNTRY.slug}`}
+                  className="rounded before:absolute before:inset-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+                >
+                  {pickText(BANGLADESH_COUNTRY.name, locale)}
+                </Link>
+              </h3>
+              <Badge tone="success">
+                {tCountries(operational ? 'bangladesh.badge' : 'bangladesh.previewBadge')}
+              </Badge>
+            </div>
+            <p className="text-muted mt-2 flex-1 text-sm leading-relaxed">
+              {tCountries(operational ? 'bangladesh.body' : 'bangladesh.previewBody')}
+            </p>
+            <p className="text-primary mt-4 inline-flex items-center gap-1 text-sm font-medium">
+              {t('viewRoute', { country: pickText(BANGLADESH_COUNTRY.name, locale) })}
+              <ArrowRight
+                className="size-4 transition-transform group-hover:translate-x-0.5"
+                aria-hidden="true"
+              />
+            </p>
+          </Card>
+        </div>
       </li>
       {internationalCountries().map((country) => {
         const name = pickText(country.name, locale);
         return (
           <li key={country.slug}>
-            <Card as="article" className="group relative flex h-full flex-col p-5">
+            <Card
+              as="article"
+              className="group relative flex h-full flex-col p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
+            >
               <div className="flex items-start justify-between gap-2">
                 <h3 className="text-ink text-base font-semibold">
                   <Link

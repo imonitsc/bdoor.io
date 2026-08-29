@@ -35,7 +35,10 @@ function PackageCards({
         const remaining = version.inclusions.slice(3);
         return (
           <li key={pkg.slug}>
-            <Card as="article" className="flex h-full flex-col p-5 md:p-6">
+            <Card
+              as="article"
+              className="flex h-full flex-col p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md md:p-6"
+            >
               <h3 className="text-ink text-lg font-semibold">{pick(pkg.name, locale)}</h3>
               <p className="text-primary mt-2 text-base font-semibold">
                 {pick(version.publicLabel, locale)}
