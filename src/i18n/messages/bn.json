@@ -78,10 +78,11 @@
     "mainNavigation": "মূল মেনু",
     "workspace": "ওয়ার্কস্পেস",
     "adminArea": "অ্যাডমিন",
-    "partnerArea": "অংশীদার"
+    "partnerArea": "অংশীদার",
+    "bangladesh": "বাংলাদেশ",
+    "packages": "প্যাকেজ"
   },
   "footer": {
-    "servicesHeading": "সেবাসমূহ",
     "companyHeading": "প্রতিষ্ঠান",
     "legalHeading": "আইনগত",
     "contactHeading": "যোগাযোগ",
@@ -92,17 +93,17 @@
     "links": {
       "formation": "কোম্পানি গঠন",
       "licences": "ট্রেড লাইসেন্স",
-      "importExport": "আমদানি ও রপ্তানি",
       "tax": "কর ও ভ্যাট",
       "compliance": "বার্ষিক কমপ্লায়েন্স",
-      "international": "আন্তর্জাতিক রুট",
-      "technology": "প্রযুক্তি",
-      "ecommerce": "ই-কমার্স",
-      "importExportIndustry": "আমদানি ও রপ্তানি",
-      "manufacturing": "উৎপাদন"
+      "internationalOverview": "সারসংক্ষেপ",
+      "unitedStates": "যুক্তরাষ্ট্র",
+      "unitedKingdom": "যুক্তরাজ্য",
+      "uae": "সংযুক্ত আরব আমিরাত",
+      "singapore": "সিঙ্গাপুর"
     },
-    "industriesHeading": "শিল্প",
-    "socialHeading": "bdoor অনুসরণ করুন"
+    "socialHeading": "bdoor অনুসরণ করুন",
+    "bangladeshHeading": "বাংলাদেশ",
+    "internationalHeading": "আন্তর্জাতিক"
   },
   "home": {
     "hero": {

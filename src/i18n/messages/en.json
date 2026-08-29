@@ -78,10 +78,11 @@
     "mainNavigation": "Main navigation",
     "workspace": "Workspace",
     "adminArea": "Admin",
-    "partnerArea": "Partner"
+    "partnerArea": "Partner",
+    "bangladesh": "Bangladesh",
+    "packages": "Packages"
   },
   "footer": {
-    "servicesHeading": "Services",
     "companyHeading": "Company",
     "legalHeading": "Legal",
     "contactHeading": "Contact",
@@ -92,17 +93,17 @@
     "links": {
       "formation": "Company formation",
       "licences": "Trade licences",
-      "importExport": "Import and export",
       "tax": "Tax and VAT",
       "compliance": "Annual compliance",
-      "international": "International routes",
-      "technology": "Technology",
-      "ecommerce": "E-commerce",
-      "importExportIndustry": "Import and export",
-      "manufacturing": "Manufacturing"
+      "internationalOverview": "Overview",
+      "unitedStates": "United States",
+      "unitedKingdom": "United Kingdom",
+      "uae": "United Arab Emirates",
+      "singapore": "Singapore"
     },
-    "industriesHeading": "Industries",
-    "socialHeading": "Follow bdoor"
+    "socialHeading": "Follow bdoor",
+    "bangladeshHeading": "Bangladesh",
+    "internationalHeading": "International"
   },
   "home": {
     "hero": {
