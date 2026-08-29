@@ -841,16 +841,16 @@ Requirements:
 5. Legal index → open every policy → verify title, version, contact, table of contents and mobile layout.
 6. Attempt payment/KYC with draft policies → server denies the action even after client-side flag tampering.
 7. Approve a test policy version → acceptance record stores version, locale, timestamp and immutable content reference.
-5. Outside Bangladesh → UAE → Formation/visa support → submit.
-6. Outside Bangladesh → Saudi Arabia → eligibility route → submit.
-7. Outside Bangladesh → Qatar → new company → submit.
-8. Outside Bangladesh → Singapore → new company → submit.
-9. Every country deep link shows selected-country context.
-10. Back and refresh retain answers.
-11. Progress updates correctly.
-12. Legal gate prevents sensitive actions.
-13. Header, mobile drawer, language switch and footer work.
-14. No dead links or Coming soon buttons.
+8. Outside Bangladesh → UAE → Formation/visa support → submit.
+9. Outside Bangladesh → Saudi Arabia → eligibility route → submit.
+10. Outside Bangladesh → Qatar → new company → submit.
+11. Outside Bangladesh → Singapore → new company → submit.
+12. Every country deep link shows selected-country context.
+13. Back and refresh retain answers.
+14. Progress updates correctly.
+15. Legal gate prevents sensitive actions.
+16. Header, mobile drawer, language switch and footer work.
+17. No dead links or Coming soon buttons.
 
 Visual regression at 360, 768 and 1440 for:
 

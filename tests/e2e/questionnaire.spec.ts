@@ -116,7 +116,9 @@ test.describe('application flow', () => {
     // Market scope first: Bangladesh / Outside Bangladesh.
     await expect(page.getByText('Where do you want to start or manage a business?')).toBeVisible();
     await expect(page.getByRole('radio', { name: 'Bangladesh', exact: true })).toBeVisible();
-    await expect(page.getByRole('radio', { name: 'Outside Bangladesh', exact: true })).toBeVisible();
+    await expect(
+      page.getByRole('radio', { name: 'Outside Bangladesh', exact: true }),
+    ).toBeVisible();
     await chooseCountry(page, 'Bangladesh');
 
     await expect(page.getByText('What do you want to do?')).toBeVisible();

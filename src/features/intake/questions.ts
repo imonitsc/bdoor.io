@@ -68,7 +68,10 @@ export const OUTSIDE_TARGET_COUNTRIES = [
 ] as const satisfies ReadonlyArray<TargetCountry>;
 
 /** Bangladesh business-stage options on the second screen. */
-export const BANGLADESH_OBJECTIVES = ['new', 'existing'] as const satisfies ReadonlyArray<Objective>;
+export const BANGLADESH_OBJECTIVES = [
+  'new',
+  'existing',
+] as const satisfies ReadonlyArray<Objective>;
 
 export const FOUNDER_LOCATIONS = ['bangladesh', 'outside'] as const;
 export const STRUCTURES = [
@@ -242,7 +245,11 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     shouldAsk: (a) => {
       if (a.objective !== undefined) return true;
       // Bangladesh: New / Existing next. Outside: still ask after country.
-      return a.market_scope === 'bangladesh' || a.market_scope === 'outside' || a.market_scope === undefined;
+      return (
+        a.market_scope === 'bangladesh' ||
+        a.market_scope === 'outside' ||
+        a.market_scope === undefined
+      );
     },
     schema: answersSchema.shape.objective,
   },
@@ -528,7 +535,8 @@ export type StageProgress = {
 export type VisibleStep = {
   current: number;
   total: number;
-  labelKey: 'location' | 'country' | 'business_stage' | 'structure' | 'support' | 'details' | 'contact';
+  labelKey:
+    'location' | 'country' | 'business_stage' | 'structure' | 'support' | 'details' | 'contact';
 };
 
 export function visibleStep(answers: PartialAnswers, index: number): VisibleStep {
@@ -541,7 +549,11 @@ export function visibleStep(answers: PartialAnswers, index: number): VisibleStep
   if (key === 'market_scope') return { current: 1, total, labelKey: 'location' };
   if (key === 'target_country') return { current: 2, total, labelKey: 'country' };
   if (key === 'objective' || key === 'existing_business') {
-    return { current: 2, total, labelKey: answers.market_scope === 'bangladesh' ? 'business_stage' : 'country' };
+    return {
+      current: 2,
+      total,
+      labelKey: answers.market_scope === 'bangladesh' ? 'business_stage' : 'country',
+    };
   }
   if (
     key === 'structure' ||

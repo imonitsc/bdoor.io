@@ -176,9 +176,7 @@ test.describe('marketing site', () => {
     await expect(page.getByText('Coming soon')).toHaveCount(0);
   });
 
-  test('marks a coming-soon service detail as not open when reached directly', async ({
-    page,
-  }) => {
+  test('marks a coming-soon service detail as not open when reached directly', async ({ page }) => {
     await page.goto('/en/services/travel-agency-registration');
     // Detail may still exist for deep links; the public index must not promote it.
     const body = await page.locator('main').innerText();

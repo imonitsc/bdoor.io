@@ -110,7 +110,9 @@ function ProcessSection() {
                 </span>
                 <div>
                   <h3 className="text-ink text-base font-semibold">{t(`steps.${step}.title`)}</h3>
-                  <p className="text-muted mt-1 text-sm leading-relaxed">{t(`steps.${step}.body`)}</p>
+                  <p className="text-muted mt-1 text-sm leading-relaxed">
+                    {t(`steps.${step}.body`)}
+                  </p>
                 </div>
               </li>
             ))}

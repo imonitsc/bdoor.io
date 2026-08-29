@@ -12,25 +12,25 @@ import { hardManualReviewReasons } from '@/features/intake/rules';
 import { newApplicationReference } from '@/features/intake/application';
 
 /**
- * Opening of the application (65/35 master §13 + seven-country follow-up):
- * help_scope first, then country/objective when the scope still needs them.
+ * Opening of the application (production-fix 29 Aug 2026):
+ * market_scope first, then country/objective when the scope still needs them.
  * An international target must never bypass manual review.
  */
 describe('target_country', () => {
-  it('follows help_scope when the visitor has not chosen a scope yet', () => {
+  it('follows market_scope when the visitor has not chosen a scope yet', () => {
     const keys = applicableQuestions({}).map((q) => q.key);
-    expect(keys[0]).toBe('help_scope');
+    expect(keys[0]).toBe('market_scope');
     expect(keys[1]).toBe('target_country');
     expect(keys[2]).toBe('objective');
   });
 
-  it('is skipped once Bangladesh help_scope has implied the country', () => {
+  it('is skipped once Bangladesh market_scope has implied the country', () => {
     const keys = applicableQuestions({
-      help_scope: 'bangladesh_new',
+      market_scope: 'bangladesh',
       target_country: 'bangladesh',
       objective: 'new',
     }).map((q) => q.key);
-    expect(keys[0]).toBe('help_scope');
+    expect(keys[0]).toBe('market_scope');
     // target_country stays applicable (answered) so prune cannot drop it,
     // but firstUnansweredIndex advances past it.
     expect(keys).toContain('target_country');

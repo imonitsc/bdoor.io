@@ -533,18 +533,18 @@ A customer may request a copy of an electronically accepted document or update c
 
 Create or replace these locale-aware routes using the relevant section above:
 
-| Route | Page title | Footer |
-|---|---|---|
-| `/[locale]/terms` | Terms of Service | Yes |
-| `/[locale]/privacy` | Privacy Policy | Yes |
-| `/[locale]/refund-policy` | Refund and Cancellation Policy | Yes |
-| `/[locale]/aml-kyc-policy` | AML, KYC and Sanctions Policy | Yes |
-| `/[locale]/cookie-policy` | Cookie Policy | Yes |
-| `/[locale]/legal-disclaimer` | Legal and Professional Services Disclaimer | Yes |
-| `/[locale]/complaints` | Complaints Policy | Yes |
-| `/[locale]/acceptable-use` | Acceptable Use Policy | Yes |
-| `/[locale]/provider-disclosure` | Third-Party Professional and Provider Disclosure | Yes |
-| `/[locale]/electronic-consent` | Electronic Communications and Consent Policy | Contextual/footer |
+| Route                           | Page title                                       | Footer            |
+| ------------------------------- | ------------------------------------------------ | ----------------- |
+| `/[locale]/terms`               | Terms of Service                                 | Yes               |
+| `/[locale]/privacy`             | Privacy Policy                                   | Yes               |
+| `/[locale]/refund-policy`       | Refund and Cancellation Policy                   | Yes               |
+| `/[locale]/aml-kyc-policy`      | AML, KYC and Sanctions Policy                    | Yes               |
+| `/[locale]/cookie-policy`       | Cookie Policy                                    | Yes               |
+| `/[locale]/legal-disclaimer`    | Legal and Professional Services Disclaimer       | Yes               |
+| `/[locale]/complaints`          | Complaints Policy                                | Yes               |
+| `/[locale]/acceptable-use`      | Acceptable Use Policy                            | Yes               |
+| `/[locale]/provider-disclosure` | Third-Party Professional and Provider Disclosure | Yes               |
+| `/[locale]/electronic-consent`  | Electronic Communications and Consent Policy     | Contextual/footer |
 
 Each policy page must include:
 
@@ -613,4 +613,3 @@ These sources informed the issue list and must be rechecked by counsel; they do 
 - Cyber Security Act, 2026: https://bdlaws.minlaw.gov.bd/act-details-1710.html
 - Information and Communication Technology Act, 2006: https://bdlaws.minlaw.gov.bd/act-details-950.html
 - Directorate of National Consumer Rights Protection: https://dncrp.gov.bd/
-

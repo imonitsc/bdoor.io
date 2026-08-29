@@ -1494,12 +1494,12 @@
       "newBusiness": {
         "title": "Start a new business",
         "body": "From sole proprietorship to private limited company: choose a route, see what it includes and what official fees stay separate.",
-        "cta": "Browse services"
+        "cta": "Start new-business assessment"
       },
       "existingBusiness": {
         "title": "Manage an existing business",
         "body": "Compliance checks, annual returns and managed finance for companies already trading in Bangladesh.",
-        "cta": "See packages and pricing"
+        "cta": "Start existing-business assessment"
       },
       "assessment": {
         "title": "Not sure which route fits?",
@@ -1507,7 +1507,56 @@
         "cta": "Start the assessment"
       },
       "previewLede": "The flagship market: apply today for formation, registrations or ongoing compliance. The initial assessment is free and a specialist reviews it within one business day.",
-      "previewOpenTitle": "What you can apply for today"
+      "previewOpenTitle": "What you can apply for today",
+      "packages": {
+        "eyebrow": "Bangladesh packages",
+        "title": "Six packages across new and existing businesses.",
+        "body": "Each card shows the audience, bdoor fee and three inclusions. Full inclusions and fee layers live on Pricing.",
+        "pricingCta": "See full pricing and fee layers"
+      },
+      "services": {
+        "eyebrow": "Service categories",
+        "title": "What bdoor coordinates in Bangladesh.",
+        "body": "Grouped workstreams — regulated steps are fulfilled by appointed providers disclosed before engagement.",
+        "cta": "Browse all services",
+        "items": {
+          "start": {
+            "title": "Start a business",
+            "body": "Structure guidance, name clearance and incorporation coordination."
+          },
+          "licences": {
+            "title": "Licences and registrations",
+            "body": "Trade licence and other local registrations required to operate."
+          },
+          "tax": {
+            "title": "Tax and accounting",
+            "body": "e-TIN, BIN/VAT and ongoing tax coordination."
+          },
+          "changes": {
+            "title": "Company changes and compliance",
+            "body": "Annual returns, filings and corporate changes."
+          },
+          "foreign": {
+            "title": "Foreign investment and specialist support",
+            "body": "Investment registration and specialist routes for foreign founders."
+          }
+        }
+      },
+      "foreign": {
+        "title": "Foreign founders",
+        "body": "Entering Bangladesh as a foreign founder follows a clear sequence. Company incorporation does not itself grant residency or work authorisation.",
+        "cta": "Foreign-founder path"
+      },
+      "quote": {
+        "title": "How your quote is structured",
+        "body": "Every binding quote separates the layers below. Nothing is payable before you accept an itemised quote and the applicable terms.",
+        "layers": {
+          "bdoor": "bdoor professional fee",
+          "government": "Government or registry fees",
+          "provider": "Appointed provider / professional fees",
+          "thirdParty": "Third-party costs and applicable tax"
+        }
+      }
     }
   }
 }

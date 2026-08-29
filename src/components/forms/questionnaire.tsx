@@ -318,13 +318,6 @@ export function Questionnaire({ initial }: { initial: IntakeState }) {
   const [syncState, setSyncState] = useState<'idle' | 'saving' | 'saved' | 'local'>('idle');
   const headingRef = useRef<HTMLDivElement>(null);
 
-  // After a successful server submit, prefer the server confirmation payload.
-  useEffect(() => {
-    if (serverState.submitted) {
-      setAnswers(serverState.answers);
-    }
-  }, [serverState.submitted, serverState.answers]);
-
   const questions = useMemo(() => applicableQuestions(answers), [answers]);
   const safeIndex = Math.min(index, questions.length);
   const question = questions[safeIndex];
@@ -426,11 +419,7 @@ export function Questionnaire({ initial }: { initial: IntakeState }) {
 
       {(countryLabel || packageSlug) && (
         <div className="border-border bg-surface-sunken text-ink flex flex-wrap items-center gap-3 rounded-[var(--radius-control)] border px-4 py-3 text-sm">
-          {countryLabel ? (
-            <span>
-              {t('contextCountry', { country: countryLabel })}
-            </span>
-          ) : null}
+          {countryLabel ? <span>{t('contextCountry', { country: countryLabel })}</span> : null}
           {packageSlug ? <span>{t('contextPackage', { package: packageSlug })}</span> : null}
         </div>
       )}

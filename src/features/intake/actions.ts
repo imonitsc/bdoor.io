@@ -244,7 +244,6 @@ async function submitIntakeApplication(previous: IntakeState): Promise<IntakeSta
   }
 }
 
-
 /**
  * Non-blocking background persist for ordinary Next/Back navigation.
  * Does not return navigation state — the client advances immediately and

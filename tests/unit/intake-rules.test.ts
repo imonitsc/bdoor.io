@@ -12,7 +12,7 @@ import { SNAPSHOT_RULES } from '@/content/rules-snapshot';
 import { expandWithPrerequisites } from '@/features/intake/guide';
 
 const LOCAL_SOLE_TRADER: PartialAnswers = {
-  help_scope: 'bangladesh_new',
+  market_scope: 'bangladesh',
   target_country: 'bangladesh',
   objective: 'new',
   founder_location: 'bangladesh',
@@ -35,9 +35,9 @@ const LOCAL_SOLE_TRADER: PartialAnswers = {
 };
 
 describe('questionnaire branching', () => {
-  it('asks help_scope first, then country/objective when still needed', () => {
+  it('asks market_scope first, then country/objective when still needed', () => {
     const keys = applicableQuestions({}).map((q) => q.key);
-    expect(keys[0]).toBe('help_scope');
+    expect(keys[0]).toBe('market_scope');
     expect(keys[1]).toBe('target_country');
     expect(keys[2]).toBe('objective');
   });
