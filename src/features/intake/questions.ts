@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { BUSINESS_CATEGORY_SLUGS, OTHER_BUSINESS_CATEGORY } from './business-categories';
+
 /**
  * The guided questionnaire.
  *
@@ -109,6 +111,7 @@ export const answersSchema = z.object({
   founder_location: z.enum(FOUNDER_LOCATIONS, { message: 'requiredChoice' }),
   nationality: country,
   residence: country,
+  business_category: z.enum(BUSINESS_CATEGORY_SLUGS, { message: 'requiredChoice' }),
   activity: z.string().trim().min(15, 'tooShort').max(1000, 'tooLong'),
   location: z.string().trim().min(2, 'requiredText').max(120, 'tooLong'),
   structure: z.enum(STRUCTURES, { message: 'requiredChoice' }),
@@ -158,6 +161,7 @@ export type QuestionKind =
   | 'number'
   | 'country'
   | 'multi'
+  | 'category'
   | 'email'
   | 'phone'
   | 'consent';
@@ -299,12 +303,27 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     schema: answersSchema.shape.existing_registrations,
   },
   {
+    key: 'business_category',
+    section: 'the_business',
+    kind: 'category',
+    hasHelp: true,
+    showWhy: true,
+    shouldAsk: always,
+    schema: answersSchema.shape.business_category,
+  },
+  /**
+   * The free-text description now exists only for the applicant whose trade is
+   * genuinely not in the list. Everyone else answered the same question by
+   * picking a category, and asking them to write it out again would be the
+   * friction the category list was added to remove.
+   */
+  {
     key: 'activity',
     section: 'the_business',
     kind: 'textarea',
     hasHelp: true,
     showWhy: true,
-    shouldAsk: always,
+    shouldAsk: (a) => a.business_category === OTHER_BUSINESS_CATEGORY,
     schema: answersSchema.shape.activity,
   },
   {
@@ -585,6 +604,7 @@ export function visibleStep(answers: PartialAnswers, index: number): VisibleStep
     return { current: 4, total, labelKey: 'support' };
   }
   if (
+    key === 'business_category' ||
     key === 'activity' ||
     key === 'location' ||
     key === 'owner_count' ||
