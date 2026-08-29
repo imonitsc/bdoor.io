@@ -78,7 +78,6 @@ function Hero() {
             </li>
           ))}
         </ul>
-        <p className="text-muted mt-6 text-xs">{t('operatorLine')}</p>
       </div>
     </section>
   );
