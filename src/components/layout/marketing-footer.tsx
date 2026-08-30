@@ -6,6 +6,7 @@ import {
   FOOTER_COMPANY_LINKS,
   FOOTER_COUNTRY_LINKS,
   FOOTER_LEGAL_LINKS,
+  FOOTER_PROFESSIONALS_LINKS,
   MARKETING_ROUTES,
 } from '@/lib/navigation';
 import { activeSocialProfiles } from '@/lib/social/profiles';
@@ -75,10 +76,19 @@ export function MarketingFooter() {
             heading={t('footer.countriesHeading')}
             links={FOOTER_COUNTRY_LINKS.map((l) => ({ href: l.href, label: t(l.labelKey) }))}
           />
-          <FooterColumn
-            heading={t('footer.companyHeading')}
-            links={FOOTER_COMPANY_LINKS.map((l) => ({ href: l.href, label: t(l.labelKey) }))}
-          />
+          <div className="flex flex-col gap-8">
+            <FooterColumn
+              heading={t('footer.companyHeading')}
+              links={FOOTER_COMPANY_LINKS.map((l) => ({ href: l.href, label: t(l.labelKey) }))}
+            />
+            <FooterColumn
+              heading={t('footer.professionalsHeading')}
+              links={FOOTER_PROFESSIONALS_LINKS.map((l) => ({
+                href: l.href,
+                label: t(l.labelKey),
+              }))}
+            />
+          </div>
           <div className="flex flex-col gap-8">
             <FooterColumn
               heading={t('footer.legalHeading')}

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Section } from '@/components/ui/section';
 import { PageHeader } from '@/components/marketing/page-header';
 import { IndependenceDisclosure } from '@/components/layout/disclosure';
+import { BreadcrumbJsonLd, FaqJsonLd, ServiceJsonLd } from '@/components/seo/json-ld';
 import {
   internationalCountries,
   internationalCountryBySlug,
@@ -72,6 +73,7 @@ export default async function InternationalCountryPage({
 
   const t = await getTranslations('international.country');
   const tStatus = await getTranslations('international.status');
+  const tPricing = await getTranslations('pricingPage');
   const loc = locale as Locale;
   const name = pickText(country.name, loc);
   const { offer } = country;
@@ -80,6 +82,26 @@ export default async function InternationalCountryPage({
 
   return (
     <>
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'bdoor', path: `/${loc}` },
+          { name: t('breadcrumbCountries'), path: `/${loc}/countries` },
+          { name, path: `/${loc}/countries/${country.slug}` },
+        ]}
+      />
+      <ServiceJsonLd
+        name={`${name} — ${pickText(offer.route, loc)}`}
+        description={pickText(offer.summary, loc)}
+        path={`/${loc}/countries/${country.slug}`}
+      />
+      {guide ? (
+        <FaqJsonLd
+          faqs={guide.faq.map((entry) => ({
+            question: pickText(entry.q, loc),
+            answer: pickText(entry.a, loc),
+          }))}
+        />
+      ) : null}
       <PageHeader
         title={name}
         description={t('lede', { country: name, route: pickText(offer.route, loc) })}
@@ -112,7 +134,11 @@ export default async function InternationalCountryPage({
                           </span>
                         ) : null}
                       </p>
-                    ) : null}
+                    ) : (
+                      <p className="text-ink mt-1 text-base font-semibold">
+                        {tPricing('noPublishedFee')}
+                      </p>
+                    )}
                     {route.publicQualifier ? (
                       <p className="text-muted mt-1 text-xs leading-relaxed">
                         {pickText(route.publicQualifier, loc)}
@@ -152,7 +178,9 @@ export default async function InternationalCountryPage({
                   <p className="text-muted mt-1 text-sm">{pickText(offer.publicQualifier, loc)}</p>
                 ) : null}
               </div>
-            ) : null}
+            ) : (
+              <p className="text-ink mt-3 text-2xl font-semibold">{tPricing('noPublishedFee')}</p>
+            )}
             <p className="text-muted mt-3 text-sm leading-relaxed">{t('pricingBody')}</p>
 
             {guide ? (

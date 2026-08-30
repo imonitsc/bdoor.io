@@ -1,17 +1,18 @@
 import { expect, test, type Page } from '@playwright/test';
 
 /**
- * The complete legal-policy suite (version 0.9.1-draft-2026-08-30): all ten
- * documents, in both locales, must be substantive customer-facing text.
+ * The complete published legal-policy suite (version 1.0, effective
+ * 30 Aug 2026): all ten documents, in both locales, must be substantive
+ * customer-facing text with no draft banner and no launch warning.
  *
- * The three failure modes this suite pins down were live on production:
- * empty documents (/legal-disclaimer, /acceptable-use, /electronic-consent
- * rendered a heading over nothing), internal drafting notes addressed to a
- * code assistant printed as policy text, and the content pack's trailing
- * "---" separators rendered literally.
+ * The failure modes this suite pins down were live on production at some
+ * point: empty documents (a heading over nothing), internal drafting notes
+ * printed as policy text, literal "---" separators — and now, after the
+ * go-live release, any lingering "Working draft" posture.
  */
 
-const VERSION = '0.9.1-draft-2026-08-30';
+/** The visible version stamp, per locale ("Version 1.0" / "সংস্করণ 1.0"). */
+const VERSION = { en: 'Version 1.0', bn: 'সংস্করণ 1.0' } as const;
 
 const POLICIES: ReadonlyArray<{ slug: string; en: string; bn: string }> = [
   { slug: 'terms', en: 'Terms of Service', bn: 'সেবার শর্তাবলি' },
@@ -52,21 +53,16 @@ async function auditPolicyPage(page: Page, locale: 'en' | 'bn', policy: (typeof 
   await expect(h1, label).toHaveCount(1);
   await expect(h1, label).toHaveText(policy[locale]);
 
-  // The version stamp customers accept against.
-  await expect(page.getByText(VERSION), label).toBeVisible();
+  // The version stamp customers accept against, with its effective date.
+  await expect(page.getByText(VERSION[locale]), label).toBeVisible();
 
-  // The professional-review notice stays until counsel approval, and the
-  // Bangla route additionally carries the translation-review notice.
-  if (locale === 'en') {
-    await expect(
-      page.getByText('Working draft — professional approval required', { exact: true }),
-      label,
-    ).toBeVisible();
-  } else {
-    await expect(
-      page.getByText('কার্যকরী খসড়া — পেশাদার অনুমোদন প্রয়োজন', { exact: true }),
-      label,
-    ).toBeVisible();
+  // Published: no draft banner in either locale. The Bangla route still
+  // carries the honest translation-review notice (its body is English).
+  await expect(page.getByText('Working draft — professional approval required'), label).toHaveCount(
+    0,
+  );
+  await expect(page.getByText('কার্যকরী খসড়া — পেশাদার অনুমোদন প্রয়োজন'), label).toHaveCount(0);
+  if (locale === 'bn') {
     await expect(page.getByText('বাংলা অনুবাদ পর্যালোচনাধীন'), label).toBeVisible();
   }
 
@@ -93,8 +89,15 @@ async function auditPolicyPage(page: Page, locale: 'en' | 'bn', policy: (typeof 
   // The content pack's horizontal rules must never render as literal dashes.
   expect(body, `${label} renders a literal ---`).not.toMatch(/^---$/m);
 
-  // Drafts are complete but not indexable legal text yet.
-  await expect(page.locator('meta[name="robots"]'), label).toHaveAttribute('content', /noindex/);
+  // Published policies are indexable and carry a canonical URL.
+  const robots = page.locator('meta[name="robots"]');
+  if ((await robots.count()) > 0) {
+    await expect(robots, label).not.toHaveAttribute('content', /noindex/);
+  }
+  await expect(page.locator('link[rel="canonical"]'), label).toHaveAttribute(
+    'href',
+    new RegExp(`/${locale}/${policy.slug}$`),
+  );
 }
 
 test.describe('legal policy suite', () => {
@@ -126,7 +129,7 @@ test.describe('legal policy suite', () => {
     for (const policy of POLICIES) {
       await expect(main.getByRole('link', { name: policy.en }), policy.slug).toBeVisible();
     }
-    await expect(main.getByText(VERSION).first()).toBeVisible();
+    await expect(main.getByText(VERSION.en).first()).toBeVisible();
 
     // The marketing footer reaches all ten from any content page.
     const footer = page.locator('footer');

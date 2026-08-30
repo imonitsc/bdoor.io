@@ -179,7 +179,7 @@ test.describe('marketing site', () => {
   test('does not publish a government fee without a verified figure', async ({ page }) => {
     await page.goto('/en/services/private-limited-company-incorporation');
     const feeRow = page.getByRole('row', { name: /RJSC registration fees/ });
-    await expect(feeRow).toContainText('Quoted after review');
+    await expect(feeRow).toContainText('Quoted after assessment');
   });
 
   test('does not list coming-soon services on the services index', async ({ page }) => {
@@ -194,9 +194,7 @@ test.describe('marketing site', () => {
     expect(body.toLowerCase()).toMatch(/coming soon|not open|enquiry|assessment/);
   });
 
-  test('legal pages show substantive drafts with a draft banner and stay noindex', async ({
-    page,
-  }) => {
+  test('legal pages are published: substantive, versioned, no draft banner', async ({ page }) => {
     for (const slug of [
       'terms',
       'privacy',
@@ -211,13 +209,16 @@ test.describe('marketing site', () => {
     ]) {
       await page.goto(`/en/${slug}`);
       await expect(
-        page.getByText('Working draft — professional approval required', { exact: true }),
-        `${slug} is missing the draft banner`,
-      ).toBeVisible();
-      // Substantive draft body is visible for counsel review in preview.
+        page.getByText('Working draft'),
+        `${slug} still shows a draft banner`,
+      ).toHaveCount(0);
+      await expect(page.getByText('Version 1.0'), `${slug} missing its version`).toBeVisible();
       const body = await page.locator('main').innerText();
       expect(body.length, `${slug} body too short`).toBeGreaterThan(400);
-      await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
+      const robots = page.locator('meta[name="robots"]');
+      if ((await robots.count()) > 0) {
+        await expect(robots, `${slug} must be indexable`).not.toHaveAttribute('content', /noindex/);
+      }
     }
 
     await page.goto('/en/legal');

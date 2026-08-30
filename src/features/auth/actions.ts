@@ -11,6 +11,7 @@ import { RateLimitError } from '@/lib/permissions/errors';
 import { recordAudit } from '@/lib/audit';
 import { logger } from '@/lib/logger';
 import { claimDraftForUser } from '@/features/intake/session';
+import { POLICY_VERSIONS, recordPolicyConsent } from '@/features/legal/consent';
 import { absoluteUrl } from '@/lib/site';
 import { resetRequestSchema, signInSchema, signUpSchema, updatePasswordSchema } from './schema';
 
@@ -140,6 +141,23 @@ export async function signUp(_previous: AuthState, formData: FormData): Promise<
       { onConflict: 'id' },
     );
     await claimDraftForUser(data.user.id);
+    // The checkbox covered both documents; record each with the exact version
+    // that was live on the page the user accepted.
+    const consentLocale = locale === 'bn' ? ('bn' as const) : ('en' as const);
+    await recordPolicyConsent({
+      consentType: 'terms_of_service',
+      policyVersion: POLICY_VERSIONS.terms,
+      method: 'signup_checkbox',
+      userId: data.user.id,
+      locale: consentLocale,
+    });
+    await recordPolicyConsent({
+      consentType: 'privacy_policy',
+      policyVersion: POLICY_VERSIONS.privacy,
+      method: 'signup_checkbox',
+      userId: data.user.id,
+      locale: consentLocale,
+    });
   }
 
   return { status: 'success', message: 'checkEmail', email: parsed.data.email };

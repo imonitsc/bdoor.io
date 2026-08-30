@@ -38,6 +38,7 @@
     "signUp": "Create account",
     "none": "None",
     "notSet": "Not set",
+    "selectOption": "Select an option",
     "estimated": "Estimated",
     "updated": "Updated",
     "created": "Created",
@@ -62,6 +63,7 @@
     "processingTimeNote": "Estimated processing time after complete documents and successful review."
   },
   "nav": {
+    "ask": "Ask bdoor AI",
     "start": "Start a business",
     "services": "Services",
     "industries": "Industries",
@@ -90,6 +92,7 @@
     "companyHeading": "Company",
     "legalHeading": "Legal",
     "contactHeading": "Contact",
+    "professionalsHeading": "For professionals",
     "rights": "All rights reserved.",
     "languageLabel": "Choose language",
     "email": "hello@bdoor.io",
@@ -105,7 +108,11 @@
       "singapore": "Singapore",
       "countriesOverview": "All countries",
       "saudiArabia": "Saudi Arabia",
-      "qatar": "Qatar"
+      "qatar": "Qatar",
+      "becomeProvider": "Become a provider",
+      "providerSignIn": "Provider sign in",
+      "providerStandards": "Provider standards",
+      "providerDisclosure": "Provider disclosure"
     },
     "socialHeading": "Follow bdoor",
     "bangladeshHeading": "Bangladesh",
@@ -117,6 +124,7 @@
       "headline": "Start and run your business in Bangladesh.",
       "support": "Company formation, licences, tax and ongoing compliance—coordinated through one clear process.",
       "primaryCta": "Start now",
+      "askCta": "Ask bdoor AI",
       "secondaryCta": "See packages",
       "trustLine": "Free assessment · Itemised quote · No obligation",
       "operatorLine": "Operated by bdoor compliance ltd.",
@@ -370,7 +378,7 @@
     "browseServices": "Browse the full service catalogue",
     "cta": "Get your itemised quote",
     "ctaBody": "The assessment takes a few minutes and produces a quote that separates every fee layer.",
-    "noPublishedFee": "Quoted after review"
+    "noPublishedFee": "Quoted after assessment"
   },
   "foreignFoundersPage": {
     "title": "Foreign founders",
@@ -452,6 +460,7 @@
     "viewRoute": "View {country}",
     "notifyNote": "Submitting an application is free and creates no obligation. A service begins only after bdoor identifies the responsible provider, issues an itemised quote and you accept the terms.",
     "country": {
+      "breadcrumbCountries": "Countries",
       "metaTitle": "{country} company formation",
       "metaDescription": "Apply for the {country} route today: scope, who performs the work, the starting price and how the specialist-reviewed quote is issued.",
       "lede": "{route} — applications open today, fulfilled with licensed local specialists in {country}.",
@@ -572,7 +581,7 @@
   "legal": {
     "index": "All policies",
     "indexTitle": "Legal policies",
-    "indexBody": "Working drafts for the bdoor platform. Draft status remains until professional approval. Payment and identity collection stay closed until then.",
+    "indexBody": "The policies that govern the bdoor platform. Each document shows its version, effective date and last update; a change is published as a new version with a new effective date.",
     "terms": "Terms of Service",
     "privacy": "Privacy Policy",
     "refund": "Refund and Cancellation Policy",
@@ -586,14 +595,13 @@
     "draftBanner": "Working draft — professional approval required",
     "draftBannerBody": "This document is a complete working draft. It has not yet been reviewed and approved by qualified Bangladesh counsel (and, where relevant, privacy or AML reviewers) and must not be relied on as final terms. Payment, KYC and identity-document collection remain closed until approval.",
     "lastUpdated": "Last updated {date}",
+    "effectiveFrom": "Effective {date}",
+    "effectiveShort": "effective {date}",
+    "versionLabel": "Version {version}",
     "tableOfContents": "On this page",
     "contactLine": "Questions: {email}. Operated by {legalName}.",
     "translationReviewTitle": "Bangla translation under review",
-    "translationReviewBody": "Until a professional Bangla translation is approved, this page shows the complete English draft. Do not treat an automatic or abbreviated Bangla summary as the policy.",
-    "preLaunchTitle": "Under professional review",
-    "preLaunchBody": "Applications are open. Paid engagements, identity verification and document collection begin only after the applicable terms and provider scope are supplied for acceptance.",
-    "preLaunchDetail": "The approved document will be published here with its version and effective date. Until then, nothing on this platform is chargeable and no identity documents are collected, so there is no agreement you need to rely on today.",
-    "preLaunchOperator": "The bdoor platform is operated by {legalName}. Questions about this document are welcome by email."
+    "translationReviewBody": "Until a professional Bangla translation is approved, this page shows the complete English text. Do not treat an automatic or abbreviated Bangla summary as the policy."
   },
   "auth": {
     "signInTitle": "Sign in",
@@ -690,7 +698,7 @@
     "contextPackage": "Selected package: {package}",
     "resumeNotice": "We restored your saved answers.",
     "anonymousNotice": "Your answers are held in this browser until you create an account.",
-    "reviewTitle": "Review your answers",
+    "reviewTitle": "Review application",
     "reviewBody": "Check anything that looks wrong before you submit your application.",
     "recommendation": {
       "title": "Your preliminary recommendation",
@@ -893,7 +901,7 @@
       },
       "consent": {
         "label": "Consent",
-        "statement": "I agree that bdoor may store these answers and contact me about this application, as described in the privacy policy."
+        "statement": "I agree that bdoor may store these answers and contact me about this application, as described in the <privacy>Privacy Policy</privacy>, and I accept the <terms>Terms of Service</terms> (version 1.0)."
       }
     },
     "validation": {
@@ -916,17 +924,13 @@
       "contact": "Contact details"
     },
     "stageLabel": "Stage {current} of {total}: {name}",
-    "stepLabel": "Step {current} of {total} · {name}",
-    "steps": {
-      "location": "Location",
-      "country": "Country",
-      "business_stage": "Business stage",
-      "structure": "Structure",
-      "support": "Support",
-      "details": "Business details",
-      "contact": "Contact and review"
+    "review": "Review application",
+    "reviewCta": "Review application",
+    "errors": {
+      "generic": "Something went wrong while submitting. Your answers are safe — please try again.",
+      "rateLimited": "Too many attempts from this connection. Please wait a few minutes and try again.",
+      "incomplete": "A few answers are still missing. We have taken you to the first unanswered question."
     },
-    "review": "Review",
     "submitCta": "Submit application",
     "submitNote": "Submitting is free and creates no obligation. No payment is taken now — a service begins only after you accept an itemised quote and terms.",
     "submitted": {
@@ -938,7 +942,8 @@
         "review": "A specialist reviews your application within one business day.",
         "quote": "You receive an itemised quote after review — your provider, scope, fees and terms are confirmed before any engagement or payment."
       },
-      "noPayment": "No payment has been taken and no obligation has been created by submitting this application."
+      "noPayment": "No payment has been taken and no obligation has been created by submitting this application.",
+      "startAnother": "Start another application"
     },
     "ack": {
       "subject": "We received your application {reference}",
@@ -1052,6 +1057,7 @@
       "validUntil": "Valid until {date}",
       "expired": "This quote has expired. Ask your case team for a new version.",
       "acceptQuote": "Accept this quote",
+      "acceptTermsNote": "By accepting this quote you agree to the <terms>Terms of Service</terms> (version 1.0) and the <refund>Refund and Cancellation Policy</refund>. The version you accept is recorded with your acceptance.",
       "acceptedOn": "Accepted {date}",
       "payNow": "Pay now",
       "amountDue": "Amount due",
@@ -1755,7 +1761,7 @@
     "choosePlaceholder": "Select…",
     "savedNote": "Progress saves on this device as you continue.",
     "notStoredNotice": "The application service is not connected in this environment, so nothing you enter here will be saved or submitted.",
-    "declarationsNote": "The provider terms are working drafts pending professional review; the version you accept is recorded with your application. bdoor is an independent coordination platform and approval to join the network is not employment, agency or a guarantee of assignments.",
+    "declarationsNote": "The version of the provider terms you accept is recorded with your application. bdoor is an independent coordination platform and approval to join the network is not employment, agency or a guarantee of assignments.",
     "submitCta": "Submit application",
     "reviewNotice": "Every application is reviewed by the bdoor partner team. Approval is per jurisdiction, service and credential — approval for one country or service never extends to another automatically. Credential evidence is collected through a secure request after initial review; please do not email certificates or identity documents.",
     "needsInformation": {
@@ -1836,7 +1842,7 @@
       "continuity_note": "Business continuity and escalation contacts",
       "accuracy_confirmed": "I declare that the information provided is accurate and complete.",
       "authority_confirmed": "I am authorised to submit this application on behalf of the firm.",
-      "terms_accepted": "I accept the draft provider terms and data-processing terms, and consent to verification of the details provided."
+      "terms_accepted": "I accept the provider terms and data-processing terms, and consent to verification of the details provided."
     },
     "categories": {
       "law_firm": "Law firm",
@@ -1906,10 +1912,10 @@
     "disclosure": "AI-generated information from bdoor's published guidance. It is general business information, not legal, tax or immigration advice, and it can be wrong — check anything important with a specialist.",
     "privacyLink": "How your questions are handled",
     "suggestions": {
-      "one": "How do I register a private limited company in Bangladesh?",
-      "two": "What is the difference between a trade licence, TIN and BIN?",
-      "three": "What does bdoor charge, and what are the government fees?",
-      "four": "Can a foreigner own 100% of a Bangladeshi company?",
+      "one": "How do I register a company in Bangladesh?",
+      "two": "Which licences does my business need?",
+      "three": "Can a foreigner own a Bangladesh company?",
+      "four": "What does bdoor charge, and what are the government fees?",
       "five": "What do I have to file every year after registering?"
     },
     "errors": {

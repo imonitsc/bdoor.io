@@ -81,17 +81,17 @@ test.describe('application flow', () => {
     const progress = page.getByRole('progressbar');
     const stepText = () =>
       page
-        .locator('p', { hasText: /^Step \d of \d/ })
+        .locator('p', { hasText: /^Stage \d of \d/ })
         .first()
         .textContent();
 
-    await expect(page.locator('p', { hasText: /^Step 1 of 6/ })).toBeVisible();
+    await expect(page.locator('p', { hasText: /^Stage 1 of 6/ })).toBeVisible();
     const totals = new Set<string>();
     const seen: number[] = [];
 
     const record = async () => {
       const text = (await stepText()) ?? '';
-      const match = text.match(/^Step (\d) of (\d)/);
+      const match = text.match(/^Stage (\d) of (\d)/);
       expect(match, `unparseable step label: ${text}`).not.toBeNull();
       seen.push(Number(match![1]));
       totals.add(match![2]!);
@@ -244,7 +244,7 @@ test.describe('application flow', () => {
     await completeContactStage(page);
 
     // Review, then submit — the CTA is an application, not a checkout.
-    await expect(page.getByRole('heading', { name: 'Review your answers' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Review application' })).toBeVisible();
     await page.getByRole('button', { name: 'Submit application' }).click();
 
     await expect(page.getByRole('heading', { name: 'Application received' })).toBeVisible();
@@ -356,5 +356,31 @@ test.describe('application flow', () => {
     await page.getByRole('button', { name: 'Back' }).click();
     await expect(page.getByText('Where are you based right now?')).toBeVisible();
     await expect(page.getByRole('radio', { name: 'In Bangladesh' })).toBeChecked();
+  });
+
+  test('Back from the question after Bangladesh never shows the country picker', async ({
+    page,
+  }) => {
+    await page.goto('/en/start');
+    await chooseCountry(page, 'Bangladesh');
+    await expect(page.getByText('What do you want to do?')).toBeVisible();
+
+    // The country was implied, not asked — Back must return to the first
+    // screen, not to a seven-country selector the founder never saw.
+    await page.getByRole('button', { name: 'Back' }).click();
+    await expect(page.getByText('Where do you want to start or manage a business?')).toBeVisible();
+    await expect(page.getByText('Which country?', { exact: true })).toHaveCount(0);
+  });
+
+  test('nationality starts on “Select an option”, never silently Bangladesh', async ({ page }) => {
+    await page.goto('/en/start?country=bangladesh&objective=new');
+    await answer(page, async () => page.getByRole('radio', { name: 'In Bangladesh' }).click());
+
+    await expect(page.getByText('What is your nationality?')).toBeVisible();
+    const select = page.getByRole('combobox');
+    await expect(select).toHaveValue('');
+    // Continuing without choosing must not advance past the question.
+    await page.getByRole('button', { name: /^Continue$/ }).click();
+    await expect(page.getByText('What is your nationality?')).toBeVisible();
   });
 });

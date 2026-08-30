@@ -58,7 +58,7 @@ function Hero() {
           </h1>
           <p className="text-muted mt-5 max-w-xl text-lg leading-relaxed">{t('support')}</p>
 
-          <div className="mt-8">
+          <div className="mt-8 flex flex-wrap items-center gap-3">
             <Button asChild size="lg">
               <Link
                 href={MARKETING_ROUTES.start}
@@ -67,6 +67,15 @@ function Hero() {
               >
                 {t('primaryCta')}
                 <ArrowRight className="size-4" aria-hidden="true" />
+              </Link>
+            </Button>
+            <Button asChild size="lg" variant="secondary">
+              <Link
+                href={MARKETING_ROUTES.ask}
+                data-testid="home-hero-ask"
+                className="inline-flex min-h-11 items-center"
+              >
+                {t('askCta')}
               </Link>
             </Button>
           </div>

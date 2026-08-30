@@ -5,6 +5,7 @@ import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server
 import { Geist_Mono, Hind_Siliguri, Manrope } from 'next/font/google';
 import { routing, localeTags, type Locale } from '@/i18n/routing';
 import { AnnouncerProvider } from '@/components/ui/announcer';
+import { OrganizationJsonLd } from '@/components/seo/json-ld';
 import { siteUrl, localizedUrl } from '@/lib/site';
 import '@/styles/globals.css';
 
@@ -123,6 +124,7 @@ export default async function LocaleLayout({
       suppressHydrationWarning
     >
       <body className="bg-canvas text-ink min-h-dvh antialiased">
+        <OrganizationJsonLd />
         <NextIntlClientProvider messages={messages}>
           <AnnouncerProvider>{children}</AnnouncerProvider>
         </NextIntlClientProvider>

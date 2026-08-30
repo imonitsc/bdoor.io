@@ -89,6 +89,7 @@ export const HEADER_LINKS = [
   { href: MARKETING_ROUTES.start, labelKey: 'nav.startShort' },
   { href: MARKETING_ROUTES.services, labelKey: 'nav.services' },
   { href: MARKETING_ROUTES.pricing, labelKey: 'nav.pricing' },
+  { href: MARKETING_ROUTES.ask, labelKey: 'nav.ask' },
   { href: MARKETING_ROUTES.resources, labelKey: 'nav.resources' },
 ] as const;
 
@@ -131,6 +132,22 @@ export const FOOTER_COMPANY_LINKS = [
   { href: MARKETING_ROUTES.contact, labelKey: 'nav.contact' },
 ] as const;
 
+/**
+ * Provider access (go-live release, 30 Aug 2026). "Provider standards" points
+ * at /partners, which carries what a provider can and cannot do plus the
+ * verification requirements; sign-in is the shared login, which routes a
+ * partner account to its own workspace.
+ */
+export const FOOTER_PROFESSIONALS_LINKS = [
+  { href: MARKETING_ROUTES.partnersApply, labelKey: 'footer.links.becomeProvider' },
+  { href: MARKETING_ROUTES.login, labelKey: 'footer.links.providerSignIn' },
+  { href: MARKETING_ROUTES.partners, labelKey: 'footer.links.providerStandards' },
+  // Short label on purpose: the Legal column already carries the document's
+  // full title, and two identical link names in one footer would be
+  // ambiguous to assistive tech (and to the e2e footer-link audit).
+  { href: MARKETING_ROUTES.providerDisclosure, labelKey: 'footer.links.providerDisclosure' },
+] as const;
+
 export const FOOTER_LEGAL_LINKS = [
   { href: MARKETING_ROUTES.legal, labelKey: 'legal.index' },
   { href: MARKETING_ROUTES.terms, labelKey: 'legal.terms' },
@@ -153,6 +170,7 @@ export const SITEMAP_ROUTES: ReadonlyArray<{
 }> = [
   { path: '/', priority: 1, changeFrequency: 'weekly' },
   { path: '/start', priority: 0.9, changeFrequency: 'monthly' },
+  { path: '/ask', priority: 0.8, changeFrequency: 'monthly' },
   { path: '/services', priority: 0.9, changeFrequency: 'weekly' },
   { path: '/industries', priority: 0.8, changeFrequency: 'monthly' },
   { path: '/countries', priority: 0.7, changeFrequency: 'monthly' },

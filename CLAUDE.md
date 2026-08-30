@@ -179,8 +179,11 @@ correctness surface.
 - The recommendation is always labelled preliminary and subject to review.
 - Do not add an office address, registration number, partner logo, press logo,
   award, testimonial, rating or statistic. BDoor does not have verified ones.
-- Legal pages are drafts pending review by qualified Bangladesh counsel and must
-  keep saying so.
+- The legal suite is published as version 1.0 (owner release, 30 Aug 2026). It
+  makes no claim of counsel or regulator approval — none exists — and a policy
+  change ships as a new version with a new effective date, never an edit under
+  the same number. A revision in progress must honestly mark itself as a draft
+  (`awaitingCounselReview`).
 
 Both locales change together. A key added to `en.json` and missing from
 `bn.json` renders the key path to a Bangla-speaking user.

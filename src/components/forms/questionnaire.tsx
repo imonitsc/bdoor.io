@@ -12,9 +12,10 @@ import { Progress } from '@/components/ui/progress';
 import { useAnnounce } from '@/components/ui/announcer';
 import {
   BUSINESS_CATEGORY_GROUPS,
+  businessCategoryLabel,
   type BusinessCategory,
 } from '@/features/intake/business-categories';
-import { COUNTRIES } from '@/features/intake/countries';
+import { COUNTRIES, countryName } from '@/features/intake/countries';
 import { Link } from '@/i18n/navigation';
 import {
   applicableQuestions,
@@ -22,8 +23,8 @@ import {
   firstUnansweredIndex,
   pruneInapplicable,
   resolveInitialAnswers,
+  stageProgress,
   validateAnswer,
-  visibleStep,
   type MarketScope,
   type PartialAnswers,
   type QuestionDefinition,
@@ -151,37 +152,55 @@ function CategoryPicker({
       </p>
 
       <div className="border-border bg-surface mt-2 max-h-[26rem] overflow-y-auto rounded-[var(--radius-control)] border">
-        {groups.map(({ group, categories }) => (
-          <fieldset key={group.slug} className="border-border border-b last:border-b-0">
-            <legend className="sr-only">{group[locale]}</legend>
-            <p
-              aria-hidden="true"
-              className="text-muted bg-surface-sunken px-4 py-2 text-xs font-semibold tracking-[0.08em] uppercase"
+        {groups.map(({ group, categories }) => {
+          // Search-first: with no query only the 18 group headers show, each
+          // expanding on demand — never all 141 options at once. Filtering
+          // opens every group that still matches, and the group holding the
+          // current selection stays open so the answer is always visible.
+          // The key remounts the <details> when the mode changes, so the
+          // browser's own toggle state never fights the computed default.
+          const containsSelection = categories.some((c) => c.slug === selected);
+          const open = Boolean(needle) || containsSelection;
+          return (
+            <details
+              key={`${group.slug}-${needle ? 'filtered' : 'browse'}`}
+              open={open}
+              className="border-border group border-b last:border-b-0"
             >
-              {group[locale]}
-            </p>
-            <div className="flex flex-col">
-              {categories.map((category) => (
-                <label
-                  key={category.slug}
-                  htmlFor={`${questionKey}-${category.slug}`}
-                  className="hover:bg-surface-sunken has-checked:bg-primary-soft flex min-h-11 cursor-pointer items-center gap-3 px-4 py-2.5 text-sm"
-                >
-                  <input
-                    type="radio"
-                    id={`${questionKey}-${category.slug}`}
-                    name={`${questionKey}-choice`}
-                    value={category.slug}
-                    checked={selected === category.slug}
-                    onChange={() => setSelected(category.slug)}
-                    className="size-4 shrink-0 accent-[var(--color-primary)]"
-                  />
-                  <span className="text-ink">{category[locale]}</span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
-        ))}
+              <summary className="text-muted bg-surface-sunken hover:text-ink flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-4 py-2 text-xs font-semibold tracking-[0.08em] uppercase [&::-webkit-details-marker]:hidden">
+                <span>
+                  {group[locale]}
+                  <span className="ms-2 font-normal tracking-normal normal-case">
+                    ({categories.length})
+                  </span>
+                </span>
+                <span aria-hidden="true" className="text-muted group-open:rotate-90">
+                  ›
+                </span>
+              </summary>
+              <div className="flex flex-col" role="radiogroup" aria-label={group[locale]}>
+                {categories.map((category) => (
+                  <label
+                    key={category.slug}
+                    htmlFor={`${questionKey}-${category.slug}`}
+                    className="hover:bg-surface-sunken has-checked:bg-primary-soft flex min-h-11 cursor-pointer items-center gap-3 px-4 py-2.5 text-sm"
+                  >
+                    <input
+                      type="radio"
+                      id={`${questionKey}-${category.slug}`}
+                      name={`${questionKey}-choice`}
+                      value={category.slug}
+                      checked={selected === category.slug}
+                      onChange={() => setSelected(category.slug)}
+                      className="size-4 shrink-0 accent-[var(--color-primary)]"
+                    />
+                    <span className="text-ink">{category[locale]}</span>
+                  </label>
+                ))}
+              </div>
+            </details>
+          );
+        })}
       </div>
     </div>
   );
@@ -349,7 +368,30 @@ function QuestionInput({
                   />
                 }
               >
-                {t(`${key}.statement`)}
+                <span>
+                  {t.rich(`${key}.statement`, {
+                    privacy: (chunks) => (
+                      <Link
+                        href="/privacy"
+                        target="_blank"
+                        className="text-primary underline underline-offset-2"
+                        onClick={(event) => event.stopPropagation()}
+                      >
+                        {chunks}
+                      </Link>
+                    ),
+                    terms: (chunks) => (
+                      <Link
+                        href="/terms"
+                        target="_blank"
+                        className="text-primary underline underline-offset-2"
+                        onClick={(event) => event.stopPropagation()}
+                      >
+                        {chunks}
+                      </Link>
+                    ),
+                  })}
+                </span>
               </ChoiceCard>
             </div>
           </fieldset>
@@ -380,17 +422,22 @@ function QuestionInput({
     case 'country':
       return (
         <Field error={error}>
-          <FieldLabel required className="text-lg font-semibold">
+          <FieldLabel required={!question.optional} className="text-lg font-semibold">
             {t(`${key}.label`)}
           </FieldLabel>
           {help ? <FieldDescription>{help}</FieldDescription> : null}
           <FieldControl hasDescription={Boolean(help)}>
+            {/* Starts on an explicit placeholder: pre-selecting Bangladesh let
+                a founder submit their nationality without ever choosing it. */}
             <NativeSelect
               name="value"
-              defaultValue={typeof value === 'string' ? value : 'BD'}
+              defaultValue={typeof value === 'string' ? value : ''}
               autoComplete="country"
               required
             >
+              <option value="" disabled>
+                {tCommon('selectOption')}
+              </option>
               {COUNTRIES.map((country) => (
                 <option key={country.code} value={country.code}>
                   {country.name}
@@ -427,7 +474,7 @@ function QuestionInput({
     case 'textarea':
       return (
         <Field error={error}>
-          <FieldLabel required className="text-lg font-semibold">
+          <FieldLabel required={!question.optional} className="text-lg font-semibold">
             {t(`${key}.label`)}
           </FieldLabel>
           {help ? <FieldDescription>{help}</FieldDescription> : null}
@@ -513,9 +560,13 @@ export function Questionnaire({ initial }: { initial: IntakeState }) {
   const safeIndex = Math.min(index, questions.length);
   const question = questions[safeIndex];
   const atReview = !question;
-  const step = visibleStep(answers, safeIndex);
-  const stepName = atReview ? t('review') : t(`steps.${step.labelKey}`);
-  const stageLabel = t('stepLabel', {
+  // Stage-based progress: the questions are declared in stage order, so the
+  // counter can only move forward — it never regresses mid-flow the way a
+  // per-question bucket mapping did — and the caption names the stage the
+  // question on screen actually belongs to.
+  const step = stageProgress(answers, safeIndex);
+  const stepName = atReview ? t('review') : t(`sections.${step.stage}`);
+  const stageLabel = t('stageLabel', {
     current: Math.min(step.current, step.total),
     total: step.total,
     name: stepName,
@@ -529,6 +580,13 @@ export function Questionnaire({ initial }: { initial: IntakeState }) {
   useEffect(() => {
     if (fieldError) announce(tErrors('form'), true);
   }, [fieldError, announce, tErrors]);
+
+  useEffect(() => {
+    // The application exists; the device draft has served its purpose. Left in
+    // place it would offer to "resume" a journey that already ended and feed a
+    // duplicate submission.
+    if (serverState.submitted) clearLocalDraft();
+  }, [serverState.submitted]);
 
   function persistLocal(next: PartialAnswers) {
     try {
@@ -613,7 +671,9 @@ export function Questionnaire({ initial }: { initial: IntakeState }) {
     return (
       <SubmittedPanel
         submitted={serverState.submitted}
-        answers={serverState.answers}
+        answers={
+          Object.keys(serverState.answers).length > 0 ? serverState.answers : initial.answers
+        }
         recommendation={serverState.recommendation}
       />
     );
@@ -676,7 +736,9 @@ export function Questionnaire({ initial }: { initial: IntakeState }) {
             questions={questions}
             formAction={formAction}
             pending={saving}
+            error={serverState.error}
             onEdit={(i) => setIndex(i)}
+            onBack={() => setIndex(Math.max(0, questions.length - 1))}
           />
         ) : (
           <form
@@ -755,17 +817,22 @@ function ReviewStep({
   questions,
   formAction,
   pending,
+  error,
   onEdit,
+  onBack,
 }: {
   answers: PartialAnswers;
   questions: QuestionDefinition[];
   formAction: (formData: FormData) => void;
   pending: boolean;
+  error?: string;
   onEdit: (index: number) => void;
+  onBack: () => void;
 }) {
   const t = useTranslations('start');
   const tQuestions = useTranslations('start.questions');
   const tCommon = useTranslations('common');
+  const locale = useLocale() === 'bn' ? 'bn' : 'en';
 
   function display(question: QuestionDefinition): string {
     const value = answers[question.key];
@@ -777,6 +844,10 @@ function ReviewStep({
         : value.map((v) => tQuestions(`${question.key}.options.${v}`)).join(', ');
     }
     if (question.kind === 'choice') return tQuestions(`${question.key}.options.${String(value)}`);
+    // Codes and slugs render as their human names, the way the question
+    // showed them — `BD` and `grocery-store` are storage, not copy.
+    if (question.kind === 'country') return countryName(String(value));
+    if (question.kind === 'category') return businessCategoryLabel(String(value), locale);
     return String(value);
   }
 
@@ -810,17 +881,28 @@ function ReviewStep({
         ))}
       </dl>
 
+      {error ? (
+        <Alert tone="danger" role="alert">
+          {t(`errors.${error}`)}
+        </Alert>
+      ) : null}
+
       <form
         action={(formData) => {
           formData.set('intent', 'submit');
           formData.set('answers', JSON.stringify(answers));
           formAction(formData);
         }}
+        className="flex flex-wrap items-center gap-3"
       >
         <input type="hidden" name="intent" value="submit" />
         <Button type="submit" size="lg" disabled={pending}>
           {pending ? tCommon('loading') : t('submitCta')}
           <ArrowRight className="size-4" aria-hidden="true" />
+        </Button>
+        <Button type="button" variant="ghost" size="lg" onClick={onBack} disabled={pending}>
+          <ArrowLeft className="size-4" aria-hidden="true" />
+          {tCommon('back')}
         </Button>
       </form>
       <p className="text-muted text-xs leading-relaxed">{t('submitNote')}</p>
@@ -844,6 +926,19 @@ function SubmittedPanel({
 }) {
   const t = useTranslations('start.submitted');
   const tQuestions = useTranslations('start.questions');
+  const [resetting, setResetting] = useState(false);
+
+  async function startAnother() {
+    // Reset both drafts BEFORE reloading, or the server render would land
+    // right back on this confirmation.
+    setResetting(true);
+    clearLocalDraft();
+    try {
+      await resetDraftBackground();
+    } finally {
+      window.location.assign(window.location.pathname);
+    }
+  }
 
   const country = answers.target_country
     ? tQuestions(`target_country.options.${answers.target_country}`)
@@ -876,6 +971,12 @@ function SubmittedPanel({
       </ul>
 
       <p className="text-muted text-xs leading-relaxed">{t('noPayment')}</p>
+
+      <div>
+        <Button type="button" variant="secondary" onClick={startAnother} disabled={resetting}>
+          {t('startAnother')}
+        </Button>
+      </div>
 
       {recommendation ? (
         <div className="border-border border-t pt-6">

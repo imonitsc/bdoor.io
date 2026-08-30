@@ -97,7 +97,7 @@ describe('international offers', () => {
     expect(featured).toEqual({
       usa: 'USD 449 estimated total',
       uk: 'GBP 349 estimated total',
-      uae: 'AED 9,375 estimated total',
+      uae: 'From AED 9,375',
       singapore: 'From S$1,500',
       'saudi-arabia': 'Professional setup from $4,900',
       qatar: 'First-year QFC estimate from $10,900',

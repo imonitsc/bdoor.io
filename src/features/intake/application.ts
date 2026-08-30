@@ -5,6 +5,7 @@ import { createAdminClient, hasServiceRole } from '@/lib/supabase/admin';
 import { getEmailProvider } from '@/lib/email';
 import { logger } from '@/lib/logger';
 import { recordAnalyticsEvent } from '@/lib/analytics';
+import { POLICY_VERSIONS, recordPolicyConsent } from '@/features/legal/consent';
 import { targetCountrySlug, type Answers, type Objective, type PartialAnswers } from './questions';
 
 /**
@@ -83,6 +84,7 @@ export async function submitApplication(input: SubmitInput): Promise<SubmittedAp
     source_path: input.sourcePath ?? null,
     answers: answers as never,
     consent_given: complete.consent === true,
+    consent_policy_version: POLICY_VERSIONS.privacy,
     session_id: input.sessionId ?? null,
   };
 
@@ -107,6 +109,12 @@ export async function submitApplication(input: SubmitInput): Promise<SubmittedAp
         packageSlug: input.packageSlug ?? null,
         sourcePath: input.sourcePath ?? null,
         properties: { objective },
+      });
+      await recordPolicyConsent({
+        consentType: 'privacy_policy',
+        policyVersion: POLICY_VERSIONS.privacy,
+        method: 'application_consent',
+        locale,
       });
       await sendAcknowledgement(reference, complete.email, countrySlug, locale);
       return { reference, countrySlug, objective, stored: true };

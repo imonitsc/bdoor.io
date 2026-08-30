@@ -3,6 +3,7 @@ import {
   OBJECTIVES,
   TARGET_COUNTRIES,
   applicableQuestions,
+  pruneInapplicable,
   stageProgress,
   targetCountryFromSlug,
   targetCountrySlug,
@@ -24,16 +25,23 @@ describe('target_country', () => {
     expect(keys[2]).toBe('objective');
   });
 
-  it('is skipped once Bangladesh market_scope has implied the country', () => {
-    const keys = applicableQuestions({
+  it('is never asked on the Bangladesh path, yet the implied answer survives pruning', () => {
+    const answers = {
       market_scope: 'bangladesh',
       target_country: 'bangladesh',
       objective: 'new',
-    }).map((q) => q.key);
+    } as const;
+    const keys = applicableQuestions(answers).map((q) => q.key);
     expect(keys[0]).toBe('market_scope');
-    // target_country stays applicable (answered) so prune cannot drop it,
-    // but firstUnansweredIndex advances past it.
-    expect(keys).toContain('target_country');
+    // Not applicable: Back from the next question must land on market_scope,
+    // never on a country picker the founder was never shown.
+    expect(keys).not.toContain('target_country');
+    // …but pruning re-derives the implied answer, so the branch model holds.
+    expect(pruneInapplicable({ ...answers }).target_country).toBe('bangladesh');
+    // And a stale foreign country under a Bangladesh scope is corrected.
+    expect(
+      pruneInapplicable({ market_scope: 'bangladesh', target_country: 'usa' }).target_country,
+    ).toBe('bangladesh');
   });
 
   it('offers exactly the seven countries, Bangladesh first, with no "unsure"', () => {

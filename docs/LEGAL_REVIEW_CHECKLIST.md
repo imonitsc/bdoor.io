@@ -8,14 +8,18 @@ are qualified to draw them.
 
 ## Where things stand
 
-- The six draft documents live in `src/content/legal/documents.ts`
-  (version `draft-2026-01`). They are working drafts written to match the
-  platform's actual controls, and none has been professionally reviewed.
-- While the gate is `draft`, the public legal pages show a concise
-  pre-launch notice instead of the drafts, are `noindex`, and the platform
-  takes no payments and collects no identity documents
-  (`src/lib/launch/gates.ts`, enforced in `startCheckout` and
-  `uploadDocument`).
+- The TEN documents live in `src/content/legal/documents.ts` and are
+  **published as version 1.0, effective 30 Aug 2026, on the owner's explicit
+  release instruction** — without professional review. The pages claim no
+  counsel or regulator approval, and the professional-services limitation
+  appears in the Terms, the Legal Disclaimer and the Provider Disclosure.
+- Payments, checkout and identity/KYC uploads remain disabled by their own
+  gates (`src/lib/launch/gates.ts`, enforced in `startCheckout` and
+  `uploadDocument`) — publishing the policies opened no regulated flow.
+- Setting `LEGAL_CONTENT_STATUS=draft` (or `LEGAL_LAUNCH_APPROVED=false`) is
+  the kill switch that restores the draft banner and noindex posture.
+- When counsel review lands, ship the changes as a NEW version (e.g. 1.1)
+  with a new effective date — never an edit under the same number.
 - The Terms name **bdoor compliance ltd** as the contracting entity and the
   Privacy policy names it as data controller. No office address is
   published anywhere, per the owner's instruction.

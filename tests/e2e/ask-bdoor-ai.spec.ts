@@ -50,10 +50,25 @@ test.describe('the homepage entry', () => {
 
   test('closes on escape and returns focus to the page', async ({ page }) => {
     await page.goto('/en');
-    await page.getByRole('button', { name: /How do I register a private limited company/ }).click();
+    await page.getByRole('button', { name: /How do I register a company in Bangladesh/ }).click();
     await expect(page.getByRole('dialog')).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(page.getByRole('dialog')).toHaveCount(0);
+  });
+
+  test('is reachable from the header navigation and the hero', async ({ page }) => {
+    await page.goto('/en');
+    await expect(page.getByTestId('home-hero-ask')).toHaveAttribute('href', '/en/ask');
+
+    // Below xl the header bar collapses into the drawer, which renders its
+    // links only once opened — open it before looking for the nav entry.
+    const toggle = page.locator('button[aria-controls="mobile-navigation"]');
+    if (await toggle.isVisible()) {
+      await toggle.click();
+    }
+    await expect(
+      page.locator('header').getByRole('link', { name: 'Ask bdoor AI' }).first(),
+    ).toHaveAttribute('href', '/en/ask');
   });
 });
 
@@ -84,10 +99,10 @@ test.describe('the /ask page', () => {
   test('offers five starting questions', async ({ page }) => {
     await page.goto('/en/ask');
     for (const question of [
-      /How do I register a private limited company in Bangladesh/,
-      /difference between a trade licence, TIN and BIN/,
+      /How do I register a company in Bangladesh/,
+      /Which licences does my business need/,
+      /Can a foreigner own a Bangladesh company/,
       /What does bdoor charge, and what are the government fees/,
-      /Can a foreigner own 100% of a Bangladeshi company/,
       /What do I have to file every year after registering/,
     ]) {
       await expect(page.getByRole('button', { name: question })).toBeVisible();
@@ -111,9 +126,7 @@ test.describe('when the model cannot be reached', () => {
     test.setTimeout(120_000);
     await page.goto('/en/ask');
 
-    await page
-      .getByRole('button', { name: /How do I register a private limited company in Bangladesh/ })
-      .click();
+    await page.getByRole('button', { name: /How do I register a company in Bangladesh/ }).click();
 
     // No credential in this environment, so the Gateway call fails. The
     // customer must be told — never handed a plausible answer from somewhere
@@ -136,7 +149,7 @@ test.describe('when the model cannot be reached', () => {
     });
 
     await page.goto('/en/ask');
-    await page.getByRole('button', { name: /Can a foreigner own 100%/ }).click();
+    await page.getByRole('button', { name: /Can a foreigner own a Bangladesh company/ }).click();
     await expect(
       page.getByRole('log').getByRole('link', { name: 'Talk to a specialist' }),
     ).toBeVisible({

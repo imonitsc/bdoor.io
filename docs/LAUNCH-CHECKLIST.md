@@ -9,12 +9,17 @@ lawyer, an accountant or a director, it says so.
 
 ---
 
-## 1 · Legal review — blocking
+## 1 · Legal review
 
-Every legal page renders a "Draft awaiting professional review" banner and is
-marked `awaitingCounselReview: true` in `src/content/legal/documents.ts`.
-`tests/e2e/marketing.spec.ts` asserts the banner is present, so removing the
-banner without changing the flag will not silently succeed.
+**Status (30 Aug 2026): the ten-document suite is PUBLISHED as version 1.0 on
+the owner's explicit release instruction** — without the counsel sign-off the
+items below describe. The pages claim no professional or regulator approval
+(none exists), payments/KYC/checkout remain disabled by their own gates, and
+`tests/e2e/legal-policies.spec.ts` now asserts the published posture (no
+draft banner, indexable, Version 1.0 + effective date). The counsel-review
+items below therefore no longer BLOCK publication, but they remain open work:
+when counsel review lands, ship it as a new version (e.g. 1.1) with a new
+effective date via `src/content/legal/documents.ts`.
 
 - [ ] **Terms of Service** reviewed and approved by qualified Bangladesh
       counsel.
@@ -88,10 +93,12 @@ verified ones. They may be added **only** with evidence.
       code change needed. Substitutes and AI-generated people are not
       acceptable.
 
-- [ ] Provider terms and data-processing terms drafted and reviewed by
-      counsel, then `PROVIDER_APPLICATIONS_STATUS=enabled` to open
-      `/partners/apply`. The application records the terms version accepted;
-      until then the page offers the contact-form fallback.
+- [ ] Provider terms and data-processing terms reviewed by counsel.
+      `/partners/apply` is OPEN by default since the go-live release
+      (30 Aug 2026, owner instruction) with `provider-terms-1.0-2026-08-30`
+      recorded on every acceptance; a counsel-reviewed revision ships as a new
+      terms version. `PROVIDER_APPLICATIONS_STATUS=disabled` is the kill
+      switch that restores the contact-form fallback.
 
 ## 4 · Integrations
 

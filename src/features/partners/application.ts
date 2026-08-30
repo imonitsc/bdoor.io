@@ -40,7 +40,7 @@ export const APPLICATION_JURISDICTIONS = [
 export type ApplicationJurisdiction = (typeof APPLICATION_JURISDICTIONS)[number];
 
 /** Which draft policy text the applicant accepted; recorded on submission. */
-export const PROVIDER_TERMS_VERSION = 'provider-terms-0.9.1-draft-2026-08-30';
+export const PROVIDER_TERMS_VERSION = 'provider-terms-1.0-2026-08-30';
 
 const requiredText = (max = 400) => z.string().trim().min(2, 'requiredText').max(max, 'tooLong');
 const optionalText = (max = 2000) => z.string().trim().max(max, 'tooLong').optional();

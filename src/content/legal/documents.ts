@@ -1,24 +1,27 @@
 import type { LegalDocument } from './types';
 
 /**
- * Draft legal documents from the 29 August 2026 English policy content pack
- * under policies/.
- *
- * EVERY document is a working draft (version 0.9). awaitingCounselReview stays
- * true until qualified counsel and compliance approve the text. Bangla routes
- * currently show the English draft with a translation-review notice — do not
- * invent a Bangla summary. See policies/README.md and docs/LAUNCH-CHECKLIST.md.
+ * The published legal suite, version 1.0, from the 29 August 2026 English
+ * policy content pack under policies/. Published on the owner's release
+ * instruction of 30 August 2026. The documents make no claim of counsel or
+ * regulator approval — none exists — and the professional-services limitation
+ * appears in the Terms, the Legal Disclaimer and the Provider Disclosure.
+ * Bangla routes currently show the English text with a translation-review
+ * notice — do not invent a Bangla summary. A change to any document is a new
+ * version with a new effective date, never an edit under the same number.
  */
 
-const VERSION = '0.9.1-draft-2026-08-30';
+const VERSION = '1.0';
+const EFFECTIVE_FROM = '2026-08-30';
 const LAST_UPDATED = '2026-08-30';
 
 export const TERMS: LegalDocument = {
   slug: 'terms',
   titleKey: 'legal.terms',
   version: VERSION,
+  effectiveFrom: EFFECTIVE_FROM,
   lastUpdated: LAST_UPDATED,
-  awaitingCounselReview: true,
+  awaitingCounselReview: false,
   sections: [
     {
       id: '1-1',
@@ -289,8 +292,9 @@ export const PRIVACY: LegalDocument = {
   slug: 'privacy',
   titleKey: 'legal.privacy',
   version: VERSION,
+  effectiveFrom: EFFECTIVE_FROM,
   lastUpdated: LAST_UPDATED,
-  awaitingCounselReview: true,
+  awaitingCounselReview: false,
   sections: [
     {
       id: '2-1',
@@ -512,8 +516,9 @@ export const REFUND_POLICY: LegalDocument = {
   slug: 'refund-policy',
   titleKey: 'legal.refund',
   version: VERSION,
+  effectiveFrom: EFFECTIVE_FROM,
   lastUpdated: LAST_UPDATED,
-  awaitingCounselReview: true,
+  awaitingCounselReview: false,
   sections: [
     {
       id: '3-1',
@@ -615,8 +620,9 @@ export const AML_KYC_POLICY: LegalDocument = {
   slug: 'aml-kyc-policy',
   titleKey: 'legal.amlKyc',
   version: VERSION,
+  effectiveFrom: EFFECTIVE_FROM,
   lastUpdated: LAST_UPDATED,
-  awaitingCounselReview: true,
+  awaitingCounselReview: false,
   sections: [
     {
       id: '4-1',
@@ -745,8 +751,9 @@ export const COOKIE_POLICY: LegalDocument = {
   slug: 'cookie-policy',
   titleKey: 'legal.cookies',
   version: VERSION,
+  effectiveFrom: EFFECTIVE_FROM,
   lastUpdated: LAST_UPDATED,
-  awaitingCounselReview: true,
+  awaitingCounselReview: false,
   sections: [
     {
       id: '5-1',
@@ -841,8 +848,9 @@ export const LEGAL_DISCLAIMER: LegalDocument = {
   slug: 'legal-disclaimer',
   titleKey: 'legal.disclaimer',
   version: VERSION,
+  effectiveFrom: EFFECTIVE_FROM,
   lastUpdated: LAST_UPDATED,
-  awaitingCounselReview: true,
+  awaitingCounselReview: false,
   sections: [
     {
       id: '6-1',
@@ -904,8 +912,8 @@ Despite reasonable care, published information may become out of date between re
       id: '6-7',
       heading: { en: `Status of these pages`, bn: `Status of these pages` },
       body: {
-        en: `The policies and legal pages on this website are working drafts pending review by qualified Bangladesh counsel. Each page shows its version and the date it was last updated, and the draft notice remains until professional review is complete. Questions about this Disclaimer may be sent to hello@bdoor.io.`,
-        bn: `The policies and legal pages on this website are working drafts pending review by qualified Bangladesh counsel. Each page shows its version and the date it was last updated, and the draft notice remains until professional review is complete. Questions about this Disclaimer may be sent to hello@bdoor.io.`,
+        en: `The policies and legal pages on this website are published by bdoor compliance ltd. Each page shows its version, its effective date and the date it was last updated. A change to any policy is published as a new version with a new effective date, never as an edit under the same number. These pages do not claim review or approval by any lawyer, regulator or authority. Questions about this Disclaimer may be sent to hello@bdoor.io.`,
+        bn: `The policies and legal pages on this website are published by bdoor compliance ltd. Each page shows its version, its effective date and the date it was last updated. A change to any policy is published as a new version with a new effective date, never as an edit under the same number. These pages do not claim review or approval by any lawyer, regulator or authority. Questions about this Disclaimer may be sent to hello@bdoor.io.`,
       },
     },
   ],
@@ -915,8 +923,9 @@ export const COMPLAINTS: LegalDocument = {
   slug: 'complaints',
   titleKey: 'legal.complaints',
   version: VERSION,
+  effectiveFrom: EFFECTIVE_FROM,
   lastUpdated: LAST_UPDATED,
-  awaitingCounselReview: true,
+  awaitingCounselReview: false,
   sections: [
     {
       id: '7-1',
@@ -983,8 +992,9 @@ export const ACCEPTABLE_USE: LegalDocument = {
   slug: 'acceptable-use',
   titleKey: 'legal.acceptableUse',
   version: VERSION,
+  effectiveFrom: EFFECTIVE_FROM,
   lastUpdated: LAST_UPDATED,
-  awaitingCounselReview: true,
+  awaitingCounselReview: false,
   sections: [
     {
       id: '8-1',
@@ -1071,8 +1081,9 @@ export const PROVIDER_DISCLOSURE: LegalDocument = {
   slug: 'provider-disclosure',
   titleKey: 'legal.providerDisclosure',
   version: VERSION,
+  effectiveFrom: EFFECTIVE_FROM,
   lastUpdated: LAST_UPDATED,
-  awaitingCounselReview: true,
+  awaitingCounselReview: false,
   sections: [
     {
       id: '9-1',
@@ -1154,8 +1165,9 @@ export const ELECTRONIC_CONSENT: LegalDocument = {
   slug: 'electronic-consent',
   titleKey: 'legal.electronicConsent',
   version: VERSION,
+  effectiveFrom: EFFECTIVE_FROM,
   lastUpdated: LAST_UPDATED,
-  awaitingCounselReview: true,
+  awaitingCounselReview: false,
   sections: [
     {
       id: '10-1',

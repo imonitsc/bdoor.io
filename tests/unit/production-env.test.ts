@@ -68,3 +68,51 @@ describe('productionEnvProblems', () => {
     expect(joined).toContain('SUPABASE_SECRET_KEY');
   });
 });
+
+describe('Ask bdoor AI release posture', () => {
+  async function envWith(env: Record<string, string | undefined>) {
+    for (const [key, value] of Object.entries(env)) {
+      vi.stubEnv(key, value);
+    }
+    vi.resetModules();
+    return import('@/lib/env');
+  }
+
+  it('is on by default everywhere, and false is the kill switch', async () => {
+    const on = await envWith({ ...COMPLETE });
+    expect(on.serverEnv().ASK_BDOOR_AI_ENABLED).toBe(true);
+
+    const off = await envWith({ ...COMPLETE, ASK_BDOOR_AI_ENABLED: 'false' });
+    expect(off.serverEnv().ASK_BDOOR_AI_ENABLED).toBe(false);
+  });
+
+  it('never fails the boot over convenience secrets — it warns instead', async () => {
+    const mod = await envWith({
+      ...COMPLETE,
+      VERCEL_ENV: 'production',
+      AI_IDENTITY_SALT: undefined,
+      CRON_SECRET: undefined,
+    });
+    expect(mod.productionEnvProblems()).toEqual([]);
+    const warnings = mod.productionEnvWarnings().join('\n');
+    expect(warnings).toContain('AI_IDENTITY_SALT');
+    expect(warnings).toContain('CRON_SECRET');
+  });
+
+  it('warns about a long-lived gateway key in production', async () => {
+    const mod = await envWith({
+      ...COMPLETE,
+      VERCEL_ENV: 'production',
+      AI_IDENTITY_SALT: 'salt-salt-salt-salt',
+      CRON_SECRET: 'cron-secret-cron-secret',
+      AI_GATEWAY_API_KEY: 'vck_example_key',
+    });
+    expect(mod.productionEnvProblems()).toEqual([]);
+    expect(mod.productionEnvWarnings().join('\n')).toContain('AI_GATEWAY_API_KEY');
+  });
+
+  it('stays quiet outside Vercel production', async () => {
+    const mod = await envWith({ ...COMPLETE, VERCEL_ENV: 'preview' });
+    expect(mod.productionEnvWarnings()).toEqual([]);
+  });
+});
