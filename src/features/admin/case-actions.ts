@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/server';
 import { requireCapability, requireStaff } from '@/lib/auth/session';
 import { recordAudit } from '@/lib/audit';
 import { logger } from '@/lib/logger';
+import { recordAnalyticsEvent } from '@/lib/analytics';
 import { canTransition, type ActorKind, type CaseStatus } from '@/features/cases/state-machine';
 
 export type CaseActionState = {
@@ -103,6 +104,17 @@ export async function transitionCase(
     caseId: current.id,
     metadata: { from: current.status, to: parsed.data.toStatus, waitingOn: check.waitingOn },
   });
+
+  // A case counts as completed only when an approved case closes — a
+  // cancellation reaching 'closed' is not delivery (§22).
+  if (current.status === 'approved' && parsed.data.toStatus === 'closed') {
+    await recordAnalyticsEvent({
+      event: 'case_completed',
+      idempotencyKey: `case_completed:${current.id}`,
+      organizationId: current.organization_id,
+      caseId: current.id,
+    });
+  }
 
   revalidatePath(`/${await getLocale()}/admin/cases/${current.id}`);
   return { status: 'success', message: 'saved' };

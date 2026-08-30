@@ -65,6 +65,8 @@ a platform role _and_ a customer membership, and each is evaluated separately.
 | `partner.read_assigned`      |      ●       |                    |         |   ●   |      ●      |
 | `partner.respond_assignment` |              |                    |         |       |             |
 | `partner.verify`             |              |                    |         |   ●   |      ●      |
+| `metrics.read`               |              |                    |    ●    |   ●   |      ●      |
+| `metrics.snapshot`           |              |                    |    ●    |   ●   |      ●      |
 | `content.publish`            |              |                    |         |   ●   |      ●      |
 | `service.manage`             |              |                    |         |   ●   |      ●      |
 | `user.manage`                |              |                    |         |   ●   |      ●      |

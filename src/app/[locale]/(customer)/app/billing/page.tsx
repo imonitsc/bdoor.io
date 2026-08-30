@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { after } from 'next/server';
 import { getFormatter, getTranslations, setRequestLocale } from 'next-intl/server';
 import { Receipt } from 'lucide-react';
 import { Alert } from '@/components/ui/alert';
@@ -10,6 +11,7 @@ import { requireCustomerOrganization } from '@/lib/auth/require-organization';
 import { createClient } from '@/lib/supabase/server';
 import { paymentsAreSandbox } from '@/lib/payments';
 import { quoteIsExpired, type Currency, type QuoteItemCategory } from '@/features/quotes/money';
+import { markQuoteVersionsViewed } from '@/features/quotes/viewed';
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
@@ -22,7 +24,7 @@ export default async function BillingPage({
 }) {
   const [{ locale }, query] = await Promise.all([params, searchParams]);
   setRequestLocale(locale);
-  await requireCustomerOrganization();
+  const { session, active } = await requireCustomerOrganization();
 
   const [t, format] = await Promise.all([getTranslations('workspace.billing'), getFormatter()]);
 
@@ -32,7 +34,7 @@ export default async function BillingPage({
     supabase
       .from('quote_versions')
       .select(
-        'id, version_no, currency, subtotal_minor, tax_minor, total_minor, valid_until, accepted_at, sent_at, quote_id, quote_items(id, category, description_en, description_bn, quantity, unit_amount_minor, currency, is_estimate, is_refundable, payee_name, sort_order), quotes(case_id)',
+        'id, version_no, currency, subtotal_minor, tax_minor, total_minor, valid_until, accepted_at, sent_at, viewed_at, quote_id, quote_items(id, category, description_en, description_bn, quantity, unit_amount_minor, currency, is_estimate, is_refundable, payee_name, sort_order), quotes(case_id)',
       )
       .not('sent_at', 'is', null)
       .order('version_no', { ascending: false }),
@@ -70,6 +72,7 @@ export default async function BillingPage({
     total_minor: number;
     valid_until: string;
     accepted_at: string | null;
+    viewed_at: string | null;
     quote_items: ItemRow[];
   };
 
@@ -117,6 +120,15 @@ export default async function BillingPage({
 
   const receipts = receiptsResult.data ?? [];
   const sandbox = paymentsAreSandbox();
+
+  // First-view stamp for the funnel, after the response streams — the page
+  // never waits on it.
+  const unviewed = ((versionsResult.data ?? []) as unknown as VersionRow[])
+    .filter((row) => row.viewed_at === null)
+    .map((row) => row.id);
+  if (unviewed.length > 0) {
+    after(() => markQuoteVersionsViewed(unviewed, active.organizationId, session.email));
+  }
 
   return (
     <div className="flex flex-col gap-6">

@@ -8,6 +8,7 @@ import { generateToken } from '@/lib/utils/hash';
 import { absoluteUrl } from '@/lib/site';
 import { getEmailProvider } from '@/lib/email';
 import { logger } from '@/lib/logger';
+import { recordAnalyticsEvent } from '@/lib/analytics';
 import {
   canTransitionApplication,
   type ProviderApplicationStatus,
@@ -263,5 +264,10 @@ export async function approveProviderApplication(id: string): Promise<ReviewResu
   }
 
   await audited('provider_application.approved', id, app.reference);
+  await recordAnalyticsEvent({
+    event: 'provider_application_approved',
+    idempotencyKey: `provider_application_approved:${id}`,
+    properties: { reference: app.reference },
+  });
   return { ok: true };
 }

@@ -5,6 +5,7 @@ import { createAdminClient, hasServiceRole } from '@/lib/supabase/admin';
 import { sha256 } from '@/lib/utils/hash';
 import { logger } from '@/lib/logger';
 import { getEmailProvider } from '@/lib/email';
+import { recordAnalyticsEvent } from '@/lib/analytics';
 import {
   APPLICATION_STEPS,
   PROVIDER_TERMS_VERSION,
@@ -366,5 +367,11 @@ export async function submitProviderDraft(): Promise<
   }
 
   logger.info('provider_application.submitted', { reference: draft.reference });
+  await recordAnalyticsEvent({
+    event: 'provider_application_submitted',
+    idempotencyKey: `provider_application_submitted:${draft.id}`,
+    actorEmail: email ?? null,
+    properties: { reference: draft.reference },
+  });
   return { ok: true, reference: draft.reference };
 }

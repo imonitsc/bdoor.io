@@ -363,6 +363,69 @@ export type Database = {
         }
         Relationships: []
       }
+      "analytics_events": {
+        Row: {
+          "id": string
+          "event_name": string
+          "occurred_at": string
+          "idempotency_key": string
+          "is_test": boolean
+          "organization_id": string | null
+          "case_id": string | null
+          "application_id": string | null
+          "quote_version_id": string | null
+          "payment_id": string | null
+          "subscription_id": string | null
+          "country": string | null
+          "locale": Database["public"]["Enums"]["locale_code"] | null
+          "package_slug": string | null
+          "source_path": string | null
+          "utm": Json
+          "properties": Json
+          "created_at": string
+        }
+        Insert: {
+          "id"?: string
+          "event_name": string
+          "occurred_at"?: string
+          "idempotency_key": string
+          "is_test"?: boolean
+          "organization_id"?: string | null
+          "case_id"?: string | null
+          "application_id"?: string | null
+          "quote_version_id"?: string | null
+          "payment_id"?: string | null
+          "subscription_id"?: string | null
+          "country"?: string | null
+          "locale"?: Database["public"]["Enums"]["locale_code"] | null
+          "package_slug"?: string | null
+          "source_path"?: string | null
+          "utm"?: Json
+          "properties"?: Json
+          "created_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "event_name"?: string
+          "occurred_at"?: string
+          "idempotency_key"?: string
+          "is_test"?: boolean
+          "organization_id"?: string | null
+          "case_id"?: string | null
+          "application_id"?: string | null
+          "quote_version_id"?: string | null
+          "payment_id"?: string | null
+          "subscription_id"?: string | null
+          "country"?: string | null
+          "locale"?: Database["public"]["Enums"]["locale_code"] | null
+          "package_slug"?: string | null
+          "source_path"?: string | null
+          "utm"?: Json
+          "properties"?: Json
+          "created_at"?: string
+        }
+        Relationships: []
+      }
       "applications": {
         Row: {
           "id": string
@@ -2601,6 +2664,69 @@ export type Database = {
         }
         Relationships: []
       }
+      "metric_definitions": {
+        Row: {
+          "id": string
+          "key": string
+          "version": number
+          "formula": string
+          "notes": string | null
+          "effective_from": string
+          "created_by": string | null
+          "created_at": string
+        }
+        Insert: {
+          "id"?: string
+          "key": string
+          "version": number
+          "formula": string
+          "notes"?: string | null
+          "effective_from"?: string
+          "created_by"?: string | null
+          "created_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "key"?: string
+          "version"?: number
+          "formula"?: string
+          "notes"?: string | null
+          "effective_from"?: string
+          "created_by"?: string | null
+          "created_at"?: string
+        }
+        Relationships: []
+      }
+      "metric_snapshots": {
+        Row: {
+          "id": string
+          "month": string
+          "payload": Json
+          "definitions_version": number
+          "note": string | null
+          "computed_by": string | null
+          "computed_at": string
+        }
+        Insert: {
+          "id"?: string
+          "month": string
+          "payload": Json
+          "definitions_version"?: number
+          "note"?: string | null
+          "computed_by"?: string | null
+          "computed_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "month"?: string
+          "payload"?: Json
+          "definitions_version"?: number
+          "note"?: string | null
+          "computed_by"?: string | null
+          "computed_at"?: string
+        }
+        Relationships: []
+      }
       "notification_preferences": {
         Row: {
           "user_id": string
@@ -3683,6 +3809,10 @@ export type Database = {
           "superseded_at": string | null
           "created_at": string
           "updated_at": string
+          "viewed_at": string | null
+          "fx_source": string | null
+          "fx_rate": number | null
+          "fx_quoted_at": string | null
         }
         Insert: {
           "id"?: string
@@ -3706,6 +3836,10 @@ export type Database = {
           "superseded_at"?: string | null
           "created_at"?: string
           "updated_at"?: string
+          "viewed_at"?: string | null
+          "fx_source"?: string | null
+          "fx_rate"?: number | null
+          "fx_quoted_at"?: string | null
         }
         Update: {
           "id"?: string
@@ -3729,6 +3863,10 @@ export type Database = {
           "superseded_at"?: string | null
           "created_at"?: string
           "updated_at"?: string
+          "viewed_at"?: string | null
+          "fx_source"?: string | null
+          "fx_rate"?: number | null
+          "fx_quoted_at"?: string | null
         }
         Relationships: []
       }
@@ -4488,6 +4626,147 @@ export type Database = {
         }
         Relationships: []
       }
+      "subscription_periods": {
+        Row: {
+          "id": string
+          "subscription_id": string
+          "period_start": string
+          "period_end": string
+          "amount_minor": number
+          "currency": Database["public"]["Enums"]["currency_code"]
+          "status": string
+          "invoice_id": string | null
+          "payment_id": string | null
+          "created_at": string
+        }
+        Insert: {
+          "id"?: string
+          "subscription_id": string
+          "period_start": string
+          "period_end": string
+          "amount_minor": number
+          "currency"?: Database["public"]["Enums"]["currency_code"]
+          "status"?: string
+          "invoice_id"?: string | null
+          "payment_id"?: string | null
+          "created_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "subscription_id"?: string
+          "period_start"?: string
+          "period_end"?: string
+          "amount_minor"?: number
+          "currency"?: Database["public"]["Enums"]["currency_code"]
+          "status"?: string
+          "invoice_id"?: string | null
+          "payment_id"?: string | null
+          "created_at"?: string
+        }
+        Relationships: []
+      }
+      "subscription_plans": {
+        Row: {
+          "id": string
+          "code": string
+          "version": number
+          "service_package_id": string | null
+          "name_en": string
+          "name_bn": string
+          "billing_period": string
+          "amount_minor": number
+          "currency": Database["public"]["Enums"]["currency_code"]
+          "is_active": boolean
+          "created_at": string
+          "updated_at": string
+        }
+        Insert: {
+          "id"?: string
+          "code": string
+          "version"?: number
+          "service_package_id"?: string | null
+          "name_en": string
+          "name_bn": string
+          "billing_period": string
+          "amount_minor": number
+          "currency"?: Database["public"]["Enums"]["currency_code"]
+          "is_active"?: boolean
+          "created_at"?: string
+          "updated_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "code"?: string
+          "version"?: number
+          "service_package_id"?: string | null
+          "name_en"?: string
+          "name_bn"?: string
+          "billing_period"?: string
+          "amount_minor"?: number
+          "currency"?: Database["public"]["Enums"]["currency_code"]
+          "is_active"?: boolean
+          "created_at"?: string
+          "updated_at"?: string
+        }
+        Relationships: []
+      }
+      "subscriptions": {
+        Row: {
+          "id": string
+          "organization_id": string
+          "plan_id": string
+          "status": string
+          "started_at": string | null
+          "current_period_start": string | null
+          "current_period_end": string | null
+          "cancelled_at": string | null
+          "cancel_reason": string | null
+          "activation_payment_id": string | null
+          "offline_payment_reference": string | null
+          "offline_payment_verified_by": string | null
+          "offline_payment_verified_at": string | null
+          "created_by": string | null
+          "created_at": string
+          "updated_at": string
+        }
+        Insert: {
+          "id"?: string
+          "organization_id": string
+          "plan_id": string
+          "status"?: string
+          "started_at"?: string | null
+          "current_period_start"?: string | null
+          "current_period_end"?: string | null
+          "cancelled_at"?: string | null
+          "cancel_reason"?: string | null
+          "activation_payment_id"?: string | null
+          "offline_payment_reference"?: string | null
+          "offline_payment_verified_by"?: string | null
+          "offline_payment_verified_at"?: string | null
+          "created_by"?: string | null
+          "created_at"?: string
+          "updated_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "organization_id"?: string
+          "plan_id"?: string
+          "status"?: string
+          "started_at"?: string | null
+          "current_period_start"?: string | null
+          "current_period_end"?: string | null
+          "cancelled_at"?: string | null
+          "cancel_reason"?: string | null
+          "activation_payment_id"?: string | null
+          "offline_payment_reference"?: string | null
+          "offline_payment_verified_by"?: string | null
+          "offline_payment_verified_at"?: string | null
+          "created_by"?: string | null
+          "created_at"?: string
+          "updated_at"?: string
+        }
+        Relationships: []
+      }
       "task_comments": {
         Row: {
           "id": string
@@ -4694,11 +4973,11 @@ export type Database = {
       "package_segment": "new_business" | "existing_business"
       "partner_verification_status": "unverified" | "in_review" | "verified" | "suspended" | "rejected"
       "payee_type": "bdoor" | "government_authority" | "partner_firm" | "third_party"
-      "payment_status": "pending" | "paid" | "failed" | "cancelled" | "partially_refunded" | "refunded"
+      "payment_status": "pending" | "paid" | "failed" | "cancelled" | "partially_refunded" | "refunded" | "processing" | "disputed"
       "platform_role": "case_manager" | "compliance_officer" | "finance" | "admin" | "super_admin"
       "publication_status": "draft" | "published" | "coming_soon" | "retired"
       "quote_item_category": "platform_service_fee" | "government_fee_estimate" | "partner_professional_fee" | "third_party_cost" | "tax" | "payment_processing_fee" | "discount"
-      "quote_status": "draft" | "internal_review" | "sent" | "accepted" | "expired" | "superseded" | "withdrawn"
+      "quote_status": "draft" | "internal_review" | "sent" | "accepted" | "expired" | "superseded" | "withdrawn" | "rejected"
       "risk_rating": "low" | "medium" | "high" | "prohibited"
       "task_status": "open" | "in_progress" | "blocked" | "done" | "cancelled"
       "task_visibility": "customer" | "internal" | "partner"

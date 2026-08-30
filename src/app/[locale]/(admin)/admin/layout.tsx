@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import {
   Banknote,
+  BarChart3,
   Briefcase,
   CalendarCheck,
   FileText,
@@ -95,6 +96,15 @@ export default async function AdminLayout({
       : []),
     ...(has('payment.read')
       ? [{ href: ADMIN_ROUTES.finance, label: t('finance'), icon: <Banknote className="size-4" /> }]
+      : []),
+    ...(has('metrics.read')
+      ? [
+          {
+            href: ADMIN_ROUTES.metrics,
+            label: t('metrics'),
+            icon: <BarChart3 className="size-4" />,
+          },
+        ]
       : []),
     {
       href: ADMIN_ROUTES.compliance,

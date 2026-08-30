@@ -57,6 +57,7 @@ export type AuditAction =
   | 'provider_application.approved'
   | 'provider_application.rejected'
   | 'case.disclosure_recorded'
+  | 'metrics.snapshot_recorded'
   | 'partner.export'
   | 'content.published'
   | 'service.updated'

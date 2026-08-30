@@ -23,7 +23,7 @@ export const ORGANIZATION_ROLES: readonly OrganizationRole[] = [
  * capability here, not sprinkling role names through components.
  *
  * This is an array rather than a bare union so the set exists at runtime:
- * `public.permission_catalog` seeds the same 27 keys, and
+ * `public.permission_catalog` seeds the same keys, and
  * `tests/integration/authorization-core.test.ts` fails if the two drift — the
  * same guard `case_status_transitions` has against the case state machine. The
  * `Capability` type is derived from it, so the list cannot fall behind the type.
@@ -51,6 +51,8 @@ export const ALL_CAPABILITIES = [
   'partner.read_assigned',
   'partner.respond_assignment',
   'partner.verify',
+  'metrics.read',
+  'metrics.snapshot',
   'content.publish',
   'service.manage',
   'user.manage',
@@ -97,6 +99,8 @@ const PLATFORM_CAPABILITIES: Record<PlatformRole, readonly Capability[]> = {
     'payment.read',
     'payment.reconcile',
     'refund.approve',
+    'metrics.read',
+    'metrics.snapshot',
   ],
   admin: [
     'case.read.own',
@@ -116,6 +120,8 @@ const PLATFORM_CAPABILITIES: Record<PlatformRole, readonly Capability[]> = {
     'payment.reconcile',
     'partner.read_assigned',
     'partner.verify',
+    'metrics.read',
+    'metrics.snapshot',
     'content.publish',
     'service.manage',
     'user.manage',
@@ -144,6 +150,8 @@ const PLATFORM_CAPABILITIES: Record<PlatformRole, readonly Capability[]> = {
     'refund.approve',
     'partner.read_assigned',
     'partner.verify',
+    'metrics.read',
+    'metrics.snapshot',
     'content.publish',
     'service.manage',
     'user.manage',
