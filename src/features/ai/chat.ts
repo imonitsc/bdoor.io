@@ -220,9 +220,24 @@ export async function answerQuestion(request: ChatRequest): Promise<ChatStream |
       let errorCode: string | null = null;
 
       try {
-        for await (const delta of result.textStream) {
-          answer += delta;
-          controller.enqueue(frame('text', { delta }));
+        // fullStream, not textStream: the SDK delivers upstream failures as
+        // 'error' parts and ends textStream cleanly, which would hand the
+        // customer an empty answer marked complete — the silent non-answer
+        // this whole pipeline exists to prevent. The e2e outage test caught
+        // exactly that.
+        for await (const part of result.fullStream) {
+          if (part.type === 'text-delta') {
+            answer += part.text;
+            controller.enqueue(frame('text', { delta: part.text }));
+          } else if (part.type === 'error') {
+            throw part.error;
+          } else if (part.type === 'abort') {
+            throw new Error('generation aborted');
+          }
+        }
+        if (answer.length === 0) {
+          // Whatever ended the stream without a word was not an answer.
+          throw new Error('stream ended without any text');
         }
       } catch (error) {
         status = 'error';

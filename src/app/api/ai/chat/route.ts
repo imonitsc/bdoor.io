@@ -6,6 +6,7 @@ import { LIMITS, SUPPORTED_COUNTRIES } from '@/features/ai/config';
 import { failureMessage, failureStatus } from '@/features/ai/errors';
 import { callerIp } from '@/features/ai/identity';
 import { createClient } from '@/lib/supabase/server';
+import { serverEnv } from '@/lib/env';
 import { logger } from '@/lib/logger';
 
 /**
@@ -81,10 +82,15 @@ export async function POST(request: NextRequest) {
 
   if (!aiEnabled()) return refusal('disabled', locale);
 
+  // RATE_LIMIT_DISABLED is the repository-wide local/test switch and is never
+  // set in production; this limiter honours it like every other one does.
+  const limiterOn = !serverEnv().RATE_LIMIT_DISABLED;
+
   const ip = callerIp(request.headers);
   if (
-    overLimit(`ai:min:${ip}`, LIMITS.perIpPerMinute, 60) ||
-    overLimit(`ai:day:${ip}`, LIMITS.perIpPerDay, 86_400)
+    limiterOn &&
+    (overLimit(`ai:min:${ip}`, LIMITS.perIpPerMinute, 60) ||
+      overLimit(`ai:day:${ip}`, LIMITS.perIpPerDay, 86_400))
   ) {
     logger.warn('ai.rate_limited', { scope: 'ip' });
     return refusal('rate_limited', locale);
@@ -109,7 +115,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'session_required' }, { status: 400 });
   }
 
-  if (overLimit(`ai:conv:${conversationId ?? ip}`, LIMITS.perConversationPerHour, 3_600)) {
+  if (
+    limiterOn &&
+    overLimit(`ai:conv:${conversationId ?? ip}`, LIMITS.perConversationPerHour, 3_600)
+  ) {
     logger.warn('ai.rate_limited', { scope: 'conversation' });
     return refusal('rate_limited', locale);
   }
