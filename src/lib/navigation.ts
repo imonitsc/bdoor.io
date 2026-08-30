@@ -142,7 +142,10 @@ export const FOOTER_PROFESSIONALS_LINKS = [
   { href: MARKETING_ROUTES.partnersApply, labelKey: 'footer.links.becomeProvider' },
   { href: MARKETING_ROUTES.login, labelKey: 'footer.links.providerSignIn' },
   { href: MARKETING_ROUTES.partners, labelKey: 'footer.links.providerStandards' },
-  { href: MARKETING_ROUTES.providerDisclosure, labelKey: 'legal.providerDisclosure' },
+  // Short label on purpose: the Legal column already carries the document's
+  // full title, and two identical link names in one footer would be
+  // ambiguous to assistive tech (and to the e2e footer-link audit).
+  { href: MARKETING_ROUTES.providerDisclosure, labelKey: 'footer.links.providerDisclosure' },
 ] as const;
 
 export const FOOTER_LEGAL_LINKS = [

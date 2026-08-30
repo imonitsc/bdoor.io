@@ -912,8 +912,8 @@ Despite reasonable care, published information may become out of date between re
       id: '6-7',
       heading: { en: `Status of these pages`, bn: `Status of these pages` },
       body: {
-        en: `The policies and legal pages on this website are working drafts pending review by qualified Bangladesh counsel. Each page shows its version and the date it was last updated, and the draft notice remains until professional review is complete. Questions about this Disclaimer may be sent to hello@bdoor.io.`,
-        bn: `The policies and legal pages on this website are working drafts pending review by qualified Bangladesh counsel. Each page shows its version and the date it was last updated, and the draft notice remains until professional review is complete. Questions about this Disclaimer may be sent to hello@bdoor.io.`,
+        en: `The policies and legal pages on this website are published by bdoor compliance ltd. Each page shows its version, its effective date and the date it was last updated. A change to any policy is published as a new version with a new effective date, never as an edit under the same number. These pages do not claim review or approval by any lawyer, regulator or authority. Questions about this Disclaimer may be sent to hello@bdoor.io.`,
+        bn: `The policies and legal pages on this website are published by bdoor compliance ltd. Each page shows its version, its effective date and the date it was last updated. A change to any policy is published as a new version with a new effective date, never as an edit under the same number. These pages do not claim review or approval by any lawyer, regulator or authority. Questions about this Disclaimer may be sent to hello@bdoor.io.`,
       },
     },
   ],

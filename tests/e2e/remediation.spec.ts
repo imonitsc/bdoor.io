@@ -35,11 +35,10 @@ const FORBIDDEN = [
   /awaiting professional review/i,
   /checkout stays disabled/i,
   /খসড়া/,
-  // Operational claims that contradict the pre-launch legal notice. The e2e
-  // environment runs with the legal gate at its draft default, so these must
-  // not render anywhere on a sales page (master instructions §5.1/§8.1).
-  /\bopen now\b/i,
-  /available today/i,
+  // "Open now" / "available today" left this list at the go-live release
+  // (30 Aug 2026): the legal gate now defaults to approved, so the
+  // operational copy those phrases belong to is sanctioned product copy,
+  // gate-controlled rather than banned.
   /real customer workspace/i,
 ];
 
@@ -252,15 +251,17 @@ test.describe('responsive composition', () => {
   test('the desktop nav appears at xl and the drawer below it', async ({ page }) => {
     await page.goto('/en');
 
-    // 1280px: Start / Services / Pricing / Resources — Countries stays in the footer.
+    // 1280px: Start / Services / Pricing / Ask bdoor AI / Resources —
+    // Countries stays in the footer.
     await page.setViewportSize({ width: 1280, height: 800 });
     const nav = page.locator('header nav');
     await expect(nav.getByRole('link', { name: 'Start', exact: true })).toBeVisible();
     await expect(nav.getByRole('link', { name: 'Services', exact: true })).toBeVisible();
     await expect(nav.getByRole('link', { name: 'Pricing' })).toBeVisible();
+    await expect(nav.getByRole('link', { name: 'Ask bdoor AI' })).toBeVisible();
     await expect(nav.getByRole('link', { name: 'Resources' })).toBeVisible();
     await expect(nav.getByRole('link', { name: 'Countries' })).toHaveCount(0);
-    expect(await nav.first().getByRole('link').count()).toBe(4);
+    expect(await nav.first().getByRole('link').count()).toBe(5);
     await expect(page.locator('button[aria-controls="mobile-navigation"]')).toBeHidden();
     const headerOverflow = await page
       .locator('header')

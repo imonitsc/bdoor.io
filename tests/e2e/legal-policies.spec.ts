@@ -11,7 +11,8 @@ import { expect, test, type Page } from '@playwright/test';
  * go-live release, any lingering "Working draft" posture.
  */
 
-const VERSION = 'Version 1.0';
+/** The visible version stamp, per locale ("Version 1.0" / "সংস্করণ 1.0"). */
+const VERSION = { en: 'Version 1.0', bn: 'সংস্করণ 1.0' } as const;
 
 const POLICIES: ReadonlyArray<{ slug: string; en: string; bn: string }> = [
   { slug: 'terms', en: 'Terms of Service', bn: 'সেবার শর্তাবলি' },
@@ -53,7 +54,7 @@ async function auditPolicyPage(page: Page, locale: 'en' | 'bn', policy: (typeof 
   await expect(h1, label).toHaveText(policy[locale]);
 
   // The version stamp customers accept against, with its effective date.
-  await expect(page.getByText(VERSION), label).toBeVisible();
+  await expect(page.getByText(VERSION[locale]), label).toBeVisible();
 
   // Published: no draft banner in either locale. The Bangla route still
   // carries the honest translation-review notice (its body is English).
@@ -128,7 +129,7 @@ test.describe('legal policy suite', () => {
     for (const policy of POLICIES) {
       await expect(main.getByRole('link', { name: policy.en }), policy.slug).toBeVisible();
     }
-    await expect(main.getByText(VERSION).first()).toBeVisible();
+    await expect(main.getByText(VERSION.en).first()).toBeVisible();
 
     // The marketing footer reaches all ten from any content page.
     const footer = page.locator('footer');

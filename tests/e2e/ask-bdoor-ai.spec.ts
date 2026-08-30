@@ -58,12 +58,17 @@ test.describe('the homepage entry', () => {
 
   test('is reachable from the header navigation and the hero', async ({ page }) => {
     await page.goto('/en');
-    const header = page.locator('header');
-    await expect(header.getByRole('link', { name: 'Ask bdoor AI' }).first()).toHaveAttribute(
-      'href',
-      '/en/ask',
-    );
     await expect(page.getByTestId('home-hero-ask')).toHaveAttribute('href', '/en/ask');
+
+    // Below xl the header bar collapses into the drawer, which renders its
+    // links only once opened — open it before looking for the nav entry.
+    const toggle = page.locator('button[aria-controls="mobile-navigation"]');
+    if (await toggle.isVisible()) {
+      await toggle.click();
+    }
+    await expect(
+      page.locator('header').getByRole('link', { name: 'Ask bdoor AI' }).first(),
+    ).toHaveAttribute('href', '/en/ask');
   });
 });
 
@@ -121,9 +126,7 @@ test.describe('when the model cannot be reached', () => {
     test.setTimeout(120_000);
     await page.goto('/en/ask');
 
-    await page
-      .getByRole('button', { name: /How do I register a private limited company in Bangladesh/ })
-      .click();
+    await page.getByRole('button', { name: /How do I register a company in Bangladesh/ }).click();
 
     // No credential in this environment, so the Gateway call fails. The
     // customer must be told — never handed a plausible answer from somewhere
@@ -146,7 +149,7 @@ test.describe('when the model cannot be reached', () => {
     });
 
     await page.goto('/en/ask');
-    await page.getByRole('button', { name: /Can a foreigner own 100%/ }).click();
+    await page.getByRole('button', { name: /Can a foreigner own a Bangladesh company/ }).click();
     await expect(
       page.getByRole('log').getByRole('link', { name: 'Talk to a specialist' }),
     ).toBeVisible({
