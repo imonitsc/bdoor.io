@@ -416,6 +416,11 @@ export type Database = {
           "completed_at": string | null
           "created_at": string
           "updated_at": string
+          "conflict_check_result": string | null
+          "conflict_check_recorded_by": string | null
+          "conflict_check_recorded_at": string | null
+          "disclosed_at": string | null
+          "disclosed_by": string | null
         }
         Insert: {
           "id"?: string
@@ -433,6 +438,11 @@ export type Database = {
           "completed_at"?: string | null
           "created_at"?: string
           "updated_at"?: string
+          "conflict_check_result"?: string | null
+          "conflict_check_recorded_by"?: string | null
+          "conflict_check_recorded_at"?: string | null
+          "disclosed_at"?: string | null
+          "disclosed_by"?: string | null
         }
         Update: {
           "id"?: string
@@ -450,6 +460,11 @@ export type Database = {
           "completed_at"?: string | null
           "created_at"?: string
           "updated_at"?: string
+          "conflict_check_result"?: string | null
+          "conflict_check_recorded_by"?: string | null
+          "conflict_check_recorded_at"?: string | null
+          "disclosed_at"?: string | null
+          "disclosed_by"?: string | null
         }
         Relationships: []
       }
@@ -931,12 +946,12 @@ export type Database = {
           "message": string
           "locale": Database["public"]["Enums"]["locale_code"]
           "consent_given": boolean
-          "interest_country": string | null
-          "interest_route": string | null
-          "source_path": string | null
           "handled_by": string | null
           "handled_at": string | null
           "created_at": string
+          "interest_country": string | null
+          "interest_route": string | null
+          "source_path": string | null
         }
         Insert: {
           "id"?: string
@@ -947,12 +962,12 @@ export type Database = {
           "message": string
           "locale"?: Database["public"]["Enums"]["locale_code"]
           "consent_given"?: boolean
-          "interest_country"?: string | null
-          "interest_route"?: string | null
-          "source_path"?: string | null
           "handled_by"?: string | null
           "handled_at"?: string | null
           "created_at"?: string
+          "interest_country"?: string | null
+          "interest_route"?: string | null
+          "source_path"?: string | null
         }
         Update: {
           "id"?: string
@@ -963,12 +978,12 @@ export type Database = {
           "message"?: string
           "locale"?: Database["public"]["Enums"]["locale_code"]
           "consent_given"?: boolean
-          "interest_country"?: string | null
-          "interest_route"?: string | null
-          "source_path"?: string | null
           "handled_by"?: string | null
           "handled_at"?: string | null
           "created_at"?: string
+          "interest_country"?: string | null
+          "interest_route"?: string | null
+          "source_path"?: string | null
         }
         Relationships: []
       }
@@ -2603,6 +2618,7 @@ export type Database = {
           "category_id": string | null
           "is_active": boolean
           "created_at": string
+          "country_code": string | null
         }
         Insert: {
           "id"?: string
@@ -2611,6 +2627,7 @@ export type Database = {
           "category_id"?: string | null
           "is_active"?: boolean
           "created_at"?: string
+          "country_code"?: string | null
         }
         Update: {
           "id"?: string
@@ -2619,6 +2636,7 @@ export type Database = {
           "category_id"?: string | null
           "is_active"?: boolean
           "created_at"?: string
+          "country_code"?: string | null
         }
         Relationships: []
       }
@@ -2666,7 +2684,6 @@ export type Database = {
           "contact_email": string | null
           "contact_phone": string | null
           "verification_status": Database["public"]["Enums"]["partner_verification_status"]
-          "public_profile_approved": boolean
           "conflict_policy_accepted_at": string | null
           "dpa_accepted_at": string | null
           "insurance_expires_on": string | null
@@ -2674,6 +2691,7 @@ export type Database = {
           "notes": string | null
           "created_at": string
           "updated_at": string
+          "public_profile_approved": boolean
         }
         Insert: {
           "id"?: string
@@ -2688,7 +2706,6 @@ export type Database = {
           "contact_email"?: string | null
           "contact_phone"?: string | null
           "verification_status"?: Database["public"]["Enums"]["partner_verification_status"]
-          "public_profile_approved"?: boolean
           "conflict_policy_accepted_at"?: string | null
           "dpa_accepted_at"?: string | null
           "insurance_expires_on"?: string | null
@@ -2696,6 +2713,7 @@ export type Database = {
           "notes"?: string | null
           "created_at"?: string
           "updated_at"?: string
+          "public_profile_approved"?: boolean
         }
         Update: {
           "id"?: string
@@ -2710,7 +2728,6 @@ export type Database = {
           "contact_email"?: string | null
           "contact_phone"?: string | null
           "verification_status"?: Database["public"]["Enums"]["partner_verification_status"]
-          "public_profile_approved"?: boolean
           "conflict_policy_accepted_at"?: string | null
           "dpa_accepted_at"?: string | null
           "insurance_expires_on"?: string | null
@@ -2718,6 +2735,7 @@ export type Database = {
           "notes"?: string | null
           "created_at"?: string
           "updated_at"?: string
+          "public_profile_approved"?: boolean
         }
         Relationships: []
       }
@@ -2983,6 +3001,174 @@ export type Database = {
           "preferred_locale"?: Database["public"]["Enums"]["locale_code"]
           "avatar_url"?: string | null
           "onboarded_at"?: string | null
+          "created_at"?: string
+          "updated_at"?: string
+        }
+        Relationships: []
+      }
+      "provider_applications": {
+        Row: {
+          "id": string
+          "reference": string
+          "status": string
+          "locale": Database["public"]["Enums"]["locale_code"]
+          "legal_name": string
+          "trading_name": string | null
+          "registration_no": string | null
+          "established_on": string | null
+          "firm_category": string
+          "registered_address": string | null
+          "operating_address": string | null
+          "website": string | null
+          "official_email_domain": string | null
+          "contact_name": string
+          "contact_email": string
+          "contact_phone": string | null
+          "signatory_name": string | null
+          "owners": Json
+          "related_entities_note": string | null
+          "sanctions_declaration": boolean
+          "integrity_declaration": boolean
+          "regulator_name": string | null
+          "licence_no": string | null
+          "licence_expires_on": string | null
+          "disciplinary_declaration": boolean
+          "indemnity_insurer": string | null
+          "indemnity_expires_on": string | null
+          "responsible_professionals": Json
+          "requested_categories": string[]
+          "jurisdictions": string[]
+          "services_note": string | null
+          "languages": string[]
+          "turnaround_note": string | null
+          "capacity_note": string | null
+          "fee_note": string | null
+          "conflict_process_note": string | null
+          "complaint_process_note": string | null
+          "security_note": string | null
+          "retention_note": string | null
+          "subcontractors_note": string | null
+          "continuity_note": string | null
+          "declarations_accepted_at": string | null
+          "terms_version": string | null
+          "resume_key_hash": string | null
+          "submitted_at": string | null
+          "reviewer_id": string | null
+          "decided_by": string | null
+          "decided_at": string | null
+          "decision_reason": string | null
+          "information_request": string | null
+          "organization_id": string | null
+          "created_at": string
+          "updated_at": string
+        }
+        Insert: {
+          "id"?: string
+          "reference": string
+          "status"?: string
+          "locale"?: Database["public"]["Enums"]["locale_code"]
+          "legal_name"?: string
+          "trading_name"?: string | null
+          "registration_no"?: string | null
+          "established_on"?: string | null
+          "firm_category"?: string
+          "registered_address"?: string | null
+          "operating_address"?: string | null
+          "website"?: string | null
+          "official_email_domain"?: string | null
+          "contact_name"?: string
+          "contact_email"?: string
+          "contact_phone"?: string | null
+          "signatory_name"?: string | null
+          "owners"?: Json
+          "related_entities_note"?: string | null
+          "sanctions_declaration"?: boolean
+          "integrity_declaration"?: boolean
+          "regulator_name"?: string | null
+          "licence_no"?: string | null
+          "licence_expires_on"?: string | null
+          "disciplinary_declaration"?: boolean
+          "indemnity_insurer"?: string | null
+          "indemnity_expires_on"?: string | null
+          "responsible_professionals"?: Json
+          "requested_categories"?: string[]
+          "jurisdictions"?: string[]
+          "services_note"?: string | null
+          "languages"?: string[]
+          "turnaround_note"?: string | null
+          "capacity_note"?: string | null
+          "fee_note"?: string | null
+          "conflict_process_note"?: string | null
+          "complaint_process_note"?: string | null
+          "security_note"?: string | null
+          "retention_note"?: string | null
+          "subcontractors_note"?: string | null
+          "continuity_note"?: string | null
+          "declarations_accepted_at"?: string | null
+          "terms_version"?: string | null
+          "resume_key_hash"?: string | null
+          "submitted_at"?: string | null
+          "reviewer_id"?: string | null
+          "decided_by"?: string | null
+          "decided_at"?: string | null
+          "decision_reason"?: string | null
+          "information_request"?: string | null
+          "organization_id"?: string | null
+          "created_at"?: string
+          "updated_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "reference"?: string
+          "status"?: string
+          "locale"?: Database["public"]["Enums"]["locale_code"]
+          "legal_name"?: string
+          "trading_name"?: string | null
+          "registration_no"?: string | null
+          "established_on"?: string | null
+          "firm_category"?: string
+          "registered_address"?: string | null
+          "operating_address"?: string | null
+          "website"?: string | null
+          "official_email_domain"?: string | null
+          "contact_name"?: string
+          "contact_email"?: string
+          "contact_phone"?: string | null
+          "signatory_name"?: string | null
+          "owners"?: Json
+          "related_entities_note"?: string | null
+          "sanctions_declaration"?: boolean
+          "integrity_declaration"?: boolean
+          "regulator_name"?: string | null
+          "licence_no"?: string | null
+          "licence_expires_on"?: string | null
+          "disciplinary_declaration"?: boolean
+          "indemnity_insurer"?: string | null
+          "indemnity_expires_on"?: string | null
+          "responsible_professionals"?: Json
+          "requested_categories"?: string[]
+          "jurisdictions"?: string[]
+          "services_note"?: string | null
+          "languages"?: string[]
+          "turnaround_note"?: string | null
+          "capacity_note"?: string | null
+          "fee_note"?: string | null
+          "conflict_process_note"?: string | null
+          "complaint_process_note"?: string | null
+          "security_note"?: string | null
+          "retention_note"?: string | null
+          "subcontractors_note"?: string | null
+          "continuity_note"?: string | null
+          "declarations_accepted_at"?: string | null
+          "terms_version"?: string | null
+          "resume_key_hash"?: string | null
+          "submitted_at"?: string | null
+          "reviewer_id"?: string | null
+          "decided_by"?: string | null
+          "decided_at"?: string | null
+          "decision_reason"?: string | null
+          "information_request"?: string | null
+          "organization_id"?: string | null
           "created_at"?: string
           "updated_at"?: string
         }

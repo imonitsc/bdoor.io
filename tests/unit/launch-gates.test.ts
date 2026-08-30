@@ -5,6 +5,7 @@ import {
   legalContentStatus,
   legalLaunchApproved,
   paymentsStatus,
+  providerApplicationsStatus,
 } from '@/lib/launch/gates';
 
 /**
@@ -20,6 +21,7 @@ const NAMES = [
   'BANGLADESH_CHECKOUT_STATUS',
   'KYC_UPLOAD_STATUS',
   'PAYMENTS_STATUS',
+  'PROVIDER_APPLICATIONS_STATUS',
 ] as const;
 
 const saved: Record<string, string | undefined> = {};
@@ -48,6 +50,15 @@ describe('defaults', () => {
     expect(bangladeshCheckoutStatus()).toBe('disabled');
     expect(kycUploadStatus()).toBe('disabled');
     expect(paymentsStatus()).toBe('disabled');
+    expect(providerApplicationsStatus()).toBe('disabled');
+  });
+
+  it('provider applications open on the explicit toggle alone', () => {
+    // Unlike payments/KYC this gate is independent of the legal-content
+    // status: applying collects business facts, not money or identity
+    // documents, and the page itself keeps the draft-terms notices.
+    set({ PROVIDER_APPLICATIONS_STATUS: 'enabled' });
+    expect(providerApplicationsStatus()).toBe('enabled');
   });
 
   it('an empty string behaves like unset, not like an invalid value', () => {
