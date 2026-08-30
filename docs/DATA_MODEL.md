@@ -174,5 +174,14 @@ The 28 August 2026 brief proposes a larger model (`assessments`,
 `audit_events`, and others). The shipped schema covers the same ground under
 different names and is the source of truth here; the genuinely absent pieces
 are the transactional outbox, `idempotency_keys`, `professional_credentials`,
-`subscriptions`, and the retention-job tables. Those are tracked in
+and the retention-job tables. Those are tracked in
 `docs/BUILD_REPORT.md` rather than half-declared here.
+
+**Analytics and recurring revenue** (fundable-startup core, 30 August 2026) —
+`analytics_events` (first-party commercial milestones: service-role writes
+only, idempotent by key, append-only, `is_test` excluded from metrics),
+`subscription_plans` / `subscriptions` / `subscription_periods` (a
+subscription cannot be `active` without a verified payment or a
+staff-verified offline payment — constraint-enforced), `metric_definitions`
+and `metric_snapshots` (both append-only; a formula change or recomputation
+is a new row). See `docs/EVENT_TAXONOMY.md` and `docs/METRIC_DEFINITIONS.md`.
