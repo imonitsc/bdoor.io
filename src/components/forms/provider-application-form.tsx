@@ -12,6 +12,7 @@ import {
   APPLICATION_STEPS,
   FIRM_CATEGORIES,
   STEP_SCHEMAS,
+  applicationErrorKey,
   type ApplicationDraftValues,
   type ApplicationStepKey,
 } from '@/features/partners/application';
@@ -122,7 +123,7 @@ export function ProviderApplicationForm({ initial }: { initial: ProviderApplySta
     const errors: Record<string, string> = {};
     for (const issue of parsed.error.issues) {
       const key = String(issue.path[0] ?? '');
-      if (key && !errors[key]) errors[key] = issue.message;
+      if (key && !errors[key]) errors[key] = applicationErrorKey(issue.message);
     }
     setFieldErrors(errors);
     return false;

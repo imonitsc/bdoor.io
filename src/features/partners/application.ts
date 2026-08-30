@@ -119,6 +119,25 @@ export type ApplicationDraftValues = {
   [K in ApplicationStepKey]?: Partial<StepValues<K>>;
 };
 
+/**
+ * The validation messages the UI knows how to translate; anything else — a
+ * Zod default like "Invalid input: expected string" for a wholly missing
+ * field — maps to the generic required key, mirroring validateAnswer() in
+ * the questionnaire.
+ */
+const APPLICATION_ERROR_KEYS = new Set([
+  'requiredText',
+  'tooLong',
+  'requiredChoice',
+  'invalidEmail',
+  'invalidDate',
+  'declarationRequired',
+]);
+
+export function applicationErrorKey(message: string): string {
+  return APPLICATION_ERROR_KEYS.has(message) ? message : 'requiredText';
+}
+
 /** The applicant-visible statuses the journey can show. */
 export type ProviderApplicationStatus =
   | 'draft'

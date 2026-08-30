@@ -88,6 +88,11 @@ verified ones. They may be added **only** with evidence.
       code change needed. Substitutes and AI-generated people are not
       acceptable.
 
+- [ ] Provider terms and data-processing terms drafted and reviewed by
+      counsel, then `PROVIDER_APPLICATIONS_STATUS=enabled` to open
+      `/partners/apply`. The application records the terms version accepted;
+      until then the page offers the contact-form fallback.
+
 ## 4 · Integrations
 
 Each of these is an adapter with a mock default. The mock is honest — it says so

@@ -92,3 +92,29 @@ create trigger case_partner_assignments_column_guard
   for each row execute function app.guard_assignment_columns();
 
 revoke all on function app.guard_assignment_columns() from public, anon;
+
+-- Latent bug exposed by the guard tests: app.enforce_partner_org() ran as
+-- the invoker, so a *customer's* legitimate consent update failed — under
+-- their RLS view the partner organisation row is invisible and the kind
+-- check concluded "not a partner organization". The check validates a fact
+-- about the referenced organisation, not the caller, so it must read past
+-- RLS: SECURITY DEFINER with an empty search path and fully-qualified
+-- objects, per the repository's SECURITY DEFINER rules.
+create or replace function app.enforce_partner_org()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if not exists (
+    select 1 from public.organizations o
+    where o.id = new.partner_org_id and o.kind = 'partner'
+  ) then
+    raise exception 'Organization % is not a partner organization', new.partner_org_id;
+  end if;
+  return new;
+end;
+$$;
+
+revoke all on function app.enforce_partner_org() from public, anon;

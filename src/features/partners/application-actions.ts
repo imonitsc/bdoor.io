@@ -8,6 +8,7 @@ import { hasServiceRole } from '@/lib/supabase/admin';
 import {
   APPLICATION_STEPS,
   STEP_SCHEMAS,
+  applicationErrorKey,
   type ApplicationDraftValues,
   type ApplicationStepKey,
   type ProviderApplicationStatus,
@@ -88,7 +89,7 @@ export async function saveProviderApplicationStep(
     const fields: Record<string, string> = {};
     for (const issue of parsed.error.issues) {
       const key = String(issue.path[0] ?? '');
-      if (key && !fields[key]) fields[key] = issue.message;
+      if (key && !fields[key]) fields[key] = applicationErrorKey(issue.message);
     }
     return { ok: false, error: 'validation', fields };
   }

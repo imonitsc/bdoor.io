@@ -52,6 +52,9 @@ export default defineConfig({
           // The suite walks the questionnaire end to end several times from one
           // address, which is exactly the shape the limiter is there to stop.
           RATE_LIMIT_DISABLED: 'true',
+          // The provider application journey is under test; the gate's
+          // disabled default is covered by tests/unit/launch-gates.test.ts.
+          PROVIDER_APPLICATIONS_STATUS: 'enabled',
           // A reviewed display rate so the approximate-USD lines render and
           // can be asserted. Synthetic: display-only, never a ledger input.
           FX_USD_BDT_RATE: '123.07',

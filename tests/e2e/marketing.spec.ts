@@ -307,8 +307,11 @@ test.describe('privacy of the private areas', () => {
   test('lists only public pages in the sitemap', async ({ request }) => {
     const sitemap = await (await request.get('/sitemap.xml')).text();
     expect(sitemap).toContain('/en/services');
-    expect(sitemap).not.toContain('/app');
+    // Segment match: /partners/apply is public and contains the letters
+    // "/app"; the private workspace is the /app *segment*.
+    expect(sitemap).not.toMatch(/\/app(?:[/<?"]|$)/m);
     expect(sitemap).not.toContain('/admin');
+    expect(sitemap).not.toContain('/partner/');
   });
 
   test('sets the security headers', async ({ request }) => {
