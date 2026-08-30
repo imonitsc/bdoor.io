@@ -78,7 +78,9 @@ jobs:
 
     services:
       postgres:
-        image: postgres:17
+        # The pgvector image is upstream postgres plus the vector extension,
+        # which migration 20260101002500 (Ask bdoor AI) requires.
+        image: pgvector/pgvector:pg17
         env:
           POSTGRES_PASSWORD: postgres
         ports: ['5432:5432']
