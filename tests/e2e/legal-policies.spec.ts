@@ -138,6 +138,17 @@ test.describe('legal policy suite', () => {
     }
   });
 
+  test('Bangla pages render in the Hind Siliguri typeface', async ({ page }) => {
+    await page.goto('/bn/terms');
+    const family = await page.evaluate(() => getComputedStyle(document.body).fontFamily);
+    expect(family).toContain('Hind Siliguri');
+
+    // English pages keep the Latin brand face as their first choice.
+    await page.goto('/en/terms');
+    const enFamily = await page.evaluate(() => getComputedStyle(document.body).fontFamily);
+    expect(enFamily).not.toContain('Hind Siliguri');
+  });
+
   test('policy pages hold their layout at phone and desktop widths', async ({ page }) => {
     for (const [width, height] of [
       [375, 800],

@@ -186,7 +186,7 @@
   --font-sans:
     var(--font-sans-brand), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-bengali:
-    var(--font-noto-bengali), var(--font-sans-brand), ui-sans-serif, system-ui, sans-serif;
+    var(--font-hind-siliguri), var(--font-sans-brand), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
 
   /* 8px rhythm helpers used by section spacing */

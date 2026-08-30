@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider, hasLocale } from 'next-intl';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
-import { Geist_Mono, Manrope, Noto_Sans_Bengali } from 'next/font/google';
+import { Geist_Mono, Hind_Siliguri, Manrope } from 'next/font/google';
 import { routing, localeTags, type Locale } from '@/i18n/routing';
 import { AnnouncerProvider } from '@/components/ui/announcer';
 import { siteUrl, localizedUrl } from '@/lib/site';
@@ -25,9 +25,12 @@ const geistMono = Geist_Mono({
   display: 'swap',
 });
 
-const notoBengali = Noto_Sans_Bengali({
+// Hind Siliguri for Bangla content (owner request, 30 Aug 2026) — the same
+// family the banglawebfonts CDN serves, but self-hosted through next/font so
+// Bangla pages make no third-party request and get no late-font layout shift.
+const hindSiliguri = Hind_Siliguri({
   subsets: ['bengali'],
-  variable: '--font-noto-bengali',
+  variable: '--font-hind-siliguri',
   display: 'swap',
   weight: ['400', '500', '600', '700'],
 });
@@ -116,7 +119,7 @@ export default async function LocaleLayout({
     <html
       lang={localeTags[locale as Locale]}
       dir="ltr"
-      className={`${manrope.variable} ${geistMono.variable} ${notoBengali.variable}`}
+      className={`${manrope.variable} ${geistMono.variable} ${hindSiliguri.variable}`}
       suppressHydrationWarning
     >
       <body className="bg-canvas text-ink min-h-dvh antialiased">
