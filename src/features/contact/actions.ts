@@ -6,9 +6,10 @@ import { contactSchema } from './schema';
 import { resolveContactInterest } from './interest';
 import { createAdminClient, hasServiceRole } from '@/lib/supabase/admin';
 import { enforceRateLimit } from '@/lib/rate-limit';
-import { hashIdentifier } from '@/lib/utils/hash';
+import { hashIdentifier, sha256 } from '@/lib/utils/hash';
 import { RateLimitError } from '@/lib/permissions/errors';
 import { logger } from '@/lib/logger';
+import { recordAnalyticsEvent } from '@/lib/analytics';
 
 export type ContactState = {
   status: 'idle' | 'success' | 'error';
@@ -124,6 +125,18 @@ export async function submitContactRequest(
     logger.error('contact.insert_failed', { message: error.message });
     return { status: 'error', formError: 'unavailable' };
   }
+
+  await recordAnalyticsEvent({
+    event: 'contact_submitted',
+    idempotencyKey: `contact_submitted:${sha256(
+      `${parsed.data.email}:${parsed.data.topic}:${parsed.data.message}`,
+    )}`,
+    actorEmail: parsed.data.email,
+    locale: locale === 'bn' ? 'bn' : 'en',
+    country: interest?.countrySlug ?? null,
+    sourcePath,
+    properties: { topic: parsed.data.topic },
+  });
 
   return { status: 'success' };
 }

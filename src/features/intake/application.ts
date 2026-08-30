@@ -4,6 +4,7 @@ import { getTranslations } from 'next-intl/server';
 import { createAdminClient, hasServiceRole } from '@/lib/supabase/admin';
 import { getEmailProvider } from '@/lib/email';
 import { logger } from '@/lib/logger';
+import { recordAnalyticsEvent } from '@/lib/analytics';
 import { targetCountrySlug, type Answers, type Objective, type PartialAnswers } from './questions';
 
 /**
@@ -90,8 +91,23 @@ export async function submitApplication(input: SubmitInput): Promise<SubmittedAp
   let lastError: { code?: string; message?: string } | null = null;
   for (let attempt = 0; attempt < 5; attempt += 1) {
     const reference = newApplicationReference();
-    const { error } = await admin.from('applications').insert({ ...record, reference });
+    const { data: inserted, error } = await admin
+      .from('applications')
+      .insert({ ...record, reference })
+      .select('id')
+      .single();
     if (!error) {
+      await recordAnalyticsEvent({
+        event: 'application_submitted',
+        idempotencyKey: `application_submitted:${reference}`,
+        actorEmail: complete.email,
+        applicationId: inserted?.id ?? null,
+        country: countrySlug,
+        locale,
+        packageSlug: input.packageSlug ?? null,
+        sourcePath: input.sourcePath ?? null,
+        properties: { objective },
+      });
       await sendAcknowledgement(reference, complete.email, countrySlug, locale);
       return { reference, countrySlug, objective, stored: true };
     }
@@ -132,6 +148,16 @@ export async function submitApplication(input: SubmitInput): Promise<SubmittedAp
     return null;
   }
 
+  await recordAnalyticsEvent({
+    event: 'application_submitted',
+    idempotencyKey: `application_submitted:${reference}`,
+    actorEmail: complete.email,
+    country: countrySlug,
+    locale,
+    packageSlug: input.packageSlug ?? null,
+    sourcePath: input.sourcePath ?? null,
+    properties: { objective, fallback: true },
+  });
   await sendAcknowledgement(reference, complete.email, countrySlug, locale);
   return { reference, countrySlug, objective, stored: true };
 }

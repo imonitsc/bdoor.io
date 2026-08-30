@@ -104,6 +104,11 @@ test.describe('the /ask page', () => {
 
 test.describe('when the model cannot be reached', () => {
   test('says so and offers a specialist, rather than answering anyway', async ({ page }) => {
+    // The pipeline's own ceiling is LIMITS.requestTimeoutMs (45s): in an
+    // environment where the gateway connection hangs rather than refusing,
+    // the error frame legitimately arrives only when that abort fires. The
+    // assertion window must cover the pipeline's budget, not race it.
+    test.setTimeout(120_000);
     await page.goto('/en/ask');
 
     await page
@@ -116,7 +121,7 @@ test.describe('when the model cannot be reached', () => {
     const log = page.getByRole('log');
     await expect(
       log.getByText(/temporarily unavailable|Something went wrong|took too long/i),
-    ).toBeVisible({ timeout: 30_000 });
+    ).toBeVisible({ timeout: 60_000 });
 
     await expect(log.getByRole('link', { name: 'Talk to a specialist' })).toBeVisible();
   });

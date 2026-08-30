@@ -8,6 +8,7 @@ import { partnerMemberships, requireSession } from '@/lib/auth/session';
 import { AuthorizationError } from '@/lib/permissions/errors';
 import { recordAudit } from '@/lib/audit';
 import { logger } from '@/lib/logger';
+import { recordAnalyticsEvent } from '@/lib/analytics';
 
 export type PartnerState = { status: 'idle' | 'error' | 'success'; message?: string };
 
@@ -125,6 +126,15 @@ export async function respondToAssignment(
     organizationId: assignment.partner_org_id,
     metadata: { decision },
   });
+
+  if (decision === 'accept') {
+    await recordAnalyticsEvent({
+      event: 'provider_assignment_accepted',
+      idempotencyKey: `provider_assignment_accepted:${assignmentId}`,
+      organizationId: assignment.partner_org_id,
+      caseId: assignment.case_id,
+    });
+  }
 
   revalidatePath(`/${await getLocale()}/partner/cases`);
   const message =
