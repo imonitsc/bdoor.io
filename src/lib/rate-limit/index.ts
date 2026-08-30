@@ -60,6 +60,8 @@ export const RATE_LIMITS = {
   'contact.submit': { limit: 3, windowSeconds: 3600 },
   'questionnaire.save': { limit: 120, windowSeconds: 3600 },
   'application.submit': { limit: 5, windowSeconds: 3600 },
+  'provider_application.save': { limit: 120, windowSeconds: 3600 },
+  'provider_application.submit': { limit: 3, windowSeconds: 3600 },
   'document.upload': { limit: 60, windowSeconds: 3600 },
   'document.download': { limit: 120, windowSeconds: 3600 },
   'invitation.send': { limit: 20, windowSeconds: 3600 },

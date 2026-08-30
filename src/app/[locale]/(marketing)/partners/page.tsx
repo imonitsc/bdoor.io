@@ -114,10 +114,14 @@ export default async function PartnersPage({ params }: { params: Promise<{ local
               <h2 className="text-ink text-base font-semibold">{t('applyTitle')}</h2>
               <p className="text-muted mt-2 text-sm leading-relaxed">{t('applyBody')}</p>
               <Button asChild className="mt-4" block>
-                <Link href={`${MARKETING_ROUTES.contact}?topic=partner`}>
+                <Link href={MARKETING_ROUTES.partnersApply}>
                   {t('applyCta')}
                   <ArrowRight className="size-4" aria-hidden="true" />
                 </Link>
+              </Button>
+              {/* Ordinary enquiries keep the contact form (portals spec §2). */}
+              <Button asChild variant="ghost" className="mt-2" block>
+                <Link href={`${MARKETING_ROUTES.contact}?topic=partner`}>{t('enquiryCta')}</Link>
               </Button>
             </Card>
 
