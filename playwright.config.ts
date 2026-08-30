@@ -80,6 +80,11 @@ export default defineConfig({
           // buys nothing. Worth paying: without it no form can be submitted in
           // this suite at all, and that blind spot is exactly what let a broken
           // signup reach production.
+          // Ask bdoor AI on, with no AI Gateway credential. That is the
+          // point: the suite exercises the entry, the drawer, the /ask page
+          // and — because every model call fails — the outage path a customer
+          // would see during a real Gateway incident.
+          ASK_BDOOR_AI_ENABLED: 'true',
           NEXT_PUBLIC_SUPABASE_URL: 'http://127.0.0.1:9',
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_e2e_placeholder',
         },
