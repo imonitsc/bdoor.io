@@ -6,6 +6,7 @@ import { Alert } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AssignmentChain } from '@/components/dashboard/assignment-chain';
 import { PageHeading } from '@/components/dashboard/page-heading';
 import { CaseStatusBadge, DocumentStatusBadge } from '@/components/dashboard/status-badge';
 import {
@@ -162,12 +163,18 @@ export default async function AdminCaseDetail({
             {detail.partner ? (
               <Card className="p-5">
                 <p className="text-ink text-sm font-medium">{detail.partner.organizationName}</p>
-                <p className="mt-2 flex flex-wrap gap-2">
+                <p className="mt-2 mb-4 flex flex-wrap gap-2">
                   <Badge tone="info">{detail.partner.status}</Badge>
-                  <Badge tone={detail.partner.authorized ? 'success' : 'warning'}>
-                    {detail.partner.authorized ? tCase('documents') : tCase('noPartner')}
-                  </Badge>
                 </p>
+                <AssignmentChain
+                  caseId={caseId}
+                  assignmentId={detail.partner.assignmentId}
+                  status={detail.partner.status}
+                  conflictResult={detail.partner.conflictResult}
+                  disclosedAt={detail.partner.disclosedAt}
+                  authorized={detail.partner.authorized}
+                  canRecordDisclosure={canAssignPartner}
+                />
               </Card>
             ) : (
               <EmptyState title={tCase('noPartner')} />

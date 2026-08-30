@@ -215,6 +215,44 @@ export async function assignPartner(
   return { status: 'success', message: 'saved' };
 }
 
+/**
+ * Records that the provider disclosure has been shown/sent to the customer
+ * (portals spec §10): provider identity, role, scope, fee split and the data
+ * to be shared. Consent (customer_authorized_at) is the customer's own act
+ * and stays theirs; this only evidences that disclosure preceded it.
+ */
+export async function recordAssignmentDisclosure(
+  _previous: CaseActionState,
+  formData: FormData,
+): Promise<CaseActionState> {
+  const session = await requireCapability('case.assign_partner');
+  const assignmentId = String(formData.get('assignmentId') ?? '');
+  const caseId = String(formData.get('caseId') ?? '');
+  if (!assignmentId || !caseId) return { status: 'error', message: 'generic' };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('case_partner_assignments')
+    .update({ disclosed_at: new Date().toISOString(), disclosed_by: session.userId })
+    .eq('id', assignmentId)
+    .eq('case_id', caseId)
+    .is('disclosed_at', null);
+  if (error) {
+    logger.error('case.disclosure_failed', { message: error.message });
+    return { status: 'error', message: 'generic' };
+  }
+
+  await recordAudit({
+    action: 'case.disclosure_recorded',
+    targetType: 'case_partner_assignment',
+    targetId: assignmentId,
+    caseId,
+  });
+
+  revalidatePath(`/${await getLocale()}/admin/cases/${caseId}`);
+  return { status: 'success', message: 'saved' };
+}
+
 export async function assignCaseManager(
   _previous: CaseActionState,
   formData: FormData,

@@ -1163,7 +1163,19 @@
       "conflictConfirm": "I have run a conflict check and can act on this matter.",
       "acceptedOn": "Accepted {date}",
       "declinedOn": "Declined {date}",
-      "scopeNote": "You can only see the customer information needed for this matter."
+      "scopeNote": "You can only see the customer information needed for this matter.",
+      "conflictLegend": "Conflict check — record the outcome",
+      "conflictOutcomes": {
+        "none_identified": "No conflict identified — the firm may accept this assignment.",
+        "potential_conflict": "Potential conflict — bdoor review required before we can proceed.",
+        "conflict_declined": "Conflict — the firm must decline this assignment.",
+        "insufficient_information": "Insufficient information — we need limited clarification from bdoor."
+      },
+      "backToConflict": "Back to conflict check",
+      "declineConflict": "Decline (conflict)",
+      "recordForReview": "Record for bdoor review",
+      "declineOther": "Decline for another reason",
+      "flagNote": "The outcome is recorded and the offer stays open while bdoor reviews it. Please put any details in the case message thread — never information that could identify another client."
     },
     "notes": {
       "title": "Partner notes",
@@ -1376,6 +1388,22 @@
         "message_required": "Write a short message to the applicant first.",
         "incomplete": "The application is missing the firm name or contact email."
       }
+    },
+    "assignmentChain": {
+      "conflict": "Conflict check",
+      "disclosure": "Customer disclosure",
+      "consent": "Customer consent",
+      "pending": "pending",
+      "recorded": "recorded",
+      "error": "Could not record the disclosure. Try again.",
+      "recordDisclosure": "Record customer disclosure",
+      "disclosureNote": "Record this only after the customer has been shown the provider's identity, role, scope, fee split and the data categories to be shared. Documents unlock only once the customer separately consents.",
+      "conflictValues": {
+        "none_identified": "no conflict",
+        "potential_conflict": "potential — review",
+        "conflict_declined": "conflict — declined",
+        "insufficient_information": "needs clarification"
+      }
     }
   },
   "caseStatus": {
@@ -1533,7 +1561,9 @@
       "tooLong": "That is longer than we can store.",
       "accepted": "Assignment accepted.",
       "declined": "Assignment declined.",
-      "saved": "Saved."
+      "saved": "Saved.",
+      "conflictFlagged": "Recorded. bdoor will review the conflict outcome and come back to you.",
+      "conflictDeclined": "Declined due to conflict. No further detail is shared with the customer."
     }
   },
   "countries": {
