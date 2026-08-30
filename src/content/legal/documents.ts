@@ -10,8 +10,8 @@ import type { LegalDocument } from './types';
  * invent a Bangla summary. See policies/README.md and docs/LAUNCH-CHECKLIST.md.
  */
 
-const VERSION = '0.9-draft-2026-08-29';
-const LAST_UPDATED = '2026-08-29';
+const VERSION = '0.9.1-draft-2026-08-30';
+const LAST_UPDATED = '2026-08-30';
 
 export const TERMS: LegalDocument = {
   slug: 'terms',
@@ -256,10 +256,10 @@ We will give notice where lawful and practical. Fees for completed work and comm
       body: {
         en: `Nothing in these Terms excludes liability that cannot lawfully be excluded. Subject to that rule, bdoor is responsible only for direct loss reasonably caused by its failure to perform the coordination service with reasonable care and skill. bdoor is not responsible for indirect loss, lost profit, loss caused by inaccurate customer information, or a decision or delay of a government authority, bank or independent provider outside bdoor’s reasonable control.
 
-Any financial cap, exclusions and indemnity wording must be inserted or approved by Bangladesh counsel and must remain fair and enforceable under applicable consumer law. Cursor must not invent a monetary liability cap.`,
+These Terms do not state a monetary liability cap. Any financial cap, further exclusions or indemnity wording will be added only once it has been approved by qualified Bangladesh counsel, and must remain fair and enforceable under applicable consumer law.`,
         bn: `Nothing in these Terms excludes liability that cannot lawfully be excluded. Subject to that rule, bdoor is responsible only for direct loss reasonably caused by its failure to perform the coordination service with reasonable care and skill. bdoor is not responsible for indirect loss, lost profit, loss caused by inaccurate customer information, or a decision or delay of a government authority, bank or independent provider outside bdoor’s reasonable control.
 
-Any financial cap, exclusions and indemnity wording must be inserted or approved by Bangladesh counsel and must remain fair and enforceable under applicable consumer law. Cursor must not invent a monetary liability cap.`,
+These Terms do not state a monetary liability cap. Any financial cap, further exclusions or indemnity wording will be added only once it has been approved by qualified Bangladesh counsel, and must remain fair and enforceable under applicable consumer law.`,
       },
     },
     {
@@ -276,14 +276,10 @@ Any financial cap, exclusions and indemnity wording must be inserted or approved
       body: {
         en: `We may update these Terms for legal, operational or security reasons. Material changes will be highlighted before they apply to an existing paid service. Each acceptance record must identify the policy version, language, timestamp and user.
 
-Notices may be delivered to the email address associated with the account. Legal or policy enquiries may be sent to hello@bdoor.io.
-
----`,
+Notices may be delivered to the email address associated with the account. Legal or policy enquiries may be sent to hello@bdoor.io.`,
         bn: `We may update these Terms for legal, operational or security reasons. Material changes will be highlighted before they apply to an existing paid service. Each acceptance record must identify the policy version, language, timestamp and user.
 
-Notices may be delivered to the email address associated with the account. Legal or policy enquiries may be sent to hello@bdoor.io.
-
----`,
+Notices may be delivered to the email address associated with the account. Legal or policy enquiries may be sent to hello@bdoor.io.`,
       },
     },
   ],
@@ -505,12 +501,8 @@ If a personal-data incident occurs, bdoor will contain and assess it, preserve e
       id: '2-12',
       heading: { en: `Changes and contact`, bn: `Changes and contact` },
       body: {
-        en: `Material changes will be shown with a new version and effective date. Privacy questions and requests may be sent to hello@bdoor.io. Formal role titles and regulatory contact details must be added when appointed and legally required.
-
----`,
-        bn: `Material changes will be shown with a new version and effective date. Privacy questions and requests may be sent to hello@bdoor.io. Formal role titles and regulatory contact details must be added when appointed and legally required.
-
----`,
+        en: `Material changes will be shown with a new version and effective date. Privacy questions and requests may be sent to hello@bdoor.io. Formal role titles and regulatory contact details must be added when appointed and legally required.`,
+        bn: `Material changes will be shown with a new version and effective date. Privacy questions and requests may be sent to hello@bdoor.io. Formal role titles and regulatory contact details must be added when appointed and legally required.`,
       },
     },
   ],
@@ -612,12 +604,8 @@ We aim to acknowledge a request within 2 business days and issue a written decis
       id: '3-8',
       heading: { en: `No misleading guarantee`, bn: `No misleading guarantee` },
       body: {
-        en: `Marketing must not state “money-back guarantee”, “guaranteed approval” or “full refund” unless the exact conditions have been approved by counsel and are shown immediately beside the claim.
-
----`,
-        bn: `Marketing must not state “money-back guarantee”, “guaranteed approval” or “full refund” unless the exact conditions have been approved by counsel and are shown immediately beside the claim.
-
----`,
+        en: `Marketing must not state “money-back guarantee”, “guaranteed approval” or “full refund” unless the exact conditions have been approved by counsel and are shown immediately beside the claim.`,
+        bn: `Marketing must not state “money-back guarantee”, “guaranteed approval” or “full refund” unless the exact conditions have been approved by counsel and are shown immediately beside the claim.`,
       },
     },
   ],
@@ -744,14 +732,10 @@ Enhanced review may include independent evidence of wealth or funds, corporate-c
       body: {
         en: `Before launch, bdoor must appoint an accountable AML/compliance lead, approve a business-wide risk assessment, document customer-risk scoring, train relevant staff, define escalation and reporting procedures, test the controls and maintain a current sanctions source list. Public wording must never imply BFIU endorsement.
 
-Questions may be sent to hello@bdoor.io with the subject “Compliance”.
-
----`,
+Questions may be sent to hello@bdoor.io with the subject “Compliance”.`,
         bn: `Before launch, bdoor must appoint an accountable AML/compliance lead, approve a business-wide risk assessment, document customer-risk scoring, train relevant staff, define escalation and reporting procedures, test the controls and maintain a current sanctions source list. Public wording must never imply BFIU endorsement.
 
-Questions may be sent to hello@bdoor.io with the subject “Compliance”.
-
----`,
+Questions may be sent to hello@bdoor.io with the subject “Compliance”.`,
       },
     },
   ],
@@ -812,18 +796,32 @@ Used to measure or personalise advertising. bdoor must not activate this categor
       id: '5-3',
       heading: { en: `Cookie register`, bn: `Cookie register` },
       body: {
-        en: `Cursor must generate the production cookie register by auditing actual code, response headers and third-party scripts. The register must show cookie or storage key, provider, purpose, category, duration and whether information is transferred internationally. Do not invent vendor names or cookie durations.`,
-        bn: `Cursor must generate the production cookie register by auditing actual code, response headers and third-party scripts. The register must show cookie or storage key, provider, purpose, category, duration and whether information is transferred internationally. Do not invent vendor names or cookie durations.`,
+        en: `bdoor currently sets only first-party cookies and device storage:
+
+- **Authentication cookies** (names beginning “sb-”) — strictly necessary. Set when an account signs in, so the session stays active and verified while the workspace is used. They are refreshed during use and removed when the session ends or is signed out.
+- **bdoor_draft** — strictly necessary. A random reference that lets an unfinished application draft be reopened. It expires after 30 days and contains no personal information itself.
+- **BDOOR_LOCALE** — preference. Remembers the chosen language (English or Bangla) for up to one year so pages open in the right locale.
+- **bdoor_intake_draft** (browser localStorage, not a cookie) — strictly necessary. Holds an unfinished application’s answers on this device only, until the application is submitted or a new one is started.
+
+No analytics, advertising or session-replay technology is currently active, and no third-party marketing scripts are loaded. If a new cookie or vendor is introduced, this register will be updated before it becomes active.`,
+        bn: `bdoor currently sets only first-party cookies and device storage:
+
+- **Authentication cookies** (names beginning “sb-”) — strictly necessary. Set when an account signs in, so the session stays active and verified while the workspace is used. They are refreshed during use and removed when the session ends or is signed out.
+- **bdoor_draft** — strictly necessary. A random reference that lets an unfinished application draft be reopened. It expires after 30 days and contains no personal information itself.
+- **BDOOR_LOCALE** — preference. Remembers the chosen language (English or Bangla) for up to one year so pages open in the right locale.
+- **bdoor_intake_draft** (browser localStorage, not a cookie) — strictly necessary. Holds an unfinished application’s answers on this device only, until the application is submitted or a new one is started.
+
+No analytics, advertising or session-replay technology is currently active, and no third-party marketing scripts are loaded. If a new cookie or vendor is introduced, this register will be updated before it becomes active.`,
       },
     },
     {
       id: '5-4',
       heading: { en: `Choices`, bn: `Choices` },
       body: {
-        en: `On first eligible visit, show a clear choice to accept, reject or customise non-essential cookies. Reject must be as easy as accept. Consent must be granular, recorded by version and withdrawable through a persistent “Cookie settings” link in the footer.
+        en: `Because bdoor currently uses only the strictly necessary and preference storage listed above, no consent banner is shown today. Before any analytics or marketing category is activated, a clear choice to accept, reject or customise it will be presented first; rejecting will be as easy as accepting, consent will be granular and recorded by policy version, and a persistent way to change the choice will be provided.
 
 Browser controls may also delete or block cookies, but blocking necessary storage may prevent sign-in or form continuity.`,
-        bn: `On first eligible visit, show a clear choice to accept, reject or customise non-essential cookies. Reject must be as easy as accept. Consent must be granular, recorded by version and withdrawable through a persistent “Cookie settings” link in the footer.
+        bn: `Because bdoor currently uses only the strictly necessary and preference storage listed above, no consent banner is shown today. Before any analytics or marketing category is activated, a clear choice to accept, reject or customise it will be presented first; rejecting will be as easy as accepting, consent will be granular and recorded by policy version, and a persistent way to change the choice will be provided.
 
 Browser controls may also delete or block cookies, but blocking necessary storage may prevent sign-in or form continuity.`,
       },
@@ -832,12 +830,8 @@ Browser controls may also delete or block cookies, but blocking necessary storag
       id: '5-5',
       heading: { en: `Changes and contact`, bn: `Changes and contact` },
       body: {
-        en: `Update this Policy and the consent record when categories or vendors materially change. Questions may be sent to hello@bdoor.io.
-
----`,
-        bn: `Update this Policy and the consent record when categories or vendors materially change. Questions may be sent to hello@bdoor.io.
-
----`,
+        en: `Update this Policy and the consent record when categories or vendors materially change. Questions may be sent to hello@bdoor.io.`,
+        bn: `Update this Policy and the consent record when categories or vendors materially change. Questions may be sent to hello@bdoor.io.`,
       },
     },
   ],
@@ -851,12 +845,68 @@ export const LEGAL_DISCLAIMER: LegalDocument = {
   awaitingCounselReview: true,
   sections: [
     {
-      id: 'overview',
-      heading: {
-        en: `Legal and Professional Services Disclaimer`,
-        bn: `Legal and Professional Services Disclaimer`,
+      id: '6-1',
+      heading: { en: `Independent platform`, bn: `Independent platform` },
+      body: {
+        en: `bdoor.io is operated by bdoor compliance ltd., an independent business-setup and compliance coordination platform. bdoor is not a government authority and is not affiliated with, endorsed by or acting for RJSC, BIDA, NBR, CCI&E, any city corporation, any ministry or any other authority in Bangladesh or elsewhere. Registrations, licences, tax numbers, visas and approvals are issued only by the relevant authority, which retains sole discretion over its decisions and timelines.`,
+        bn: `bdoor.io is operated by bdoor compliance ltd., an independent business-setup and compliance coordination platform. bdoor is not a government authority and is not affiliated with, endorsed by or acting for RJSC, BIDA, NBR, CCI&E, any city corporation, any ministry or any other authority in Bangladesh or elsewhere. Registrations, licences, tax numbers, visas and approvals are issued only by the relevant authority, which retains sole discretion over its decisions and timelines.`,
       },
-      body: { en: ``, bn: `` },
+    },
+    {
+      id: '6-2',
+      heading: { en: `No legal or professional advice`, bn: `No legal or professional advice` },
+      body: {
+        en: `bdoor is not a law firm, chartered-accountancy firm, audit firm or immigration consultancy. Information on this website — including guides, country pages, service descriptions, fee information and questionnaire results — is general information about processes and requirements. It is not legal, tax, accounting, audit, immigration or investment advice, and it is not a substitute for advice from a qualified professional who knows the specific facts.
+
+Where a matter requires regulated professional work, that work is performed by an appropriately qualified independent professional or firm, identified to the customer before a binding engagement, as described in the Third-Party Provider Disclosure.`,
+        bn: `bdoor is not a law firm, chartered-accountancy firm, audit firm or immigration consultancy. Information on this website — including guides, country pages, service descriptions, fee information and questionnaire results — is general information about processes and requirements. It is not legal, tax, accounting, audit, immigration or investment advice, and it is not a substitute for advice from a qualified professional who knows the specific facts.
+
+Where a matter requires regulated professional work, that work is performed by an appropriately qualified independent professional or firm, identified to the customer before a binding engagement, as described in the Third-Party Provider Disclosure.`,
+      },
+    },
+    {
+      id: '6-3',
+      heading: { en: `No guarantee of outcome`, bn: `No guarantee of outcome` },
+      body: {
+        en: `bdoor does not guarantee that any application will be approved, that a bank account will be opened, that a visa will be granted, or that an authority will act within a particular time. Statements about typical timelines are estimates based on experience, carry the date they were last reviewed, and can be affected by authority workloads, public holidays, document quality and matters outside anyone’s control.`,
+        bn: `bdoor does not guarantee that any application will be approved, that a bank account will be opened, that a visa will be granted, or that an authority will act within a particular time. Statements about typical timelines are estimates based on experience, carry the date they were last reviewed, and can be affected by authority workloads, public holidays, document quality and matters outside anyone’s control.`,
+      },
+    },
+    {
+      id: '6-4',
+      heading: { en: `Fees and published information`, bn: `Fees and published information` },
+      body: {
+        en: `A government or authority fee is published on this website only where a verified figure and its review date are shown. Where a figure cannot be verified, the website says “Quoted after review” instead. Government fees can change without notice; the amount payable is the amount the authority actually charges at the time of filing, and it is always separate from the bdoor fee.
+
+Despite reasonable care, published information may become out of date between reviews. If a quotation and the website differ, the written quotation issued for the specific matter prevails.`,
+        bn: `A government or authority fee is published on this website only where a verified figure and its review date are shown. Where a figure cannot be verified, the website says “Quoted after review” instead. Government fees can change without notice; the amount payable is the amount the authority actually charges at the time of filing, and it is always separate from the bdoor fee.
+
+Despite reasonable care, published information may become out of date between reviews. If a quotation and the website differ, the written quotation issued for the specific matter prevails.`,
+      },
+    },
+    {
+      id: '6-5',
+      heading: { en: `Preliminary recommendations`, bn: `Preliminary recommendations` },
+      body: {
+        en: `Any recommendation produced by the guided questionnaire is preliminary, generated from stated answers using rules bdoor’s operations team maintains. It is labelled preliminary, is subject to specialist review, and may change once documents are reviewed or facts are clarified. It is not professional advice and should not be acted on as a final determination of eligibility, structure or cost.`,
+        bn: `Any recommendation produced by the guided questionnaire is preliminary, generated from stated answers using rules bdoor’s operations team maintains. It is labelled preliminary, is subject to specialist review, and may change once documents are reviewed or facts are clarified. It is not professional advice and should not be acted on as a final determination of eligibility, structure or cost.`,
+      },
+    },
+    {
+      id: '6-6',
+      heading: { en: `Third-party content`, bn: `Third-party content` },
+      body: {
+        en: `This website may reference or link to external websites, authorities and providers. bdoor does not control external content and is not responsible for its accuracy or availability. A reference to an authority or provider is not a claim of affiliation or endorsement in either direction.`,
+        bn: `This website may reference or link to external websites, authorities and providers. bdoor does not control external content and is not responsible for its accuracy or availability. A reference to an authority or provider is not a claim of affiliation or endorsement in either direction.`,
+      },
+    },
+    {
+      id: '6-7',
+      heading: { en: `Status of these pages`, bn: `Status of these pages` },
+      body: {
+        en: `The policies and legal pages on this website are working drafts pending review by qualified Bangladesh counsel. Each page shows its version and the date it was last updated, and the draft notice remains until professional review is complete. Questions about this Disclaimer may be sent to hello@bdoor.io.`,
+        bn: `The policies and legal pages on this website are working drafts pending review by qualified Bangladesh counsel. Each page shows its version and the date it was last updated, and the draft notice remains until professional review is complete. Questions about this Disclaimer may be sent to hello@bdoor.io.`,
+      },
     },
   ],
 };
@@ -922,12 +972,8 @@ Complex complaints may require more time. We will explain the reason and provide
       id: '7-5',
       heading: { en: `External rights`, bn: `External rights` },
       body: {
-        en: `Nothing in this Policy prevents a customer from using a court, regulator, professional body, payment-provider dispute process or Bangladesh consumer complaint route available under applicable law. The National Consumer Complaint Centre currently publishes hotline 16121 and an online complaint route; Cursor must link to the current official DNCRP page rather than hard-code an unofficial domain.
-
----`,
-        bn: `Nothing in this Policy prevents a customer from using a court, regulator, professional body, payment-provider dispute process or Bangladesh consumer complaint route available under applicable law. The National Consumer Complaint Centre currently publishes hotline 16121 and an online complaint route; Cursor must link to the current official DNCRP page rather than hard-code an unofficial domain.
-
----`,
+        en: `Nothing in this Policy prevents a customer from using a court, regulator, professional body, payment-provider dispute process or Bangladesh consumer complaint route available under applicable law. The Directorate of National Consumer Rights Protection currently publishes the 16121 national consumer hotline and an online complaint route; current details are available through that authority’s own official channels. bdoor is not affiliated with any such authority.`,
+        bn: `Nothing in this Policy prevents a customer from using a court, regulator, professional body, payment-provider dispute process or Bangladesh consumer complaint route available under applicable law. The Directorate of National Consumer Rights Protection currently publishes the 16121 national consumer hotline and an online complaint route; current details are available through that authority’s own official channels. bdoor is not affiliated with any such authority.`,
       },
     },
   ],
@@ -941,9 +987,82 @@ export const ACCEPTABLE_USE: LegalDocument = {
   awaitingCounselReview: true,
   sections: [
     {
-      id: 'overview',
-      heading: { en: `Acceptable Use Policy`, bn: `Acceptable Use Policy` },
-      body: { en: ``, bn: `` },
+      id: '8-1',
+      heading: { en: `Purpose and scope`, bn: `Purpose and scope` },
+      body: {
+        en: `This Policy sets the rules for using bdoor.io, the customer workspace and bdoor’s communication channels. It applies to every visitor, applicant, customer, organisation member and partner user, alongside the Terms of Service. Using the website or workspace means agreeing to use them only as this Policy allows.`,
+        bn: `This Policy sets the rules for using bdoor.io, the customer workspace and bdoor’s communication channels. It applies to every visitor, applicant, customer, organisation member and partner user, alongside the Terms of Service. Using the website or workspace means agreeing to use them only as this Policy allows.`,
+      },
+    },
+    {
+      id: '8-2',
+      heading: { en: `Lawful use only`, bn: `Lawful use only` },
+      body: {
+        en: `The platform may be used only for lawful business purposes. You must not use bdoor to:
+
+- set up or operate a business for an unlawful purpose;
+- conceal the true ownership, control, source of funds or purpose of a business;
+- evade sanctions, tax obligations, currency controls or court orders;
+- impersonate another person or organisation, or provide information you know to be false or misleading; or
+- infringe another party’s intellectual property or confidentiality rights.`,
+        bn: `The platform may be used only for lawful business purposes. You must not use bdoor to:
+
+- set up or operate a business for an unlawful purpose;
+- conceal the true ownership, control, source of funds or purpose of a business;
+- evade sanctions, tax obligations, currency controls or court orders;
+- impersonate another person or organisation, or provide information you know to be false or misleading; or
+- infringe another party’s intellectual property or confidentiality rights.`,
+      },
+    },
+    {
+      id: '8-3',
+      heading: { en: `Account and platform integrity`, bn: `Account and platform integrity` },
+      body: {
+        en: `You are responsible for keeping account credentials confidential and for activity under your account. You must not:
+
+- share an account or let an unauthorised person use it;
+- probe, scan or test the platform for vulnerabilities without written permission;
+- attempt to bypass authentication, authorisation or rate limits;
+- upload malware or any code intended to disrupt the platform;
+- scrape, bulk-download or republish platform content or other customers’ information; or
+- interfere with the service’s availability for others.
+
+Suspected security problems should be reported to hello@bdoor.io rather than exploited or published.`,
+        bn: `You are responsible for keeping account credentials confidential and for activity under your account. You must not:
+
+- share an account or let an unauthorised person use it;
+- probe, scan or test the platform for vulnerabilities without written permission;
+- attempt to bypass authentication, authorisation or rate limits;
+- upload malware or any code intended to disrupt the platform;
+- scrape, bulk-download or republish platform content or other customers’ information; or
+- interfere with the service’s availability for others.
+
+Suspected security problems should be reported to hello@bdoor.io rather than exploited or published.`,
+      },
+    },
+    {
+      id: '8-4',
+      heading: { en: `Content and document standards`, bn: `Content and document standards` },
+      body: {
+        en: `Information and documents submitted to bdoor must be accurate, lawfully held and relevant to the requested service. You must not upload material that is unlawful, defamatory, infringing or deliberately misleading, and you must not submit documents belonging to another person without the authority to do so. Identity and banking documents should be provided only through the secure collection steps bdoor opens for the purpose — never through ordinary email or the free application form.`,
+        bn: `Information and documents submitted to bdoor must be accurate, lawfully held and relevant to the requested service. You must not upload material that is unlawful, defamatory, infringing or deliberately misleading, and you must not submit documents belonging to another person without the authority to do so. Identity and banking documents should be provided only through the secure collection steps bdoor opens for the purpose — never through ordinary email or the free application form.`,
+      },
+    },
+    {
+      id: '8-5',
+      heading: { en: `Fair communication`, bn: `Fair communication` },
+      body: {
+        en: `Communication with bdoor staff and with providers must remain lawful and respectful. Spam, harassment, threats and abusive language are not acceptable, and repeated misuse of communication channels may lead to restrictions on the account.`,
+        bn: `Communication with bdoor staff and with providers must remain lawful and respectful. Spam, harassment, threats and abusive language are not acceptable, and repeated misuse of communication channels may lead to restrictions on the account.`,
+      },
+    },
+    {
+      id: '8-6',
+      heading: { en: `Consequences and reports`, bn: `Consequences and reports` },
+      body: {
+        en: `Breach of this Policy may lead to a warning, suspension or termination under the Terms of Service, and to removal of offending content. Where the law requires it, unlawful activity may be reported to the relevant authority. Suspected misuse of the platform by others may be reported to hello@bdoor.io.`,
+        bn: `Breach of this Policy may lead to a warning, suspension or termination under the Terms of Service, and to removal of offending content. Where the law requires it, unlawful activity may be reported to the relevant authority. Suspected misuse of the platform by others may be reported to hello@bdoor.io.`,
+      },
     },
   ],
 };
@@ -978,7 +1097,7 @@ export const PROVIDER_DISCLOSURE: LegalDocument = {
 - the data and documents to be shared; and
 - whether the provider acts independently or as bdoor’s subcontractor for that task.
 
-Do not call a provider “verified” unless the credential, issuer, status, expiry date and last-check date are recorded.`,
+bdoor does not describe a provider as “verified” unless the relevant credential, its issuer, its status, its expiry date and the date it was last checked have been recorded.`,
         bn: `Before a provider is appointed, the customer must receive:
 
 - the provider’s legal or trading name;
@@ -990,7 +1109,7 @@ Do not call a provider “verified” unless the credential, issuer, status, exp
 - the data and documents to be shared; and
 - whether the provider acts independently or as bdoor’s subcontractor for that task.
 
-Do not call a provider “verified” unless the credential, issuer, status, expiry date and last-check date are recorded.`,
+bdoor does not describe a provider as “verified” unless the relevant credential, its issuer, its status, its expiry date and the date it was last checked have been recorded.`,
       },
     },
     {
@@ -1024,12 +1143,8 @@ Do not call a provider “verified” unless the credential, issuer, status, exp
       id: '9-6',
       heading: { en: `No government endorsement`, bn: `No government endorsement` },
       body: {
-        en: `An external provider’s registration or professional membership does not make bdoor government-approved or endorsed. Government and regulator logos must not be displayed without written permission.
-
----`,
-        bn: `An external provider’s registration or professional membership does not make bdoor government-approved or endorsed. Government and regulator logos must not be displayed without written permission.
-
----`,
+        en: `An external provider’s registration or professional membership does not make bdoor government-approved or endorsed. Government and regulator logos must not be displayed without written permission.`,
+        bn: `An external provider’s registration or professional membership does not make bdoor government-approved or endorsed. Government and regulator logos must not be displayed without written permission.`,
       },
     },
   ],
@@ -1043,12 +1158,58 @@ export const ELECTRONIC_CONSENT: LegalDocument = {
   awaitingCounselReview: true,
   sections: [
     {
-      id: 'overview',
-      heading: {
-        en: `Electronic Communications and Consent Policy`,
-        bn: `Electronic Communications and Consent Policy`,
+      id: '10-1',
+      heading: { en: `What this Policy covers`, bn: `What this Policy covers` },
+      body: {
+        en: `This Policy explains how bdoor uses electronic records and communications. By using bdoor.io, creating an account, submitting an application or accepting a quotation, you agree to receive information, records, quotations, policies and notices from bdoor electronically, and to transact with bdoor by electronic means, to the extent applicable law allows.`,
+        bn: `This Policy explains how bdoor uses electronic records and communications. By using bdoor.io, creating an account, submitting an application or accepting a quotation, you agree to receive information, records, quotations, policies and notices from bdoor electronically, and to transact with bdoor by electronic means, to the extent applicable law allows.`,
       },
-      body: { en: ``, bn: `` },
+    },
+    {
+      id: '10-2',
+      heading: {
+        en: `Electronic records and acceptances`,
+        bn: `Electronic records and acceptances`,
+      },
+      body: {
+        en: `When you accept a policy, quotation or engagement online, bdoor records the version of the document shown, the language, the time and the account that accepted it. These records are kept as evidence of what was agreed and which text you saw. Where applicable law requires a wet-ink signature, a notarised document or a physical filing for a specific step, that requirement continues to apply and bdoor will tell you before that step.`,
+        bn: `When you accept a policy, quotation or engagement online, bdoor records the version of the document shown, the language, the time and the account that accepted it. These records are kept as evidence of what was agreed and which text you saw. Where applicable law requires a wet-ink signature, a notarised document or a physical filing for a specific step, that requirement continues to apply and bdoor will tell you before that step.`,
+      },
+    },
+    {
+      id: '10-3',
+      heading: { en: `Delivery of notices`, bn: `Delivery of notices` },
+      body: {
+        en: `Notices, quotations, status updates and policy changes may be delivered to the email address associated with the account or presented in the customer workspace. A notice is treated as delivered when it is sent to the current email address on file or made available in the workspace. Keeping the account email address current is the account holder’s responsibility.`,
+        bn: `Notices, quotations, status updates and policy changes may be delivered to the email address associated with the account or presented in the customer workspace. A notice is treated as delivered when it is sent to the current email address on file or made available in the workspace. Keeping the account email address current is the account holder’s responsibility.`,
+      },
+    },
+    {
+      id: '10-4',
+      heading: { en: `What you need`, bn: `What you need` },
+      body: {
+        en: `To use the service electronically you need a current web browser, a working email account and an internet connection. Documents are provided in commonly readable formats. If a record cannot be opened, a copy in another common format may be requested from hello@bdoor.io.`,
+        bn: `To use the service electronically you need a current web browser, a working email account and an internet connection. Documents are provided in commonly readable formats. If a record cannot be opened, a copy in another common format may be requested from hello@bdoor.io.`,
+      },
+    },
+    {
+      id: '10-5',
+      heading: {
+        en: `Paper copies and withdrawing consent`,
+        bn: `Paper copies and withdrawing consent`,
+      },
+      body: {
+        en: `A paper or PDF copy of any policy or record relating to your matter may be requested at any time from hello@bdoor.io. Consent to electronic delivery may be withdrawn by written notice; because the service is delivered online, withdrawing consent may limit or end the ability to use the workspace, and any fee consequences will be explained before the withdrawal takes effect.`,
+        bn: `A paper or PDF copy of any policy or record relating to your matter may be requested at any time from hello@bdoor.io. Consent to electronic delivery may be withdrawn by written notice; because the service is delivered online, withdrawing consent may limit or end the ability to use the workspace, and any fee consequences will be explained before the withdrawal takes effect.`,
+      },
+    },
+    {
+      id: '10-6',
+      heading: { en: `Changes and contact`, bn: `Changes and contact` },
+      body: {
+        en: `bdoor may update this Policy for legal, operational or security reasons. Material changes will be highlighted before they apply to an existing paid service. Questions may be sent to hello@bdoor.io.`,
+        bn: `bdoor may update this Policy for legal, operational or security reasons. Material changes will be highlighted before they apply to an existing paid service. Questions may be sent to hello@bdoor.io.`,
+      },
     },
   ],
 };

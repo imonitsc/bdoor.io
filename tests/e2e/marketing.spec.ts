@@ -211,7 +211,7 @@ test.describe('marketing site', () => {
     ]) {
       await page.goto(`/en/${slug}`);
       await expect(
-        page.getByText('Draft version 0.9 — professional approval required', { exact: true }),
+        page.getByText('Working draft — professional approval required', { exact: true }),
         `${slug} is missing the draft banner`,
       ).toBeVisible();
       // Substantive draft body is visible for counsel review in preview.
