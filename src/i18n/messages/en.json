@@ -205,6 +205,20 @@
       "title": "A clear process from first question to ongoing compliance.",
       "body": "Tell us what you need, receive specialist review, accept an itemised quote, then track your case.",
       "imageAlt": "Professionals reviewing a business compliance checklist",
+      "compact": {
+        "one": {
+          "title": "Assessment",
+          "body": "Answer a short assessment about your business. Applying is free and creates no obligation."
+        },
+        "two": {
+          "title": "Itemised quote",
+          "body": "A specialist reviews your application and sends an itemised quote — the bdoor fee separated from government charges and third-party costs."
+        },
+        "three": {
+          "title": "Workspace",
+          "body": "Accept the quote, then follow milestones, documents and renewals in one workspace."
+        }
+      },
       "steps": {
         "one": {
           "title": "Tell us what you need",
@@ -507,6 +521,12 @@
     "how2": "Then a person takes over. A case manager scopes the work, requests exactly the documents that are needed, and where the matter requires legal or specialist authority, engages a verified partner advocate under a separate agreement with you. Every status change, document view and fee is recorded.",
     "limits1": "We are not a government authority and we have no influence over any decision an authority makes. We do not present ourselves as a law firm, and we do not give legal advice. Where legal work is required it is done by independent advocates or partner firms under their own engagement with you, and we tell you who they are before anything is shared.",
     "limits2": "We do not guarantee approval, a visa, a bank account, or a completion date. We give you an estimate, we tell you what it assumes, and we tell you when it changes. Investment and share capital never passes through bdoor.",
+    "founder": {
+      "name": "Imon Ibraheem",
+      "role": "Founder",
+      "bio": "Imon founded bdoor to make business formation and ongoing compliance in Bangladesh clearer for local and international founders.",
+      "portraitAlt": "Portrait of Imon Ibraheem, founder of bdoor"
+    },
     "cta": "Start your business"
   },
   "contact": {
@@ -664,9 +684,7 @@
     "description": "Choose your country, answer only what applies to you, and submit your application. It is free, you can save and resume, and a specialist reviews every application.",
     "sectionLabel": "Section",
     "whyWeAsk": "Why we ask",
-    "saveAndExit": "Save and exit",
-    "saveOnDevice": "Save on this device and exit",
-    "savedLocally": "Changes saved on this device. We will retry.",
+    "saveAndExit": "Save & exit",
     "contextCountry": "Starting in {country}",
     "contextPackage": "Selected package: {package}",
     "resumeNotice": "We restored your saved answers.",
@@ -924,7 +942,15 @@
     "ack": {
       "subject": "We received your application {reference}",
       "body": "Thank you — your application has been received.\n\nReference: {reference}\nCountry: {country}\n\nA specialist will review your application within one business day. You will receive an itemised quote after review; no payment is taken and no obligation is created until you accept a quote and terms.\n\nbdoor"
-    }
+    },
+    "resume": {
+      "title": "You have a saved application",
+      "body": "Your earlier answers are saved on this device. Continue where you left off, or start a fresh application — starting fresh clears the saved answers.",
+      "continueCta": "Resume saved application",
+      "startNewCta": "Start a new application"
+    },
+    "savedOnDevice": "Draft saved on this device",
+    "savedToAccountDraft": "Draft saved"
   },
   "workspace": {
     "nav": {
@@ -1570,5 +1596,8 @@
         }
       }
     }
+  },
+  "applyLayout": {
+    "needHelp": "Need help? Contact us"
   }
 }

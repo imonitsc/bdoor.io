@@ -7,7 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Section, SectionHeading } from '@/components/ui/section';
 import { PackageSelector } from '@/components/marketing/package-selector';
 import { HeroFounder } from '@/components/marketing/hero-founder';
-import { HowItWorksImage } from '@/components/marketing/how-it-works-image';
+import {
+  HOW_IT_WORKS_IMAGE_READY,
+  HowItWorksImage,
+} from '@/components/marketing/how-it-works-image';
 import { WorkspacePreview } from '@/components/marketing/workspace-preview';
 import { FaqList } from '@/components/marketing/faq-list';
 import { getGlobalFaqs } from '@/features/catalog/queries';
@@ -102,16 +105,24 @@ function PackagesSection({
 
 function ProcessSection() {
   const t = useTranslations('home.process');
-  const steps = ['one', 'two', 'three', 'four'] as const;
+  // Hotfix §5/§6: three concise steps keep the section under the 600px
+  // desktop budget; /how-it-works keeps the fuller four-step timeline.
+  const steps = ['one', 'two', 'three'] as const;
 
   return (
     <Section>
-      <div className="container-page grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:items-center lg:gap-16">
+      <div
+        className={
+          HOW_IT_WORKS_IMAGE_READY
+            ? 'container-page grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:items-center lg:gap-16'
+            : 'container-page max-w-3xl'
+        }
+      >
         <div>
-          <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
+          <SectionHeading eyebrow={t('eyebrow')} title={t('title')} />
           <ol className="border-border mt-8 divide-y border-y">
             {steps.map((step, index) => (
-              <li key={step} className="flex gap-4 py-5">
+              <li key={step} className="flex gap-4 py-4">
                 <span
                   className="text-muted font-mono text-sm font-semibold tabular-nums"
                   aria-hidden="true"
@@ -119,9 +130,9 @@ function ProcessSection() {
                   {String(index + 1).padStart(2, '0')}
                 </span>
                 <div>
-                  <h3 className="text-ink text-base font-semibold">{t(`steps.${step}.title`)}</h3>
+                  <h3 className="text-ink text-base font-semibold">{t(`compact.${step}.title`)}</h3>
                   <p className="text-muted mt-1 text-sm leading-relaxed">
-                    {t(`steps.${step}.body`)}
+                    {t(`compact.${step}.body`)}
                   </p>
                 </div>
               </li>

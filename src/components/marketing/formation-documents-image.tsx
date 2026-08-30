@@ -6,35 +6,30 @@ const SRC = '/images/bdoor/formation-documents.webp';
 const ABS = path.join(process.cwd(), 'public', 'images', 'bdoor', 'formation-documents.webp');
 
 /**
- * Services/Pricing image slot for `formation-documents.webp` (once only).
- * Homepage must not use this asset.
+ * Whether the owner-supplied formation-documents artwork is in the build.
+ * The hotfix package that was meant to carry it arrived without the file;
+ * until it lands the Services introduction renders without the image — a
+ * customer must never see "Missing asset" text, and no substitute may be
+ * invented.
+ */
+export const FORMATION_DOCUMENTS_IMAGE_READY = existsSync(ABS);
+
+/**
+ * Services image for `formation-documents.webp`, used once near the
+ * introduction (hotfix §5). Renders nothing while the asset is absent.
  */
 export function FormationDocumentsImage({ alt }: { alt: string }) {
-  const ready = existsSync(ABS);
+  if (!FORMATION_DOCUMENTS_IMAGE_READY) return null;
 
   return (
     <div className="relative mx-auto aspect-[16/10] w-full max-w-xl overflow-hidden rounded-xl">
-      {ready ? (
-        <Image
-          src={SRC}
-          alt={alt}
-          fill
-          sizes="(min-width: 1024px) 560px, 92vw"
-          className="object-cover object-center"
-        />
-      ) : (
-        <div
-          role="img"
-          aria-label={alt}
-          className="bg-surface-sunken border-border text-muted flex h-full min-h-[180px] w-full flex-col items-center justify-center gap-2 border border-dashed p-6 text-center text-sm"
-          data-missing-asset="formation-documents.webp"
-        >
-          <span className="font-medium">{alt}</span>
-          <span className="text-xs">
-            Missing asset: public/images/bdoor/formation-documents.webp
-          </span>
-        </div>
-      )}
+      <Image
+        src={SRC}
+        alt={alt}
+        fill
+        sizes="(min-width: 1024px) 560px, 92vw"
+        className="object-cover object-center"
+      />
     </div>
   );
 }

@@ -15,19 +15,48 @@ import {
   type BusinessCategory,
 } from '@/features/intake/business-categories';
 import { COUNTRIES } from '@/features/intake/countries';
+import { Link } from '@/i18n/navigation';
 import {
   applicableQuestions,
   answersImpliedByMarketScope,
   firstUnansweredIndex,
   pruneInapplicable,
+  resolveInitialAnswers,
   validateAnswer,
   visibleStep,
   type MarketScope,
   type PartialAnswers,
   type QuestionDefinition,
 } from '@/features/intake/questions';
-import { intakeAction, persistAnswerBackground, type IntakeState } from '@/features/intake/actions';
+import {
+  intakeAction,
+  persistAnswerBackground,
+  resetDraftBackground,
+  type IntakeState,
+} from '@/features/intake/actions';
 import { RecommendationPanel } from './recommendation-panel';
+
+const LOCAL_DRAFT_KEY = 'bdoor_intake_draft';
+
+/** This device's saved draft, or nothing — never throws (private mode). */
+function readLocalDraft(): PartialAnswers {
+  if (typeof window === 'undefined') return {};
+  try {
+    const raw = window.localStorage.getItem(LOCAL_DRAFT_KEY);
+    if (!raw) return {};
+    return (JSON.parse(raw) as { answers?: PartialAnswers }).answers ?? {};
+  } catch {
+    return {};
+  }
+}
+
+function clearLocalDraft() {
+  try {
+    window.localStorage.removeItem(LOCAL_DRAFT_KEY);
+  } catch {
+    // Private mode / quota — nothing stored, nothing to clear.
+  }
+}
 
 /** "Why we ask" disclosure. Collapsed by default so it never crowds the question. */
 function WhyWeAsk({ text }: { text: string }) {
@@ -444,37 +473,41 @@ export function Questionnaire({ initial }: { initial: IntakeState }) {
   const announce = useAnnounce();
 
   const [serverState, formAction, saving] = useActionState(intakeAction, initial);
-  const [answers, setAnswers] = useState<PartialAnswers>(() => {
-    if (typeof window === 'undefined') return initial.answers;
-    try {
-      const raw = window.localStorage.getItem('bdoor_intake_draft');
-      if (!raw) return initial.answers;
-      const parsed = JSON.parse(raw) as { answers?: PartialAnswers };
-      return { ...initial.answers, ...(parsed.answers ?? {}) };
-    } catch {
-      return initial.answers;
-    }
-  });
-  const [index, setIndex] = useState(() =>
-    firstUnansweredIndex({
-      ...initial.answers,
-      ...(typeof window !== 'undefined'
-        ? (() => {
-            try {
-              const raw = window.localStorage.getItem('bdoor_intake_draft');
-              if (!raw) return {};
-              return (JSON.parse(raw) as { answers?: PartialAnswers }).answers ?? {};
-            } catch {
-              return {};
-            }
-          })()
-        : {}),
-    }),
+  // One precedence rule on both sides of hydration (hotfix §2): a valid URL
+  // seed beats this device's draft, which beats the stored server draft.
+  // The old initialiser spread localStorage LAST, so a stale United States
+  // draft silently overrode ?country=uk — the reported launch blocker.
+  const [answers, setAnswers] = useState<PartialAnswers>(() =>
+    resolveInitialAnswers(initial.answers, readLocalDraft(), initial.seed ?? {}),
   );
+  const [index, setIndex] = useState(() =>
+    firstUnansweredIndex(
+      resolveInitialAnswers(initial.answers, readLocalDraft(), initial.seed ?? {}),
+    ),
+  );
+  // "Resume saved application / Start a new application": offered only when
+  // nothing in the URL chose a route and a draft (either store) has answers.
+  const [resumeChoice, setResumeChoice] = useState<'pending' | 'made'>(() => {
+    if (initial.seed) return 'made';
+    const draft = resolveInitialAnswers(initial.answers, readLocalDraft(), {});
+    return Object.keys(draft).length > 0 && firstUnansweredIndex(draft) > 0 ? 'pending' : 'made';
+  });
   const [fieldError, setFieldError] = useState<string | undefined>();
   const [syncState, setSyncState] = useState<'idle' | 'saving' | 'saved' | 'local'>('idle');
   const headingRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+
+  function startNewApplication() {
+    clearLocalDraft();
+    // Fire-and-forget: the visible reset never waits on the network, and a
+    // failed server reset only means an orphaned empty-keyed draft.
+    void resetDraftBackground();
+    setAnswers({});
+    setIndex(0);
+    setFieldError(undefined);
+    setSyncState('idle');
+    setResumeChoice('made');
+  }
 
   const questions = useMemo(() => applicableQuestions(answers), [answers]);
   const safeIndex = Math.min(index, questions.length);
@@ -500,7 +533,7 @@ export function Questionnaire({ initial }: { initial: IntakeState }) {
   function persistLocal(next: PartialAnswers) {
     try {
       window.localStorage.setItem(
-        'bdoor_intake_draft',
+        LOCAL_DRAFT_KEY,
         JSON.stringify({ answers: next, savedAt: Date.now() }),
       );
     } catch {
@@ -560,9 +593,12 @@ export function Questionnaire({ initial }: { initial: IntakeState }) {
     // immediately; background-sync only after contact/email is known.
     if (next.email) {
       setSyncState('saving');
-      void persistAnswerBackground(question.key, validation.data).then((result) => {
-        setSyncState(result.ok ? 'saved' : 'local');
-      });
+      void persistAnswerBackground(question.key, validation.data).then(
+        (result) => setSyncState(result.ok ? 'saved' : 'local'),
+        // A dropped connection rejects client-side before the action's own
+        // error handling can answer; the draft is already safe on-device.
+        () => setSyncState('local'),
+      );
     } else {
       setSyncState('local');
     }
@@ -587,6 +623,26 @@ export function Questionnaire({ initial }: { initial: IntakeState }) {
     ? tQuestions(`target_country.options.${answers.target_country}`)
     : null;
   const packageSlug = initial.packageSlug;
+
+  if (resumeChoice === 'pending') {
+    return (
+      <div className="flex flex-col gap-5">
+        <div>
+          <h2 className="text-ink text-xl font-semibold">{t('resume.title')}</h2>
+          <p className="text-muted mt-2 text-sm leading-relaxed">{t('resume.body')}</p>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <Button type="button" size="lg" onClick={() => setResumeChoice('made')}>
+            {t('resume.continueCta')}
+            <ArrowRight className="size-4" aria-hidden="true" />
+          </Button>
+          <Button type="button" variant="secondary" size="lg" onClick={startNewApplication}>
+            {t('resume.startNewCta')}
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -667,16 +723,25 @@ export function Questionnaire({ initial }: { initial: IntakeState }) {
                   {tCommon('back')}
                 </Button>
               ) : null}
+              {/*
+                Hotfix P1: the old save control was a non-interactive <span>
+                that read like a button. Now it is two truthful things — a
+                passive status line, and a real keyboard-accessible Save &
+                exit link that persists this device's draft and goes home.
+              */}
               <span className="text-muted ms-auto inline-flex items-center gap-1.5 text-sm">
                 <Save className="size-4" aria-hidden="true" />
-                {answers.email
-                  ? syncState === 'saving'
-                    ? tCommon('saving')
-                    : syncState === 'local'
-                      ? t('savedLocally')
-                      : t('saveAndExit')
-                  : t('saveOnDevice')}
+                {answers.email && syncState === 'saving'
+                  ? tCommon('saving')
+                  : answers.email && syncState === 'saved'
+                    ? t('savedToAccountDraft')
+                    : t('savedOnDevice')}
               </span>
+              <Button asChild variant="ghost" size="sm">
+                <Link href="/" onClick={() => persistLocal(answers)}>
+                  {t('saveAndExit')}
+                </Link>
+              </Button>
             </div>
           </form>
         )}

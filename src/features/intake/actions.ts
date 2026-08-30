@@ -6,13 +6,14 @@ import { enforceRateLimit } from '@/lib/rate-limit';
 import { hashIdentifier } from '@/lib/utils/hash';
 import { RateLimitError } from '@/lib/permissions/errors';
 import { logger } from '@/lib/logger';
-import { ensureDraftSession, getDraftSession, saveAnswer } from './session';
+import { ensureDraftSession, getDraftSession, resetDraft, saveAnswer } from './session';
 import { generateRecommendation, loadRules } from './recommendation';
 import { recommend } from './rules';
 import { submitApplication, type SubmittedApplication } from './application';
 import {
   applicableQuestions,
   answersImpliedByMarketScope,
+  applySeed,
   asQuestionKey,
   firstUnansweredIndex,
   isComplete,
@@ -36,6 +37,14 @@ export type IntakeState = {
   packageSlug?: string;
   /** Path (with query) of the /start URL that seeded any preset answers. */
   sourcePath?: string;
+  /**
+   * The validated URL seed itself (hotfix §2). The client re-applies it OVER
+   * its device-local draft, so an explicit link always beats stored state on
+   * both sides of hydration.
+   */
+  seed?: PartialAnswers;
+  /** True when a stored server draft carried at least one answer. */
+  hadStoredDraft?: boolean;
 };
 
 /** Pre-seeded answers from validated /start query parameters. */
@@ -54,19 +63,22 @@ async function rateLimitKey(): Promise<string> {
 /** Reads the current draft for the initial render. */
 export async function loadIntake(preset?: IntakePreset): Promise<IntakeState> {
   const session = await getDraftSession();
-  const answers = { ...session?.answers } as PartialAnswers;
+  const stored = { ...session?.answers } as PartialAnswers;
 
-  // Preset answers (a validated ?country=/&objective=) fill gaps only: a
-  // saved draft answer always wins over a link parameter, so following a
-  // country CTA never silently rewrites an application in progress. The
-  // write target is always the canonical key from the question model, never
-  // the incoming string — no query parameter can name a property here.
+  // Hotfix §2 precedence: a valid explicit URL parameter OVERRIDES the
+  // stored draft — a customer opening ?country=uk after a United States
+  // draft starts in the United Kingdom, always — and every stored answer
+  // that stops applying under the new routing is cleared, never merged.
+  // Keys are resolved to their canonical form inside `applySeed`, so no
+  // query parameter can name a property here.
+  const seed: PartialAnswers = {};
   for (const [key, value] of Object.entries(preset?.answers ?? {})) {
     const qk = asQuestionKey(key);
-    if (qk !== undefined && answers[qk] === undefined) {
-      (answers as Record<string, unknown>)[qk] = value;
+    if (qk !== undefined && value !== undefined) {
+      (seed as Record<string, unknown>)[qk] = value;
     }
   }
+  const answers = applySeed(stored, seed);
 
   return {
     answers,
@@ -75,6 +87,8 @@ export async function loadIntake(preset?: IntakePreset): Promise<IntakeState> {
     unavailable: session === null,
     packageSlug: preset?.packageSlug,
     sourcePath: preset?.sourcePath,
+    seed: Object.keys(seed).length > 0 ? seed : undefined,
+    hadStoredDraft: Object.keys(stored).length > 0,
   };
 }
 
@@ -203,9 +217,11 @@ export async function intakeAction(
   const applicable = new Set(applicableQuestions(answers).map((q) => q.key));
   for (const [presetKey, presetValue] of Object.entries(previous.answers)) {
     const qk = asQuestionKey(presetKey);
-    if (qk === undefined || qk === key || answers[qk] !== undefined || !applicable.has(qk)) {
-      continue;
-    }
+    if (qk === undefined || qk === key || !applicable.has(qk)) continue;
+    // Overwrite, not just fill: a URL-seeded route (hotfix §2) lives only in
+    // the action state until here, and the stored draft may carry the OLD
+    // route — persisting only missing keys would resurrect it on reload.
+    if (JSON.stringify(answers[qk]) === JSON.stringify(presetValue)) continue;
     const revalidated = validateAnswer(qk, presetValue);
     if (!revalidated.success) continue;
     answers = await saveAnswer(session.id, qk, revalidated.data);
@@ -299,4 +315,21 @@ export async function persistAnswerBackground(
   }
   void answers;
   return { ok: true };
+}
+
+/**
+ * "Start a new application" (hotfix §2): discards the stored server draft
+ * and the anonymous draft cookie. The client clears its own device-local
+ * draft alongside; neither side blocks the visible reset on the other.
+ */
+export async function resetDraftBackground(): Promise<{ ok: boolean }> {
+  try {
+    await resetDraft();
+    return { ok: true };
+  } catch (error) {
+    logger.warn('intake.reset_failed', {
+      message: error instanceof Error ? error.message : 'unknown',
+    });
+    return { ok: false };
+  }
 }

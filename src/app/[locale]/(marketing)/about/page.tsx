@@ -5,6 +5,7 @@ import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { Section } from '@/components/ui/section';
 import { PageHeader } from '@/components/marketing/page-header';
+import { FOUNDER_PORTRAIT_READY, FounderPortrait } from '@/components/marketing/founder-portrait';
 import { IndependenceDisclosure } from '@/components/layout/disclosure';
 import { MARKETING_ROUTES } from '@/lib/navigation';
 import { localizedUrl } from '@/lib/site';
@@ -58,8 +59,40 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
           <div className="mt-10 max-w-prose">
             <IndependenceDisclosure />
           </div>
+        </div>
+      </Section>
 
-          <Button asChild className="mt-8" size="lg">
+      {/*
+        Founder section (production hotfix P1). Only the owner-approved
+        strings: name, role, one-sentence bio. No qualifications, licences,
+        customer counts, awards or partnerships may be added here.
+      */}
+      <Section tone="surface" className="border-border border-y py-12 md:py-16">
+        <div
+          className={
+            FOUNDER_PORTRAIT_READY
+              ? 'container-page grid gap-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:items-center lg:gap-16'
+              : 'container-page max-w-3xl'
+          }
+        >
+          <FounderPortrait alt={t('founder.portraitAlt')} />
+          <div>
+            <p className="text-muted font-mono text-xs tracking-[0.14em] uppercase">
+              {t('founder.role')}
+            </p>
+            <h2 className="text-ink mt-3 text-2xl leading-tight md:text-3xl">
+              {t('founder.name')}
+            </h2>
+            <p className="text-muted mt-4 max-w-prose text-base leading-relaxed">
+              {t('founder.bio')}
+            </p>
+          </div>
+        </div>
+      </Section>
+
+      <Section className="py-12 md:py-16">
+        <div className="container-page">
+          <Button asChild size="lg">
             <Link href={MARKETING_ROUTES.start}>
               {t('cta')}
               <ArrowRight className="size-4" aria-hidden="true" />
