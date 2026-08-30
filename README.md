@@ -37,14 +37,15 @@ for the BDoor team.
 
 ## What is in here
 
-| Area                 | Route base          | Who                            |
-| -------------------- | ------------------- | ------------------------------ |
-| Marketing site       | `/[locale]`         | anyone, indexed                |
-| Guided questionnaire | `/[locale]/start`   | anyone, no account needed      |
-| Authentication       | `/[locale]/login` … | anyone                         |
-| Customer workspace   | `/[locale]/app`     | organisation members           |
-| Partner workspace    | `/[locale]/partner` | verified partner organisations |
-| Operations / admin   | `/[locale]/admin`   | BDoor staff, per capability    |
+| Area                 | Route base                 | Who                                   |
+| -------------------- | -------------------------- | ------------------------------------- |
+| Marketing site       | `/[locale]`                | anyone, indexed                       |
+| Guided questionnaire | `/[locale]/start`          | anyone, no account needed             |
+| Authentication       | `/[locale]/login` …        | anyone                                |
+| Customer workspace   | `/[locale]/app`            | organisation members                  |
+| Provider application | `/[locale]/partners/apply` | firms applying to the network (gated) |
+| Partner workspace    | `/[locale]/partner`        | verified partner organisations        |
+| Operations / admin   | `/[locale]/admin`          | BDoor staff, per capability           |
 
 Two locales ship: English (`en`) and Bangla (`bn`). Every public page exists in
 both, with `hreflang` alternates and a locale switcher in the header and footer.

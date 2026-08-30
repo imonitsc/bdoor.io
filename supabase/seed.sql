@@ -678,13 +678,16 @@ on conflict do nothing;
 -- Partner assigned to the foreign-founder case, with customer authorisation.
 insert into public.case_partner_assignments
   (id, case_id, partner_org_id, status, scope_note, customer_authorized_at, customer_authorized_by,
-   conflict_check_confirmed, offered_by, offered_at, responded_at)
+   conflict_check_confirmed, conflict_check_result, conflict_check_recorded_at,
+   disclosed_at, disclosed_by, offered_by, offered_at, responded_at)
 values
   ('f1000000-0000-4000-8000-000000000001', 'f0000000-0000-4000-8000-000000000002',
    'b0000000-0000-4000-8000-000000000001', 'accepted',
    'Foreign ownership eligibility review and constitutional document drafting.',
    now() - interval '12 days', '11111111-1111-4111-8111-000000000002',
-   true, '33333333-3333-4333-8333-000000000001', now() - interval '14 days', now() - interval '13 days')
+   true, 'none_identified', now() - interval '13 days',
+   now() - interval '12 days', '33333333-3333-4333-8333-000000000001',
+   '33333333-3333-4333-8333-000000000001', now() - interval '14 days', now() - interval '13 days')
 on conflict (id) do nothing;
 
 -- Milestones

@@ -134,9 +134,12 @@ export type CaseDetail = {
     isMandatory: boolean;
   }>;
   partner: {
+    assignmentId: string;
     organizationName: string;
     status: Enums<'assignment_status'>;
     authorized: boolean;
+    conflictResult: string | null;
+    disclosedAt: string | null;
   } | null;
   submissions: Array<{
     id: string;
@@ -180,7 +183,8 @@ export async function getCaseDetail(caseId: string): Promise<CaseDetail | null> 
     supabase
       .from('case_partner_assignments')
       .select(
-        'status, customer_authorized_at, organizations!case_partner_assignments_partner_org_id_fkey(name)',
+        'id, status, customer_authorized_at, conflict_check_result, disclosed_at, ' +
+          'organizations!case_partner_assignments_partner_org_id_fkey(name)',
       )
       .eq('case_id', caseId)
       .in('status', ['offered', 'accepted'])
@@ -199,8 +203,11 @@ export async function getCaseDetail(caseId: string): Promise<CaseDetail | null> 
   ]);
 
   type AssignmentRow = {
+    id: string;
     status: Enums<'assignment_status'>;
     customer_authorized_at: string | null;
+    conflict_check_result: string | null;
+    disclosed_at: string | null;
     organizations: { name: string } | null;
   };
   const assignmentRow = assignment.data as unknown as AssignmentRow | null;
@@ -232,9 +239,12 @@ export async function getCaseDetail(caseId: string): Promise<CaseDetail | null> 
     })),
     partner: assignmentRow
       ? {
+          assignmentId: assignmentRow.id,
           organizationName: assignmentRow.organizations?.name ?? '',
           status: assignmentRow.status,
           authorized: Boolean(assignmentRow.customer_authorized_at),
+          conflictResult: assignmentRow.conflict_check_result,
+          disclosedAt: assignmentRow.disclosed_at,
         }
       : null,
     submissions: (submissions.data ?? []).map((s) => ({

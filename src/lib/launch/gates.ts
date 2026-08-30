@@ -83,6 +83,18 @@ export function paymentsStatus(): Toggle {
 }
 
 /**
+ * Provider applications (partner portals spec §20). Unlike payments/KYC this
+ * collects business information rather than identity documents, but it still
+ * defaults closed: the multi-step /partners/apply flow opens only when the
+ * owner sets PROVIDER_APPLICATIONS_STATUS=enabled after the provider terms
+ * are ready. While disabled, the page renders the enquiry fallback and the
+ * server actions refuse — the gate is enforced server-side, not cosmetically.
+ */
+export function providerApplicationsStatus(): Toggle {
+  return read('PROVIDER_APPLICATIONS_STATUS', TOGGLES, 'disabled');
+}
+
+/**
  * Whether the public site may make operational claims — "Open now",
  * "available today" and their kin. While the legal documents are drafts the
  * platform takes no payments and collects no identity documents, so a page

@@ -418,7 +418,7 @@
     "description": "How licensed advocates, chartered accountants and specialist firms work with bdoor — and how verification protects customers before any case is shared.",
     "applyTitle": "Work with us",
     "applyBody": "If you are a licensed advocate, chartered accountant or specialist consultancy in Bangladesh, tell us about your practice. Every partner is verified before receiving a case.",
-    "applyCta": "Register interest",
+    "applyCta": "Apply to join",
     "howTitle": "How a partner joins a case",
     "canTitle": "What a partner can do",
     "cannotTitle": "What a partner cannot do",
@@ -438,7 +438,8 @@
       "aml": "View internal AML analysis unless specifically authorised.",
       "export": "Bulk-export personal data.",
       "audit": "Edit or delete audit history."
-    }
+    },
+    "enquiryCta": "Ask a question first"
   },
   "international": {
     "status": {
@@ -1162,7 +1163,19 @@
       "conflictConfirm": "I have run a conflict check and can act on this matter.",
       "acceptedOn": "Accepted {date}",
       "declinedOn": "Declined {date}",
-      "scopeNote": "You can only see the customer information needed for this matter."
+      "scopeNote": "You can only see the customer information needed for this matter.",
+      "conflictLegend": "Conflict check — record the outcome",
+      "conflictOutcomes": {
+        "none_identified": "No conflict identified — the firm may accept this assignment.",
+        "potential_conflict": "Potential conflict — bdoor review required before we can proceed.",
+        "conflict_declined": "Conflict — the firm must decline this assignment.",
+        "insufficient_information": "Insufficient information — we need limited clarification from bdoor."
+      },
+      "backToConflict": "Back to conflict check",
+      "declineConflict": "Decline (conflict)",
+      "recordForReview": "Record for bdoor review",
+      "declineOther": "Decline for another reason",
+      "flagNote": "The outcome is recorded and the offer stays open while bdoor reviews it. Please put any details in the case message thread — never information that could identify another client."
     },
     "notes": {
       "title": "Partner notes",
@@ -1345,6 +1358,52 @@
         "engaged": "Engaged",
         "closed": "Closed"
       }
+    },
+    "providerApplications": {
+      "title": "Provider applications",
+      "description": "Applications to join the provider network. Approval is per jurisdiction and service; the approver cannot be the applicant.",
+      "empty": "No provider applications yet.",
+      "firmColumn": "Firm",
+      "jurisdictionsColumn": "Jurisdictions",
+      "submittedColumn": "Submitted",
+      "reviewActions": "Review",
+      "messageLabel": "Message to the applicant (required for requests and rejections)",
+      "startReview": "Start review",
+      "beginVerification": "Begin verification",
+      "requestInformation": "Request information",
+      "reject": "Reject",
+      "approve": "Approve and invite owner",
+      "approveNote": "Approving creates the partner organisation, records the verification decision under your name, and emails a single-use owner invitation (7-day expiry) to the applicant's contact address. This action requires a second factor on this session.",
+      "informationRequested": "Information requested from the applicant",
+      "decisionReason": "Decision reason (shared with the applicant)",
+      "firmSection": "Firm identity",
+      "ownershipSection": "Ownership and control",
+      "standingSection": "Professional standing",
+      "servicesSection": "Services and jurisdictions",
+      "controlsSection": "Operational controls",
+      "actionErrors": {
+        "unavailable": "The action could not be completed. Try again.",
+        "not_found": "This application no longer exists.",
+        "invalid_transition": "That action is not available in the current status.",
+        "message_required": "Write a short message to the applicant first.",
+        "incomplete": "The application is missing the firm name or contact email."
+      }
+    },
+    "assignmentChain": {
+      "conflict": "Conflict check",
+      "disclosure": "Customer disclosure",
+      "consent": "Customer consent",
+      "pending": "pending",
+      "recorded": "recorded",
+      "error": "Could not record the disclosure. Try again.",
+      "recordDisclosure": "Record customer disclosure",
+      "disclosureNote": "Record this only after the customer has been shown the provider's identity, role, scope, fee split and the data categories to be shared. Documents unlock only once the customer separately consents.",
+      "conflictValues": {
+        "none_identified": "no conflict",
+        "potential_conflict": "potential — review",
+        "conflict_declined": "conflict — declined",
+        "insufficient_information": "needs clarification"
+      }
     }
   },
   "caseStatus": {
@@ -1502,7 +1561,9 @@
       "tooLong": "That is longer than we can store.",
       "accepted": "Assignment accepted.",
       "declined": "Assignment declined.",
-      "saved": "Saved."
+      "saved": "Saved.",
+      "conflictFlagged": "Recorded. bdoor will review the conflict outcome and come back to you.",
+      "conflictDeclined": "Declined due to conflict. No further detail is shared with the customer."
     }
   },
   "countries": {
@@ -1599,5 +1660,136 @@
   },
   "applyLayout": {
     "needHelp": "Need help? Contact us"
+  },
+  "partnersApply": {
+    "title": "Apply to join the provider network",
+    "description": "For law firms, advocates, chartered accountants, tax and VAT practices, company-secretarial firms, formation providers, registered agents and other specialists. Applying is free, and verification of credentials happens before any approval.",
+    "stepLabel": "Step {current} of {total} · {name}",
+    "choosePlaceholder": "Select…",
+    "savedNote": "Progress saves on this device as you continue.",
+    "notStoredNotice": "The application service is not connected in this environment, so nothing you enter here will be saved or submitted.",
+    "declarationsNote": "The provider terms are working drafts pending professional review; the version you accept is recorded with your application. bdoor is an independent coordination platform and approval to join the network is not employment, agency or a guarantee of assignments.",
+    "submitCta": "Submit application",
+    "reviewNotice": "Every application is reviewed by the bdoor partner team. Approval is per jurisdiction, service and credential — approval for one country or service never extends to another automatically. Credential evidence is collected through a secure request after initial review; please do not email certificates or identity documents.",
+    "needsInformation": {
+      "title": "We need a little more information"
+    },
+    "closed": {
+      "title": "Provider applications are not open yet",
+      "body": "We are preparing the provider network and are not accepting formal applications at this moment. You can register your interest through the contact form and we will write to you when applications open.",
+      "contactCta": "Contact the partner team"
+    },
+    "success": {
+      "title": "Application received",
+      "body": "Thank you. Your application has been recorded and the partner team will review it. We will contact you at the email address you provided — usually within five business days.",
+      "next": "Verification of registration, licences and insurance happens before any approval. If anything is missing we will ask for it; please do not send documents by ordinary email."
+    },
+    "steps": {
+      "firm": {
+        "title": "Firm identity",
+        "intro": "Tell us who the firm is. Use the registered legal name exactly as it appears on your registration."
+      },
+      "ownership": {
+        "title": "Ownership and control",
+        "intro": "List the owners, partners or directors, and declare any sanctions or integrity matters. These declarations are relied on during verification."
+      },
+      "standing": {
+        "title": "Professional standing",
+        "intro": "The regulator or professional body, licence details and insurance for the work you are applying to perform."
+      },
+      "services": {
+        "title": "Services and jurisdictions",
+        "intro": "Approval is recorded per category and per jurisdiction. Select only what the firm can actually deliver today."
+      },
+      "controls": {
+        "title": "Operational controls",
+        "intro": "How the firm manages conflicts, complaints, security and continuity. Short, factual answers are ideal."
+      },
+      "declarations": {
+        "title": "Declarations",
+        "intro": "Confirm the declarations below to submit. Your acceptance, its date and the terms version are recorded."
+      }
+    },
+    "fields": {
+      "legal_name": "Registered legal name",
+      "trading_name": "Trading name",
+      "registration_no": "Registration or incorporation number",
+      "established_on": "Date established",
+      "firm_category": "Primary firm category",
+      "registered_address": "Registered address",
+      "operating_address": "Operating address, if different",
+      "website": "Website",
+      "official_email_domain": "Official email domain (e.g. firm.com.bd)",
+      "contact_name": "Primary contact name",
+      "contact_email": "Primary contact email",
+      "contact_phone": "Primary contact phone",
+      "signatory_name": "Authorised signatory",
+      "owners_text": "Owners, partners and directors — one per line (name, role, ownership share)",
+      "related_entities_note": "Related entities, parent organisation or potential conflicts",
+      "sanctions_declaration": "I confirm that neither the firm nor any owner, partner or director is subject to sanctions, and that beneficial ownership has been disclosed where required.",
+      "integrity_declaration": "I confirm there is no undisclosed involvement in money-laundering, fraud or corruption proceedings.",
+      "regulator_name": "Regulator, bar, institute or licensing authority",
+      "licence_no": "Licence or membership number",
+      "licence_expires_on": "Licence expiry date",
+      "disciplinary_declaration": "I confirm there are no undisclosed disciplinary findings or ongoing proceedings against the firm or its named professionals.",
+      "indemnity_insurer": "Professional indemnity insurer, where held",
+      "indemnity_expires_on": "Indemnity insurance expiry date",
+      "requested_categories": "Provider categories you are applying for",
+      "jurisdictions": "Jurisdictions the firm can cover",
+      "services_note": "Specific services you provide",
+      "languages_text": "Working languages, comma-separated",
+      "turnaround_note": "Typical turnaround",
+      "capacity_note": "Capacity and assignment limits",
+      "fee_note": "Standard professional fees and typical government-cost estimates",
+      "conflict_process_note": "How the firm runs conflict checks",
+      "complaint_process_note": "How the firm handles client complaints",
+      "security_note": "Information-security controls",
+      "retention_note": "Document-retention process",
+      "subcontractors_note": "Subcontractors and data locations",
+      "continuity_note": "Business continuity and escalation contacts",
+      "accuracy_confirmed": "I declare that the information provided is accurate and complete.",
+      "authority_confirmed": "I am authorised to submit this application on behalf of the firm.",
+      "terms_accepted": "I accept the draft provider terms and data-processing terms, and consent to verification of the details provided."
+    },
+    "categories": {
+      "law_firm": "Law firm",
+      "advocate": "Individual advocate practice",
+      "chartered_accountant": "Chartered-accountancy firm",
+      "tax_vat_practice": "Tax and VAT practice",
+      "company_secretarial": "Company-secretarial / corporate services",
+      "trade_licence_specialist": "Trade-licence / local-government specialist",
+      "accounting_payroll": "Accounting, payroll or bookkeeping",
+      "immigration_specialist": "Immigration or employment specialist",
+      "overseas_formation_provider": "Overseas company-formation provider",
+      "registered_agent": "Registered agent / registered office",
+      "foreign_tax_agent": "Foreign tax agent",
+      "bank_support_provider": "Bank-account introduction / support",
+      "notary_legalisation": "Notary, legalisation or apostille",
+      "translation_provider": "Translation or document processing",
+      "consultancy": "Consultancy",
+      "other": "Other specialist"
+    },
+    "jurisdictions": {
+      "bangladesh": "Bangladesh",
+      "usa": "United States",
+      "uk": "United Kingdom",
+      "uae": "United Arab Emirates",
+      "saudi-arabia": "Saudi Arabia",
+      "qatar": "Qatar",
+      "singapore": "Singapore"
+    },
+    "errors": {
+      "requiredText": "Please complete this field.",
+      "tooLong": "This is too long.",
+      "requiredChoice": "Please choose at least one option.",
+      "invalidEmail": "Please enter a valid email address.",
+      "invalidDate": "Please use the date picker (YYYY-MM-DD).",
+      "declarationRequired": "This declaration is required to continue.",
+      "closed": "Provider applications are not open at the moment.",
+      "rateLimited": "Too many attempts in a short time. Please wait a few minutes.",
+      "unavailable": "We could not save your application just now. Please try again.",
+      "incomplete": "Some earlier steps are incomplete — please go back and check them.",
+      "validation": "Please correct the highlighted fields."
+    }
   }
 }

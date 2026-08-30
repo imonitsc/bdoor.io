@@ -182,8 +182,12 @@ test.describe('Save & exit (hotfix P1)', () => {
     await expect(page.getByText('Where are you based right now?')).toBeVisible();
 
     const saveAndExit = page.getByRole('link', { name: 'Save & exit' });
-    await saveAndExit.focus();
-    await expect(saveAndExit).toBeFocused();
+    // Hydration can replace the node between focus() and the assertion, so
+    // retry the pair until focus sticks on the live element.
+    await expect(async () => {
+      await saveAndExit.focus();
+      await expect(saveAndExit).toBeFocused({ timeout: 500 });
+    }).toPass({ timeout: 10_000 });
     await page.keyboard.press('Enter');
 
     await expect(page).toHaveURL(/\/en$/);
