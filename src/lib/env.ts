@@ -43,12 +43,14 @@ const serverSchema = z.object({
   MALWARE_SCAN_PROVIDER: providerMode,
   AI_PROVIDER: z.enum(['disabled', 'anthropic']).default('disabled'),
   AI_API_KEY: z.string().min(10).optional(),
-  // Ask bdoor AI. Off unless explicitly switched on, so a deploy that has not
-  // had its knowledge base reviewed serves the rest of the site normally and
-  // simply does not offer the assistant.
+  // Ask bdoor AI. The default is on for Vercel PREVIEW deployments only —
+  // that is where the owner reviews the assistant — and off everywhere else,
+  // production above all. An explicit setting always wins in both directions,
+  // so ASK_BDOOR_AI_ENABLED=false silences a preview and enabling production
+  // remains a deliberate owner action, never a default.
   ASK_BDOOR_AI_ENABLED: z
     .enum(['true', 'false'])
-    .default('false')
+    .default(process.env.VERCEL_ENV === 'preview' ? 'true' : 'false')
     .transform((v) => v === 'true'),
   // AI Gateway credential for LOCAL DEVELOPMENT ONLY. Deployed environments
   // authenticate with Vercel OIDC, which the SDK picks up from the runtime
@@ -180,21 +182,28 @@ export function productionEnvProblems(): string[] {
     problems.push('AI_API_KEY — required when AI_PROVIDER is not "disabled"');
   }
   if (env.ASK_BDOOR_AI_ENABLED) {
+    // These rows guard the REAL production deployment, so they key on
+    // VERCEL_ENV, not NODE_ENV — a Vercel preview also builds with
+    // NODE_ENV=production, and the assistant defaulting on for previews must
+    // not stop a preview from booting. A preview missing any of these runs
+    // the assistant honestly degraded (no persistence, unsalted-but-hashed
+    // identifiers, no retention sweep on preview data that never persists).
+    const vercelProduction = process.env.VERCEL_ENV === 'production';
     // The assistant persists every conversation before it calls the model, so
     // without the service role it would answer and remember nothing — including
     // the usage ledger the budget check reads.
-    if (!env.SUPABASE_SECRET_KEY) {
+    if (vercelProduction && !env.SUPABASE_SECRET_KEY) {
       problems.push('SUPABASE_SECRET_KEY — required when ASK_BDOOR_AI_ENABLED is "true"');
     }
-    if (isProduction && !env.AI_IDENTITY_SALT) {
+    if (vercelProduction && !env.AI_IDENTITY_SALT) {
       problems.push(
         'AI_IDENTITY_SALT — required in production when ASK_BDOOR_AI_ENABLED is "true"',
       );
     }
-    if (isProduction && !env.CRON_SECRET) {
+    if (vercelProduction && !env.CRON_SECRET) {
       problems.push('CRON_SECRET — required in production so conversations are actually deleted');
     }
-    if (isProduction && env.AI_GATEWAY_API_KEY) {
+    if (vercelProduction && env.AI_GATEWAY_API_KEY) {
       problems.push(
         'AI_GATEWAY_API_KEY — must not be set in production; deployed environments use Vercel OIDC',
       );
