@@ -14,6 +14,7 @@ import {
   ScrollText,
   Settings,
   ShieldAlert,
+  Sparkles,
   Tags,
   UserRound,
   Users,
@@ -117,6 +118,7 @@ export default async function AdminLayout({
             label: t('content'),
             icon: <Newspaper className="size-4" />,
           },
+          { href: ADMIN_ROUTES.ai, label: t('ai'), icon: <Sparkles className="size-4" /> },
         ]
       : []),
     ...(has('user.manage')

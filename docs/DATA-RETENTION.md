@@ -147,3 +147,28 @@ and the privacy policy has to be updated to name the processor.
 4. The lawful basis stated for each processing purpose in the privacy policy.
 5. Where the Supabase project may be hosted, and what has to be disclosed about
    cross-border transfer.
+
+---
+
+## Ask bdoor AI conversations
+
+Conversations with the public assistant are not case records and are not held to
+the categories above. They are retained for **90 days** from creation
+(`LIMITS.retentionDays`, stamped onto `ai_conversations.delete_after` at
+creation) and swept nightly by `/api/ai/retention`.
+
+| What                                             |      Retention      |              Deletable early               |
+| ------------------------------------------------ | :-----------------: | :----------------------------------------: |
+| `ai_conversations`, `ai_messages`, `ai_feedback` |       90 days       | yes — by the customer, from the chat panel |
+| `ai_usage`                                       |        kept         |                     no                     |
+| `ai_unanswered_questions`                        | kept until resolved |                     —                      |
+
+`ai_usage` survives deletion deliberately: it references the conversation with
+`on delete set null`, so removing a transcript removes what was said without
+erasing the record that money was spent. The monthly budget check sums this
+table, and a ledger that shrinks when customers exercise deletion is a ledger
+that under-reports spend.
+
+Everything written to `ai_messages` and `ai_unanswered_questions` has passed
+through `src/features/ai/redaction.ts` first, so what is retained is questions
+rather than identifiers. Nothing logs message text at all.

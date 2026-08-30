@@ -12,6 +12,357 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      "ai_conversations": {
+        Row: {
+          "id": string
+          "user_id": string | null
+          "anonymous_session_id": string | null
+          "country": string
+          "locale": Database["public"]["Enums"]["locale_code"]
+          "title": string | null
+          "delete_after": string | null
+          "created_at": string
+          "updated_at": string
+        }
+        Insert: {
+          "id"?: string
+          "user_id"?: string | null
+          "anonymous_session_id"?: string | null
+          "country"?: string
+          "locale"?: Database["public"]["Enums"]["locale_code"]
+          "title"?: string | null
+          "delete_after"?: string | null
+          "created_at"?: string
+          "updated_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "user_id"?: string | null
+          "anonymous_session_id"?: string | null
+          "country"?: string
+          "locale"?: Database["public"]["Enums"]["locale_code"]
+          "title"?: string | null
+          "delete_after"?: string | null
+          "created_at"?: string
+          "updated_at"?: string
+        }
+        Relationships: []
+      }
+      "ai_feedback": {
+        Row: {
+          "id": string
+          "message_id": string
+          "conversation_id": string
+          "rating": number
+          "reason": string | null
+          "created_at": string
+        }
+        Insert: {
+          "id"?: string
+          "message_id": string
+          "conversation_id": string
+          "rating": number
+          "reason"?: string | null
+          "created_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "message_id"?: string
+          "conversation_id"?: string
+          "rating"?: number
+          "reason"?: string | null
+          "created_at"?: string
+        }
+        Relationships: []
+      }
+      "ai_knowledge_audit_log": {
+        Row: {
+          "id": string
+          "source_id": string | null
+          "source_slug": string | null
+          "content_version": number | null
+          "action": string
+          "from_status": Database["public"]["Enums"]["ai_source_status"] | null
+          "to_status": Database["public"]["Enums"]["ai_source_status"] | null
+          "actor_id": string | null
+          "note": string | null
+          "created_at": string
+        }
+        Insert: {
+          "id"?: string
+          "source_id"?: string | null
+          "source_slug"?: string | null
+          "content_version"?: number | null
+          "action": string
+          "from_status"?: Database["public"]["Enums"]["ai_source_status"] | null
+          "to_status"?: Database["public"]["Enums"]["ai_source_status"] | null
+          "actor_id"?: string | null
+          "note"?: string | null
+          "created_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "source_id"?: string | null
+          "source_slug"?: string | null
+          "content_version"?: number | null
+          "action"?: string
+          "from_status"?: Database["public"]["Enums"]["ai_source_status"] | null
+          "to_status"?: Database["public"]["Enums"]["ai_source_status"] | null
+          "actor_id"?: string | null
+          "note"?: string | null
+          "created_at"?: string
+        }
+        Relationships: []
+      }
+      "ai_knowledge_chunks": {
+        Row: {
+          "id": string
+          "source_id": string
+          "chunk_index": number
+          "content": string
+          "token_estimate": number | null
+          "embedding": unknown | null
+          "embedding_model": string
+          "embedding_dimensions": number
+          "search_vector": unknown | null
+          "created_at": string
+        }
+        Insert: {
+          "id"?: string
+          "source_id": string
+          "chunk_index": number
+          "content": string
+          "token_estimate"?: number | null
+          "embedding"?: unknown | null
+          "embedding_model"?: string
+          "embedding_dimensions"?: number
+          "search_vector"?: unknown | null
+          "created_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "source_id"?: string
+          "chunk_index"?: number
+          "content"?: string
+          "token_estimate"?: number | null
+          "embedding"?: unknown | null
+          "embedding_model"?: string
+          "embedding_dimensions"?: number
+          "search_vector"?: unknown | null
+          "created_at"?: string
+        }
+        Relationships: []
+      }
+      "ai_knowledge_sources": {
+        Row: {
+          "id": string
+          "slug": string
+          "title": string
+          "country": string
+          "service_category": string | null
+          "locale": Database["public"]["Enums"]["locale_code"]
+          "source_type": Database["public"]["Enums"]["ai_source_type"]
+          "source_url": string | null
+          "body": string
+          "content_version": number
+          "effective_from": string
+          "expires_on": string | null
+          "review_due_on": string | null
+          "last_reviewed_at": string | null
+          "reviewed_by": string | null
+          "status": Database["public"]["Enums"]["ai_source_status"]
+          "access_scope": Database["public"]["Enums"]["ai_access_scope"]
+          "indexed_at": string | null
+          "created_by": string | null
+          "created_at": string
+          "updated_at": string
+        }
+        Insert: {
+          "id"?: string
+          "slug": string
+          "title": string
+          "country"?: string
+          "service_category"?: string | null
+          "locale"?: Database["public"]["Enums"]["locale_code"]
+          "source_type": Database["public"]["Enums"]["ai_source_type"]
+          "source_url"?: string | null
+          "body": string
+          "content_version"?: number
+          "effective_from"?: string
+          "expires_on"?: string | null
+          "review_due_on"?: string | null
+          "last_reviewed_at"?: string | null
+          "reviewed_by"?: string | null
+          "status"?: Database["public"]["Enums"]["ai_source_status"]
+          "access_scope"?: Database["public"]["Enums"]["ai_access_scope"]
+          "indexed_at"?: string | null
+          "created_by"?: string | null
+          "created_at"?: string
+          "updated_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "slug"?: string
+          "title"?: string
+          "country"?: string
+          "service_category"?: string | null
+          "locale"?: Database["public"]["Enums"]["locale_code"]
+          "source_type"?: Database["public"]["Enums"]["ai_source_type"]
+          "source_url"?: string | null
+          "body"?: string
+          "content_version"?: number
+          "effective_from"?: string
+          "expires_on"?: string | null
+          "review_due_on"?: string | null
+          "last_reviewed_at"?: string | null
+          "reviewed_by"?: string | null
+          "status"?: Database["public"]["Enums"]["ai_source_status"]
+          "access_scope"?: Database["public"]["Enums"]["ai_access_scope"]
+          "indexed_at"?: string | null
+          "created_by"?: string | null
+          "created_at"?: string
+          "updated_at"?: string
+        }
+        Relationships: []
+      }
+      "ai_messages": {
+        Row: {
+          "id": string
+          "conversation_id": string
+          "role": Database["public"]["Enums"]["ai_message_role"]
+          "content": string
+          "source_ids": string[]
+          "model": string | null
+          "input_tokens": number | null
+          "output_tokens": number | null
+          "estimated_cost_usd": number | null
+          "latency_ms": number | null
+          "status": Database["public"]["Enums"]["ai_completion_status"]
+          "error_code": string | null
+          "created_at": string
+        }
+        Insert: {
+          "id"?: string
+          "conversation_id": string
+          "role": Database["public"]["Enums"]["ai_message_role"]
+          "content": string
+          "source_ids"?: string[]
+          "model"?: string | null
+          "input_tokens"?: number | null
+          "output_tokens"?: number | null
+          "estimated_cost_usd"?: number | null
+          "latency_ms"?: number | null
+          "status"?: Database["public"]["Enums"]["ai_completion_status"]
+          "error_code"?: string | null
+          "created_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "conversation_id"?: string
+          "role"?: Database["public"]["Enums"]["ai_message_role"]
+          "content"?: string
+          "source_ids"?: string[]
+          "model"?: string | null
+          "input_tokens"?: number | null
+          "output_tokens"?: number | null
+          "estimated_cost_usd"?: number | null
+          "latency_ms"?: number | null
+          "status"?: Database["public"]["Enums"]["ai_completion_status"]
+          "error_code"?: string | null
+          "created_at"?: string
+        }
+        Relationships: []
+      }
+      "ai_unanswered_questions": {
+        Row: {
+          "id": string
+          "conversation_id": string | null
+          "question": string
+          "locale": Database["public"]["Enums"]["locale_code"]
+          "country": string | null
+          "reason": string
+          "occurrences": number
+          "resolved_at": string | null
+          "resolved_by": string | null
+          "created_at": string
+        }
+        Insert: {
+          "id"?: string
+          "conversation_id"?: string | null
+          "question": string
+          "locale"?: Database["public"]["Enums"]["locale_code"]
+          "country"?: string | null
+          "reason": string
+          "occurrences"?: number
+          "resolved_at"?: string | null
+          "resolved_by"?: string | null
+          "created_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "conversation_id"?: string | null
+          "question"?: string
+          "locale"?: Database["public"]["Enums"]["locale_code"]
+          "country"?: string | null
+          "reason"?: string
+          "occurrences"?: number
+          "resolved_at"?: string | null
+          "resolved_by"?: string | null
+          "created_at"?: string
+        }
+        Relationships: []
+      }
+      "ai_usage": {
+        Row: {
+          "id": string
+          "occurred_on": string
+          "conversation_id": string | null
+          "model": string
+          "provider": string | null
+          "country": string | null
+          "locale": Database["public"]["Enums"]["locale_code"] | null
+          "input_tokens": number
+          "output_tokens": number
+          "estimated_cost_usd": number
+          "latency_ms": number | null
+          "status": Database["public"]["Enums"]["ai_completion_status"]
+          "error_code": string | null
+          "created_at": string
+        }
+        Insert: {
+          "id"?: string
+          "occurred_on"?: string
+          "conversation_id"?: string | null
+          "model": string
+          "provider"?: string | null
+          "country"?: string | null
+          "locale"?: Database["public"]["Enums"]["locale_code"] | null
+          "input_tokens"?: number
+          "output_tokens"?: number
+          "estimated_cost_usd"?: number
+          "latency_ms"?: number | null
+          "status": Database["public"]["Enums"]["ai_completion_status"]
+          "error_code"?: string | null
+          "created_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "occurred_on"?: string
+          "conversation_id"?: string | null
+          "model"?: string
+          "provider"?: string | null
+          "country"?: string | null
+          "locale"?: Database["public"]["Enums"]["locale_code"] | null
+          "input_tokens"?: number
+          "output_tokens"?: number
+          "estimated_cost_usd"?: number
+          "latency_ms"?: number | null
+          "status"?: Database["public"]["Enums"]["ai_completion_status"]
+          "error_code"?: string | null
+          "created_at"?: string
+        }
+        Relationships: []
+      }
       "analytics_events": {
         Row: {
           "id": string
@@ -4591,6 +4942,11 @@ export type Database = {
     }
     Functions: Record<string, never>
     Enums: {
+      "ai_access_scope": "public" | "restricted"
+      "ai_completion_status": "pending" | "streaming" | "complete" | "stopped" | "error" | "refused"
+      "ai_message_role": "user" | "assistant"
+      "ai_source_status": "draft" | "in_review" | "approved" | "published" | "withdrawn"
+      "ai_source_type": "website_page" | "service_page" | "country_page" | "package" | "faq" | "requirement" | "legal_policy" | "provider_disclosure" | "procedure" | "guide" | "government_reference" | "internal_article"
       "assignment_status": "offered" | "accepted" | "declined" | "withdrawn" | "completed"
       "case_status": "draft" | "awaiting_kyc" | "kyc_review" | "quote_ready" | "awaiting_acceptance" | "awaiting_payment" | "documents_required" | "partner_review" | "ready_to_submit" | "submitted" | "authority_query" | "customer_action_required" | "approved" | "rejected" | "closed" | "cancelled"
       "case_waiting_on": "none" | "customer" | "partner" | "authority" | "payment"

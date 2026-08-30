@@ -43,6 +43,26 @@ const serverSchema = z.object({
   MALWARE_SCAN_PROVIDER: providerMode,
   AI_PROVIDER: z.enum(['disabled', 'anthropic']).default('disabled'),
   AI_API_KEY: z.string().min(10).optional(),
+  // Ask bdoor AI. Off unless explicitly switched on, so a deploy that has not
+  // had its knowledge base reviewed serves the rest of the site normally and
+  // simply does not offer the assistant.
+  ASK_BDOOR_AI_ENABLED: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((v) => v === 'true'),
+  // AI Gateway credential for LOCAL DEVELOPMENT ONLY. Deployed environments
+  // authenticate with Vercel OIDC, which the SDK picks up from the runtime
+  // without any secret in project configuration. Setting this in production
+  // would be a long-lived credential where a short-lived token already works.
+  AI_GATEWAY_API_KEY: z.string().min(10).optional(),
+  // Application-side spend caps. The enforced caps are the AI Gateway budgets
+  // (`vercel ai-gateway budgets set ...`); these stop the app before it spends.
+  AI_DAILY_BUDGET_USD: z.coerce.number().positive().default(25),
+  AI_MONTHLY_BUDGET_USD: z.coerce.number().positive().default(400),
+  // Salt for the hashed safety identifier sent to AI Gateway.
+  AI_IDENTITY_SALT: z.string().min(16).optional(),
+  // Shared secret for scheduled jobs (Vercel cron sends it as a bearer token).
+  CRON_SECRET: z.string().min(16).optional(),
   SENTRY_DSN: optionalUrl,
   RATE_LIMIT_DISABLED: z
     .enum(['true', 'false'])
@@ -158,6 +178,27 @@ export function productionEnvProblems(): string[] {
   }
   if (env.AI_PROVIDER !== 'disabled' && !env.AI_API_KEY) {
     problems.push('AI_API_KEY — required when AI_PROVIDER is not "disabled"');
+  }
+  if (env.ASK_BDOOR_AI_ENABLED) {
+    // The assistant persists every conversation before it calls the model, so
+    // without the service role it would answer and remember nothing — including
+    // the usage ledger the budget check reads.
+    if (!env.SUPABASE_SECRET_KEY) {
+      problems.push('SUPABASE_SECRET_KEY — required when ASK_BDOOR_AI_ENABLED is "true"');
+    }
+    if (isProduction && !env.AI_IDENTITY_SALT) {
+      problems.push(
+        'AI_IDENTITY_SALT — required in production when ASK_BDOOR_AI_ENABLED is "true"',
+      );
+    }
+    if (isProduction && !env.CRON_SECRET) {
+      problems.push('CRON_SECRET — required in production so conversations are actually deleted');
+    }
+    if (isProduction && env.AI_GATEWAY_API_KEY) {
+      problems.push(
+        'AI_GATEWAY_API_KEY — must not be set in production; deployed environments use Vercel OIDC',
+      );
+    }
   }
 
   return problems;

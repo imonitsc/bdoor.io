@@ -1201,7 +1201,8 @@
       "audit": "Audit log",
       "settings": "Settings",
       "applications": "Applications",
-      "metrics": "Metrics"
+      "metrics": "Metrics",
+      "ai": "AI assistant"
     },
     "queues": {
       "title": "Work queues",
@@ -1436,6 +1437,60 @@
       "recordSnapshot": "Record snapshot",
       "snapshotRecorded": "Snapshot recorded. Snapshots are append-only; a recomputation adds a new row.",
       "invalidMonth": "Enter the month as YYYY-MM."
+    },
+    "ai": {
+      "title": "AI Management",
+      "description": "What Ask bdoor AI is allowed to say, what it could not answer, and what it costs. Published sources are the only thing customers ever see.",
+      "knowledge": "Knowledge sources",
+      "gaps": "Questions it could not answer",
+      "noGaps": "No unanswered questions in the queue.",
+      "import": "Import reviewed site content",
+      "importDone": "Import finished ({detail} created/skipped). Everything imported is a draft.",
+      "failed": "That did not work. Try again.",
+      "index": "Index",
+      "reindex": "Re-index",
+      "indexed": "Indexed",
+      "notIndexed": "Not indexed",
+      "switchedOff": "Ask bdoor AI is switched off in this environment. Customers do not see it, and nothing on this page is live.",
+      "needsIndexing": "{count} published sources have not been indexed. Until they are, the assistant cannot retrieve them.",
+      "correctionPolicy": "To correct an answer, edit the source it came from and re-index it. Never edit a stored answer — an answer is a record of what the assistant said, not source material.",
+      "empty": {
+        "title": "No knowledge sources yet",
+        "body": "Import the reviewed site content to create drafts, then review, approve, publish and index them."
+      },
+      "stats": {
+        "published": "Published sources",
+        "answers": "Answers (30 days)",
+        "failures": "Failures (30 days)",
+        "spend": "Spend this month"
+      },
+      "columns": {
+        "title": "Source",
+        "scope": "Scope",
+        "status": "Status",
+        "reviewed": "Last reviewed",
+        "actions": "Actions"
+      },
+      "status": {
+        "draft": "Draft",
+        "in_review": "In review",
+        "approved": "Approved",
+        "published": "Published",
+        "withdrawn": "Withdrawn"
+      },
+      "transitions": {
+        "draft": "Return to draft",
+        "in_review": "Send for review",
+        "approved": "Approve",
+        "published": "Publish",
+        "withdrawn": "Withdraw"
+      },
+      "reasons": {
+        "no_match": "Nothing matched",
+        "expired_only": "Only expired content matched",
+        "out_of_scope": "Out of scope",
+        "low_confidence": "Low confidence"
+      }
     }
   },
   "caseStatus": {
@@ -1823,5 +1878,43 @@
       "incomplete": "Some earlier steps are incomplete — please go back and check them.",
       "validation": "Please correct the highlighted fields."
     }
+  },
+  "ask": {
+    "eyebrow": "Ask bdoor AI",
+    "heading": "Ask bdoor AI",
+    "pageTitle": "Ask bdoor AI",
+    "description": "Get clear answers about starting and running a business in Bangladesh and the countries bdoor supports. Answers come from bdoor's published guidance and live price list, with the source shown every time.",
+    "placeholder": "Ask about company registration, licences, tax or pricing…",
+    "cta": "Ask bdoor AI",
+    "submit": "Send",
+    "inputLabel": "Your question",
+    "close": "Close",
+    "thinking": "Reading bdoor's published guidance…",
+    "sources": "Sources",
+    "reviewed": "reviewed {date}",
+    "emptyBody": "Ask anything about forming or running your business. Here are a few questions people ask most.",
+    "drawerDescription": "Answers from bdoor's published guidance, with sources.",
+    "entryFooter": "Answers cite their source and show when it was last reviewed.",
+    "openFullPage": "Open the full page",
+    "privacyBadge": "Cannot see your documents, case or payment details",
+    "talkToSpecialist": "Talk to a specialist",
+    "startApplication": "Start an application",
+    "feedbackPrompt": "Was this useful?",
+    "feedbackUp": "Yes, this was useful",
+    "feedbackDown": "No, this was not useful",
+    "feedbackThanks": "Thank you — that helps us improve the answer.",
+    "disclosure": "AI-generated information from bdoor's published guidance. It is general business information, not legal, tax or immigration advice, and it can be wrong — check anything important with a specialist.",
+    "privacyLink": "How your questions are handled",
+    "suggestions": {
+      "one": "How do I register a private limited company in Bangladesh?",
+      "two": "What is the difference between a trade licence, TIN and BIN?",
+      "three": "What does bdoor charge, and what are the government fees?",
+      "four": "Can a foreigner own 100% of a Bangladeshi company?",
+      "five": "What do I have to file every year after registering?"
+    },
+    "errors": {
+      "unknown": "Something went wrong answering that. Please try again, or speak with a specialist."
+    },
+    "deleteConversation": "Delete this conversation"
   }
 }
