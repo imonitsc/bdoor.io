@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Section, SectionHeading } from '@/components/ui/section';
 import { PackageSelector } from '@/components/marketing/package-selector';
 import { HeroFounder } from '@/components/marketing/hero-founder';
+import { AskBdoorEntry } from '@/components/ai/ask-bdoor-entry';
 import {
   HOW_IT_WORKS_IMAGE_READY,
   HowItWorksImage,
@@ -16,6 +17,7 @@ import { FaqList } from '@/components/marketing/faq-list';
 import { getGlobalFaqs } from '@/features/catalog/queries';
 import type { Locale } from '@/features/catalog/types';
 import { packageUsdNotes } from '@/lib/fx/usd-notes';
+import { aiEnabled } from '@/features/ai/chat';
 import { MARKETING_ROUTES } from '@/lib/navigation';
 import { localizedUrl } from '@/lib/site';
 
@@ -188,6 +190,16 @@ async function FaqAndNextStep({ locale }: { locale: Locale }) {
   );
 }
 
+function AskSection({ locale }: { locale: 'en' | 'bn' }) {
+  return (
+    <Section tone="sunken">
+      <div className="container-page">
+        <AskBdoorEntry locale={locale} />
+      </div>
+    </Section>
+  );
+}
+
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
@@ -197,6 +209,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   return (
     <>
       <Hero />
+      {/* Directly under the hero: a visitor who did not find their answer in
+          the headline is one scroll from asking for it. Rendered only when the
+          assistant is switched on, so a deploy without a reviewed knowledge
+          base shows the page it always showed. */}
+      {aiEnabled() ? <AskSection locale={locale as 'en' | 'bn'} /> : null}
       <PackagesSection locale={typedLocale} usdNotes={usdNotes} />
       <ProcessSection />
       <Preview />
