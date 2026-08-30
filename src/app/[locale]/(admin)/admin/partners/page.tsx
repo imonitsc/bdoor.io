@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { DataList, type DataListColumn } from '@/components/ui/data-list';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PageHeading } from '@/components/dashboard/page-heading';
+import { Link } from '@/i18n/navigation';
+import { Button } from '@/components/ui/button';
 import { requireStaff } from '@/lib/auth/session';
 import { createClient } from '@/lib/supabase/server';
 
@@ -29,9 +31,10 @@ export default async function AdminPartnersPage({
   setRequestLocale(locale);
   await requireStaff();
 
-  const [t, tCommon, format] = await Promise.all([
+  const [t, tCommon, tApplications, format] = await Promise.all([
     getTranslations('admin.nav'),
     getTranslations('common'),
+    getTranslations('admin.providerApplications'),
     getFormatter(),
   ]);
 
@@ -106,7 +109,14 @@ export default async function AdminPartnersPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeading title={t('partners')} />
+      <PageHeading
+        title={t('partners')}
+        actions={
+          <Button asChild variant="secondary" size="sm">
+            <Link href="/admin/partners/applications">{tApplications('title')}</Link>
+          </Button>
+        }
+      />
       <DataList
         rows={rows}
         columns={columns}

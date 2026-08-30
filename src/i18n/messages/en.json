@@ -1346,6 +1346,36 @@
         "engaged": "Engaged",
         "closed": "Closed"
       }
+    },
+    "providerApplications": {
+      "title": "Provider applications",
+      "description": "Applications to join the provider network. Approval is per jurisdiction and service; the approver cannot be the applicant.",
+      "empty": "No provider applications yet.",
+      "firmColumn": "Firm",
+      "jurisdictionsColumn": "Jurisdictions",
+      "submittedColumn": "Submitted",
+      "reviewActions": "Review",
+      "messageLabel": "Message to the applicant (required for requests and rejections)",
+      "startReview": "Start review",
+      "beginVerification": "Begin verification",
+      "requestInformation": "Request information",
+      "reject": "Reject",
+      "approve": "Approve and invite owner",
+      "approveNote": "Approving creates the partner organisation, records the verification decision under your name, and emails a single-use owner invitation (7-day expiry) to the applicant's contact address. This action requires a second factor on this session.",
+      "informationRequested": "Information requested from the applicant",
+      "decisionReason": "Decision reason (shared with the applicant)",
+      "firmSection": "Firm identity",
+      "ownershipSection": "Ownership and control",
+      "standingSection": "Professional standing",
+      "servicesSection": "Services and jurisdictions",
+      "controlsSection": "Operational controls",
+      "actionErrors": {
+        "unavailable": "The action could not be completed. Try again.",
+        "not_found": "This application no longer exists.",
+        "invalid_transition": "That action is not available in the current status.",
+        "message_required": "Write a short message to the applicant first.",
+        "incomplete": "The application is missing the firm name or contact email."
+      }
     }
   },
   "caseStatus": {
