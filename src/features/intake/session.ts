@@ -5,6 +5,7 @@ import { createAdminClient, hasServiceRole } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { sha256 } from '@/lib/utils/hash';
 import { logger } from '@/lib/logger';
+import { recordAnalyticsEvent } from '@/lib/analytics';
 import { pruneInapplicable, type PartialAnswers, type QuestionKey } from './questions';
 
 /**
@@ -147,6 +148,15 @@ export async function ensureDraftSession(locale: 'en' | 'bn'): Promise<DraftSess
     logger.error('intake.create_session_failed', { message: error?.message });
     return null;
   }
+
+  // One funnel event per draft session, at first persistence. No answers have
+  // been given yet, so there is nothing personal to attach.
+  await recordAnalyticsEvent({
+    event: 'application_started',
+    idempotencyKey: `application_started:${data.id}`,
+    locale,
+    properties: { authenticated: userId !== null },
+  });
 
   if (!userId) await writeDraftKey(key);
   return rowToSession(data, {});

@@ -13,20 +13,20 @@ payments (`payments.is_sandbox = true`).
 
 ## Definitions (v1, 2026-08-30)
 
-| Key | Definition |
-| --- | --- |
-| `gross_transaction_value` | Sum of `payments.amount_minor` with status `paid`/`partially_refunded`/`refunded`, before refunds, including pass-through. |
-| `collected_cash` | Gross transaction value minus `refunded_minor`. |
-| `pass_through_fees` | Sum of accepted-quote `pass_through_minor` attributable to paid invoices — government/statutory money that is not bdoor revenue. |
-| `net_revenue` | Collected cash minus pass-through fees. |
-| `gross_margin` | `(net_revenue − direct_delivery_costs) / net_revenue`. Direct delivery costs = provider costs + payment fees recorded against cases. |
-| `contribution_margin` | `net_revenue − provider_costs − payment_fees − case_variable_costs`. |
-| `mrr` | Sum over subscriptions with status `active` of the period-normalised amount: monthly plans as-is, annual plans ÷ 12. |
-| `arr` | `mrr × 12`. |
-| `cac` | `attributable_acquisition_spend / new_paying_customers` in the window. Spend is entered by finance (no ad platforms are connected); until a spend record exists CAC reports "no spend recorded", never 0. |
-| `cac_payback_months` | `cac / average_monthly_gross_profit_per_new_customer`. |
-| `renewal_rate` | `renewed_eligible_subscriptions / subscriptions_due_for_renewal` in the window. |
-| `funnel_*` | Counts of taxonomy events (`application_started`, `application_submitted`, `quote_issued`, `quote_accepted`, `payment_confirmed`, `case_completed`) with `is_test = false`, deduplicated by idempotency key. |
+| Key                       | Definition                                                                                                                                                                                                   |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `gross_transaction_value` | Sum of `payments.amount_minor` with status `paid`/`partially_refunded`/`refunded`, before refunds, including pass-through.                                                                                   |
+| `collected_cash`          | Gross transaction value minus `refunded_minor`.                                                                                                                                                              |
+| `pass_through_fees`       | Sum of accepted-quote `pass_through_minor` attributable to paid invoices — government/statutory money that is not bdoor revenue.                                                                             |
+| `net_revenue`             | Collected cash minus pass-through fees.                                                                                                                                                                      |
+| `gross_margin`            | `(net_revenue − direct_delivery_costs) / net_revenue`. Direct delivery costs = provider costs + payment fees recorded against cases.                                                                         |
+| `contribution_margin`     | `net_revenue − provider_costs − payment_fees − case_variable_costs`.                                                                                                                                         |
+| `mrr`                     | Sum over subscriptions with status `active` of the period-normalised amount: monthly plans as-is, annual plans ÷ 12.                                                                                         |
+| `arr`                     | `mrr × 12`.                                                                                                                                                                                                  |
+| `cac`                     | `attributable_acquisition_spend / new_paying_customers` in the window. Spend is entered by finance (no ad platforms are connected); until a spend record exists CAC reports "no spend recorded", never 0.    |
+| `cac_payback_months`      | `cac / average_monthly_gross_profit_per_new_customer`.                                                                                                                                                       |
+| `renewal_rate`            | `renewed_eligible_subscriptions / subscriptions_due_for_renewal` in the window.                                                                                                                              |
+| `funnel_*`                | Counts of taxonomy events (`application_started`, `application_submitted`, `quote_issued`, `quote_accepted`, `payment_confirmed`, `case_completed`) with `is_test = false`, deduplicated by idempotency key. |
 
 ## Exclusion rules (§13.7)
 

@@ -11,21 +11,21 @@ brief's phases are implemented against this map, not against a rewrite.
 
 ## 1 · What already works (verified on `claude/new-session-0n73z6` @ `4ba2207`)
 
-| Brief section | Existing implementation |
-| --- | --- |
-| §6.1 Homepage | Bangladesh-first, ≤6 sections, single `Start now` CTA (BD-first redesign, PR #32/#36). |
-| §6.2 Start journey | `/start` branching flow: scope → BD new/existing or country-first international; URL params beat stale drafts; non-blocking saves; draft reference + anonymous recovery via hashed-key cookie; submits real `applications` rows (PRs #30/#32/#36). |
-| §6.2.9 Real submissions | `public.applications` (service-role-only writes, random references) + staff ops queue under `/admin/applications`. |
-| §7.1 Package catalogue | `service_packages` / `package_versions` / `package_fee_components` / `international_offers` — versioned, admin-editable, seeded with the approved baseline prices. Components render pricing from the catalogue, not hardcoded copy. |
-| §7.3 Fee separation | `quote_items.payee` (`bdoor` / `government_authority` / `partner_firm` / `third_party`), `bdoor_revenue_minor` vs `pass_through_minor` on quote versions, `government_fee_advances` + disbursement/refund ledger. Share capital never routes through bdoor. |
-| §8 Quotes | `quotes` + `quote_versions` (immutable once accepted, DB trigger) + snapshot `quote_items` with tax treatment, estimates flagged, discount sign rules. Acceptance records exact version + policy version + locale + IP hash in append-only `engagement_acceptances`. |
-| §8 Payments | `payments` (+ unique provider ref), append-only `payment_events` idempotent on `(provider, event_id)`, HMAC-verified webhook, amounts always computed server-side, refunds ledger, receipts. Mock provider default; launch-gated (`paymentsStatus()`, `bangladeshCheckoutStatus()` fail closed). |
-| §9 (partial) | `compliance_obligations` (never auto-created from a guess), `compliance_reminders`, `renewal_cases`. No rules catalogue yet (Phase 3). |
-| §11 Providers | Provider applications + verification queue + assignment §10 chain (conflict → disclosure → consent → document access) with DB-enforced state machines and column guards (PR #37). |
-| §12 Admin | Role-based admin: applications, leads, cases, KYC, compliance, finance, partners, pricing, services, content, users, audit, settings. Capability matrix (`roles.ts` ↔ `permission_catalog`, drift-tested), step-up (AAL2) on sensitive capabilities, MFA mandatory for staff + partners. |
-| §17 Legal gates | 10 policies live as marked drafts (0.9.1); launch gates keep payment/KYC/provider-applications closed independent of page visibility. |
-| §19 Security | RLS on every exposed table; `SECURITY DEFINER` confined to `app.*` with empty search_path; append-only audit; redacting logger; private storage + signed URLs. Integration suite exercises wrong-actor rejection per policy. |
-| §20 Architecture | Next.js 16 App Router / React 19 / TS strict / next-intl (en+bn) / Tailwind 4, server-first with focused client components. |
+| Brief section           | Existing implementation                                                                                                                                                                                                                                                                          |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| §6.1 Homepage           | Bangladesh-first, ≤6 sections, single `Start now` CTA (BD-first redesign, PR #32/#36).                                                                                                                                                                                                           |
+| §6.2 Start journey      | `/start` branching flow: scope → BD new/existing or country-first international; URL params beat stale drafts; non-blocking saves; draft reference + anonymous recovery via hashed-key cookie; submits real `applications` rows (PRs #30/#32/#36).                                               |
+| §6.2.9 Real submissions | `public.applications` (service-role-only writes, random references) + staff ops queue under `/admin/applications`.                                                                                                                                                                               |
+| §7.1 Package catalogue  | `service_packages` / `package_versions` / `package_fee_components` / `international_offers` — versioned, admin-editable, seeded with the approved baseline prices. Components render pricing from the catalogue, not hardcoded copy.                                                             |
+| §7.3 Fee separation     | `quote_items.payee` (`bdoor` / `government_authority` / `partner_firm` / `third_party`), `bdoor_revenue_minor` vs `pass_through_minor` on quote versions, `government_fee_advances` + disbursement/refund ledger. Share capital never routes through bdoor.                                      |
+| §8 Quotes               | `quotes` + `quote_versions` (immutable once accepted, DB trigger) + snapshot `quote_items` with tax treatment, estimates flagged, discount sign rules. Acceptance records exact version + policy version + locale + IP hash in append-only `engagement_acceptances`.                             |
+| §8 Payments             | `payments` (+ unique provider ref), append-only `payment_events` idempotent on `(provider, event_id)`, HMAC-verified webhook, amounts always computed server-side, refunds ledger, receipts. Mock provider default; launch-gated (`paymentsStatus()`, `bangladeshCheckoutStatus()` fail closed). |
+| §9 (partial)            | `compliance_obligations` (never auto-created from a guess), `compliance_reminders`, `renewal_cases`. No rules catalogue yet (Phase 3).                                                                                                                                                           |
+| §11 Providers           | Provider applications + verification queue + assignment §10 chain (conflict → disclosure → consent → document access) with DB-enforced state machines and column guards (PR #37).                                                                                                                |
+| §12 Admin               | Role-based admin: applications, leads, cases, KYC, compliance, finance, partners, pricing, services, content, users, audit, settings. Capability matrix (`roles.ts` ↔ `permission_catalog`, drift-tested), step-up (AAL2) on sensitive capabilities, MFA mandatory for staff + partners.         |
+| §17 Legal gates         | 10 policies live as marked drafts (0.9.1); launch gates keep payment/KYC/provider-applications closed independent of page visibility.                                                                                                                                                            |
+| §19 Security            | RLS on every exposed table; `SECURITY DEFINER` confined to `app.*` with empty search_path; append-only audit; redacting logger; private storage + signed URLs. Integration suite exercises wrong-actor rejection per policy.                                                                     |
+| §20 Architecture        | Next.js 16 App Router / React 19 / TS strict / next-intl (en+bn) / Tailwind 4, server-first with focused client components.                                                                                                                                                                      |
 
 CI status at baseline: green (run 143 on the merge of PR #37; CodeQL green).
 No production-blocking workflow defects found, so Phase 0's "fix failing CI"
@@ -59,26 +59,26 @@ The brief names states; the live schema already encodes equivalent machines.
 Renaming enum values would churn every policy, test and UI for zero behaviour,
 so the mapping is recorded here instead:
 
-| Brief (§8 quotes) | Implementation |
-| --- | --- |
-| `draft` | `quote_status 'draft'` |
-| `internal_review` | `'internal_review'` |
-| `issued` | `'sent'` + `quote_versions.sent_at` |
-| `viewed` | `quote_versions.viewed_at` (timestamp, not a status — a viewed quote is still an issued quote) |
-| `accepted` | `'accepted'` + immutability trigger |
-| `expired` | `'expired'` (+ server-side `quoteIsExpired()` re-check on accept) |
-| `superseded` | `'superseded'` + `superseded_at` |
-| `rejected` | `'rejected'` (new value; `'withdrawn'` remains for issuer withdrawal) |
+| Brief (§8 quotes) | Implementation                                                                                 |
+| ----------------- | ---------------------------------------------------------------------------------------------- |
+| `draft`           | `quote_status 'draft'`                                                                         |
+| `internal_review` | `'internal_review'`                                                                            |
+| `issued`          | `'sent'` + `quote_versions.sent_at`                                                            |
+| `viewed`          | `quote_versions.viewed_at` (timestamp, not a status — a viewed quote is still an issued quote) |
+| `accepted`        | `'accepted'` + immutability trigger                                                            |
+| `expired`         | `'expired'` (+ server-side `quoteIsExpired()` re-check on accept)                              |
+| `superseded`      | `'superseded'` + `superseded_at`                                                               |
+| `rejected`        | `'rejected'` (new value; `'withdrawn'` remains for issuer withdrawal)                          |
 
-| Brief (§8 payments) | Implementation |
-| --- | --- |
-| `not_requested` | absence of a `payments` row for the invoice |
-| `pending` | `payment_status 'pending'` |
-| `processing` | `'processing'` (new value) |
-| `paid` | `'paid'` |
-| `partially_refunded` / `refunded` | unchanged |
-| `failed` / `cancelled` | unchanged |
-| `disputed` | `'disputed'` (new value) |
+| Brief (§8 payments)               | Implementation                              |
+| --------------------------------- | ------------------------------------------- |
+| `not_requested`                   | absence of a `payments` row for the invoice |
+| `pending`                         | `payment_status 'pending'`                  |
+| `processing`                      | `'processing'` (new value)                  |
+| `paid`                            | `'paid'`                                    |
+| `partially_refunded` / `refunded` | unchanged                                   |
+| `failed` / `cancelled`            | unchanged                                   |
+| `disputed`                        | `'disputed'` (new value)                    |
 
 §12's role list maps onto the existing five platform roles + capability matrix;
 new capabilities (`metrics.read`, `metrics.snapshot`) follow the established

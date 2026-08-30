@@ -14,6 +14,7 @@ import { absoluteUrl } from '@/lib/site';
 import { POLICY_VERSIONS } from '@/content/legal/documents';
 import { quoteIsExpired } from '@/features/quotes/money';
 import { bangladeshCheckoutStatus, paymentsStatus } from '@/lib/launch/gates';
+import { recordAnalyticsEvent } from '@/lib/analytics';
 
 export type BillingState = { status: 'idle' | 'error' | 'success'; message?: string };
 
@@ -98,6 +99,16 @@ export async function acceptQuote(
     organizationId: row.quotes.organization_id,
     caseId: row.quotes.case_id,
     metadata: { policyVersion: POLICY_VERSIONS.terms },
+  });
+
+  await recordAnalyticsEvent({
+    event: 'quote_accepted',
+    idempotencyKey: `quote_accepted:${row.id}`,
+    actorEmail: session.email,
+    organizationId: row.quotes.organization_id,
+    caseId: row.quotes.case_id,
+    quoteVersionId: row.id,
+    locale,
   });
 
   revalidatePath(`/${locale}/app/billing`);

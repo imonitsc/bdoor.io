@@ -1200,7 +1200,8 @@
       "users": "Users",
       "audit": "Audit log",
       "settings": "Settings",
-      "applications": "Applications"
+      "applications": "Applications",
+      "metrics": "Metrics"
     },
     "queues": {
       "title": "Work queues",
@@ -1404,6 +1405,37 @@
         "conflict_declined": "conflict — declined",
         "insufficient_information": "needs clarification"
       }
+    },
+    "metrics": {
+      "title": "Metrics",
+      "description": "Internal investor metrics computed from production records. Test traffic, seed data and sandbox payments are excluded.",
+      "integrityNote": "Figures are computed live from stored milestones under the version-1 metric definitions (docs/METRIC_DEFINITIONS.md). A monthly snapshot is the number of record for investor reporting; the live view may move as late records arrive.",
+      "netRevenue": "Net revenue",
+      "collectedCash": "Collected cash",
+      "passThrough": "Pass-through fees",
+      "mrr": "Monthly recurring revenue",
+      "arr": "Annual recurring revenue",
+      "activeSubscriptions": "Active subscriptions",
+      "paidPayments": "Paid payments",
+      "sandboxExcluded": "Sandbox and test payments are excluded.",
+      "funnel": "Acquisition funnel",
+      "noEvents": "No production events recorded yet",
+      "events": {
+        "application_started": "Applications started",
+        "application_submitted": "Applications submitted",
+        "contact_submitted": "Enquiries submitted",
+        "quote_viewed": "Quotes viewed",
+        "quote_accepted": "Quotes accepted",
+        "payment_confirmed": "Payments confirmed",
+        "case_completed": "Cases completed"
+      },
+      "snapshots": "Monthly snapshots",
+      "noSnapshots": "No snapshots recorded yet. Record one at the start of each month for the month just ended.",
+      "snapshotMonth": "Month",
+      "snapshotNote": "Note (optional)",
+      "recordSnapshot": "Record snapshot",
+      "snapshotRecorded": "Snapshot recorded. Snapshots are append-only; a recomputation adds a new row.",
+      "invalidMonth": "Enter the month as YYYY-MM."
     }
   },
   "caseStatus": {

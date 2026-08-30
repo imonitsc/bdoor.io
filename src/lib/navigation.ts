@@ -71,6 +71,7 @@ export const ADMIN_ROUTES = {
   documents: '/admin/documents',
   compliance: '/admin/compliance',
   finance: '/admin/finance',
+  metrics: '/admin/metrics',
   content: '/admin/content',
   users: '/admin/users',
   audit: '/admin/audit',

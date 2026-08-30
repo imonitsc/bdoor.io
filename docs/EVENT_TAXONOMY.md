@@ -35,21 +35,21 @@ explains each event; the code decides.
 
 ## Events
 
-| Event | Recorded by | When |
-| --- | --- | --- |
-| `application_started` | intake session persistence | first server-side save of a questionnaire session (one per session) |
-| `application_submitted` | `/start` submission action | an `applications` row is created |
-| `contact_submitted` | contact form action | a contact/lead row is created |
-| `provider_application_submitted` | provider apply action | a provider application reaches `submitted` |
-| `provider_application_approved` | admin approval action | staff approve a provider application |
-| `provider_assignment_accepted` | partner respond action | a partner accepts an assignment with a clean conflict result |
-| `quote_issued` | staff quote action | a quote version is sent to the customer |
-| `quote_viewed` | customer billing page | first authenticated view of a sent quote version |
-| `quote_accepted` | `acceptQuote` | acceptance recorded against the immutable version |
-| `payment_confirmed` | payment webhook | provider event marks a payment `paid` (signature verified) |
-| `case_completed` | case transition action | a case reaches its terminal completed state |
-| `subscription_started` | subscription activation | a subscription becomes `active` (verified payment / recorded offline payment) |
-| `subscription_renewed` | renewal processing | a new paid service period begins |
+| Event                            | Recorded by                | When                                                                                                                      |
+| -------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `application_started`            | intake session persistence | first server-side save of a questionnaire session (one per session)                                                       |
+| `application_submitted`          | `/start` submission action | an `applications` row is created                                                                                          |
+| `contact_submitted`              | contact form action        | a contact/lead row is created                                                                                             |
+| `provider_application_submitted` | provider apply action      | a provider application reaches `submitted`                                                                                |
+| `provider_application_approved`  | admin approval action      | staff approve a provider application                                                                                      |
+| `provider_assignment_accepted`   | partner respond action     | a partner accepts an assignment with a clean conflict result                                                              |
+| `quote_issued`                   | (reserved)                 | no code path issues quotes yet — versions reach `sent` operationally; the event lands with the staff quote-issuing action |
+| `quote_viewed`                   | customer billing page      | first authenticated view of a sent quote version                                                                          |
+| `quote_accepted`                 | `acceptQuote`              | acceptance recorded against the immutable version                                                                         |
+| `payment_confirmed`              | payment webhook            | provider event marks a payment `paid` (signature verified)                                                                |
+| `case_completed`                 | case transition action     | a case reaches its terminal completed state                                                                               |
+| `subscription_started`           | (reserved for Phase 3)     | a subscription becomes `active` (verified payment / recorded offline payment)                                             |
+| `subscription_renewed`           | (reserved for Phase 3)     | a new paid service period begins                                                                                          |
 
 Events named in the brief but **deliberately not recorded yet**:
 `homepage_viewed`, `start_flow_opened`, `market_scope_selected`,

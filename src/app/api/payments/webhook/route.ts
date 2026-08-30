@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { getPaymentProvider } from '@/lib/payments';
 import { createAdminClient, hasServiceRole } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { recordAnalyticsEvent } from '@/lib/analytics';
 
 /**
  * Payment webhook.
@@ -66,7 +67,7 @@ export async function POST(request: NextRequest) {
 
   const { data: payment } = await admin
     .from('payments')
-    .select('id, invoice_id, amount_minor, organization_id, case_id, status')
+    .select('id, invoice_id, amount_minor, organization_id, case_id, status, is_sandbox')
     .eq('checkout_session_id', verification.sessionId)
     .maybeSingle();
 
@@ -89,6 +90,20 @@ export async function POST(request: NextRequest) {
     .update({ payment_id: payment.id, processed_at: new Date().toISOString() })
     .eq('provider', provider.name)
     .eq('event_id', verification.eventId);
+
+  if (verification.status === 'paid') {
+    // Funnel milestone (§22): keyed by the provider event id, so a replayed
+    // webhook counts once. Sandbox payments are flagged out of the metrics.
+    await recordAnalyticsEvent({
+      event: 'payment_confirmed',
+      idempotencyKey: `payment_confirmed:${provider.name}:${verification.eventId}`,
+      isTest: payment.is_sandbox,
+      organizationId: payment.organization_id,
+      caseId: payment.case_id,
+      paymentId: payment.id,
+      properties: { amountMinor: payment.amount_minor },
+    });
+  }
 
   if (verification.status === 'paid' && payment.invoice_id) {
     const { data: invoice } = await admin
