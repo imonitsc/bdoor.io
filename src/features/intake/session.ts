@@ -185,6 +185,24 @@ export async function saveAnswer(
   return pruned;
 }
 
+/**
+ * Discards the caller's stored draft (hotfix §2 "Start a new application"):
+ * the session's answers are deleted server-side and the anonymous draft
+ * cookie cleared, so neither this device nor the next load resurrects the
+ * old routing. The session row itself may remain — it holds nothing once
+ * its answers are gone.
+ */
+export async function resetDraft(): Promise<void> {
+  if (hasServiceRole()) {
+    const session = await getDraftSession();
+    if (session) {
+      const admin = createAdminClient();
+      await admin.from('questionnaire_answers').delete().eq('session_id', session.id);
+    }
+  }
+  await clearDraftKey();
+}
+
 /** Attaches an anonymous draft to a user after signup or sign-in. */
 export async function claimDraftForUser(userId: string): Promise<void> {
   if (!hasServiceRole()) return;

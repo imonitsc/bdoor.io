@@ -647,6 +647,49 @@ export function isComplete(answers: PartialAnswers): boolean {
 }
 
 /**
+ * Applies a validated URL seed OVER a base draft (production hotfix §2):
+ * an explicit link parameter always wins against incompatible stored state,
+ * and everything downstream that stops applying under the new routing is
+ * cleared — never silently merged. Keys are resolved through
+ * `asQuestionKey`, so nothing caller-shaped can name a property.
+ */
+export function applySeed(base: PartialAnswers, seed: PartialAnswers): PartialAnswers {
+  if (Object.keys(seed).length === 0) return { ...base };
+  const merged: PartialAnswers = { ...base };
+  for (const [key, value] of Object.entries(seed)) {
+    const qk = asQuestionKey(key);
+    if (qk !== undefined && value !== undefined) {
+      (merged as Record<string, unknown>)[qk] = value;
+    }
+  }
+  return pruneInapplicable(merged);
+}
+
+/**
+ * The one place start-state precedence is decided (hotfix §2), used by the
+ * server page and the client form alike so hydration can never flip it:
+ *
+ *   1. valid explicit URL parameters (`seed`)
+ *   2. this device's own session draft (`localDraft`)
+ *   3. the stored server draft (`storedDraft`)
+ *   4. empty
+ */
+export function resolveInitialAnswers(
+  storedDraft: PartialAnswers,
+  localDraft: PartialAnswers,
+  seed: PartialAnswers,
+): PartialAnswers {
+  const base: PartialAnswers = { ...storedDraft };
+  for (const [key, value] of Object.entries(localDraft)) {
+    const qk = asQuestionKey(key);
+    if (qk !== undefined && value !== undefined) {
+      (base as Record<string, unknown>)[qk] = value;
+    }
+  }
+  return applySeed(pruneInapplicable(base), seed);
+}
+
+/**
  * Drops answers that are no longer applicable after an earlier answer changed.
  * Without this a founder who switches from "outside Bangladesh" to "in
  * Bangladesh" would keep a stale residence answer that the engine still reads.

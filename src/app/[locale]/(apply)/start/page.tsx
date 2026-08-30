@@ -1,71 +1,14 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Section } from '@/components/ui/section';
 import { Card } from '@/components/ui/card';
 import { Questionnaire } from '@/components/forms/questionnaire';
 import { IndependenceDisclosure } from '@/components/layout/disclosure';
-import { loadIntake, type IntakePreset } from '@/features/intake/actions';
-import {
-  BANGLADESH_OBJECTIVES,
-  OBJECTIVES,
-  marketScopeFromPreset,
-  targetCountryFromSlug,
-  type Objective,
-} from '@/features/intake/questions';
-import { BANGLADESH_PACKAGES } from '@/content/packages/catalog';
+import { loadIntake } from '@/features/intake/actions';
+import { presetFromParams } from '@/features/intake/preset';
 import { localizedUrl } from '@/lib/site';
 import type { Locale } from '@/features/catalog/types';
-
-/**
- * Country CTAs land here as /start?country=<slug>&objective=<o>&package=<slug>.
- * Every parameter is validated against the question model or the commercial
- * catalog before it becomes an answer — an unknown value is dropped, never
- * echoed anywhere. The rebuilt (validated-only) query string is what gets
- * recorded as the application's source path.
- */
-function presetFromParams(params: { [key: string]: string | string[] | undefined }): IntakePreset {
-  const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
-
-  const preset: IntakePreset = { answers: {} };
-  const query: string[] = [];
-
-  const country = targetCountryFromSlug(first(params.country) ?? '');
-  if (country) {
-    preset.answers.target_country = country;
-    query.push(`country=${country.replace(/_/g, '-')}`);
-  }
-
-  const objective = first(params.objective);
-  if (objective && (OBJECTIVES as readonly string[]).includes(objective)) {
-    preset.answers.objective = objective as Objective;
-    query.push(`objective=${objective}`);
-  }
-
-  const scope = marketScopeFromPreset(country);
-  if (scope) {
-    preset.answers.market_scope = scope;
-    if (scope === 'bangladesh') {
-      preset.answers.target_country = 'bangladesh';
-      if (
-        preset.answers.objective &&
-        !(BANGLADESH_OBJECTIVES as readonly string[]).includes(preset.answers.objective)
-      ) {
-        delete preset.answers.objective;
-      }
-    }
-  }
-
-  const pkg = first(params.package);
-  if (pkg && BANGLADESH_PACKAGES.some((p) => p.slug === pkg)) {
-    preset.packageSlug = pkg;
-    query.push(`package=${pkg}`);
-    preset.answers.market_scope = 'bangladesh';
-    preset.answers.target_country = 'bangladesh';
-  }
-
-  if (query.length > 0) preset.sourcePath = `/start?${query.join('&')}`;
-  return preset;
-}
 
 /**
  * The questionnaire renders the visitor's own saved draft, so it is
@@ -104,6 +47,7 @@ export default async function StartPage({
   setRequestLocale(locale);
 
   const preset = presetFromParams(await searchParams);
+  if (preset.redirectTo) redirect(`/${locale}${preset.redirectTo}`);
   const [t, initial] = await Promise.all([getTranslations('start'), loadIntake(preset)]);
 
   return (

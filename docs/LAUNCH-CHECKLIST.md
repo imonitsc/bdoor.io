@@ -80,6 +80,13 @@ verified ones. They may be added **only** with evidence.
 - [ ] A published **security contact address**, then update
       `docs/INCIDENT-RESPONSE.md`.
 - [ ] A named **incident lead** and deputy.
+- [ ] Three owner-supplied images the August 2026 hotfix expected but did not
+      ship: `public/images/bdoor/compliance-review.webp` (homepage process),
+      `formation-documents.webp` (Services intro) and
+      `bdoor-founder-imon-cobalt.webp` (About founder portrait). Their page
+      slots hide until the files exist and light up on the next build — no
+      code change needed. Substitutes and AI-generated people are not
+      acceptable.
 
 ## 4 · Integrations
 
