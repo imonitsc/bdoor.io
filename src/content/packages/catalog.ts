@@ -446,11 +446,15 @@ export const INTERNATIONAL_OFFERS: InternationalOffer[] = [
     providerApproved: false,
     priceApproved: true,
     checkoutEnabled: false,
-    publicLabel: { en: 'AED 9,375 estimated total', bn: 'আনুমানিক মোট ৯,৩৭৫ দিরহাম' },
+    // "From" framing on purpose: this is the UAE's lowest-cost route and the
+    // figure every listing card leads with, while the Dubai route below starts
+    // at AED 15,000. The qualifier names both so the card, the country page
+    // and the per-route list all tell one story instead of two prices.
+    publicLabel: { en: 'From AED 9,375', bn: '৯,৩৭৫ দিরহাম থেকে' },
     publicLabelAlt: { en: 'About ৳314,000', bn: 'আনুমানিক ৳৩,১৪,০০০' },
     publicQualifier: {
-      en: 'Eligible Sharjah no-visa estimated package',
-      bn: 'যোগ্য শারজাহ নো-ভিসা আনুমানিক প্যাকেজ',
+      en: 'Sharjah eligible no-visa route, estimated total AED 9,375; Dubai routes from AED 15,000',
+      bn: 'যোগ্য শারজাহ নো-ভিসা রুট, আনুমানিক মোট ৯,৩৭৫ দিরহাম; দুবাই রুট ১৫,০০০ দিরহাম থেকে',
     },
     summary: {
       en: 'Free-zone licence routes scoped to the intended activity.',

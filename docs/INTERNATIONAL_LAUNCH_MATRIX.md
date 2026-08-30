@@ -95,14 +95,14 @@ prices (their table §5). `priceApproved` is therefore true everywhere;
 `providerApproved` stays false until a signed agreement exists for a route,
 which is why no route may leave `managed_application`.
 
-| Route                      | Availability       | Mode                | Public status     | Provider | Price | Notes                                                 |
-| -------------------------- | ------------------ | ------------------- | ----------------- | -------- | ----- | ----------------------------------------------------- |
-| US — Wyoming LLC           | available_by_quote | managed_application | applications_open | ✗        | ✓     | From $499, estimated first-year package               |
-| UK — non-resident Ltd      | available_by_quote | managed_application | applications_open | ✗        | ✓     | From $299, estimated first-year package               |
-| UAE — zero-visa free zone  | available_by_quote | managed_application | applications_open | ✗        | ✓     | From $3,899, zero-visa free-zone estimate             |
-| SA — screened market entry | available_by_quote | managed_application | applications_open | ✗        | ✓     | eligibility-led; professional setup from $4,900       |
-| QA — QFC route             | available_by_quote | managed_application | applications_open | ✗        | ✓     | eligibility-led; first-year QFC estimate from $10,900 |
-| SG — foreign-founder Pte   | available_by_quote | managed_application | applications_open | ✗        | ✓     | From $1,899; conditions apply                         |
+| Route                      | Availability       | Mode                | Public status     | Provider | Price | Notes                                                                    |
+| -------------------------- | ------------------ | ------------------- | ----------------- | -------- | ----- | ------------------------------------------------------------------------ |
+| US — Wyoming LLC           | available_by_quote | managed_application | applications_open | ✗        | ✓     | From $499, estimated first-year package                                  |
+| UK — non-resident Ltd      | available_by_quote | managed_application | applications_open | ✗        | ✓     | From $299, estimated first-year package                                  |
+| UAE — zero-visa free zone  | available_by_quote | managed_application | applications_open | ✗        | ✓     | From AED 9,375 (Sharjah no-visa, estimated total); Dubai from AED 15,000 |
+| SA — screened market entry | available_by_quote | managed_application | applications_open | ✗        | ✓     | eligibility-led; professional setup from $4,900                          |
+| QA — QFC route             | available_by_quote | managed_application | applications_open | ✗        | ✓     | eligibility-led; first-year QFC estimate from $10,900                    |
+| SG — foreign-founder Pte   | available_by_quote | managed_application | applications_open | ✗        | ✓     | From $1,899; conditions apply                                            |
 
 Flipping any row is an owner decision recorded in a commit that changes the
 catalog — the same commit must update this table and the pinned figures in

@@ -22,12 +22,13 @@ export type LegalDocument = {
   titleKey: string;
   /** Recorded against every acceptance, so we know which text a customer saw. */
   version: string;
+  /** The date this version started to apply. A new version gets a new date. */
+  effectiveFrom: string;
   lastUpdated: string;
   /**
-   * Every document here is a working draft. It must be reviewed and approved by
-   * qualified Bangladesh counsel (and, for the privacy and AML documents, by a
-   * privacy/compliance professional) before public launch. The banner rendered
-   * on each page says so, and this flag is what turns it on.
+   * When true the page renders the working-draft banner. The suite was
+   * published as 1.0 on the owner's instruction (30 Aug 2026); the flag stays
+   * so a future in-progress revision can honestly mark itself as a draft.
    */
   awaitingCounselReview: boolean;
   sections: LegalSection[];

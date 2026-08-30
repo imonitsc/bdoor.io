@@ -444,6 +444,7 @@ export type Database = {
           "session_id": string | null
           "created_at": string
           "updated_at": string
+          "consent_policy_version": string | null
         }
         Insert: {
           "id"?: string
@@ -462,6 +463,7 @@ export type Database = {
           "session_id"?: string | null
           "created_at"?: string
           "updated_at"?: string
+          "consent_policy_version"?: string | null
         }
         Update: {
           "id"?: string
@@ -480,6 +482,7 @@ export type Database = {
           "session_id"?: string | null
           "created_at"?: string
           "updated_at"?: string
+          "consent_policy_version"?: string | null
         }
         Relationships: []
       }
@@ -1321,6 +1324,7 @@ export type Database = {
           "ip_hash": string | null
           "user_agent_hash": string | null
           "created_at": string
+          "method": string | null
         }
         Insert: {
           "id"?: string
@@ -1334,6 +1338,7 @@ export type Database = {
           "ip_hash"?: string | null
           "user_agent_hash"?: string | null
           "created_at"?: string
+          "method"?: string | null
         }
         Update: {
           "id"?: string
@@ -1347,6 +1352,7 @@ export type Database = {
           "ip_hash"?: string | null
           "user_agent_hash"?: string | null
           "created_at"?: string
+          "method"?: string | null
         }
         Relationships: []
       }
@@ -3688,6 +3694,7 @@ export type Database = {
           "expires_at": string
           "created_at": string
           "updated_at": string
+          "application_reference": string | null
         }
         Insert: {
           "id"?: string
@@ -3701,6 +3708,7 @@ export type Database = {
           "expires_at"?: string
           "created_at"?: string
           "updated_at"?: string
+          "application_reference"?: string | null
         }
         Update: {
           "id"?: string
@@ -3714,6 +3722,7 @@ export type Database = {
           "expires_at"?: string
           "created_at"?: string
           "updated_at"?: string
+          "application_reference"?: string | null
         }
         Relationships: []
       }

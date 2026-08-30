@@ -234,10 +234,11 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
     kind: 'choice',
     options: TARGET_COUNTRIES,
     showWhy: true,
-    shouldAsk: (a) => {
-      if (a.target_country !== undefined) return true;
-      return a.market_scope === 'outside' || a.market_scope === undefined;
-    },
+    // Never asked on the Bangladesh path: choosing "In Bangladesh" implies
+    // the answer, and keeping the question applicable put the country picker
+    // one Back-press away from a screen the founder never saw.
+    // `pruneInapplicable` re-implies the answer, so it survives pruning.
+    shouldAsk: (a) => a.market_scope === 'outside' || a.market_scope === undefined,
     schema: answersSchema.shape.target_country,
   },
   {
@@ -555,73 +556,12 @@ export type StageProgress = {
   stage: Stage | 'review';
 };
 
-/** Stable stage-based progress for the question at `index` (review beyond). */
 /**
- * Visible questionnaire steps for the production-fix progress label.
- * Conditional questions still live under stages; this is the truthful
- * customer-facing counter (Location → Country/Business stage → …).
+ * Stable stage-based progress for the question at `index` (review beyond).
+ * `QUESTIONS` is declared in stage order and tests/unit/stage-progress.test.ts
+ * proves it, so this counter only ever moves forward — conditional questions
+ * appearing or disappearing can never make it regress.
  */
-export type VisibleStep = {
-  current: number;
-  total: number;
-  labelKey:
-    'location' | 'country' | 'business_stage' | 'structure' | 'support' | 'details' | 'contact';
-};
-
-export function visibleStep(answers: PartialAnswers, index: number): VisibleStep {
-  const total = 6;
-  const question = applicableQuestions(answers)[index];
-  if (!question) {
-    return { current: total, total, labelKey: 'contact' };
-  }
-  const key = question.key;
-  if (key === 'market_scope') return { current: 1, total, labelKey: 'location' };
-  if (key === 'target_country') return { current: 2, total, labelKey: 'country' };
-  if (key === 'objective' || key === 'existing_business') {
-    return {
-      current: 2,
-      total,
-      labelKey: answers.market_scope === 'bangladesh' ? 'business_stage' : 'country',
-    };
-  }
-  if (
-    key === 'structure' ||
-    key === 'founder_location' ||
-    key === 'nationality' ||
-    key === 'residence'
-  ) {
-    return { current: 3, total, labelKey: 'structure' };
-  }
-  if (
-    key === 'need_visa' ||
-    key === 'need_banking' ||
-    key === 'need_address' ||
-    key === 'import_export' ||
-    key === 'hire_employees' ||
-    key === 'regulated_activity' ||
-    key === 'start_window'
-  ) {
-    return { current: 4, total, labelKey: 'support' };
-  }
-  if (
-    key === 'business_category' ||
-    key === 'activity' ||
-    key === 'location' ||
-    key === 'owner_count' ||
-    key === 'director_count' ||
-    key === 'foreign_owners' ||
-    key === 'entity_owner' ||
-    key === 'foreign_ownership_percent' ||
-    key === 'remit_capital' ||
-    key === 'founder_will_work' ||
-    key === 'existing_registrations' ||
-    key === 'notes'
-  ) {
-    return { current: 5, total, labelKey: 'details' };
-  }
-  return { current: 6, total, labelKey: 'contact' };
-}
-
 export function stageProgress(answers: PartialAnswers, index: number): StageProgress {
   const question = applicableQuestions(answers)[index];
   if (!question) {
@@ -654,7 +594,10 @@ export function isComplete(answers: PartialAnswers): boolean {
  * `asQuestionKey`, so nothing caller-shaped can name a property.
  */
 export function applySeed(base: PartialAnswers, seed: PartialAnswers): PartialAnswers {
-  if (Object.keys(seed).length === 0) return { ...base };
+  // Prune even without a seed: a stored draft can carry answers that stopped
+  // applying (or a stale implied country), and every caller expects the
+  // resolved state to be internally consistent.
+  if (Object.keys(seed).length === 0) return pruneInapplicable({ ...base });
   const merged: PartialAnswers = { ...base };
   for (const [key, value] of Object.entries(seed)) {
     const qk = asQuestionKey(key);
@@ -701,6 +644,12 @@ export function pruneInapplicable(answers: PartialAnswers): PartialAnswers {
     if (applicable.has(key as QuestionKey)) {
       (out as Record<string, unknown>)[key] = value;
     }
+  }
+  // Implied answers are derived state, not asked questions: on the Bangladesh
+  // path `target_country` is never applicable (so the loop above dropped it),
+  // but the whole branch model keys off it — re-derive it every time.
+  if (out.market_scope === 'bangladesh') {
+    out.target_country = 'bangladesh';
   }
   return out;
 }

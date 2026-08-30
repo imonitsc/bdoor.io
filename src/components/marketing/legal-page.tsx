@@ -10,13 +10,11 @@ import type { Locale } from '@/features/catalog/types';
 /**
  * Shared renderer for the legal documents.
  *
- * While LEGAL_CONTENT_STATUS is `draft`, public pages show the substantive
- * working draft with a clear draft banner and stay noindexed. Publishing a
- * bare "under review" stub hid the owner-supplied policy pack and blocked
- * counsel review of the live preview. Payment, KYC and identity uploads
- * remain force-closed until the gate flips to `approved`.
+ * The suite is published (version 1.0, 30 Aug 2026). The draft banner only
+ * returns if the owner sets LEGAL_CONTENT_STATUS=draft or a future revision
+ * marks itself awaitingCounselReview — a working revision must say so.
  *
- * Bangla routes render the full English draft plus a translation-review
+ * Bangla routes render the full English text plus a translation-review
  * notice until a professional Bangla translation is approved — never an
  * abbreviated automatic summary.
  */
@@ -53,10 +51,14 @@ export async function LegalPage({ document, locale }: { document: LegalDocument;
               {title(document.titleKey)}
             </h1>
             <p className="text-muted mt-3 text-sm">
+              {t('effectiveFrom', {
+                date: format.dateTime(new Date(document.effectiveFrom), 'long'),
+              })}{' '}
+              ·{' '}
               {t('lastUpdated', {
                 date: format.dateTime(new Date(document.lastUpdated), 'long'),
               })}{' '}
-              · {document.version}
+              · {t('versionLabel', { version: document.version })}
             </p>
 
             {isDraft ? (

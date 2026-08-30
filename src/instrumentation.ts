@@ -1,4 +1,4 @@
-import { productionEnvProblems } from '@/lib/env';
+import { productionEnvProblems, productionEnvWarnings } from '@/lib/env';
 
 /**
  * Runs once when the server starts.
@@ -10,6 +10,15 @@ import { productionEnvProblems } from '@/lib/env';
  */
 export async function register(): Promise<void> {
   if (process.env.NEXT_RUNTIME !== 'nodejs') return;
+
+  // Hygiene gaps with safe fallbacks are logged, never fatal — a missing
+  // convenience secret degrades one feature, not the whole deployment.
+  const warnings = productionEnvWarnings();
+  if (warnings.length > 0) {
+    console.warn(
+      `[bdoor] Production environment warnings:\n${warnings.map((w) => `  - ${w}`).join('\n')}`,
+    );
+  }
 
   const problems = productionEnvProblems();
   if (problems.length === 0) return;

@@ -46,6 +46,7 @@ export default async function CountriesPage({ params }: { params: Promise<{ loca
   setRequestLocale(locale);
   const t = await getTranslations('countries');
   const tIntl = await getTranslations('international');
+  const tPricing = await getTranslations('pricingPage');
   const loc = locale as Locale;
   const countries = internationalCountries();
   // While the legal documents are drafts nothing is chargeable, so the page
@@ -133,7 +134,13 @@ export default async function CountriesPage({ params }: { params: Promise<{ loca
                           </p>
                         ) : null}
                       </div>
-                    ) : null}
+                    ) : (
+                      // A route without an approved price never leaves a
+                      // silent gap where the figure would be.
+                      <p className="text-ink text-base font-semibold">
+                        {tPricing('noPublishedFee')}
+                      </p>
+                    )}
                     <div className="flex flex-wrap items-center gap-2">
                       <Button asChild size="sm" className="w-fit">
                         <Link href={`${MARKETING_ROUTES.start}?country=${country.slug}`}>

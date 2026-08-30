@@ -43,27 +43,28 @@ afterEach(() => {
 });
 
 describe('defaults', () => {
-  it('everything closed when nothing is configured', () => {
+  it('published legal + open provider applications; money and identity stay closed', () => {
+    // Release posture (owner instruction, 30 Aug 2026): the v1.0 policy suite
+    // and provider applications are live by default, while everything that
+    // charges money or collects identity documents still needs its own
+    // explicit variable.
     set({});
-    expect(legalContentStatus()).toBe('draft');
+    expect(legalContentStatus()).toBe('approved');
     expect(legalLaunchApproved()).toBe(false);
     expect(bangladeshCheckoutStatus()).toBe('disabled');
     expect(kycUploadStatus()).toBe('disabled');
     expect(paymentsStatus()).toBe('disabled');
-    expect(providerApplicationsStatus()).toBe('disabled');
+    expect(providerApplicationsStatus()).toBe('enabled');
   });
 
-  it('provider applications open on the explicit toggle alone', () => {
-    // Unlike payments/KYC this gate is independent of the legal-content
-    // status: applying collects business facts, not money or identity
-    // documents, and the page itself keeps the draft-terms notices.
-    set({ PROVIDER_APPLICATIONS_STATUS: 'enabled' });
-    expect(providerApplicationsStatus()).toBe('enabled');
+  it('provider applications close on the explicit kill switch', () => {
+    set({ PROVIDER_APPLICATIONS_STATUS: 'disabled' });
+    expect(providerApplicationsStatus()).toBe('disabled');
   });
 
   it('an empty string behaves like unset, not like an invalid value', () => {
     set({ LEGAL_CONTENT_STATUS: '' });
-    expect(legalContentStatus()).toBe('draft');
+    expect(legalContentStatus()).toBe('approved');
   });
 });
 

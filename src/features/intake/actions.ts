@@ -6,7 +6,13 @@ import { enforceRateLimit } from '@/lib/rate-limit';
 import { hashIdentifier } from '@/lib/utils/hash';
 import { RateLimitError } from '@/lib/permissions/errors';
 import { logger } from '@/lib/logger';
-import { ensureDraftSession, getDraftSession, resetDraft, saveAnswer } from './session';
+import {
+  ensureDraftSession,
+  getDraftSession,
+  markDraftSubmitted,
+  resetDraft,
+  saveAnswer,
+} from './session';
 import { generateRecommendation, loadRules } from './recommendation';
 import { recommend } from './rules';
 import { submitApplication, type SubmittedApplication } from './application';
@@ -17,6 +23,7 @@ import {
   asQuestionKey,
   firstUnansweredIndex,
   isComplete,
+  targetCountrySlug,
   validateAnswer,
   type MarketScope,
   type PartialAnswers,
@@ -64,6 +71,28 @@ async function rateLimitKey(): Promise<string> {
 export async function loadIntake(preset?: IntakePreset): Promise<IntakeState> {
   const session = await getDraftSession();
   const stored = { ...session?.answers } as PartialAnswers;
+
+  // This draft already became an application: render the confirmation with
+  // the SAME reference instead of a re-walkable review screen. "Start
+  // another application" clears the answers, which reopens the flow.
+  if (
+    session?.applicationReference &&
+    Object.keys(stored).length > 0 &&
+    stored.target_country !== undefined &&
+    stored.objective !== undefined
+  ) {
+    return {
+      answers: stored,
+      index: 0,
+      total: applicableQuestions(stored).length,
+      submitted: {
+        reference: session.applicationReference,
+        countrySlug: targetCountrySlug(stored.target_country),
+        objective: stored.objective,
+        stored: true,
+      },
+    };
+  }
 
   // Hotfix §2 precedence: a valid explicit URL parameter OVERRIDES the
   // stored draft — a customer opening ?country=uk after a United States
@@ -252,6 +281,23 @@ async function submitIntakeApplication(previous: IntakeState): Promise<IntakeSta
   const session = await getDraftSession();
   const locale = (await getLocale()) === 'bn' ? 'bn' : 'en';
 
+  // Idempotent submit: this draft already produced an application, so a
+  // repeat (double-click, refresh, replayed form) returns the SAME reference
+  // instead of filing a second application.
+  if (session?.applicationReference) {
+    return {
+      ...previous,
+      submitted: {
+        reference: session.applicationReference,
+        countrySlug: targetCountrySlug(previous.answers.target_country ?? 'bangladesh'),
+        objective: previous.answers.objective ?? 'new',
+        stored: true,
+      },
+      error: undefined,
+      fieldError: undefined,
+    };
+  }
+
   try {
     const submitted = await submitApplication({
       answers: previous.answers,
@@ -261,6 +307,9 @@ async function submitIntakeApplication(previous: IntakeState): Promise<IntakeSta
       sessionId: session?.id,
     });
     if (!submitted) return { ...previous, error: 'generic' };
+    if (session && submitted.stored) {
+      await markDraftSubmitted(session.id, submitted.reference);
+    }
 
     // A Bangladesh application still gets the preliminary recommendation the
     // operating market supports; an international one goes straight to the

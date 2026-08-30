@@ -94,7 +94,10 @@ export default async function LegalIndexPage({ params }: { params: Promise<{ loc
                 >
                   {t(item.titleKey)}
                 </Link>
-                <span className="text-muted text-xs">{doc.version}</span>
+                <span className="text-muted text-xs">
+                  {t('versionLabel', { version: doc.version })} ·{' '}
+                  {t('effectiveShort', { date: doc.effectiveFrom })}
+                </span>
               </li>
             );
           })}

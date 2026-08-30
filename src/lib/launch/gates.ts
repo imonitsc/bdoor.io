@@ -3,24 +3,22 @@ import 'server-only';
 /**
  * Launch gates.
  *
- * These decide what the product may truthfully offer, and they default to the
- * most conservative value so a missing variable can never open a gate. The
- * legal documents are working drafts, so until the owner flips
- * `LEGAL_CONTENT_STATUS=approved` (and `LEGAL_LAUNCH_APPROVED=true`) after
- * documented professional review:
+ * These decide what the product may truthfully offer. Payments, checkout and
+ * identity/KYC uploads still default to the most conservative value so a
+ * missing variable can never open a regulated flow.
  *
- *   - payments stay off (`startCheckout` refuses),
- *   - identity/KYC document uploads stay off (`uploadDocument` refuses the
- *     identity categories),
- *   - the legal pages carry the draft banner and are not indexed.
+ * The legal suite was published as version 1.0 on the owner's release
+ * instruction (30 Aug 2026), so `LEGAL_CONTENT_STATUS` now defaults to
+ * `approved`: the policies render without a draft banner and are indexable.
+ * Setting `LEGAL_CONTENT_STATUS=draft` or `LEGAL_LAUNCH_APPROVED=false`
+ * remains the kill switch and forces everything back to draft posture.
+ * Payments and KYC additionally depend on their own variables below, which
+ * still default to `disabled` — publishing policies opens no chargeable or
+ * identity-collecting flow by itself.
  *
  * A value outside the allowed set is treated as a configuration error, not
  * silently coerced: it throws at first read, which surfaces in the boot
  * completeness check rather than as a permissive default in production.
- *
- * Flipping a gate in the environment is necessary but not sufficient for a
- * production launch — the release procedure in docs/LEGAL_REVIEW_CHECKLIST.md
- * still applies, and the approved legal text has to actually exist first.
  */
 
 const LEGAL_STATUSES = ['draft', 'approved'] as const;
@@ -56,7 +54,7 @@ export function legalLaunchApproved(): boolean {
 }
 
 export function legalContentStatus(): LegalContentStatus {
-  const status = read('LEGAL_CONTENT_STATUS', LEGAL_STATUSES, 'draft');
+  const status = read('LEGAL_CONTENT_STATUS', LEGAL_STATUSES, 'approved');
   // When LEGAL_LAUNCH_APPROVED is explicitly set to false, keep the product
   // in draft mode even if LEGAL_CONTENT_STATUS was flipped early. When the
   // alias is unset, LEGAL_CONTENT_STATUS alone decides (existing behaviour).
@@ -83,15 +81,16 @@ export function paymentsStatus(): Toggle {
 }
 
 /**
- * Provider applications (partner portals spec §20). Unlike payments/KYC this
- * collects business information rather than identity documents, but it still
- * defaults closed: the multi-step /partners/apply flow opens only when the
- * owner sets PROVIDER_APPLICATIONS_STATUS=enabled after the provider terms
- * are ready. While disabled, the page renders the enquiry fallback and the
+ * Provider applications (partner portals spec §20). Open by default since the
+ * owner's release instruction (30 Aug 2026): the multi-step /partners/apply
+ * flow collects business information rather than identity documents, and
+ * every submission still goes through admin verification before a provider
+ * can receive a case. PROVIDER_APPLICATIONS_STATUS=disabled remains the kill
+ * switch; while disabled, the page renders the enquiry fallback and the
  * server actions refuse — the gate is enforced server-side, not cosmetically.
  */
 export function providerApplicationsStatus(): Toggle {
-  return read('PROVIDER_APPLICATIONS_STATUS', TOGGLES, 'disabled');
+  return read('PROVIDER_APPLICATIONS_STATUS', TOGGLES, 'enabled');
 }
 
 /**

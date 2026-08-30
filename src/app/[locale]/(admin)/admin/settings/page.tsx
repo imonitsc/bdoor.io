@@ -7,6 +7,7 @@ import { PageHeading } from '@/components/dashboard/page-heading';
 import { requireCapability } from '@/lib/auth/session';
 import { createClient } from '@/lib/supabase/server';
 import { integrationModes } from '@/lib/env';
+import { LEGAL_DOCUMENTS } from '@/content/legal/documents';
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
@@ -19,9 +20,10 @@ export default async function AdminSettingsPage({
   setRequestLocale(locale);
   await requireCapability('settings.manage');
 
-  const [t, tCommon, format] = await Promise.all([
+  const [t, tCommon, tAll, format] = await Promise.all([
     getTranslations('admin.nav'),
     getTranslations('common'),
+    getTranslations(),
     getFormatter(),
   ]);
 
@@ -92,6 +94,34 @@ export default async function AdminSettingsPage({
                 <Badge tone={flag.is_enabled ? 'success' : 'neutral'}>
                   {flag.is_enabled ? tCommon('yes') : tCommon('no')}
                 </Badge>
+              </li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle as="h2">Policy versions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {/* The published legal suite, straight from the content module the
+              public pages render — so this list can never drift from what a
+              customer actually sees. Earlier versions live in git history;
+              a revision ships as a new version with a new effective date. */}
+          <ul className="divide-border divide-y">
+            {Object.values(LEGAL_DOCUMENTS).map((doc) => (
+              <li key={doc.slug} className="flex flex-wrap items-center justify-between gap-3 py-3">
+                <div>
+                  <p className="text-ink text-sm">{tAll(doc.titleKey)}</p>
+                  <p className="text-muted font-mono text-xs">/{doc.slug}</p>
+                </div>
+                <div className="text-muted text-right text-xs">
+                  <Badge tone={doc.awaitingCounselReview ? 'warning' : 'success'}>
+                    v{doc.version}
+                  </Badge>
+                  <p className="mt-1">{format.dateTime(new Date(doc.effectiveFrom), 'long')}</p>
+                </div>
               </li>
             ))}
           </ul>

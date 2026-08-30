@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { IndependenceDisclosure } from '@/components/layout/disclosure';
+import { Link } from '@/i18n/navigation';
 import { acceptQuote, startCheckout, type BillingState } from '@/features/payments/actions';
 import { isPassThrough, type Currency, type QuoteItemCategory } from '@/features/quotes/money';
 
@@ -184,6 +185,33 @@ export function QuotePanel({ quote, sandbox }: { quote: QuoteView; sandbox: bool
           <Alert tone="danger" live="assertive">
             {tErrors(payState.message)}
           </Alert>
+        ) : null}
+
+        {!quote.acceptedAt && !quote.expired ? (
+          // The recorded acceptance names a terms version, so the screen the
+          // customer accepts FROM has to show which one — and link it.
+          <p className="text-muted text-xs leading-relaxed">
+            {t.rich('acceptTermsNote', {
+              terms: (chunks) => (
+                <Link
+                  href="/terms"
+                  target="_blank"
+                  className="text-primary underline underline-offset-2"
+                >
+                  {chunks}
+                </Link>
+              ),
+              refund: (chunks) => (
+                <Link
+                  href="/refund-policy"
+                  target="_blank"
+                  className="text-primary underline underline-offset-2"
+                >
+                  {chunks}
+                </Link>
+              ),
+            })}
+          </p>
         ) : null}
 
         <div className="flex flex-wrap gap-3">

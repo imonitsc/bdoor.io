@@ -30,6 +30,8 @@ export type DraftSession = {
   locale: 'en' | 'bn';
   userId: string | null;
   completedAt: string | null;
+  /** Set once this draft produced an application; a resubmit returns it. */
+  applicationReference: string | null;
 };
 
 function newDraftKey(): string {
@@ -63,6 +65,7 @@ function rowToSession(
     locale: string;
     user_id: string | null;
     completed_at: string | null;
+    application_reference?: string | null;
   },
   answers: PartialAnswers,
 ): DraftSession {
@@ -72,6 +75,7 @@ function rowToSession(
     locale: row.locale === 'bn' ? 'bn' : 'en',
     userId: row.user_id,
     completedAt: row.completed_at,
+    applicationReference: row.application_reference ?? null,
   };
 }
 
@@ -101,7 +105,7 @@ export async function getDraftSession(): Promise<DraftSession | null> {
   if (userId) {
     const { data } = await admin
       .from('questionnaire_sessions')
-      .select('id, locale, user_id, completed_at')
+      .select('id, locale, user_id, completed_at, application_reference')
       .eq('user_id', userId)
       .order('updated_at', { ascending: false })
       .limit(1)
@@ -115,7 +119,7 @@ export async function getDraftSession(): Promise<DraftSession | null> {
 
   const { data } = await admin
     .from('questionnaire_sessions')
-    .select('id, locale, user_id, completed_at')
+    .select('id, locale, user_id, completed_at, application_reference')
     .eq('anon_key_hash', sha256(key))
     .maybeSingle();
 
@@ -125,7 +129,10 @@ export async function getDraftSession(): Promise<DraftSession | null> {
 
 export async function ensureDraftSession(locale: 'en' | 'bn'): Promise<DraftSession | null> {
   const existing = await getDraftSession();
-  if (existing) return existing;
+  // A session that already produced an application is closed: reusing it
+  // would make the idempotent-submit stamp return the OLD reference for a
+  // genuinely new application. Start a fresh session instead.
+  if (existing && !existing.applicationReference) return existing;
   if (!hasServiceRole()) return null;
 
   const admin = createAdminClient();
@@ -141,7 +148,7 @@ export async function ensureDraftSession(locale: 'en' | 'bn'): Promise<DraftSess
       anon_key_hash: userId ? null : sha256(key),
       locale,
     })
-    .select('id, locale, user_id, completed_at')
+    .select('id, locale, user_id, completed_at, application_reference')
     .single();
 
   if (error || !data) {
@@ -193,6 +200,24 @@ export async function saveAnswer(
   await admin.from('questionnaire_sessions').update({ current_step: key }).eq('id', sessionId);
 
   return pruned;
+}
+
+/**
+ * Stamps the reference of the application a draft produced. From here the
+ * session is closed: `loadIntake` renders the confirmation instead of the
+ * form, a repeat submit returns this same reference, and `ensureDraftSession`
+ * starts a new session for the next application.
+ */
+export async function markDraftSubmitted(sessionId: string, reference: string): Promise<void> {
+  if (!hasServiceRole()) return;
+  const { error } = await createAdminClient()
+    .from('questionnaire_sessions')
+    .update({ application_reference: reference, completed_at: new Date().toISOString() })
+    .eq('id', sessionId)
+    .is('application_reference', null);
+  if (error) {
+    logger.warn('intake.mark_submitted_failed', { message: error.message });
+  }
 }
 
 /**
