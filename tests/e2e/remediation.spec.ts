@@ -251,17 +251,24 @@ test.describe('responsive composition', () => {
   test('the desktop nav appears at xl and the drawer below it', async ({ page }) => {
     await page.goto('/en');
 
-    // 1280px: Start / Services / Pricing / Ask bdoor AI / Resources —
-    // Countries stays in the footer.
+    // 1280px: the header carries only the two actions — Start and Ask bdoor
+    // AI (owner request, 31 Aug 2026). Services, Pricing and Resources moved
+    // to the footer; Countries was already footer-only.
     await page.setViewportSize({ width: 1280, height: 800 });
     const nav = page.locator('header nav');
     await expect(nav.getByRole('link', { name: 'Start', exact: true })).toBeVisible();
-    await expect(nav.getByRole('link', { name: 'Services', exact: true })).toBeVisible();
-    await expect(nav.getByRole('link', { name: 'Pricing' })).toBeVisible();
     await expect(nav.getByRole('link', { name: 'Ask bdoor AI' })).toBeVisible();
-    await expect(nav.getByRole('link', { name: 'Resources' })).toBeVisible();
+    await expect(nav.getByRole('link', { name: 'Services', exact: true })).toHaveCount(0);
+    await expect(nav.getByRole('link', { name: 'Pricing' })).toHaveCount(0);
+    await expect(nav.getByRole('link', { name: 'Resources' })).toHaveCount(0);
     await expect(nav.getByRole('link', { name: 'Countries' })).toHaveCount(0);
-    expect(await nav.first().getByRole('link').count()).toBe(5);
+    expect(await nav.first().getByRole('link').count()).toBe(2);
+
+    // …and the three relocated destinations are in the footer.
+    const footer = page.locator('footer');
+    await expect(footer.getByRole('link', { name: 'Services', exact: true })).toBeVisible();
+    await expect(footer.getByRole('link', { name: 'Packages' })).toBeVisible();
+    await expect(footer.getByRole('link', { name: 'Resources' })).toBeVisible();
     await expect(page.locator('button[aria-controls="mobile-navigation"]')).toBeHidden();
     const headerOverflow = await page
       .locator('header')
@@ -276,6 +283,8 @@ test.describe('responsive composition', () => {
     const drawer = page.locator('#mobile-navigation');
     await expect(drawer.getByRole('link', { name: 'Start', exact: true })).toBeVisible();
     await expect(drawer.getByRole('link', { name: 'Services' })).toBeVisible();
+    await expect(drawer.getByRole('link', { name: 'Pricing' })).toBeVisible();
+    await expect(drawer.getByRole('link', { name: 'Resources' })).toBeVisible();
     await expect(drawer.getByRole('link', { name: 'Partners' })).toBeVisible();
     await expect(drawer.getByRole('link', { name: 'Contact' })).toBeVisible();
     await expect(drawer.getByRole('link', { name: 'Countries' })).toHaveCount(0);
