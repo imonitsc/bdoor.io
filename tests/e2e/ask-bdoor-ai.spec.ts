@@ -3,11 +3,14 @@ import { expect, test } from '@playwright/test';
 /**
  * Ask bdoor AI, end to end.
  *
- * The suite runs with the feature switched on and no AI Gateway credential, so
- * every model call fails. That is deliberate: the interface, the copy, the
- * disclosure and the escalation path all have to be right, and the failure
- * path is the one a customer meets during a real outage — the one nobody
- * tests, and the one where "no silent fallback" has to actually hold.
+ * The suite runs with the feature switched on and no AI Gateway credential,
+ * so every model call fails. That is deliberate: the interface, the copy, the
+ * truthful stages and the escalation path all have to be right, and the
+ * failure path is the one a customer meets during a real outage — the one
+ * nobody tests, and the one where "no silent fallback" has to actually hold.
+ *
+ * The greeting fast path is the exception: it never calls the model, so it
+ * exercises the full streaming transport for real even in this environment.
  */
 
 const HEADING = 'Ask bdoor AI';
@@ -19,16 +22,11 @@ test.describe('the homepage entry', () => {
     const entry = page.getByRole('heading', { name: HEADING, exact: true });
     await expect(entry).toBeVisible();
 
-    await expect(
-      page.getByText('Get clear answers about starting and running a business in Bangladesh', {
-        exact: false,
-      }),
-    ).toBeVisible();
-
-    // The hero is still the hero.
+    // The hero is still the hero, and its secondary action carries the spark.
     await expect(page.getByRole('heading', { level: 1 })).toContainText(
       'Start and run your business in Bangladesh',
     );
+    await expect(page.getByTestId('home-hero-ask').locator('svg').first()).toBeVisible();
 
     const input = page.getByPlaceholder('Ask about company registration, licences, tax or pricing');
     await expect(input.first()).toBeVisible();
@@ -48,7 +46,7 @@ test.describe('the homepage entry', () => {
     await expect(drawer.getByText('How do I register a private limited company?')).toBeVisible();
   });
 
-  test('closes on escape and returns focus to the page', async ({ page }) => {
+  test('closes on escape', async ({ page }) => {
     await page.goto('/en');
     await page.getByRole('button', { name: /How do I register a company in Bangladesh/ }).click();
     await expect(page.getByRole('dialog')).toBeVisible();
@@ -72,71 +70,77 @@ test.describe('the homepage entry', () => {
   });
 });
 
-test.describe('the /ask page', () => {
-  test('is a permanent, indexable address with a language selector', async ({ page }) => {
+test.describe('the /ask application shell', () => {
+  test('is a permanent, indexable address with a compact header and no footer', async ({
+    page,
+  }) => {
     const response = await page.goto('/en/ask');
     expect(response?.ok()).toBe(true);
 
-    await expect(page.getByRole('heading', { level: 1 })).toContainText(HEADING);
-    // Visible on the page, not only in the footer: someone arriving from an
-    // English search result needs to switch before they type.
-    await expect(page.locator('main').getByRole('button', { name: /language/i })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(
+      'What do you want to start or solve?',
+    );
+    // The bdoor header stays, compact; the marketing footer does not follow
+    // the customer into the application.
+    await expect(page.getByRole('banner')).toBeVisible();
+    await expect(page.getByRole('contentinfo')).toHaveCount(0);
+    // The language selector is in the shell: someone arriving from an English
+    // search result switches before they type.
+    await expect(page.getByRole('banner').getByRole('button', { name: /language/i })).toBeVisible();
+  });
+
+  test('keeps the disclosure to one honest line with the full detail linked', async ({ page }) => {
+    await page.goto('/en/ask');
+    await expect(page.getByText('General information, not professional advice.')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Privacy' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Service limits' })).toBeVisible();
     await expect(
-      page.getByText('Cannot see your documents, case or payment details', { exact: false }),
+      page.getByText('AI answers with current official sources', { exact: false }),
     ).toBeVisible();
   });
 
-  test('states the AI disclosure beside the input on every surface', async ({ page }) => {
+  test('offers the four quick suggestions', async ({ page }) => {
     await page.goto('/en/ask');
-    await expect(
-      page.getByText('AI-generated information from bdoor', { exact: false }),
-    ).toBeVisible();
-    await expect(
-      page.getByText('not legal, tax or immigration advice', { exact: false }),
-    ).toBeVisible();
-  });
-
-  test('offers five starting questions', async ({ page }) => {
-    await page.goto('/en/ask');
-    for (const question of [
-      /How do I register a company in Bangladesh/,
-      /Which licences does my business need/,
-      /Can a foreigner own a Bangladesh company/,
-      /What does bdoor charge, and what are the government fees/,
-      /What do I have to file every year after registering/,
+    for (const suggestion of [
+      'Start a business',
+      'Find required licences',
+      'Understand tax and VAT',
+      'Check annual compliance',
     ]) {
-      await expect(page.getByRole('button', { name: question })).toBeVisible();
+      await expect(page.getByRole('button', { name: suggestion, exact: true })).toBeVisible();
     }
   });
 
   test('serves Bangla when the locale is bn', async ({ page }) => {
     await page.goto('/bn/ask');
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('Ask bdoor AI');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(
+      'আপনি কী শুরু করতে বা সমাধান করতে চান?',
+    );
     await expect(page.getByPlaceholder('কোম্পানি নিবন্ধন')).toBeVisible();
-    await expect(page.getByText('AI-নির্মিত তথ্য', { exact: false })).toBeVisible();
   });
 });
 
 test.describe('when the model cannot be reached', () => {
-  test('says so and offers a specialist, rather than answering anyway', async ({ page }) => {
+  test('shows truthful stages, then says so and offers a specialist', async ({ page }) => {
     // The pipeline's own ceiling is LIMITS.requestTimeoutMs (45s): in an
     // environment where the gateway connection hangs rather than refusing,
-    // the error frame legitimately arrives only when that abort fires. The
-    // assertion window must cover the pipeline's budget, not race it.
+    // the failure legitimately arrives only when that abort fires.
     test.setTimeout(120_000);
     await page.goto('/en/ask');
 
-    await page.getByRole('button', { name: /How do I register a company in Bangladesh/ }).click();
+    await page.getByRole('button', { name: 'Start a business', exact: true }).click();
 
-    // No credential in this environment, so the Gateway call fails. The
-    // customer must be told — never handed a plausible answer from somewhere
-    // else that they have no way of recognising as such.
+    // The truthful stage indicator appears while the pipeline works…
+    await expect(
+      page.getByText(/Understanding your question|Checking current official sources|Preparing your answer/),
+    ).toBeVisible({ timeout: 10_000 });
+
+    // …and the failure is told to the customer — never a silent substitute.
     const log = page.getByRole('log');
     await expect(
-      log.getByText(/temporarily unavailable|Something went wrong|took too long/i),
+      log.getByText(/temporarily unavailable|Something went wrong|took too long/i).first(),
     ).toBeVisible({ timeout: 60_000 });
-
-    await expect(log.getByRole('link', { name: 'Talk to a specialist' })).toBeVisible();
+    await expect(log.getByRole('link', { name: 'Talk to a specialist' }).first()).toBeVisible();
   });
 
   test('never leaks a credential, model route or internal error to the browser', async ({
@@ -149,12 +153,10 @@ test.describe('when the model cannot be reached', () => {
     });
 
     await page.goto('/en/ask');
-    await page.getByRole('button', { name: /Can a foreigner own a Bangladesh company/ }).click();
+    await page.getByRole('button', { name: 'Find required licences', exact: true }).click();
     await expect(
-      page.getByRole('log').getByRole('link', { name: 'Talk to a specialist' }),
-    ).toBeVisible({
-      timeout: 30_000,
-    });
+      page.getByRole('log').getByRole('link', { name: 'Talk to a specialist' }).first(),
+    ).toBeVisible({ timeout: 60_000 });
 
     const all = bodies.join('\n');
     for (const secret of ['AI_GATEWAY', 'sk-', 'service_role', 'SUPABASE_SECRET', 'Bearer ']) {
@@ -187,7 +189,9 @@ test.describe('rejected input', () => {
     expect(await response.json()).toMatchObject({ error: 'session_required' });
   });
 
-  test('declines an out-of-scope question without calling the model', async ({ request }) => {
+  test('declines an out-of-scope question in the stream, without calling the model', async ({
+    request,
+  }) => {
     const response = await request.post('/api/ai/chat', {
       data: {
         message: 'write me a poem about the moon',
@@ -198,8 +202,10 @@ test.describe('rejected input', () => {
     });
 
     expect(response.ok()).toBe(true);
-    const body = (await response.json()) as { error: string; message: string };
-    expect(body.error).toBe('out_of_scope');
-    expect(body.message).toMatch(/company registration|licences/i);
+    const body = await response.text();
+    // The decline arrives as stream content: a data-failure part naming the
+    // reason plus the bilingual refusal copy.
+    expect(body).toContain('out_of_scope');
+    expect(body).toMatch(/company registration|licences/i);
   });
 });

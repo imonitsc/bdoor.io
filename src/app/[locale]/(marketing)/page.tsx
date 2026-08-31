@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { useTranslations } from 'next-intl';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { Section, SectionHeading } from '@/components/ui/section';
@@ -75,6 +75,7 @@ function Hero() {
                 data-testid="home-hero-ask"
                 className="inline-flex min-h-11 items-center"
               >
+                <Sparkles className="size-4" aria-hidden="true" />
                 {t('askCta')}
               </Link>
             </Button>
