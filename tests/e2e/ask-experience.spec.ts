@@ -155,11 +155,15 @@ test.describe('conversation behaviour', () => {
     await expect(page.getByRole('button', { name: 'Try again' }).first()).toBeVisible({
       timeout: 60_000,
     });
+    // The retry must actually resend the question. The stage indicator can
+    // flash sub-paint in this credential-less environment and the first
+    // failure's copy is already on screen, so neither is trustworthy — the
+    // second POST to the chat endpoint is.
+    const resent = page.waitForRequest(
+      (request) => request.url().includes('/api/ai/chat') && request.method() === 'POST',
+      { timeout: 10_000 },
+    );
     await page.getByRole('button', { name: 'Try again' }).first().click();
-    await expect(
-      page.getByText(
-        /Understanding your question|Checking current official sources|Preparing your answer/,
-      ),
-    ).toBeVisible({ timeout: 10_000 });
+    await resent;
   });
 });
