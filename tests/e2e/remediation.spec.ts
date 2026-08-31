@@ -72,10 +72,7 @@ test.describe('one commercial source of truth', () => {
         page.getByRole('heading', { name, exact: true }),
         `${name} missing on /en/pricing`,
       ).toBeVisible();
-      await expect(
-        page.getByText(label).first(),
-        `${label} missing on /en/pricing`,
-      ).toBeVisible();
+      await expect(page.getByText(label).first(), `${label} missing on /en/pricing`).toBeVisible();
     }
   });
 

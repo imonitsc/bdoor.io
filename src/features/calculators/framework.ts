@@ -37,7 +37,9 @@ export function defineCalculator<Input, Output>(
     throw new Error(`calculator id "${definition.id}" must be a kebab-case slug`);
   }
   if (!/^\d{4}-\d{2}-\d{2}\.\d+$/.test(definition.version)) {
-    throw new Error(`calculator ${definition.id}: version must be date.revision, e.g. 2026-08-31.1`);
+    throw new Error(
+      `calculator ${definition.id}: version must be date.revision, e.g. 2026-08-31.1`,
+    );
   }
   if (!ISO_DATE.test(definition.effectiveFrom)) {
     throw new Error(`calculator ${definition.id}: effectiveFrom must be an ISO date`);
