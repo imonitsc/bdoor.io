@@ -7,6 +7,7 @@ import { Loader2 } from 'lucide-react';
 import {
   importKnowledgeSeed,
   indexKnowledgeSource,
+  publishImportedSeed,
   transitionKnowledgeSource,
 } from '@/features/admin/ai-knowledge-actions';
 import type { SourceStatus } from '@/features/ai/knowledge';
@@ -103,6 +104,42 @@ export function AiImportButton() {
       >
         {pending ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : null}
         {t('import')}
+      </Button>
+      {message ? (
+        <span className="text-muted text-xs" role="status">
+          {message}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
+/**
+ * One audited click that takes every imported seed draft through review to
+ * published and indexed. Scoped to repo-reviewed seed content only — a source
+ * authored in the admin still walks the workflow by hand.
+ */
+export function AiPublishSeedButton() {
+  const t = useTranslations('admin.ai');
+  const [pending, startTransition] = useTransition();
+  const [message, setMessage] = useState<string | null>(null);
+
+  return (
+    <div className="flex items-center gap-2">
+      <Button
+        variant="primary"
+        disabled={pending}
+        onClick={() =>
+          startTransition(async () => {
+            const result = await publishImportedSeed();
+            setMessage(
+              result.ok ? t('publishSeedDone', { detail: result.detail ?? '' }) : t('failed'),
+            );
+          })
+        }
+      >
+        {pending ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : null}
+        {t('publishSeed')}
       </Button>
       {message ? (
         <span className="text-muted text-xs" role="status">

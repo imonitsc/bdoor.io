@@ -22,14 +22,32 @@ class FakeSupabaseClient {
     return Promise.resolve({
       data: [
         {
-          chunk_id: `chunk-${fn}`,
+          chunk_id: `chunk-${fn}-bdoor`,
+          source_id: 'source-bdoor',
+          title: 'What bdoor packages include (sample)',
+          content: 'The formation package covers filing coordination.',
+          country: 'bd',
+          locale: 'en',
+          source_type: 'service_page',
+          source_url: '/pricing',
+          last_reviewed_at: '2026-08-01',
+          effective_from: '2026-01-01',
+          authority_tier: null,
+          issuing_institution: null,
+          reference_number: null,
+          section_ref: null,
+          page_start: null,
+          rank: 1,
+        },
+        {
+          chunk_id: `chunk-${fn}-official`,
           source_id: 'source-1',
           title: 'Trade licence guide',
           content: 'Renewal happens at the city corporation.',
           country: 'bd',
           locale: 'en',
           source_type: 'government_reference',
-          source_url: null,
+          source_url: 'https://dscc.gov.bd/',
           last_reviewed_at: '2026-08-01',
           effective_from: '2026-01-01',
           authority_tier: 2,
@@ -37,7 +55,7 @@ class FakeSupabaseClient {
           reference_number: null,
           section_ref: null,
           page_start: null,
-          rank: 1,
+          rank: 2,
         },
       ],
       error: null,
@@ -74,5 +92,36 @@ describe('retrieveContext calls the database client the way supabase-js requires
     expect(result.empty).toBe(false);
     expect(result.citations.length).toBeGreaterThan(0);
     expect(result.sourceIds).toContain('source-1');
+  });
+
+  it('rewrites natural questions into meaningful OR terms for the simple-config index', async () => {
+    const { keywordQuery } = await import('@/features/ai/retrieval');
+    // 'simple' config ANDs every literal word, so the raw question would
+    // demand "how", "do" and "i" appear in a chunk. The rewrite keeps signal.
+    expect(keywordQuery('How do I register a company in Bangladesh?')).toBe(
+      'register OR company OR bangladesh',
+    );
+    expect(keywordQuery('বাংলাদেশে কোম্পানি নিবন্ধন করব কীভাবে?')).toBe(
+      'বাংলাদেশে OR কোম্পানি OR নিবন্ধন',
+    );
+    // A question of nothing but noise words falls back to the raw text.
+    expect(keywordQuery('How do I?')).toBe('How do I?');
+  });
+
+  it('presents official government sources above bdoor commercial content', async () => {
+    const { retrieveContext } = await import('@/features/ai/retrieval');
+    const result = await retrieveContext('trade licence renewal', 'en', 'bd');
+
+    // The bdoor chunk outranks the official one on raw relevance (rank 1 vs
+    // rank 2 in both lists), but the context and citation list must lead with
+    // the authority the regulatory answer rests on.
+    const officialIndex = result.citations.findIndex((c) => c.institution === 'DSCC (sample)');
+    const bdoorIndex = result.citations.findIndex((c) => c.url === '/pricing');
+    expect(officialIndex).toBeGreaterThanOrEqual(0);
+    expect(bdoorIndex).toBeGreaterThanOrEqual(0);
+    expect(officialIndex).toBeLessThan(bdoorIndex);
+    expect(result.context.indexOf('Trade licence guide')).toBeLessThan(
+      result.context.indexOf('What bdoor packages include (sample)'),
+    );
   });
 });

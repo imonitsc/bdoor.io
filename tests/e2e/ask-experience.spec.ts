@@ -96,6 +96,33 @@ test.describe('the greeting fast path', () => {
   });
 });
 
+test.describe('send is acknowledged instantly', () => {
+  test('the user message and first stage appear before the server responds at all', async ({
+    page,
+  }) => {
+    await page.goto('/en/ask');
+
+    // Hold the chat response for 3 seconds. Nothing the interface shows in
+    // that window can have come from the server — which is the requirement:
+    // send feedback never waits on retrieval, persistence or the model.
+    await page.route('**/api/ai/chat', async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 3_000));
+      await route.continue();
+    });
+
+    const input = page.locator('#ask-bdoor-input');
+    await input.fill('How do I register a company in Bangladesh?');
+    const before = Date.now();
+    await page.keyboard.press('Enter');
+
+    await expect(page.locator('[data-role="user"]').last()).toContainText('register a company', {
+      timeout: 1_000,
+    });
+    await expect(page.getByText('Understanding your question')).toBeVisible({ timeout: 1_000 });
+    expect(Date.now() - before).toBeLessThan(2_500);
+  });
+});
+
 test.describe('conversation behaviour', () => {
   test('a suggestion submits and the transcript announces politely', async ({ page }) => {
     await page.goto('/en/ask');

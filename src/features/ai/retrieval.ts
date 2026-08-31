@@ -129,6 +129,103 @@ type Rpc = (
 const CANDIDATES = Math.max(LIMITS.retrievalCount * 4, 40);
 
 /**
+ * Question words and connectives that carry no retrieval signal, English and
+ * Bangla. Not a linguistic stopword list — only the words that made real
+ * questions fail.
+ */
+const QUERY_NOISE = new Set([
+  // English
+  'a',
+  'an',
+  'and',
+  'any',
+  'are',
+  'as',
+  'at',
+  'be',
+  'by',
+  'can',
+  'do',
+  'does',
+  'for',
+  'from',
+  'get',
+  'how',
+  'i',
+  'if',
+  'in',
+  'is',
+  'it',
+  'me',
+  'my',
+  'need',
+  'of',
+  'on',
+  'or',
+  'should',
+  'the',
+  'to',
+  'want',
+  'we',
+  'what',
+  'when',
+  'where',
+  'which',
+  'who',
+  'why',
+  'will',
+  'with',
+  'you',
+  'your',
+  // Bangla
+  'কি',
+  'কী',
+  'কীভাবে',
+  'কিভাবে',
+  'কোথায়',
+  'কখন',
+  'কেন',
+  'কত',
+  'করব',
+  'করবো',
+  'করতে',
+  'করার',
+  'করা',
+  'হবে',
+  'হয়',
+  'চাই',
+  'আমি',
+  'আমার',
+  'আমরা',
+  'এবং',
+  'বা',
+]);
+
+/**
+ * The chunk index uses the 'simple' text-search configuration (no stemming,
+ * no stopwords — the price of indexing Bangla and English in one column), and
+ * `websearch_to_tsquery` ANDs every word. A natural question — "How do I
+ * register a company in Bangladesh?" — therefore matches nothing unless a
+ * chunk contains "how", "do" and "i" literally. This rewrite keeps the words
+ * that carry signal and ORs them, so ts_rank surfaces the chunks matching the
+ * most meaningful terms instead of demanding all the meaningless ones.
+ */
+export function keywordQuery(question: string): string {
+  const terms = [
+    ...new Set(
+      question
+        .toLowerCase()
+        // \p{M} keeps Bangla words whole: vowel signs and hasanta are
+        // combining marks, and splitting on them shatters নিবন্ধন into noise.
+        .split(/[^\p{L}\p{M}\p{N}]+/u)
+        .filter((term) => term.length > 1 && !QUERY_NOISE.has(term)),
+    ),
+  ];
+  // A query of nothing but noise words falls back to the raw question.
+  return terms.length ? terms.join(' OR ') : question;
+}
+
+/**
  * supabase-js's `rpc` reads `this.rest` internally, so it must stay bound to
  * its client — extracting the bare method throws on the first call.
  */
@@ -142,7 +239,7 @@ async function keywordCandidates(question: string, countries: string[]): Promise
   const results = await Promise.all(
     countries.map((code) =>
       rpc('ai_search_keyword', {
-        query_text: question,
+        query_text: keywordQuery(question),
         p_country: code,
         candidate_count: CANDIDATES,
       }),
@@ -270,7 +367,7 @@ export async function retrieveContext(
         if (!existing || chunk.score > existing.score) merged.set(chunk.chunk_id, chunk);
       }
     });
-    chunks = [...merged.values()]
+    const selected = [...merged.values()]
       .sort((a, b) => {
         const aLocale = a.locale === locale ? 1 : 0;
         const bLocale = b.locale === locale ? 1 : 0;
@@ -278,6 +375,17 @@ export async function retrieveContext(
         return b.score - a.score;
       })
       .slice(0, LIMITS.retrievalCount);
+
+    // Selection is by relevance; PRESENTATION puts official government sources
+    // above bdoor's own content. The model reads the context top-down and the
+    // customer reads the citation list top-down — for a regulatory question
+    // the authority the answer rests on has to come before the sales page.
+    chunks = selected.sort((a, b) => {
+      const aTier = a.authority_tier ?? Number.MAX_SAFE_INTEGER;
+      const bTier = b.authority_tier ?? Number.MAX_SAFE_INTEGER;
+      if (aTier !== bTier) return aTier - bTier;
+      return b.score - a.score;
+    });
     timings?.mark('fused');
   } catch (error) {
     // The question itself is never logged — only that retrieval failed.

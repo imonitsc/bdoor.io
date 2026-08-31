@@ -12,6 +12,7 @@ import {
   transitionDocument,
   type DocumentLifecycle,
 } from '@/features/ai/registry/documents';
+import { retrieveDiagnostics, type RetrievalDiagnostics } from '@/features/ai/diagnostics';
 import { extractRulesDraft, transitionRule, type RuleStatus } from '@/features/ai/registry/rules';
 import { retrieveContext, type RetrievalResult } from '@/features/ai/retrieval';
 import { recordAudit } from '@/lib/audit';
@@ -283,6 +284,35 @@ export async function runRetrievalTest(input: {
         empty: result.empty,
       },
     };
+  } catch (error) {
+    return { ok: false, error: (error as Error).message };
+  }
+}
+
+export type RetrievalDiagnosticResult =
+  { ok: true; diagnostics: RetrievalDiagnostics } | { ok: false; error: string };
+
+/**
+ * The "why" behind a retrieval: every candidate with its per-list ranks and
+ * score components, and the sources that look relevant but can never be
+ * retrieved (not published, published-but-not-indexed, or restricted).
+ */
+export async function runRetrievalDiagnostic(input: {
+  question: string;
+  locale: 'en' | 'bn';
+  country: string;
+}): Promise<RetrievalDiagnosticResult> {
+  await requireCapability('content.publish');
+  const parsed = testQuerySchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: 'invalid_request' };
+
+  try {
+    const diagnostics = await retrieveDiagnostics(
+      parsed.data.question,
+      parsed.data.locale,
+      parsed.data.country,
+    );
+    return { ok: true, diagnostics };
   } catch (error) {
     return { ok: false, error: (error as Error).message };
   }

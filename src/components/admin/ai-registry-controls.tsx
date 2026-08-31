@@ -9,12 +9,14 @@ import {
   publishRegistryDocument,
   resolveChangeAlert,
   retireRegistryDocument,
+  runRetrievalDiagnostic,
   runRetrievalTest,
   seedSourceRegistry,
   setRuleFeeVerified,
   transitionRegistryDocument,
   transitionStructuredRule,
   updateRegistrySource,
+  type RetrievalDiagnosticResult,
   type RetrievalTestResult,
 } from '@/features/admin/ai-registry-actions';
 import type { DocumentLifecycle } from '@/features/ai/registry/documents';
@@ -248,6 +250,7 @@ export function RetrievalConsole() {
   const [locale, setLocale] = useState<'en' | 'bn'>('en');
   const [pending, startTransition] = useTransition();
   const [output, setOutput] = useState<RetrievalTestResult | null>(null);
+  const [diagnostic, setDiagnostic] = useState<RetrievalDiagnosticResult | null>(null);
 
   return (
     <div className="space-y-4">
@@ -256,7 +259,12 @@ export function RetrievalConsole() {
         onSubmit={(event) => {
           event.preventDefault();
           startTransition(async () => {
-            setOutput(await runRetrievalTest({ question, locale, country: 'bd' }));
+            const [test, diag] = await Promise.all([
+              runRetrievalTest({ question, locale, country: 'bd' }),
+              runRetrievalDiagnostic({ question, locale, country: 'bd' }),
+            ]);
+            setOutput(test);
+            setDiagnostic(diag);
           });
         }}
       >
@@ -317,6 +325,72 @@ export function RetrievalConsole() {
             {output.error}
           </p>
         )
+      ) : null}
+
+      {diagnostic?.ok ? (
+        <div className="space-y-3">
+          <div>
+            <p className="text-muted text-xs font-medium uppercase">{t('diagnosticScores')}</p>
+            <div className="mt-1 overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="text-muted">
+                  <tr>
+                    <th className="py-1 pr-2">{t('diagnosticSource')}</th>
+                    <th className="py-1 pr-2">{t('diagnosticTier')}</th>
+                    <th className="py-1 pr-2">kw</th>
+                    <th className="py-1 pr-2">sem</th>
+                    <th className="py-1 pr-2">rrf</th>
+                    <th className="py-1 pr-2">bonus</th>
+                    <th className="py-1 pr-2">score</th>
+                    <th className="py-1">{t('diagnosticIncluded')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {diagnostic.diagnostics.candidates.map((row) => (
+                    <tr key={row.chunkId} className={row.included ? '' : 'text-muted'}>
+                      <td className="py-1 pr-2">
+                        {row.title} ({row.locale})
+                      </td>
+                      <td className="py-1 pr-2">{row.authorityTier ?? 'bdoor'}</td>
+                      <td className="py-1 pr-2">{row.keywordRank ?? '—'}</td>
+                      <td className="py-1 pr-2">{row.semanticRank ?? '—'}</td>
+                      <td className="py-1 pr-2">{row.rrfScore.toFixed(4)}</td>
+                      <td className="py-1 pr-2">{row.authorityBonus.toFixed(4)}</td>
+                      <td className="py-1 pr-2">{row.totalScore.toFixed(4)}</td>
+                      <td className="py-1">{row.included ? '✓' : '—'}</td>
+                    </tr>
+                  ))}
+                  {diagnostic.diagnostics.candidates.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className="text-muted py-2">
+                        {t('diagnosticNoCandidates')}
+                      </td>
+                    </tr>
+                  ) : null}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {diagnostic.diagnostics.excluded.length ? (
+            <div>
+              <p className="text-warning text-xs font-medium uppercase">
+                {t('diagnosticExcluded')}
+              </p>
+              <ul className="mt-1 space-y-1 text-xs">
+                {diagnostic.diagnostics.excluded.map((row) => (
+                  <li key={row.slug}>
+                    {row.title} — {t(`exclusion.${row.reason}`)} ({row.status})
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+        </div>
+      ) : diagnostic && !diagnostic.ok ? (
+        <p className="text-danger text-sm" role="status">
+          {diagnostic.error}
+        </p>
       ) : null}
     </div>
   );

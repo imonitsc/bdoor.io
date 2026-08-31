@@ -285,6 +285,9 @@ export async function importSeedSources(
         status: 'draft',
         access_scope: 'public',
         last_reviewed_at: `${candidate.lastReviewed}T00:00:00Z`,
+        authority_tier: candidate.authorityTier ?? null,
+        issuing_institution: candidate.issuingInstitution ?? null,
+        reference_number: candidate.referenceNumber ?? null,
       })
       .select('id');
 

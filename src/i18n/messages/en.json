@@ -1452,6 +1452,8 @@
       "noGaps": "No unanswered questions in the queue.",
       "import": "Import reviewed site content",
       "importDone": "Import finished ({detail} created/skipped). Everything imported is a draft.",
+      "publishSeed": "Publish and index imported content",
+      "publishSeedDone": "Done: {detail}. Your account is recorded as the reviewer for every step.",
       "failed": "That did not work. Try again.",
       "index": "Index",
       "reindex": "Re-index",
@@ -1679,7 +1681,18 @@
       "consoleEmpty": "Nothing retrieved — this question would be answered with \"cannot confirm\" and a specialist offer.",
       "consoleCitations": "Citations",
       "consoleContext": "Context handed to the model",
-      "consoleNothing": "(empty)"
+      "consoleNothing": "(empty)",
+      "diagnosticScores": "Ranking (every candidate, score components)",
+      "diagnosticSource": "Chunk",
+      "diagnosticTier": "Tier",
+      "diagnosticIncluded": "In context",
+      "diagnosticNoCandidates": "No chunk matched either search. If the answer should exist, check the exclusions below and whether the source is published and indexed.",
+      "diagnosticExcluded": "Relevant sources the search can never return",
+      "exclusion": {
+        "not_published": "not published",
+        "published_not_indexed": "published but not indexed",
+        "restricted": "restricted access scope"
+      }
     }
   },
   "caseStatus": {
