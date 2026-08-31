@@ -15,6 +15,7 @@
  * `pnpm run verify`. Run it against a preview with the AI Gateway available
  * before a knowledge release, and archive the summary in the PR.
  */
+import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 
 const BASE = process.env.EVAL_BASE_URL;
@@ -56,7 +57,7 @@ async function ask(question, locale) {
       message: question,
       locale,
       country: 'bd',
-      anonymousSessionId: `eval-${Math.random().toString(36).slice(2, 14)}`,
+      anonymousSessionId: `eval-${randomUUID()}`,
     }),
   });
 
