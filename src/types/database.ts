@@ -801,6 +801,9 @@ export type Database = {
           "occurred_on": string
           "conversation_id": string | null
           "model": string
+          "model_role": string
+          "risk_class": string
+          "failover_count": number
           "provider": string | null
           "country": string | null
           "locale": Database["public"]["Enums"]["locale_code"] | null
@@ -817,6 +820,9 @@ export type Database = {
           "occurred_on"?: string
           "conversation_id"?: string | null
           "model": string
+          "model_role"?: string
+          "risk_class"?: string
+          "failover_count"?: number
           "provider"?: string | null
           "country"?: string | null
           "locale"?: Database["public"]["Enums"]["locale_code"] | null
@@ -833,6 +839,9 @@ export type Database = {
           "occurred_on"?: string
           "conversation_id"?: string | null
           "model"?: string
+          "model_role"?: string
+          "risk_class"?: string
+          "failover_count"?: number
           "provider"?: string | null
           "country"?: string | null
           "locale"?: Database["public"]["Enums"]["locale_code"] | null
@@ -1531,6 +1540,8 @@ export type Database = {
         Row: {
           "id": string
           "organization_id": string
+          "bdoor_id": string
+          "public_verification_opt_in": boolean
           "legal_name": string
           "trading_name": string | null
           "structure": string
@@ -1548,6 +1559,8 @@ export type Database = {
         Insert: {
           "id"?: string
           "organization_id": string
+          "bdoor_id"?: string
+          "public_verification_opt_in"?: boolean
           "legal_name": string
           "trading_name"?: string | null
           "structure": string
@@ -1565,6 +1578,8 @@ export type Database = {
         Update: {
           "id"?: string
           "organization_id"?: string
+          "bdoor_id"?: string
+          "public_verification_opt_in"?: boolean
           "legal_name"?: string
           "trading_name"?: string | null
           "structure"?: string

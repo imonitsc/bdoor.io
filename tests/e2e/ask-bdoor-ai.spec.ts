@@ -13,32 +13,69 @@ import { expect, test } from '@playwright/test';
  * exercises the full streaming transport for real even in this environment.
  */
 
-const HEADING = 'Ask bdoor AI';
-
 test.describe('the homepage entry', () => {
-  test('the hero leads to /ask; the card section and workspace preview are gone', async ({
+  // BI-OS §5.1 (owner instruction, 31 Aug 2026): the composer is above the
+  // fold and working, with the four starters and one Start now secondary.
+  test('the hero carries the working composer, the four starters and Start now', async ({
     page,
   }) => {
     await page.goto('/en');
 
-    // The hero is still the hero, and its secondary action carries the spark.
     await expect(page.getByRole('heading', { level: 1 })).toContainText(
-      'Start and run your business in Bangladesh',
+      'Bangladesh business intelligence, from first question to next action.',
     );
+    await expect(
+      page.getByPlaceholder('Ask about starting or running a business in Bangladesh'),
+    ).toBeVisible();
     await expect(page.getByTestId('home-hero-ask').locator('svg').first()).toBeVisible();
 
-    // Owner request (31 Aug 2026): the Ask bdoor AI card section and the
-    // workspace preview left the homepage — /ask is the assistant's home.
-    await expect(page.getByRole('heading', { name: HEADING, exact: true })).toHaveCount(0);
-    await expect(
-      page.getByPlaceholder('Ask about company registration, licences, tax or pricing'),
-    ).toHaveCount(0);
-    await expect(page.getByText('One workspace for the whole case')).toHaveCount(0);
+    for (const starter of [
+      'Start a business',
+      'Find licences',
+      'Understand tax and VAT',
+      'Prepare for investment',
+    ]) {
+      await expect(page.getByRole('link', { name: starter, exact: true })).toBeVisible();
+    }
+    await expect(page.getByTestId('home-hero-start')).toHaveAttribute('href', '/en/start');
+
+    // No service catalogue, country grid or statistics on this page (§5.1).
+    await expect(page.getByText('Choose a starting package')).toHaveCount(0);
+    await expect(page.locator('#international')).toHaveCount(0);
   });
 
-  test('is reachable from the header navigation and the hero', async ({ page }) => {
+  test('the composer submits to /ask with the question, without JavaScript tricks', async ({
+    page,
+  }) => {
     await page.goto('/en');
-    await expect(page.getByTestId('home-hero-ask')).toHaveAttribute('href', '/en/ask');
+
+    await page
+      .getByPlaceholder('Ask about starting or running a business in Bangladesh')
+      .fill('How do I open a restaurant in Dhaka?');
+    await page.getByTestId('home-hero-ask').click();
+
+    await expect(page).toHaveURL(/\/en\/ask\?q=/);
+    // The question left the homepage and arrived in the conversation: it is
+    // sent automatically and appears as the customer's first message.
+    await expect(
+      page.getByRole('log').getByText('How do I open a restaurant in Dhaka?'),
+    ).toBeVisible({ timeout: 15_000 });
+  });
+
+  test('a starter chip lands on /ask and sends its full question', async ({ page }) => {
+    await page.goto('/en');
+
+    await page.getByRole('link', { name: 'Find licences', exact: true }).click();
+    await expect(page).toHaveURL(/\/en\/ask\?q=/);
+    await expect(
+      page
+        .getByRole('log')
+        .getByText('Which licences and permits does my business need in Bangladesh?'),
+    ).toBeVisible({ timeout: 15_000 });
+  });
+
+  test('is reachable from the header navigation', async ({ page }) => {
+    await page.goto('/en');
 
     // Below xl the header bar collapses into the drawer, which renders its
     // links only once opened — open it before looking for the nav entry.

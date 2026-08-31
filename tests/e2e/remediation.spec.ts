@@ -57,22 +57,22 @@ test.describe('no internal language on sales pages', () => {
 });
 
 test.describe('one commercial source of truth', () => {
-  test('homepage and pricing page show identical package labels', async ({ page }) => {
+  // The homepage no longer carries the package catalogue (BI-OS §5.1,
+  // 31 Aug 2026) — /pricing is where the central catalog renders.
+  test('the pricing page shows the catalog package labels', async ({ page }) => {
     const packages = [
       ['Solo Start', 'BDT 9,900 + official fees'],
       ['Limited Company', 'BDT 24,900 + RJSC fees'],
       ['Complete Launch', 'BDT 39,900 + official and third-party fees'],
     ] as const;
 
-    for (const path of ['/en', '/en/pricing']) {
-      await page.goto(path);
-      for (const [name, label] of packages) {
-        await expect(
-          page.getByRole('heading', { name, exact: true }),
-          `${name} missing on ${path}`,
-        ).toBeVisible();
-        await expect(page.getByText(label).first(), `${label} missing on ${path}`).toBeVisible();
-      }
+    await page.goto('/en/pricing');
+    for (const [name, label] of packages) {
+      await expect(
+        page.getByRole('heading', { name, exact: true }),
+        `${name} missing on /en/pricing`,
+      ).toBeVisible();
+      await expect(page.getByText(label).first(), `${label} missing on /en/pricing`).toBeVisible();
     }
   });
 
@@ -115,7 +115,7 @@ test.describe('seven-country truthfulness', () => {
     await page.goto('/en');
 
     await expect(
-      page.getByRole('heading', { name: /Start and run your business in Bangladesh/i }),
+      page.getByRole('heading', { name: /Bangladesh business intelligence/i }),
     ).toBeVisible();
     await expect(page.getByRole('link', { name: 'Start now' }).first()).toBeVisible();
 

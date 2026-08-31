@@ -20,16 +20,23 @@ import { buildSystemPrompt, PROMPT_VERSION } from '@/features/ai/system-prompt';
  * something that breaks the build if it stops being true.
  */
 
-describe('the answer model', () => {
-  it('is Claude by default, and any override goes through the validated env layer', () => {
+describe('the model role registry', () => {
+  // The Claude-only pin that stood here was superseded on 31 Aug 2026 by the
+  // BI-OS instruction §6.1 (multi-provider fallback chains). What did NOT get
+  // superseded, and what these tests now pin: fallback is explicit
+  // configuration rather than code or gateway improvisation, and every
+  // generation is locked to the requested slug's own vendor.
+  it('defaults to the production-verified slugs, configurable only via validated env', () => {
     expect(DEFAULT_ANSWER_MODEL).toBe('anthropic/claude-sonnet-5');
     // Extraction is never customer-facing, but it defaults to the same
     // verified slug until a cheaper model passes the extraction evaluation.
     expect(DEFAULT_EXTRACTION_MODEL).toBe('anthropic/claude-sonnet-5');
 
-    // No silent fallback: nothing in the feature may name a non-Claude answer
-    // model, and nothing may read a model from a bare process.env — overrides
-    // exist only as validated serverEnv() fields.
+    // Cross-provider chains are configuration, never code: nothing in the
+    // feature may hardcode another vendor's chat model (a slug written here
+    // would only go stale — docs/BIOS-BASELINE.md decision 2), and nothing
+    // may read a model from a bare process.env — overrides exist only as
+    // validated serverEnv() fields.
     const sources = execFileSync('grep', ['-rl', '', 'src/features/ai', '--include=*.ts'], {
       encoding: 'utf8',
     })
@@ -39,15 +46,27 @@ describe('the answer model', () => {
     for (const file of sources) {
       const body = readFileSync(file, 'utf8');
       expect(body, file).not.toMatch(/openai\/|meta\/|mistral\/|google\/gemini-[\d.]+-(pro|flash)/);
-      expect(body, file).not.toMatch(/process\.env\.\w*ANSWER_MODEL/);
+      expect(body, file).not.toMatch(/process\.env\.\w*(ANSWER|EXPERT|VERIFIER)_MODEL/);
     }
   });
 
-  it('never routes an answer outside Anthropic', () => {
+  it('locks every generation to the requested slug’s own vendor', () => {
     const chat = readFileSync('src/features/ai/chat.ts', 'utf8');
-    // `only` is the enforcement. `order` alone would fall through to whoever
-    // is up when every Claude route is down.
-    expect(chat).toMatch(/only:\s*\[\.\.\.ANSWER_PROVIDER_ORDER\]/);
+    // `only` is the enforcement: a failover is an explicit hop to the next
+    // slug in the chain, never the gateway substituting whoever is up.
+    // `order` alone would fall through silently.
+    expect(chat).toMatch(/only:\s*providerLockFor\(model\)/);
+    expect(chat).toMatch(/order:\s*providerLockFor\(model\)/);
+  });
+
+  it('never names a provider in customer-facing copy', () => {
+    // One bdoor AI identity (§3.1): the customer sees bdoor AI, whatever
+    // model served the answer. Vendor names may appear in admin screens only.
+    for (const file of ['src/i18n/messages/en.json', 'src/i18n/messages/bn.json']) {
+      const messages = JSON.parse(readFileSync(file, 'utf8')) as Record<string, unknown>;
+      const ask = JSON.stringify(messages['ask']);
+      expect(ask, file).not.toMatch(/anthropic|claude|openai|gpt|gemini|deepseek|llama/i);
+    }
   });
 });
 
@@ -254,7 +273,14 @@ describe('limits and tagging', () => {
     expect(LIMITS.retentionDays).toBeGreaterThan(0);
   });
 
-  it('tag spend by feature, country and language', () => {
+  it('tag spend by feature, country, language, and — for model calls — role and risk', () => {
     expect(usageTags('bd', 'bn')).toEqual(['bdoor-ai', 'country:bd', 'lang:bn']);
+    expect(usageTags('bd', 'en', { role: 'expert', risk: 'high' })).toEqual([
+      'bdoor-ai',
+      'country:bd',
+      'lang:en',
+      'role:expert',
+      'risk:high',
+    ]);
   });
 });

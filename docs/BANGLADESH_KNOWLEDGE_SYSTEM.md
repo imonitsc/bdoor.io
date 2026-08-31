@@ -171,12 +171,33 @@ I register a company in Bangladesh?" matches nothing. The admin testing
 console shows per-chunk ranks, score components and — for sources that look
 relevant but can never be retrieved — the exclusion reason.
 
+## Model routes
+
+The BI-OS instruction (31 Aug 2026) moved the assistant from a single fixed
+model to a role registry (`src/features/ai/models.ts`) — see
+`docs/BIOS-BASELINE.md` for the recorded supersession. In short:
+
+- Roles: **answer** (standard questions), **expert** (high-risk tax/VAT,
+  customs, investment/FX, licensing questions), **verifier** (off until a
+  chain is configured and evaluated), **extraction**, **embedding**. The
+  "router" is the deterministic classifier and the "reranker" is the RRF
+  fusion — code, not paid model calls.
+- Each role resolves to a fallback chain of AI Gateway slugs, configured with
+  `AI_ANSWER_MODEL` + `AI_ANSWER_FALLBACK_MODELS`, `AI_EXPERT_MODEL` and
+  `AI_VERIFIER_MODEL` (comma-separated). Defaults stay the
+  production-verified `anthropic/claude-sonnet-5`; cross-provider fallbacks
+  ship empty and are configured from the live gateway model list on
+  `/admin/ai/models` — never hardcoded.
+- Failover walks the chain only before the first streamed word, inside the
+  one request budget, with the identical prompt and citation contract on
+  every model. Each slug is provider-locked to its own vendor, every hop is
+  logged, and `ai_usage` records `model_role`, `risk_class` and
+  `failover_count`.
+
 ## Operating notes
 
-- Models are env-configurable (`AI_ANSWER_MODEL`, `AI_EXTRACTION_MODEL`),
-  defaulting to the production-verified `anthropic/claude-sonnet-5`. The
-  answer path keeps the gateway `only: [anthropic routes]` guard. Adopt a
-  cheaper extraction slug only after it passes the extraction evaluation.
+- Adopt a cheaper extraction slug only after it passes the extraction
+  evaluation.
 - This environment's egress proxy blocks `.gov.bd`; ingestion runs where the
   app runs (Vercel), on the cron. The registry ships seeded with 31 official
   institutions; documents flow from the first production ticks into the

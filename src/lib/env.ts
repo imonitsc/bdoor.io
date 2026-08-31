@@ -66,9 +66,25 @@ const serverSchema = z.object({
   // src/features/ai/config.ts beside the reasoning for each choice.
   AI_ANSWER_MODEL: z.string().min(3).optional(),
   AI_EXTRACTION_MODEL: z.string().min(3).optional(),
+  // Multi-model fallback chains, as comma-separated AI Gateway slugs. All
+  // three ship EMPTY: cross-provider fallbacks are configured by an admin
+  // from the gateway's runtime model listing (/admin/ai/models), never
+  // hardcoded — a slug written here in code would only go stale. The chain
+  // semantics live in src/features/ai/models.ts.
+  AI_ANSWER_FALLBACK_MODELS: z.string().min(3).optional(),
+  AI_EXPERT_MODEL: z.string().min(3).optional(),
+  AI_VERIFIER_MODEL: z.string().min(3).optional(),
   // Document OCR for scanned official documents. Disabled by default: the
   // ingestion pipeline records that OCR is needed rather than inventing text.
   AI_OCR_PROVIDER: z.enum(['disabled', 'external']).default('disabled'),
+  // bdoor ID (BI-OS §4.2): shows the private business identifier in the
+  // customer workspace. The database column exists either way; the flag gates
+  // display only, for the staged rollout §17 asks for. Off by default until
+  // the founder approves the surface.
+  BDOOR_ID_ENABLED: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((v) => v === 'true'),
   // Shared secret for scheduled jobs (Vercel cron sends it as a bearer token).
   CRON_SECRET: z.string().min(16).optional(),
   SENTRY_DSN: optionalUrl,

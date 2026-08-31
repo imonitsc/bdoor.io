@@ -33,11 +33,30 @@ export async function generateMetadata({
   };
 }
 
-export default async function AskPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
+export default async function AskPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ q?: string | string[] }>;
+}) {
+  const [{ locale }, { q }] = await Promise.all([params, searchParams]);
   setRequestLocale(locale);
 
   if (!aiEnabled()) notFound();
 
-  return <AskBdoorPanel locale={locale as 'en' | 'bn'} variant="page" autoFocus />;
+  // The homepage composer and starter chips arrive as /ask?q=… — reading the
+  // query here (server-side, so the page renders per request) survives both
+  // full-page and client-side navigation; the panel sends the question on
+  // mount. A client-side read raced Next's URL update on soft navigation.
+  const question = typeof q === 'string' ? q.trim().slice(0, 2_000) : '';
+
+  return (
+    <AskBdoorPanel
+      locale={locale as 'en' | 'bn'}
+      variant="page"
+      autoFocus
+      initialQuestion={question || undefined}
+    />
+  );
 }

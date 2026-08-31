@@ -13,12 +13,13 @@ import { serverEnv } from '@/lib/env';
  */
 
 /**
- * The answer model. Claude, always — the brief is explicit that there is no
- * silent fallback to a different answer model. The default is the slug
- * verified in production; `AI_ANSWER_MODEL` exists so a model *upgrade* is a
- * configuration change with a rollback, not a deploy. It goes through
- * `serverEnv()` (the validated layer), never a bare process.env read, and the
- * provider `only` guard in chat.ts still refuses any non-Anthropic route.
+ * The primary answer model: the slug verified in production. `AI_ANSWER_MODEL`
+ * exists so a model *upgrade* is a configuration change with a rollback, not a
+ * deploy; it goes through `serverEnv()` (the validated layer), never a bare
+ * process.env read. Fallback beyond this model is a configured chain in
+ * models.ts (BI-OS §6.1, 31 Aug 2026, superseding the earlier Claude-only
+ * rule — see docs/BIOS-BASELINE.md): explicit, counted, per-slug
+ * provider-locked, never silent.
  */
 export const DEFAULT_ANSWER_MODEL = 'anthropic/claude-sonnet-5';
 
@@ -54,11 +55,13 @@ export const EMBEDDING_MODEL = 'google/gemini-embedding-001';
 export const EMBEDDING_DIMENSIONS = 768;
 
 /**
- * Failover *within Claude*. AI Gateway may serve claude-sonnet-5 from
- * Anthropic directly or through Bedrock/Vertex; any of those is the same model
- * and the same answer. `only` is the guard that matters: it makes it
- * impossible for the gateway to satisfy the request with someone else's model
- * if every Claude route is down. A gateway outage must surface as an outage.
+ * Failover *within one Anthropic model*. AI Gateway may serve a claude slug
+ * from Anthropic directly or through Bedrock/Vertex; any of those is the same
+ * model and the same answer. Passed as the gateway `only` lock for anthropic/
+ * slugs (models.ts `providerLockFor`), so the gateway can never satisfy the
+ * request with someone else's model — moving to a different model is an
+ * explicit hop to the next slug in the configured chain, never the gateway's
+ * own idea.
  */
 export const ANSWER_PROVIDER_ORDER = ['anthropic', 'bedrock', 'vertex'] as const;
 
@@ -83,9 +86,19 @@ export const LIMITS = {
   retentionDays: 90,
 } as const;
 
-/** Usage tags. `bdoor-ai` identifies the feature in spend reports; the rest split it. */
-export function usageTags(country: string, locale: string): string[] {
-  return ['bdoor-ai', `country:${country}`, `lang:${locale}`];
+/**
+ * Usage tags. `bdoor-ai` identifies the feature in spend reports; the rest
+ * split it. Role and risk (§6.2 "tag calls by role and risk") are optional so
+ * the greeting fast path, which never reaches a model, stays untagged.
+ */
+export function usageTags(
+  country: string,
+  locale: string,
+  routing?: { role: string; risk: string },
+): string[] {
+  const tags = ['bdoor-ai', `country:${country}`, `lang:${locale}`];
+  if (routing) tags.push(`role:${routing.role}`, `risk:${routing.risk}`);
+  return tags;
 }
 
 /** Countries the assistant will answer for, Bangladesh first. */

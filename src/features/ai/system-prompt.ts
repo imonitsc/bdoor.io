@@ -1,7 +1,5 @@
 import 'server-only';
 
-import { answerModel } from './config';
-
 /**
  * The permanent operating rules, as approved. They are a constant rather than
  * a database row on purpose: a system prompt that can be edited from an admin
@@ -57,7 +55,10 @@ export function buildSystemPrompt(input: PromptInput): string {
     '',
     `COUNTRY: ${input.country}`,
     `LANGUAGE: ${input.locale}`,
-    `MODEL: ${answerModel()}`,
+    // No MODEL line: one prompt serves every model in the fallback chain
+    // (§6.2 — the citation contract never weakens on failover), and the
+    // slug that actually served is recorded in ai_usage, not told to the
+    // model.
     `PROMPT VERSION: ${PROMPT_VERSION}`,
   ];
 

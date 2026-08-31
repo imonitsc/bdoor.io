@@ -9,14 +9,9 @@ import {
 } from 'ai';
 
 import { checkBudget } from './budget';
-import {
-  ANSWER_PROVIDER_ORDER,
-  LIMITS,
-  answerModel,
-  isSupportedCountry,
-  usageTags,
-} from './config';
+import { LIMITS, isSupportedCountry, usageTags } from './config';
 import { classifyUpstreamError, failureMessage, type AiFailure } from './errors';
+import { answerRoute, classifyRisk, providerLockFor } from './models';
 import { FAST_PATH_MODEL, greetingReply, isGreeting } from './fast-path';
 import { actionsFor } from './follow-ups';
 import { safetyIdentifier } from './identity';
@@ -57,9 +52,11 @@ import { logger } from '@/lib/logger';
  *        → streamText the moment retrieval lands
  *        → persistence during/after completion, never before first token
  *
- * There is no branch in this file that answers from a model other than
- * Claude: if the gateway cannot serve the answer model from an Anthropic
- * route, the request fails visibly.
+ * Models are resolved per request through the role registry (models.ts):
+ * a question's risk class picks the answer or expert chain, and failover
+ * walks the chain explicitly — each slug locked to its own vendor's routes,
+ * every hop counted and logged, the same prompt and citation contract on
+ * every model. If the whole chain is down, the request fails visibly.
  */
 
 export type ChatRequest = {
@@ -270,6 +267,12 @@ export function streamAnswer(request: ChatRequest): Response {
           ? safetyIdentifier('user', request.owner.userId)
           : safetyIdentifier('anon', request.owner.anonymousSessionId);
 
+      // Risk class picks the chain (§6.2): high-risk tax/customs/FX/licensing
+      // questions route to the expert chain, everything else to the answer
+      // chain. The classifier is deterministic and free — the "router" role.
+      const risk = classifyRisk(question);
+      const route = answerRoute(risk);
+
       logger.info('ai.answer.start', {
         requestId: timings.requestId,
         conversation: conversation.persisted ? conversation.id : null,
@@ -277,6 +280,8 @@ export function streamAnswer(request: ChatRequest): Response {
         locale,
         sources: retrieval.sourceIds.length,
         promptVersion: PROMPT_VERSION,
+        role: route.role,
+        risk,
         // The question itself is never logged: only its shape.
         ...messageTelemetry(question),
       });
@@ -285,71 +290,129 @@ export function streamAnswer(request: ChatRequest): Response {
       let errorCode: string | null = null;
       let failurePart: FailurePart | null = null;
 
-      const finished = new Promise<{
+      type Attempt = {
         text: string;
         inputTokens: number | null;
         outputTokens: number | null;
         generationId: string | null;
-      }>((resolve) => {
-        timings.mark('model_start');
-        const result = streamText({
-          model: answerModel(),
-          system,
-          messages: [...history, { role: 'user' as const, content: question }],
-          maxOutputTokens: LIMITS.maxOutputTokens,
-          maxRetries: LIMITS.maxRetries,
-          abortSignal: AbortSignal.timeout(LIMITS.requestTimeoutMs),
-          providerOptions: {
-            gateway: {
-              // Spend attribution and abuse tracing, hashed. Never a raw id.
-              user,
-              tags: usageTags(country, locale),
-              // Claude, from an Anthropic route, or not at all. `only` is
-              // what makes "no silent fallback to a non-Claude model"
-              // enforceable rather than aspirational.
-              only: [...ANSWER_PROVIDER_ORDER],
-              order: [...ANSWER_PROVIDER_ORDER],
-              disallowPromptTraining: true,
+        failure: AiFailure | null;
+      };
+
+      // One generation against one slug. `only` locks the gateway to the
+      // slug's own vendor (Anthropic slugs may also come via Bedrock/Vertex —
+      // the same model under resale), so a failure here is a real model
+      // failure, never quietly answered by someone else's model.
+      const attemptModel = (model: string, timeoutMs: number) =>
+        new Promise<Attempt>((resolve) => {
+          const result = streamText({
+            model,
+            system,
+            messages: [...history, { role: 'user' as const, content: question }],
+            maxOutputTokens: LIMITS.maxOutputTokens,
+            maxRetries: LIMITS.maxRetries,
+            abortSignal: AbortSignal.timeout(timeoutMs),
+            providerOptions: {
+              gateway: {
+                // Spend attribution and abuse tracing, hashed. Never a raw id.
+                user,
+                tags: usageTags(country, locale, { role: route.role, risk }),
+                only: providerLockFor(model),
+                order: providerLockFor(model),
+                disallowPromptTraining: true,
+              },
             },
-          },
-          onChunk: () => {
-            timings.mark('first_token');
-          },
-          onError: ({ error }) => {
-            status = 'error';
-            const failure = classifyUpstreamError(error);
-            errorCode = failure;
-            failurePart = { uiMessageId, failure, message: failureMessage(failure, locale) };
-            logger.error('ai.answer.failed', {
-              requestId: timings.requestId,
-              failure,
-              conversation: conversation.id,
-            });
-            resolve({ text: '', inputTokens: null, outputTokens: null, generationId: null });
-          },
-          onFinish: ({ text, usage, providerMetadata }) => {
-            const raw = providerMetadata?.gateway?.generationId;
-            resolve({
-              text,
-              inputTokens: usage.inputTokens ?? null,
-              outputTokens: usage.outputTokens ?? null,
-              generationId: typeof raw === 'string' ? raw : null,
-            });
-          },
+            onChunk: () => {
+              timings.mark('first_token');
+            },
+            onError: ({ error }) => {
+              const failure = classifyUpstreamError(error);
+              logger.error('ai.answer.failed', {
+                requestId: timings.requestId,
+                failure,
+                role: route.role,
+                conversation: conversation.id,
+              });
+              resolve({
+                text: '',
+                inputTokens: null,
+                outputTokens: null,
+                generationId: null,
+                failure,
+              });
+            },
+            onFinish: ({ text, usage, providerMetadata }) => {
+              const raw = providerMetadata?.gateway?.generationId;
+              resolve({
+                text,
+                inputTokens: usage.inputTokens ?? null,
+                outputTokens: usage.outputTokens ?? null,
+                generationId: typeof raw === 'string' ? raw : null,
+                failure: null,
+              });
+            },
+          });
+
+          // The customer's stream: text deltas the moment they exist. The
+          // start/finish frames are ours, so this merge sends neither — and
+          // error parts are withheld too: a failed attempt that streamed no
+          // text is followed by the next model in the chain, and a final
+          // failure travels as a data-failure part with honest copy. Leaking
+          // the raw error part would paint a failure banner over an answer
+          // the next model went on to give.
+          writer.merge(
+            result
+              .toUIMessageStream({ sendStart: false, sendFinish: false, onError: () => '' })
+              .pipeThrough(
+                new TransformStream({
+                  transform(part, controller) {
+                    if ((part as { type?: string }).type !== 'error') controller.enqueue(part);
+                  },
+                }),
+              ),
+          );
         });
 
-        // The customer's stream: text deltas the moment they exist. The
-        // start/finish frames are ours, so this merge sends neither.
-        writer.merge(
-          result.toUIMessageStream({
-            sendStart: false,
-            sendFinish: false,
-            onError: (error) => failureMessage(classifyUpstreamError(error), locale),
-          }),
-        );
-      });
+      // Walk the chain (§6.1 automatic fallback). Only before the first
+      // visible word — once any text has streamed, a retry would duplicate
+      // it — and inside the single request budget, so a chain never
+      // multiplies the wall-clock ceiling. Every hop is counted and logged;
+      // the prompt and citation contract are identical on every model.
+      timings.mark('model_start');
+      let failoverCount = 0;
+      let modelUsed = '';
+      let outcome: Attempt = {
+        text: '',
+        inputTokens: null,
+        outputTokens: null,
+        generationId: null,
+        failure: 'unknown',
+      };
+      for (const model of route.chain) {
+        const remainingMs = LIMITS.requestTimeoutMs - (Date.now() - startedAt);
+        if (modelUsed !== '' && remainingMs < 2_000) break;
+        if (modelUsed !== '') {
+          failoverCount += 1;
+          logger.warn('ai.answer.failover', {
+            requestId: timings.requestId,
+            failure: outcome.failure,
+            hop: failoverCount,
+          });
+        }
+        modelUsed = model;
+        outcome = await attemptModel(model, Math.max(remainingMs, 1_000));
+        if (outcome.failure === null || outcome.text.length > 0) break;
+      }
 
-      const outcome = await finished;
+      if (outcome.failure) {
+        status = 'error';
+        errorCode = outcome.failure;
+        const message = failureMessage(outcome.failure, locale);
+        failurePart = { uiMessageId, failure: outcome.failure, message };
+        // The TERMINAL failure — the whole chain exhausted — does surface as
+        // a stream error part: that is what makes the client's retry
+        // affordance appear. Only mid-chain errors are withheld above.
+        writer.write({ type: 'error', errorText: JSON.stringify({ message }) });
+      }
       timings.mark('completed');
 
       if (failurePart) {
@@ -373,7 +436,10 @@ export function streamAnswer(request: ChatRequest): Response {
       const messageId = await recordAnswer(conversation, {
         content: outcome.text,
         sourceIds: retrieval.sourceIds,
-        model: answerModel(),
+        model: modelUsed,
+        modelRole: route.role,
+        riskClass: risk,
+        failoverCount,
         provider: info?.provider ?? null,
         inputTokens: outcome.inputTokens,
         outputTokens: outcome.outputTokens,
@@ -407,6 +473,9 @@ export function streamAnswer(request: ChatRequest): Response {
         inputTokens: outcome.inputTokens,
         outputTokens: outcome.outputTokens,
         provider: info?.provider ?? null,
+        role: route.role,
+        risk,
+        failoverCount,
       });
       timings.flush({
         path: 'answer',
