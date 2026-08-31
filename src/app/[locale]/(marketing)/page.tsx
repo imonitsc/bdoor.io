@@ -7,17 +7,14 @@ import { Button } from '@/components/ui/button';
 import { Section, SectionHeading } from '@/components/ui/section';
 import { PackageSelector } from '@/components/marketing/package-selector';
 import { HeroFounder } from '@/components/marketing/hero-founder';
-import { AskBdoorEntry } from '@/components/ai/ask-bdoor-entry';
 import {
   HOW_IT_WORKS_IMAGE_READY,
   HowItWorksImage,
 } from '@/components/marketing/how-it-works-image';
-import { WorkspacePreview } from '@/components/marketing/workspace-preview';
 import { FaqList } from '@/components/marketing/faq-list';
 import { getGlobalFaqs } from '@/features/catalog/queries';
 import type { Locale } from '@/features/catalog/types';
 import { packageUsdNotes } from '@/lib/fx/usd-notes';
-import { aiEnabled } from '@/features/ai/chat';
 import { MARKETING_ROUTES } from '@/lib/navigation';
 import { localizedUrl } from '@/lib/site';
 
@@ -41,9 +38,11 @@ export async function generateMetadata({
 }
 
 /**
- * Homepage — five sections (production-fix 29 Aug 2026):
- * hero → Bangladesh packages → how it works → workspace proof → FAQ + CTA.
- * International country cards stay off this page; footer links remain.
+ * Homepage — four sections (owner request, 31 Aug 2026):
+ * hero → Bangladesh packages → how it works → FAQ + CTA.
+ * The Ask bdoor AI card and the workspace preview left the page; the hero's
+ * secondary action still opens /ask. International country cards stay off
+ * this page; footer links remain.
  */
 function Hero() {
   const t = useTranslations('home.hero');
@@ -157,21 +156,6 @@ function ProcessSection() {
   );
 }
 
-function Preview() {
-  const t = useTranslations('home.preview');
-  return (
-    <Section tone="sunken">
-      <div className="container-page">
-        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} align="center" />
-        <p className="text-muted mt-2 text-center text-xs">{t('productPreviewNotice')}</p>
-        <div className="mt-10">
-          <WorkspacePreview />
-        </div>
-      </div>
-    </Section>
-  );
-}
-
 async function FaqAndNextStep({ locale }: { locale: Locale }) {
   const [{ data: faqs }, t, tCta] = await Promise.all([
     getGlobalFaqs(),
@@ -200,16 +184,6 @@ async function FaqAndNextStep({ locale }: { locale: Locale }) {
   );
 }
 
-function AskSection({ locale }: { locale: 'en' | 'bn' }) {
-  return (
-    <Section tone="sunken">
-      <div className="container-page">
-        <AskBdoorEntry locale={locale} />
-      </div>
-    </Section>
-  );
-}
-
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
@@ -219,14 +193,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   return (
     <>
       <Hero />
-      {/* Directly under the hero: a visitor who did not find their answer in
-          the headline is one scroll from asking for it. Rendered only when the
-          assistant is switched on, so a deploy without a reviewed knowledge
-          base shows the page it always showed. */}
-      {aiEnabled() ? <AskSection locale={locale as 'en' | 'bn'} /> : null}
       <PackagesSection locale={typedLocale} usdNotes={usdNotes} />
       <ProcessSection />
-      <Preview />
       <FaqAndNextStep locale={typedLocale} />
     </>
   );

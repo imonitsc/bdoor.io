@@ -34,8 +34,9 @@ test.describe('marketing site', () => {
   test('the hero shows the founder photograph, uncropped', async ({ page }) => {
     await page.goto('/en');
 
-    await expect(page.getByText('Product preview — sample data')).toBeVisible();
     await expect(page.locator('#international')).toHaveCount(0);
+    // The workspace preview left the homepage (owner request, 31 Aug 2026).
+    await expect(page.getByText('Product preview — sample data')).toHaveCount(0);
 
     const hero = page.locator('img[src*="bdoor-homepage-hero-large"]');
     await expect(hero).toHaveCount(1);
@@ -124,7 +125,8 @@ test.describe('marketing site', () => {
         nodes.map((n) => (n as HTMLAnchorElement).getAttribute('href')).filter(Boolean),
       );
 
-    expect(links.length).toBeGreaterThan(3);
+    // Two links since the header slimmed to Start + Ask bdoor AI (31 Aug 2026).
+    expect(links.length).toBeGreaterThan(1);
     for (const href of links) {
       const response = await page.request.get(new URL(href!, baseURL).toString());
       expect(response.status(), `${href} returned ${response.status()}`).toBeLessThan(400);

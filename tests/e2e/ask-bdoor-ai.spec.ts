@@ -16,11 +16,10 @@ import { expect, test } from '@playwright/test';
 const HEADING = 'Ask bdoor AI';
 
 test.describe('the homepage entry', () => {
-  test('offers a real input under the hero, not a floating character', async ({ page }) => {
+  test('the hero leads to /ask; the card section and workspace preview are gone', async ({
+    page,
+  }) => {
     await page.goto('/en');
-
-    const entry = page.getByRole('heading', { name: HEADING, exact: true });
-    await expect(entry).toBeVisible();
 
     // The hero is still the hero, and its secondary action carries the spark.
     await expect(page.getByRole('heading', { level: 1 })).toContainText(
@@ -28,30 +27,13 @@ test.describe('the homepage entry', () => {
     );
     await expect(page.getByTestId('home-hero-ask').locator('svg').first()).toBeVisible();
 
-    const input = page.getByPlaceholder('Ask about company registration, licences, tax or pricing');
-    await expect(input.first()).toBeVisible();
-  });
-
-  test('opens the conversation with the question already asked', async ({ page }) => {
-    await page.goto('/en');
-
-    const input = page
-      .getByPlaceholder('Ask about company registration, licences, tax or pricing')
-      .first();
-    await input.fill('How do I register a private limited company?');
-    await page.getByRole('button', { name: HEADING, exact: true }).click();
-
-    const drawer = page.getByRole('dialog');
-    await expect(drawer).toBeVisible();
-    await expect(drawer.getByText('How do I register a private limited company?')).toBeVisible();
-  });
-
-  test('closes on escape', async ({ page }) => {
-    await page.goto('/en');
-    await page.getByRole('button', { name: /How do I register a company in Bangladesh/ }).click();
-    await expect(page.getByRole('dialog')).toBeVisible();
-    await page.keyboard.press('Escape');
-    await expect(page.getByRole('dialog')).toHaveCount(0);
+    // Owner request (31 Aug 2026): the Ask bdoor AI card section and the
+    // workspace preview left the homepage — /ask is the assistant's home.
+    await expect(page.getByRole('heading', { name: HEADING, exact: true })).toHaveCount(0);
+    await expect(
+      page.getByPlaceholder('Ask about company registration, licences, tax or pricing'),
+    ).toHaveCount(0);
+    await expect(page.getByText('One workspace for the whole case')).toHaveCount(0);
   });
 
   test('is reachable from the header navigation and the hero', async ({ page }) => {
