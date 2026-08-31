@@ -5,6 +5,47 @@ production merge `d1d28ad` (PR #49). Governing document:
 `docs/BDoor_Business_Intelligence_OS_Master_Claude_Code_Instruction_2026-08-31.md`.
 Preview-only until founder approval; nothing on this branch deploys production.
 
+> **Superseded (31 Aug 2026, later the same day).** The owner issued
+> `docs/BDoor_Firstbase_Inspired_Business_Intelligence_OS_Master_Claude_Code_Instruction_2026-08-31.md`,
+> which states it replaces this document's governing instruction. Everything
+> below remains an accurate record of what PR
+> [#50](https://github.com/imonitsc/bdoor.io/pull/50) delivered and why; the
+> delta against the replacement is recorded here.
+
+## Replacement instruction — delta map
+
+What the replacement keeps that is already delivered (do not rebuild):
+
+| Replacement area                   | State after PR #50 (merged, production)                                                                               |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Phase 1 multi-model Ask (§6)       | Delivered: role registry, provider-locked fallback, risk routing, role/risk/failover in `ai_usage`, /admin/ai/models. |
+| Phase 2 knowledge core (§7)        | Delivered earlier (PRs #43–#47); BD registration seed still awaits the owner's import+publish clicks on /admin/ai.    |
+| §5.1 above-the-fold homepage       | Delivered: mandated headline, working composer, four starters, Start now, restrained trust line.                      |
+| §4.2 bdoor ID foundation           | Delivered: private `BDR-` identifier generated per company, tenancy-bound, display behind `BDOOR_ID_ENABLED`.         |
+| §4.5 calculators                   | Delivered: versioned/sourced framework + package-estimate calculator.                                                 |
+| §4.0.2 New vs existing (intake)    | Pre-existing: /start branches Bangladesh → new/existing and Outside Bangladesh → country selector.                    |
+| Provider portal (§10.2 base)       | Pre-existing: provider applications, verification, conflict/disclosure/consent chain.                                 |
+| Compliance obligations (§4.8 base) | Pre-existing tables: `compliance_obligations`, `compliance_reminders`, `renewal_cases`; workspace page.               |
+
+What the replacement newly demands, phased honestly (built only when real):
+
+- **Product family surfaces** — /products/start and /products/comply describing
+  real capability; Books, Address, Connect and Discovery/Investor marketplace
+  are NOT built and get no route: §5.1 forbids presenting a flagged-off product
+  as available. Working tier names (Comply Monitor/Prepare/Managed etc.) stay
+  internal until founder approval (§13.1A); the six approved BDT packages are
+  preserved untouched (§13.1).
+- **One-time data capture (§4.0.1)** — a field-provenance layer for business
+  profile facts (who supplied, when, evidence, verification status).
+- **Comply v1 (§4.8)** — the mandated obligation grouping over the existing
+  obligations model.
+- **Homepage below-fold** — same five-section budget, sections renamed to the
+  replacement's list; "Run it from one workspace" mentions only what exists
+  (bdoor ID + compliance workspace), never Books/Address before they do.
+- **Later phases** — Books (5), Address/Connect (7), monetisation instrumentation
+  beyond what Fundable core already records (8): explicitly not in this
+  increment; listed as incomplete in the implementation report.
+
 ## What already exists (do not rebuild)
 
 | Instruction area            | State at d1d28ad                                                                                                                                                            |
