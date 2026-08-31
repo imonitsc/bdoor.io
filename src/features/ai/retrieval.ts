@@ -128,8 +128,17 @@ type Rpc = (
 /** Candidate pool per list, matching the old hybrid function's inner limits. */
 const CANDIDATES = Math.max(LIMITS.retrievalCount * 4, 40);
 
+/**
+ * supabase-js's `rpc` reads `this.rest` internally, so it must stay bound to
+ * its client — extracting the bare method throws on the first call.
+ */
+function boundRpc(): Rpc {
+  const db = aiDb();
+  return db.rpc.bind(db) as unknown as Rpc;
+}
+
 async function keywordCandidates(question: string, countries: string[]): Promise<RankedChunk[][]> {
-  const rpc = aiDb().rpc as unknown as Rpc;
+  const rpc = boundRpc();
   const results = await Promise.all(
     countries.map((code) =>
       rpc('ai_search_keyword', {
@@ -152,7 +161,7 @@ async function semanticCandidates(
 ): Promise<RankedChunk[][]> {
   const embedding = await embedQuery(question);
   timings?.mark('embedding');
-  const rpc = aiDb().rpc as unknown as Rpc;
+  const rpc = boundRpc();
   const results = await Promise.all(
     countries.map((code) =>
       rpc('ai_search_semantic', {
