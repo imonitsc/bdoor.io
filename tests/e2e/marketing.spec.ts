@@ -87,8 +87,17 @@ test.describe('marketing site', () => {
     // ("home.process.steps.one.title"). That shipped once, on /how-it-works,
     // because nothing asserted its absence; this sweep does, in both locales.
     const RAW_KEY =
-      /\b(?:home|nav|start|packages|countries|international|contact|footer|legal|pricingPage|howItWorksPage|admin)\.[A-Za-z_]+(?:\.[A-Za-z_]+)+\b/;
-    const paths = ['', '/how-it-works', '/countries', '/countries/qatar', '/pricing', '/contact'];
+      /\b(?:home|nav|start|packages|products|countries|international|contact|footer|legal|pricingPage|howItWorksPage|admin)\.[A-Za-z_]+(?:\.[A-Za-z_]+)+\b/;
+    const paths = [
+      '',
+      '/how-it-works',
+      '/countries',
+      '/countries/qatar',
+      '/pricing',
+      '/contact',
+      '/products/start',
+      '/products/comply',
+    ];
 
     for (const locale of ['en', 'bn'] as const) {
       for (const path of paths) {
@@ -114,6 +123,28 @@ test.describe('marketing site', () => {
     expect(body).not.toContain('guaranteed approval');
     expect(body).not.toContain('instant approval');
     expect(body).not.toContain('government authorized');
+  });
+
+  test('the two real product pages resolve and stay honest', async ({ page }) => {
+    // Only genuinely operating products get a page (BI-OS §5.1): Start and
+    // Comply. Books/Address/Connect must 404 — an unbuilt product presented
+    // as available is the failure this test exists to prevent.
+    for (const [path, claim] of [
+      ['/en/products/start', /does not submit applications to any authority automatically/i],
+      ['/en/products/comply', /not an official government good-standing status/i],
+    ] as const) {
+      const response = await page.goto(path);
+      expect(response?.ok(), path).toBe(true);
+      await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+      await expect(page.getByText(claim)).toBeVisible();
+      const body = (await page.locator('body').innerText()).toLowerCase();
+      expect(body, path).not.toMatch(/autopilot|guaranteed|coming soon/);
+    }
+
+    for (const missing of ['/en/products/books', '/en/products/address', '/en/products/connect']) {
+      const response = await page.goto(missing);
+      expect(response?.status(), missing).toBe(404);
+    }
   });
 
   test('every header link resolves', async ({ page, baseURL }) => {
