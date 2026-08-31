@@ -247,11 +247,14 @@ test.describe('assets and founder section (hotfix P1)', () => {
     await expect(page.getByText('প্রতিষ্ঠাতা', { exact: true })).toBeVisible();
   });
 
-  test('the homepage process section reads as three concise steps', async ({ page }) => {
+  test('the homepage journey section reads as three concise steps', async ({ page }) => {
+    // The BI-OS homepage (PR #50 onward) replaced Assessment/Quote/Workspace
+    // with the answer→roadmap→case journey; the intent of this pin — three
+    // concise steps, not a wall of process prose — is unchanged.
     await page.goto('/en');
-    await expect(page.getByRole('heading', { name: 'Assessment' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Itemised quote' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Workspace', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Ask', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Plan', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Run', exact: true })).toBeVisible();
   });
 });
 
