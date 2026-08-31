@@ -406,11 +406,12 @@ export function streamAnswer(request: ChatRequest): Response {
       if (outcome.failure) {
         status = 'error';
         errorCode = outcome.failure;
-        failurePart = {
-          uiMessageId,
-          failure: outcome.failure,
-          message: failureMessage(outcome.failure, locale),
-        };
+        const message = failureMessage(outcome.failure, locale);
+        failurePart = { uiMessageId, failure: outcome.failure, message };
+        // The TERMINAL failure — the whole chain exhausted — does surface as
+        // a stream error part: that is what makes the client's retry
+        // affordance appear. Only mid-chain errors are withheld above.
+        writer.write({ type: 'error', errorText: JSON.stringify({ message }) });
       }
       timings.mark('completed');
 
