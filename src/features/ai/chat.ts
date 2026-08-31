@@ -285,66 +285,69 @@ export function streamAnswer(request: ChatRequest): Response {
       let errorCode: string | null = null;
       let failurePart: FailurePart | null = null;
 
-      const finished = new Promise<{ text: string; inputTokens: number | null; outputTokens: number | null; generationId: string | null }>(
-        (resolve) => {
-          timings.mark('model_start');
-          const result = streamText({
-            model: answerModel(),
-            system,
-            messages: [...history, { role: 'user' as const, content: question }],
-            maxOutputTokens: LIMITS.maxOutputTokens,
-            maxRetries: LIMITS.maxRetries,
-            abortSignal: AbortSignal.timeout(LIMITS.requestTimeoutMs),
-            providerOptions: {
-              gateway: {
-                // Spend attribution and abuse tracing, hashed. Never a raw id.
-                user,
-                tags: usageTags(country, locale),
-                // Claude, from an Anthropic route, or not at all. `only` is
-                // what makes "no silent fallback to a non-Claude model"
-                // enforceable rather than aspirational.
-                only: [...ANSWER_PROVIDER_ORDER],
-                order: [...ANSWER_PROVIDER_ORDER],
-                disallowPromptTraining: true,
-              },
+      const finished = new Promise<{
+        text: string;
+        inputTokens: number | null;
+        outputTokens: number | null;
+        generationId: string | null;
+      }>((resolve) => {
+        timings.mark('model_start');
+        const result = streamText({
+          model: answerModel(),
+          system,
+          messages: [...history, { role: 'user' as const, content: question }],
+          maxOutputTokens: LIMITS.maxOutputTokens,
+          maxRetries: LIMITS.maxRetries,
+          abortSignal: AbortSignal.timeout(LIMITS.requestTimeoutMs),
+          providerOptions: {
+            gateway: {
+              // Spend attribution and abuse tracing, hashed. Never a raw id.
+              user,
+              tags: usageTags(country, locale),
+              // Claude, from an Anthropic route, or not at all. `only` is
+              // what makes "no silent fallback to a non-Claude model"
+              // enforceable rather than aspirational.
+              only: [...ANSWER_PROVIDER_ORDER],
+              order: [...ANSWER_PROVIDER_ORDER],
+              disallowPromptTraining: true,
             },
-            onChunk: () => {
-              timings.mark('first_token');
-            },
-            onError: ({ error }) => {
-              status = 'error';
-              const failure = classifyUpstreamError(error);
-              errorCode = failure;
-              failurePart = { uiMessageId, failure, message: failureMessage(failure, locale) };
-              logger.error('ai.answer.failed', {
-                requestId: timings.requestId,
-                failure,
-                conversation: conversation.id,
-              });
-              resolve({ text: '', inputTokens: null, outputTokens: null, generationId: null });
-            },
-            onFinish: ({ text, usage, providerMetadata }) => {
-              const raw = providerMetadata?.gateway?.generationId;
-              resolve({
-                text,
-                inputTokens: usage.inputTokens ?? null,
-                outputTokens: usage.outputTokens ?? null,
-                generationId: typeof raw === 'string' ? raw : null,
-              });
-            },
-          });
+          },
+          onChunk: () => {
+            timings.mark('first_token');
+          },
+          onError: ({ error }) => {
+            status = 'error';
+            const failure = classifyUpstreamError(error);
+            errorCode = failure;
+            failurePart = { uiMessageId, failure, message: failureMessage(failure, locale) };
+            logger.error('ai.answer.failed', {
+              requestId: timings.requestId,
+              failure,
+              conversation: conversation.id,
+            });
+            resolve({ text: '', inputTokens: null, outputTokens: null, generationId: null });
+          },
+          onFinish: ({ text, usage, providerMetadata }) => {
+            const raw = providerMetadata?.gateway?.generationId;
+            resolve({
+              text,
+              inputTokens: usage.inputTokens ?? null,
+              outputTokens: usage.outputTokens ?? null,
+              generationId: typeof raw === 'string' ? raw : null,
+            });
+          },
+        });
 
-          // The customer's stream: text deltas the moment they exist. The
-          // start/finish frames are ours, so this merge sends neither.
-          writer.merge(
-            result.toUIMessageStream({
-              sendStart: false,
-              sendFinish: false,
-              onError: (error) => failureMessage(classifyUpstreamError(error), locale),
-            }),
-          );
-        },
-      );
+        // The customer's stream: text deltas the moment they exist. The
+        // start/finish frames are ours, so this merge sends neither.
+        writer.merge(
+          result.toUIMessageStream({
+            sendStart: false,
+            sendFinish: false,
+            onError: (error) => failureMessage(classifyUpstreamError(error), locale),
+          }),
+        );
+      });
 
       const outcome = await finished;
       timings.mark('completed');

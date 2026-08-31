@@ -14,11 +14,7 @@ import { cn } from '@/lib/utils/cn';
  * whenever the view is not at the bottom.
  */
 
-export function Conversation({
-  className,
-  children,
-  ...props
-}: React.ComponentProps<'div'>) {
+export function Conversation({ className, children, ...props }: React.ComponentProps<'div'>) {
   const viewport = useRef<HTMLDivElement>(null);
   const [atBottom, setAtBottom] = useState(true);
 
@@ -55,7 +51,7 @@ export function Conversation({
         ref={viewport}
         role="log"
         aria-live="polite"
-        className="h-full overflow-y-auto overscroll-contain scroll-pb-4"
+        className="h-full scroll-pb-4 overflow-y-auto overscroll-contain"
       >
         {children}
       </div>
@@ -64,7 +60,7 @@ export function Conversation({
           type="button"
           onClick={() => scrollToBottom()}
           aria-label="Scroll to latest message"
-          className="border-border bg-surface text-ink shadow-sm hover:bg-surface-sunken absolute bottom-3 left-1/2 inline-flex size-9 -translate-x-1/2 items-center justify-center rounded-full border"
+          className="border-border bg-surface text-ink hover:bg-surface-sunken absolute bottom-3 left-1/2 inline-flex size-9 -translate-x-1/2 items-center justify-center rounded-full border shadow-sm"
         >
           <ArrowDown className="size-4" aria-hidden="true" />
         </button>
@@ -74,5 +70,7 @@ export function Conversation({
 }
 
 export function ConversationContent({ className, ...props }: React.ComponentProps<'div'>) {
-  return <div className={cn('mx-auto w-full max-w-3xl space-y-4 px-4 py-4', className)} {...props} />;
+  return (
+    <div className={cn('mx-auto w-full max-w-3xl space-y-4 px-4 py-4', className)} {...props} />
+  );
 }

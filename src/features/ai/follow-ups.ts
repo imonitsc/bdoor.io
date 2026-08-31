@@ -48,7 +48,10 @@ const FOLLOW_UPS: Partial<Record<Topic, Localized[]>> = {
     { en: 'What are my obligations when hiring staff?', bn: 'কর্মী নিয়োগে আমার দায়িত্ব কী কী?' },
   ],
   environment_factory_fire: [
-    { en: 'Which businesses need environmental clearance?', bn: 'কোন ব্যবসায় পরিবেশ ছাড়পত্র লাগে?' },
+    {
+      en: 'Which businesses need environmental clearance?',
+      bn: 'কোন ব্যবসায় পরিবেশ ছাড়পত্র লাগে?',
+    },
   ],
   intellectual_property: [
     { en: 'How do I register a trademark?', bn: 'ট্রেডমার্ক কীভাবে নিবন্ধন করব?' },
@@ -60,7 +63,10 @@ const FOLLOW_UPS: Partial<Record<Topic, Localized[]>> = {
 
 /** Fallback when no topic was detected — the safest useful next steps. */
 const GENERIC: Localized[] = [
-  { en: 'How do I register a company in Bangladesh?', bn: 'বাংলাদেশে কোম্পানি কীভাবে নিবন্ধন করব?' },
+  {
+    en: 'How do I register a company in Bangladesh?',
+    bn: 'বাংলাদেশে কোম্পানি কীভাবে নিবন্ধন করব?',
+  },
   { en: 'Which licences does my business need?', bn: 'আমার ব্যবসায় কোন লাইসেন্সগুলো লাগবে?' },
   { en: 'What do I have to file every year?', bn: 'প্রতি বছর কী কী জমা দিতে হয়?' },
 ];

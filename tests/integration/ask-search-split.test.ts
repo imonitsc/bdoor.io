@@ -28,7 +28,13 @@ const VECTOR = (first: number) =>
 
 async function seedSource(
   tx: Awaited<ReturnType<typeof connect>>,
-  options: { slug: string; tier: number | null; body: string; vectorFirst: number; status?: string },
+  options: {
+    slug: string;
+    tier: number | null;
+    body: string;
+    vectorFirst: number;
+    status?: string;
+  },
 ) {
   const { rows } = await tx.query<{ id: string }>(
     `insert into public.ai_knowledge_sources
@@ -36,7 +42,13 @@ async function seedSource(
      values ($1, $2, 'bd', 'en', 'government_reference', $3, $4::public.ai_source_status,
              'public', '2020-01-01', $5)
      returning id`,
-    [options.slug, `Source ${options.slug}`, options.body, options.status ?? 'published', options.tier],
+    [
+      options.slug,
+      `Source ${options.slug}`,
+      options.body,
+      options.status ?? 'published',
+      options.tier,
+    ],
   );
   await tx.query(
     `insert into public.ai_knowledge_chunks (source_id, chunk_index, content, embedding)

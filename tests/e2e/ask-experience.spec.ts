@@ -25,7 +25,11 @@ test.describe('viewport fit', () => {
       await expect(heading).toBeVisible();
       await expect(input).toBeVisible();
 
-      for (const locator of [heading, input, page.getByRole('button', { name: 'Start a business' })]) {
+      for (const locator of [
+        heading,
+        input,
+        page.getByRole('button', { name: 'Start a business' }),
+      ]) {
         const box = await locator.boundingBox();
         expect(box, 'element has a box').not.toBeNull();
         expect(box!.y).toBeGreaterThanOrEqual(0);
@@ -126,7 +130,9 @@ test.describe('conversation behaviour', () => {
     });
     await page.getByRole('button', { name: 'Try again' }).first().click();
     await expect(
-      page.getByText(/Understanding your question|Checking current official sources|Preparing your answer/),
+      page.getByText(
+        /Understanding your question|Checking current official sources|Preparing your answer/,
+      ),
     ).toBeVisible({ timeout: 10_000 });
   });
 });

@@ -92,7 +92,7 @@ test.describe('the /ask application shell', () => {
   test('keeps the disclosure to one honest line with the full detail linked', async ({ page }) => {
     await page.goto('/en/ask');
     await expect(page.getByText('General information, not professional advice.')).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Privacy' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'How your questions are handled' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Service limits' })).toBeVisible();
     await expect(
       page.getByText('AI answers with current official sources', { exact: false }),
@@ -130,9 +130,17 @@ test.describe('when the model cannot be reached', () => {
 
     await page.getByRole('button', { name: 'Start a business', exact: true }).click();
 
-    // The truthful stage indicator appears while the pipeline works…
+    // The truthful stage indicator appears while the pipeline works. In this
+    // credential-less environment retrieval is skipped and the model call
+    // fails immediately, so the stage can be gone before the first paint —
+    // accept either the stage or the failure it truthfully gave way to. The
+    // stage copy itself is pinned by the retry test in ask-experience.spec.ts.
     await expect(
-      page.getByText(/Understanding your question|Checking current official sources|Preparing your answer/),
+      page
+        .getByText(
+          /Understanding your question|Checking current official sources|Preparing your answer|temporarily unavailable|Something went wrong|took too long/i,
+        )
+        .first(),
     ).toBeVisible({ timeout: 10_000 });
 
     // …and the failure is told to the customer — never a silent substitute.

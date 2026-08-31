@@ -25,7 +25,11 @@ export function Message({
   return (
     <div
       data-role={from}
-      className={cn('flex w-full gap-2.5', from === 'user' ? 'justify-end' : 'justify-start', className)}
+      className={cn(
+        'flex w-full gap-2.5',
+        from === 'user' ? 'justify-end' : 'justify-start',
+        className,
+      )}
       {...props}
     >
       {children}

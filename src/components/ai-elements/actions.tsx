@@ -42,7 +42,15 @@ export function Action({
   );
 }
 
-export function CopyAction({ text, label, copiedLabel }: { text: string; label: string; copiedLabel: string }) {
+export function CopyAction({
+  text,
+  label,
+  copiedLabel,
+}: {
+  text: string;
+  label: string;
+  copiedLabel: string;
+}) {
   const [copied, setCopied] = useState(false);
   return (
     <Action
@@ -54,7 +62,11 @@ export function CopyAction({ text, label, copiedLabel }: { text: string; label: 
         });
       }}
     >
-      {copied ? <Check className="size-3.5" aria-hidden="true" /> : <Copy className="size-3.5" aria-hidden="true" />}
+      {copied ? (
+        <Check className="size-3.5" aria-hidden="true" />
+      ) : (
+        <Copy className="size-3.5" aria-hidden="true" />
+      )}
     </Action>
   );
 }

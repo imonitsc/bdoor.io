@@ -48,7 +48,9 @@ export function SourcesTrigger({
 }
 
 export function SourcesContent({ className, ...props }: React.ComponentProps<'ul'>) {
-  return <ul className={cn('border-border space-y-1.5 border-t px-3 py-2', className)} {...props} />;
+  return (
+    <ul className={cn('border-border space-y-1.5 border-t px-3 py-2', className)} {...props} />
+  );
 }
 
 export function Source({
