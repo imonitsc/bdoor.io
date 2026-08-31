@@ -17,6 +17,8 @@ import {
   usageSummary,
   type SourceStatus,
 } from '@/features/ai/knowledge';
+import { coverageReport } from '@/features/ai/registry/coverage';
+import { Link } from '@/i18n/navigation';
 import { requireCapability } from '@/lib/auth/session';
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
@@ -43,11 +45,13 @@ export default async function AdminAiPage({ params }: { params: Promise<{ locale
   await requireCapability('content.publish');
 
   const t = await getTranslations('admin.ai');
+  const tRegistry = await getTranslations('admin.aiRegistry');
 
-  const [sources, unanswered, usage] = await Promise.all([
+  const [sources, unanswered, usage, coverage] = await Promise.all([
     listSources(),
     listUnanswered(),
     usageSummary(30),
+    coverageReport(),
   ]);
 
   const limits = budgetLimits();
@@ -58,7 +62,37 @@ export default async function AdminAiPage({ params }: { params: Promise<{ locale
     <div className="space-y-8">
       <PageHeading title={t('title')} description={t('description')} actions={<AiImportButton />} />
 
+      {/* The knowledge centre. Each screen owns one half of the pipeline. */}
+      <nav aria-label={tRegistry('navLabel')} className="flex flex-wrap gap-2 text-sm">
+        {(
+          [
+            ['/admin/ai/registry', tRegistry('navRegistry')],
+            ['/admin/ai/documents', tRegistry('navDocuments')],
+            ['/admin/ai/rules', tRegistry('navRules')],
+            ['/admin/ai/coverage', tRegistry('navCoverage')],
+            ['/admin/ai/testing', tRegistry('navTesting')],
+          ] as const
+        ).map(([href, label]) => (
+          <Link
+            key={href}
+            href={href}
+            className="border-border-strong text-ink hover:bg-surface-sunken rounded-[var(--radius-control)] border px-3 py-1.5"
+          >
+            {label}
+          </Link>
+        ))}
+      </nav>
+
       {!aiEnabled() ? <Alert tone="warning">{t('switchedOff')}</Alert> : null}
+
+      {coverage.openAlerts > 0 || coverage.abandonedJobs > 0 ? (
+        <Alert tone="warning">
+          {tRegistry('attentionSummary', {
+            alerts: coverage.openAlerts,
+            jobs: coverage.abandonedJobs,
+          })}
+        </Alert>
+      ) : null}
 
       {publishedNotIndexed.length > 0 ? (
         // Published but not indexed is the one state that looks fine and is

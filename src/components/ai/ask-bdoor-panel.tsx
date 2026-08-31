@@ -41,6 +41,24 @@ function Citations({ message }: { message: ChatMessage }) {
             ) : (
               <span className="text-ink">{citation.title}</span>
             )}
+            {citation.institution ? (
+              <span className="text-muted"> · {citation.institution}</span>
+            ) : null}
+            {citation.referenceNumber ? (
+              <span className="text-muted"> · {citation.referenceNumber}</span>
+            ) : null}
+            {citation.sectionRef ? (
+              <span className="text-muted"> · {citation.sectionRef}</span>
+            ) : null}
+            {citation.page ? (
+              <span className="text-muted"> · {t('page', { page: citation.page })}</span>
+            ) : null}
+            {citation.effectiveFrom ? (
+              <span className="text-muted">
+                {' '}
+                · {t('effectiveFrom', { date: citation.effectiveFrom })}
+              </span>
+            ) : null}
             {citation.lastReviewed ? (
               <span className="text-muted">
                 {' '}

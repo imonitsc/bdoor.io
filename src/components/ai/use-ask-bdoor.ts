@@ -17,6 +17,12 @@ export type Citation = {
   title: string;
   url: string | null;
   lastReviewed: string | null;
+  /** Official-source detail; null for bdoor-authored content. */
+  institution?: string | null;
+  referenceNumber?: string | null;
+  sectionRef?: string | null;
+  page?: number | null;
+  effectiveFrom?: string | null;
 };
 
 export type ChatMessage = {

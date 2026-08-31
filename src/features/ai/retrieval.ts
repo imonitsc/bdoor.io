@@ -3,6 +3,8 @@ import 'server-only';
 import { detectCountry, LIMITS } from './config';
 import { aiDb, hasAiDatabase, type RetrievedChunk } from './db';
 import { embedQuery } from './embeddings';
+import { renderRules, rulesForQuestion } from './registry/rules';
+import { AUTHORITY_TIER_NAMES, type AuthorityTier } from './registry/taxonomy';
 import { STRUCTURED_SOURCE, structuredRecordsFor } from './structured';
 import { logger } from '@/lib/logger';
 
@@ -24,6 +26,15 @@ export type Citation = {
   url: string | null;
   /** ISO date. What "last reviewed" means to the customer: when a person checked it. */
   lastReviewed: string | null;
+  /** Who issued the document, for official sources. Null for bdoor content. */
+  institution: string | null;
+  /** Act / SRO / circular / form number, verbatim, when the source carries one. */
+  referenceNumber: string | null;
+  /** Section/clause/schedule and page, when the cited chunk is that precise. */
+  sectionRef: string | null;
+  page: number | null;
+  /** ISO date the source took effect — the "applicable date" of the answer. */
+  effectiveFrom: string | null;
 };
 
 export type RetrievalResult = {
@@ -55,8 +66,20 @@ function renderContext(chunks: RetrievedChunk[], offset: number): string {
         `[${offset + i + 1}] ${chunk.title}`,
         `type: ${chunk.source_type}`,
         `country: ${chunk.country}`,
+        // The model is told what kind of authority it is reading, so it can
+        // distinguish law from guidance and prefer the gazette over a guide
+        // when they disagree.
+        chunk.authority_tier
+          ? `authority: ${AUTHORITY_TIER_NAMES[chunk.authority_tier as AuthorityTier] ?? `tier ${chunk.authority_tier}`}`
+          : 'authority: bdoor content',
+        chunk.issuing_institution ? `issued by: ${chunk.issuing_institution}` : null,
+        chunk.reference_number ? `reference: ${chunk.reference_number}` : null,
+        chunk.section_ref ? `provision: ${chunk.section_ref}` : null,
+        `effective from: ${chunk.effective_from?.slice(0, 10) ?? 'not recorded'}`,
         `last reviewed: ${reviewDate(chunk) ?? 'not recorded'}`,
-      ].join(' | ');
+      ]
+        .filter(Boolean)
+        .join(' | ');
       return `${header}\n${chunk.content}`;
     })
     .join('\n\n---\n\n');
@@ -76,18 +99,39 @@ export async function retrieveContext(
   locale: 'en' | 'bn',
   country: string,
 ): Promise<RetrievalResult> {
-  const structured = structuredRecordsFor(country);
+  const catalogue = structuredRecordsFor(country);
+
+  // Published, in-date structured rules join the structured block for
+  // Bangladesh questions. Their own filters run inside rulesForQuestion —
+  // this read goes through the service role, so RLS is not on this path.
+  let rulesBlock = '';
+  if (country === 'bd') {
+    try {
+      const rules = await rulesForQuestion(question);
+      if (rules.length) {
+        rulesBlock = `VERIFIED REGULATORY RULES (published after human review; each names its legal basis):\n${renderRules(rules)}`;
+      }
+    } catch (error) {
+      logger.warn('ai.retrieval.rules_failed', { message: (error as Error).message });
+    }
+  }
+  const structured = [catalogue, rulesBlock].filter(Boolean).join('\n\n');
 
   // The catalogue is source [1] whenever it has content, so a quoted price is
   // always attributable to the page a customer can check it on.
   const citations: Citation[] = [];
-  if (structured) {
+  if (catalogue) {
     citations.push({
       index: 1,
       sourceId: null,
       title: STRUCTURED_SOURCE.title,
       url: STRUCTURED_SOURCE.url,
       lastReviewed: STRUCTURED_SOURCE.lastReviewed,
+      institution: null,
+      referenceNumber: null,
+      sectionRef: null,
+      page: null,
+      effectiveFrom: null,
     });
   }
 
@@ -161,6 +205,11 @@ export async function retrieveContext(
       title: chunk.title,
       url: chunk.source_url,
       lastReviewed: reviewDate(chunk),
+      institution: chunk.issuing_institution,
+      referenceNumber: chunk.reference_number,
+      sectionRef: chunk.section_ref,
+      page: chunk.page_start,
+      effectiveFrom: chunk.effective_from?.slice(0, 10) ?? null,
     });
   }
 

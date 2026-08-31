@@ -3,6 +3,13 @@
 A retrieval-grounded assistant that answers public questions about starting and
 running a business, in English and Bangla, from bdoor's own approved content.
 
+The Bangladesh authoritative knowledge layer — the source registry, official
+document ingestion, structured rules, authority-ranked retrieval and the admin
+knowledge centre — is documented in `docs/BANGLADESH_KNOWLEDGE_SYSTEM.md`,
+with `docs/BANGLADESH_SOURCE_POLICY.md` and
+`docs/BANGLADESH_AI_REVIEW_PLAYBOOK.md`. This file remains the reference for
+the base pipeline it builds on.
+
 It is **off by default**. `ASK_BDOOR_AI_ENABLED=false` is the shipped state, and
 nothing on the customer site changes until it is switched on.
 
