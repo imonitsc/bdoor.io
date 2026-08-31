@@ -1507,6 +1507,7 @@
       "navRules": "Structured rules",
       "navCoverage": "Coverage",
       "navTesting": "Retrieval testing",
+      "navModels": "Model routes",
       "attentionSummary": "{alerts, plural, =0 {No open change alerts} one {1 open change alert} other {# open change alerts}} · {jobs, plural, =0 {no abandoned ingestion jobs} one {1 abandoned ingestion job} other {# abandoned ingestion jobs}}. See Documents.",
       "registryTitle": "Source registry",
       "registryDescription": "The official Bangladesh institutions the knowledge system watches, their authority tier and check schedule. A .gov.bd domain is not trusted by itself: every document records its issuing authority and is verified in review.",
@@ -1693,6 +1694,53 @@
         "published_not_indexed": "published but not indexed",
         "restricted": "restricted access scope"
       }
+    },
+    "aiModels": {
+      "title": "Model routes",
+      "description": "One bdoor AI identity, several models behind it. Each role resolves to a fallback chain of AI Gateway slugs; a failover is an explicit hop to the next slug, counted and logged, never a silent substitution. Customers never see a provider name.",
+      "roleColumn": "Role",
+      "chainColumn": "Configured chain",
+      "configColumn": "Configured by",
+      "deterministic": "Deterministic — no model call",
+      "off": "Off until configured",
+      "defaultChain": "Default",
+      "roles": {
+        "router": {
+          "name": "Router",
+          "purpose": "Classifies each question (greeting, scope, topic, risk) before anything is spent. Implemented as deterministic code, not a paid model, so it costs no latency and no money."
+        },
+        "answer": {
+          "name": "Answer",
+          "purpose": "Standard-risk customer answers."
+        },
+        "expert": {
+          "name": "Expert",
+          "purpose": "High-risk questions: tax and VAT, customs, investment and FX, licensing. Falls back to the answer chain when no expert chain is configured — never to a weaker route."
+        },
+        "verifier": {
+          "name": "Verifier",
+          "purpose": "Second-model check of high-risk answers. Off until a verifier chain is configured here and has passed evaluation; turning it on is a configuration decision, not a code default."
+        },
+        "extraction": {
+          "name": "Extraction",
+          "purpose": "Document classification and extraction for the knowledge pipeline. Never customer-facing."
+        },
+        "embedding": {
+          "name": "Embedding",
+          "purpose": "Retrieval vectors. Never a chain: a different embedding model is a different vector space, so changing it is a migration plus a full reindex, not a runtime fallback."
+        },
+        "reranker": {
+          "name": "Reranker",
+          "purpose": "Orders retrieved chunks: reciprocal-rank fusion plus authority tiering, in code. No model call."
+        }
+      },
+      "gatewayTitle": "Models available at the gateway",
+      "gatewayDescription": "Fetched live from AI Gateway, so chains are configured from current model identifiers rather than remembered ones. Set chains with the AI_ANSWER_FALLBACK_MODELS, AI_EXPERT_MODEL and AI_VERIFIER_MODEL environment variables, comma-separated.",
+      "gatewayUnreachable": "The gateway model list could not be fetched from this environment. Chains can still be configured; slugs are validated at the gateway on first use.",
+      "gatewayCount": "{count, plural, one {1 model listed} other {# models listed}}",
+      "gatewayUnlisted": "Not in the gateway list",
+      "configuredVia": "Environment variable",
+      "builtIn": "Built-in"
     }
   },
   "caseStatus": {

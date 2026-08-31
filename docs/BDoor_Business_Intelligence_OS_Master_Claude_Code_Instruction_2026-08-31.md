@@ -1,4 +1,5 @@
 # bdoor Business Intelligence OS
+
 ## Master Claude Code Product, Engineering and Fundability Instruction
 
 **Product:** bdoor  

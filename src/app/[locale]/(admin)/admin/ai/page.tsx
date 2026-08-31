@@ -84,6 +84,7 @@ export default async function AdminAiPage({ params }: { params: Promise<{ locale
             ['/admin/ai/rules', tRegistry('navRules')],
             ['/admin/ai/coverage', tRegistry('navCoverage')],
             ['/admin/ai/testing', tRegistry('navTesting')],
+            ['/admin/ai/models', tRegistry('navModels')],
           ] as const
         ).map(([href, label]) => (
           <Link

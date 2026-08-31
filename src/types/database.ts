@@ -801,6 +801,9 @@ export type Database = {
           "occurred_on": string
           "conversation_id": string | null
           "model": string
+          "model_role": string
+          "risk_class": string
+          "failover_count": number
           "provider": string | null
           "country": string | null
           "locale": Database["public"]["Enums"]["locale_code"] | null
@@ -817,6 +820,9 @@ export type Database = {
           "occurred_on"?: string
           "conversation_id"?: string | null
           "model": string
+          "model_role"?: string
+          "risk_class"?: string
+          "failover_count"?: number
           "provider"?: string | null
           "country"?: string | null
           "locale"?: Database["public"]["Enums"]["locale_code"] | null
@@ -833,6 +839,9 @@ export type Database = {
           "occurred_on"?: string
           "conversation_id"?: string | null
           "model"?: string
+          "model_role"?: string
+          "risk_class"?: string
+          "failover_count"?: number
           "provider"?: string | null
           "country"?: string | null
           "locale"?: Database["public"]["Enums"]["locale_code"] | null

@@ -122,6 +122,11 @@ export type AnswerRecord = {
   content: string;
   sourceIds: string[];
   model: string;
+  /** Which role served this answer, and at what risk class (§6.2 tagging).
+   *  Optional so the model-free fast paths default to the plain answer role. */
+  modelRole?: string;
+  riskClass?: string;
+  failoverCount?: number;
   provider?: string | null;
   inputTokens?: number | null;
   outputTokens?: number | null;
@@ -174,6 +179,9 @@ export async function recordAnswer(
   const { error: usageError } = await db.from('ai_usage').insert({
     conversation_id: conversation.id,
     model: answer.model,
+    model_role: answer.modelRole ?? 'answer',
+    risk_class: answer.riskClass ?? 'standard',
+    failover_count: answer.failoverCount ?? 0,
     provider: answer.provider ?? null,
     country: answer.country,
     locale: answer.locale,
