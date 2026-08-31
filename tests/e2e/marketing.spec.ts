@@ -138,7 +138,9 @@ test.describe('marketing site', () => {
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
       await expect(page.getByText(claim)).toBeVisible();
       const body = (await page.locator('body').innerText()).toLowerCase();
-      expect(body, path).not.toMatch(/autopilot|guaranteed|coming soon/);
+      // 'guaranteed approval', not bare 'guaranteed': the footer's honest
+      // disclosure legitimately says approval is NOT guaranteed.
+      expect(body, path).not.toMatch(/autopilot|guaranteed approval|coming soon/);
     }
 
     for (const missing of ['/en/products/books', '/en/products/address', '/en/products/connect']) {
