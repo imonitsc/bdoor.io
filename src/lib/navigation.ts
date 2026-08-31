@@ -17,6 +17,8 @@ export const MARKETING_ROUTES = {
   partnersApply: '/partners/apply',
   resources: '/resources',
   ask: '/ask',
+  productStart: '/products/start',
+  productComply: '/products/comply',
   about: '/about',
   contact: '/contact',
   login: '/login',
@@ -128,6 +130,11 @@ export const FOOTER_COUNTRY_LINKS = [
 ] as const;
 
 export const FOOTER_COMPANY_LINKS = [
+  // Only products that genuinely operate get a page (replacement instruction
+  // §5.1): Start and Comply. Books, Address and Connect have no route until
+  // they are real.
+  { href: MARKETING_ROUTES.productStart, labelKey: 'footer.links.productStart' },
+  { href: MARKETING_ROUTES.productComply, labelKey: 'footer.links.productComply' },
   { href: MARKETING_ROUTES.about, labelKey: 'nav.about' },
   { href: MARKETING_ROUTES.howItWorks, labelKey: 'nav.howItWorks' },
   { href: MARKETING_ROUTES.pricing, labelKey: 'nav.packages' },
@@ -175,6 +182,8 @@ export const SITEMAP_ROUTES: ReadonlyArray<{
   { path: '/', priority: 1, changeFrequency: 'weekly' },
   { path: '/start', priority: 0.9, changeFrequency: 'monthly' },
   { path: '/ask', priority: 0.8, changeFrequency: 'monthly' },
+  { path: '/products/start', priority: 0.7, changeFrequency: 'monthly' },
+  { path: '/products/comply', priority: 0.7, changeFrequency: 'monthly' },
   { path: '/services', priority: 0.9, changeFrequency: 'weekly' },
   { path: '/industries', priority: 0.8, changeFrequency: 'monthly' },
   { path: '/countries', priority: 0.7, changeFrequency: 'monthly' },

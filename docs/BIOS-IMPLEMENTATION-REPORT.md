@@ -1,9 +1,51 @@
 # Business Intelligence OS — implementation report (§18)
 
 Date: 31 Aug 2026. Branch: `feat/bdoor-business-intelligence-os` (preview
-only; production untouched). Governing document:
-`docs/BDoor_Business_Intelligence_OS_Master_Claude_Code_Instruction_2026-08-31.md`;
-decisions recorded in `docs/BIOS-BASELINE.md`.
+only). Governing document (replacement, same day):
+`docs/BDoor_Firstbase_Inspired_Business_Intelligence_OS_Master_Claude_Code_Instruction_2026-08-31.md`;
+decisions and the delta map in `docs/BIOS-BASELINE.md`. The sections below
+marked "PR #50" merged to production earlier today; the "second increment"
+sections are this branch's follow-up work.
+
+## Second increment (replacement instruction)
+
+- **Implemented — product surfaces (§4.0/§5.5)**: `/products/start` and
+  `/products/comply`, en + bn, describing only real capability. Start states
+  plainly that no automated authority submission exists; Comply states that
+  its view is bdoor's tracking, never an official good-standing status. No
+  tier names or prices (§13.1A); the six approved packages on /pricing remain
+  the only published figures. In footer and sitemap; header stays Start + Ask.
+- **Deliberately absent — Books, Address, Connect, Discovery**: not built, so
+  no route, card, flag-off placeholder or "coming soon" CTA anywhere (§5.1's
+  own rule). Each launches only through its §19 gate (premises/authorisation
+  for Address, signed partners for Connect, assigned reviewers for Books,
+  verified investors before any Discovery language).
+- **Implemented — one-time data capture (§4.0.1)**: `business_profile_facts`
+  with supplier, moment, evidence document, verification status; superseded
+  never edited; one current value per field enforced by the database; RLS
+  rides the companies tenancy (wrong-actor integration tests). The
+  `recordFact`/`currentFacts` module is the single write path. **Incomplete**:
+  no workflow consumes it yet — wiring Start/roadmap reuse ("confirm or
+  update", never silent reuse) is the next increment.
+- **Implemented — Comply v1 grouping (§4.8)**: the workspace compliance page
+  groups by status AND calendar into due now / upcoming / under review /
+  overdue / completed / not applicable. **Incomplete**: "awaiting
+  information" and the filed/accepted split need filing-workflow states
+  (document request, submission, acknowledgement) that do not exist;
+  approximating them would imply an authority outcome bdoor never tracked.
+  Configurable Monitor/Prepare/Managed service levels: not built (names and
+  prices await founder approval).
+- **Implemented — homepage below-fold (§5.1 replacement list)**: sections
+  renamed to "Start or add your business" (existing-business path named) and
+  "Run it from one workspace" (deadlines/renewals/reminders that exist);
+  Books/Address/Connect unmentioned.
+- **Incomplete — the wider replacement scope**, recorded so nothing reads as
+  quietly done: field-provenance consumption in Start; the §4.3 roadmap
+  artefact; provider-firm portal gaps vs §10.2 (capacity, SLA metrics
+  surfaces); §9.5 subscriptions/entitlements beyond the existing Fundable
+  records; §13.1A packaging architecture; §14 product-event expansion; §15
+  golden set beyond 124 questions; §16's journey-level Playwright tests for
+  flows that do not exist yet (Books, Address, Connect).
 
 Every claim below is one of four honest states: **implemented** (built and
 tested on this branch), **already live** (existed before this branch, in
