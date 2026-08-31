@@ -81,20 +81,21 @@ export const ADMIN_ROUTES = {
 } as const;
 
 /**
- * Primary destinations (production-fix 29 Aug 2026): Start, Services,
- * Pricing, Resources. Countries stay in the footer only — not the header.
- * Partners, how-it-works and company pages remain in the drawer and footer.
+ * Primary destinations (owner request, 31 Aug 2026): the header carries only
+ * the two actions — Start and Ask bdoor AI. Services, Pricing and Resources
+ * moved to the footer (and stay in the drawer below xl); Countries was
+ * already footer-only.
  */
 export const HEADER_LINKS = [
   { href: MARKETING_ROUTES.start, labelKey: 'nav.startShort' },
-  { href: MARKETING_ROUTES.services, labelKey: 'nav.services' },
-  { href: MARKETING_ROUTES.pricing, labelKey: 'nav.pricing' },
   { href: MARKETING_ROUTES.ask, labelKey: 'nav.ask' },
-  { href: MARKETING_ROUTES.resources, labelKey: 'nav.resources' },
 ] as const;
 
-/** Shown in the mobile/tablet drawer under the five primary destinations. */
+/** Shown in the mobile/tablet drawer under the primary destinations. */
 export const DRAWER_SECONDARY_LINKS = [
+  { href: MARKETING_ROUTES.services, labelKey: 'nav.services' },
+  { href: MARKETING_ROUTES.pricing, labelKey: 'nav.pricing' },
+  { href: MARKETING_ROUTES.resources, labelKey: 'nav.resources' },
   { href: MARKETING_ROUTES.howItWorks, labelKey: 'nav.howItWorks' },
   { href: MARKETING_ROUTES.partners, labelKey: 'nav.partners' },
   { href: MARKETING_ROUTES.foreignFounders, labelKey: 'nav.foreignFounders' },
@@ -105,6 +106,9 @@ export const DRAWER_SECONDARY_LINKS = [
 
 /** Three footer groups plus legal/contact — not one group per site area. */
 export const FOOTER_BANGLADESH_LINKS = [
+  // The services overview moved here from the header (31 Aug 2026); the
+  // category links below it deep-link into the same catalogue.
+  { href: MARKETING_ROUTES.services, labelKey: 'nav.services' },
   { href: '/services?category=company-formation', labelKey: 'footer.links.formation' },
   { href: '/services?category=licences', labelKey: 'footer.links.licences' },
   { href: '/services?category=tax-vat', labelKey: 'footer.links.tax' },
