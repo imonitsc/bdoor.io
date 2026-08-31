@@ -120,13 +120,13 @@
   },
   "home": {
     "hero": {
-      "eyebrow": "Business formation & compliance in Bangladesh",
-      "headline": "Start and run your business in Bangladesh.",
-      "support": "Company formation, licences, tax and ongoing compliance—coordinated through one clear process.",
+      "eyebrow": "Business intelligence for Bangladesh",
+      "headline": "Bangladesh business intelligence, from first question to next action.",
+      "support": "Ask about company formation, licences, tax, VAT and compliance. bdoor AI explains the official process and cites its sources — and when you are ready, bdoor runs the case with verified professionals.",
       "primaryCta": "Start now",
       "askCta": "Ask bdoor AI",
       "secondaryCta": "See packages",
-      "trustLine": "Free assessment · Itemised quote · No obligation",
+      "trustLine": "Cited answers, general information only — not legal, tax or investment advice. The assessment is free and creates no obligation.",
       "operatorLine": "Operated by bdoor compliance ltd.",
       "doorAlt": "An open doorway overlooking Dhaka's business district",
       "founderAlt": "Founder using the bdoor workspace on a laptop.",
@@ -143,6 +143,29 @@
           "quote": "Quote"
         },
         "readiness": "No identity documents are needed to apply — collection begins only after you accept a quote."
+      },
+      "composer": {
+        "label": "Your question",
+        "placeholder": "Ask about starting or running a business in Bangladesh",
+        "cta": "Ask bdoor AI"
+      },
+      "starters": {
+        "business": {
+          "label": "Start a business",
+          "question": "How do I start a business in Bangladesh?"
+        },
+        "licences": {
+          "label": "Find licences",
+          "question": "Which licences and permits does my business need in Bangladesh?"
+        },
+        "tax": {
+          "label": "Understand tax and VAT",
+          "question": "How do tax and VAT work for a company in Bangladesh?"
+        },
+        "investment": {
+          "label": "Prepare for investment",
+          "question": "How do I prepare my company for foreign investment in Bangladesh?"
+        }
       }
     },
     "packages": {
@@ -197,10 +220,10 @@
       "cta": "Read how the whole process works"
     },
     "finalCta": {
-      "title": "Ready to start?",
-      "body": "Answer a few questions and receive an itemised quote before you commit.",
+      "title": "Start with a question, or start the process.",
+      "body": "Ask bdoor AI anything about doing business in Bangladesh, or begin the free assessment and receive an itemised quote before you commit.",
       "primary": "Start now",
-      "secondary": "Contact us"
+      "secondary": "Ask bdoor AI"
     },
     "trust": {
       "quotes": "Transparent itemised quotes",
@@ -272,6 +295,58 @@
       "partnerModel": "Regulated work is performed by appointed third-party providers — law and accountancy firms and licensed local specialists. Your provider, their scope and their fees are disclosed before any engagement or payment.",
       "cta": "See compliance packages",
       "partnerCta": "How the partner model works"
+    },
+    "solve": {
+      "eyebrow": "What bdoor AI can solve",
+      "title": "Ask a real question. Get the official process.",
+      "body": "Every answer draws on published sources and says which authority owns each step. Where professional advice is required, it says so and offers a specialist.",
+      "items": {
+        "formation": {
+          "title": "Start a business",
+          "body": "Entity choice, name clearance, incorporation documents and the registration sequence — with the official references for each step."
+        },
+        "licences": {
+          "title": "Licences and renewals",
+          "body": "Which trade licence, sector permits and registrations apply to your activity, who issues them and when they renew."
+        },
+        "tax": {
+          "title": "Tax and VAT",
+          "body": "e-TIN, VAT registration and return filing — and the difference between a government fee and a service fee, explained, never invented."
+        },
+        "investment": {
+          "title": "Investment and FX readiness",
+          "body": "What foreign shareholding, capital remittance and repatriation involve, and which parts need a bank, an authority or a professional."
+        }
+      }
+    },
+    "journey": {
+      "eyebrow": "From answer to action",
+      "title": "From answer to roadmap to managed case.",
+      "steps": {
+        "one": {
+          "title": "Ask",
+          "body": "Start with a question. bdoor AI answers from published sources, with citations and honest limits."
+        },
+        "two": {
+          "title": "Plan",
+          "body": "The free assessment turns your situation into a preliminary roadmap — always labelled preliminary and subject to specialist review."
+        },
+        "three": {
+          "title": "Run",
+          "body": "Accept an itemised quote — bdoor's fee separated from government charges — and follow milestones, documents and renewals in your workspace."
+        }
+      }
+    },
+    "workspace": {
+      "eyebrow": "bdoor ID & workspace",
+      "title": "One private workspace for your business.",
+      "body": "Your case history, documents, quotes and compliance dates live in one place, private to you and your case team.",
+      "identity": "Inside it, your business carries a private bdoor ID — an internal reference that ties your history together. It is not a government identifier, not a credit rating and never public: nothing is published unless you opt in to verification."
+    },
+    "providers": {
+      "eyebrow": "Verified provider review",
+      "title": "Regulated work goes to verified independent professionals.",
+      "body": "Advocates and firms apply, are verified and pass conflict-of-interest checks before they can take an engagement — and they are identified to you before any document is shared. bdoor coordinates; it is not a law firm."
     }
   },
   "howItWorksPage": {
@@ -1148,6 +1223,10 @@
       "preferencesTitle": "How we contact you",
       "channelEmail": "Email",
       "channelInApp": "In app"
+    },
+    "bdoorId": {
+      "label": "bdoor ID",
+      "privacy": "Your bdoor ID is a private bdoor platform reference for this business. It is not a government identifier or a credit rating, and it is never published — verification, if you ever want it, is a separate opt-in."
     }
   },
   "partnerWorkspace": {

@@ -5,16 +5,12 @@ import { ArrowRight, Sparkles } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { Section, SectionHeading } from '@/components/ui/section';
-import { PackageSelector } from '@/components/marketing/package-selector';
 import { HeroFounder } from '@/components/marketing/hero-founder';
 import {
   HOW_IT_WORKS_IMAGE_READY,
   HowItWorksImage,
 } from '@/components/marketing/how-it-works-image';
-import { FaqList } from '@/components/marketing/faq-list';
-import { getGlobalFaqs } from '@/features/catalog/queries';
 import type { Locale } from '@/features/catalog/types';
-import { packageUsdNotes } from '@/lib/fx/usd-notes';
 import { MARKETING_ROUTES } from '@/lib/navigation';
 import { localizedUrl } from '@/lib/site';
 
@@ -38,13 +34,16 @@ export async function generateMetadata({
 }
 
 /**
- * Homepage — four sections (owner request, 31 Aug 2026):
- * hero → Bangladesh packages → how it works → FAQ + CTA.
- * The Ask bdoor AI card and the workspace preview left the page; the hero's
- * secondary action still opens /ask. International country cards stay off
- * this page; footer links remain.
+ * Homepage — the Business Intelligence OS layout (BI-OS §5.1, 31 Aug 2026):
+ * a working Ask composer above the fold with four starters and one Start now
+ * secondary, then exactly five sections — what bdoor AI can solve,
+ * answer→roadmap→case, bdoor ID & workspace, verified provider review, and
+ * the final action. No country grid, no service catalogue, no statistics.
  */
-function Hero() {
+
+const STARTERS = ['business', 'licences', 'tax', 'investment'] as const;
+
+function Hero({ locale }: { locale: Locale }) {
   const t = useTranslations('home.hero');
 
   return (
@@ -52,13 +51,54 @@ function Hero() {
       <div className="mx-auto grid w-full max-w-[80rem] items-center gap-10 px-5 py-14 md:gap-12 md:px-8 md:py-16 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-16 lg:py-[4.5rem] xl:max-w-none xl:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] xl:pr-8 xl:pl-[max(2rem,calc((100vw-1280px)/2+2rem))]">
         <div className="flex max-w-[38.75rem] flex-col justify-center">
           <p className="text-muted font-mono text-xs tracking-[0.14em] uppercase">{t('eyebrow')}</p>
-          <h1 className="text-ink mt-4 text-[2.5rem] leading-[1.04] font-semibold md:text-[3.5rem] lg:text-[3.75rem]">
+          <h1 className="text-ink mt-4 text-[2.25rem] leading-[1.06] font-semibold md:text-[3rem] lg:text-[3.25rem]">
             {t('headline')}
           </h1>
           <p className="text-muted mt-5 max-w-xl text-lg leading-relaxed">{t('support')}</p>
 
+          {/* The working composer. A plain GET form on purpose: it navigates
+              to /ask?q=… with zero client JavaScript, so the question box
+              works before hydration — the /ask panel picks the question up
+              and sends it. */}
+          <form
+            action={`/${locale}/ask`}
+            method="get"
+            data-testid="home-ask-form"
+            className="border-border-strong bg-surface mt-8 flex items-stretch gap-2 rounded-[var(--radius-panel)] border p-2 shadow-sm"
+          >
+            <label htmlFor="home-ask-input" className="sr-only">
+              {t('composer.label')}
+            </label>
+            <input
+              id="home-ask-input"
+              name="q"
+              type="text"
+              maxLength={2000}
+              placeholder={t('composer.placeholder')}
+              className="text-ink placeholder:text-muted min-h-11 w-full min-w-0 flex-1 bg-transparent px-3 text-base focus:outline-none"
+            />
+            <Button type="submit" data-testid="home-hero-ask" className="shrink-0">
+              <Sparkles className="size-4" aria-hidden="true" />
+              <span className="hidden sm:inline">{t('composer.cta')}</span>
+              <span className="sr-only sm:hidden">{t('composer.cta')}</span>
+            </Button>
+          </form>
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            {STARTERS.map((starter) => (
+              <Link
+                key={starter}
+                href={{ pathname: '/ask', query: { q: t(`starters.${starter}.question`) } }}
+                data-testid={`home-starter-${starter}`}
+                className="border-border text-ink hover:bg-surface-sunken rounded-full border px-3.5 py-1.5 text-sm"
+              >
+                {t(`starters.${starter}.label`)}
+              </Link>
+            ))}
+          </div>
+
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Button asChild size="lg">
+            <Button asChild size="lg" variant="secondary">
               <Link
                 href={MARKETING_ROUTES.start}
                 data-testid="home-hero-start"
@@ -66,16 +106,6 @@ function Hero() {
               >
                 {t('primaryCta')}
                 <ArrowRight className="size-4" aria-hidden="true" />
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="secondary">
-              <Link
-                href={MARKETING_ROUTES.ask}
-                data-testid="home-hero-ask"
-                className="inline-flex min-h-11 items-center"
-              >
-                <Sparkles className="size-4" aria-hidden="true" />
-                {t('askCta')}
               </Link>
             </Button>
           </div>
@@ -96,28 +126,32 @@ function Hero() {
   );
 }
 
-function PackagesSection({
-  locale,
-  usdNotes,
-}: {
-  locale: Locale;
-  usdNotes?: Record<string, string>;
-}) {
-  const t = useTranslations('home.packages');
+function SolveSection() {
+  const t = useTranslations('home.solve');
+  const items = ['formation', 'licences', 'tax', 'investment'] as const;
+
   return (
     <Section tone="surface">
       <div className="container-page">
         <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
-        <PackageSelector locale={locale} usdNotes={usdNotes} compact />
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {items.map((item) => (
+            <div
+              key={item}
+              className="border-border bg-canvas rounded-[var(--radius-panel)] border p-5"
+            >
+              <h3 className="text-ink text-base font-semibold">{t(`items.${item}.title`)}</h3>
+              <p className="text-muted mt-2 text-sm leading-relaxed">{t(`items.${item}.body`)}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </Section>
   );
 }
 
-function ProcessSection() {
-  const t = useTranslations('home.process');
-  // Hotfix §5/§6: three concise steps keep the section under the 600px
-  // desktop budget; /how-it-works keeps the fuller four-step timeline.
+function JourneySection() {
+  const t = useTranslations('home.journey');
   const steps = ['one', 'two', 'three'] as const;
 
   return (
@@ -141,44 +175,70 @@ function ProcessSection() {
                   {String(index + 1).padStart(2, '0')}
                 </span>
                 <div>
-                  <h3 className="text-ink text-base font-semibold">{t(`compact.${step}.title`)}</h3>
+                  <h3 className="text-ink text-base font-semibold">{t(`steps.${step}.title`)}</h3>
                   <p className="text-muted mt-1 text-sm leading-relaxed">
-                    {t(`compact.${step}.body`)}
+                    {t(`steps.${step}.body`)}
                   </p>
                 </div>
               </li>
             ))}
           </ol>
         </div>
-        <HowItWorksImage alt={t('imageAlt')} />
+        <HowItWorksImage alt={t('title')} />
       </div>
     </Section>
   );
 }
 
-async function FaqAndNextStep({ locale }: { locale: Locale }) {
-  const [{ data: faqs }, t, tCta] = await Promise.all([
-    getGlobalFaqs(),
-    getTranslations('home.faq'),
-    getTranslations('home.finalCta'),
-  ]);
+function WorkspaceSection() {
+  const t = useTranslations('home.workspace');
+
+  return (
+    <Section tone="surface">
+      <div className="container-page max-w-3xl">
+        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
+        {/* The §4.2 disclaimers travel with the feature everywhere it is
+            described: not a government ID, not a rating, never public. */}
+        <p className="text-muted mt-4 text-sm leading-relaxed">{t('identity')}</p>
+      </div>
+    </Section>
+  );
+}
+
+function ProvidersSection() {
+  const t = useTranslations('home.providers');
 
   return (
     <Section>
-      <div className="container-page grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
-        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} />
-        <FaqList faqs={faqs} locale={locale} limit={4} />
+      <div className="container-page max-w-3xl">
+        <SectionHeading eyebrow={t('eyebrow')} title={t('title')} body={t('body')} />
       </div>
+    </Section>
+  );
+}
 
-      <div className="container-page border-border mt-16 flex flex-col items-center gap-5 border-t pt-16 text-center">
-        <h2 className="text-ink max-w-2xl text-2xl leading-tight md:text-3xl">{tCta('title')}</h2>
-        <p className="text-muted max-w-xl text-base leading-relaxed">{tCta('body')}</p>
-        <Button asChild size="lg">
-          <Link href={MARKETING_ROUTES.start}>
-            {tCta('primary')}
-            <ArrowRight className="size-4" aria-hidden="true" />
-          </Link>
-        </Button>
+function FinalCta() {
+  const t = useTranslations('home.finalCta');
+
+  return (
+    <Section tone="surface">
+      <div className="container-page flex flex-col items-center gap-5 text-center">
+        <h2 className="text-ink max-w-2xl text-2xl leading-tight md:text-3xl">{t('title')}</h2>
+        <p className="text-muted max-w-xl text-base leading-relaxed">{t('body')}</p>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <Button asChild size="lg">
+            <Link href={MARKETING_ROUTES.start}>
+              {t('primary')}
+              <ArrowRight className="size-4" aria-hidden="true" />
+            </Link>
+          </Button>
+          <Button asChild size="lg" variant="secondary">
+            <Link href={MARKETING_ROUTES.ask}>
+              <Sparkles className="size-4" aria-hidden="true" />
+              {t('secondary')}
+            </Link>
+          </Button>
+        </div>
       </div>
     </Section>
   );
@@ -187,15 +247,15 @@ async function FaqAndNextStep({ locale }: { locale: Locale }) {
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const typedLocale = locale as Locale;
-  const usdNotes = await packageUsdNotes(typedLocale);
 
   return (
     <>
-      <Hero />
-      <PackagesSection locale={typedLocale} usdNotes={usdNotes} />
-      <ProcessSection />
-      <FaqAndNextStep locale={typedLocale} />
+      <Hero locale={locale as Locale} />
+      <SolveSection />
+      <JourneySection />
+      <WorkspaceSection />
+      <ProvidersSection />
+      <FinalCta />
     </>
   );
 }

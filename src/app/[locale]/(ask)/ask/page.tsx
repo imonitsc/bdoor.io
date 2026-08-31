@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 
-import { AskBdoorPanel } from '@/components/ai/ask-bdoor-panel';
+import { AskFromQuery } from '@/components/ai/ask-from-query';
 import { aiEnabled } from '@/features/ai/chat';
 import type { Locale } from '@/features/catalog/types';
 import { localizedUrl } from '@/lib/site';
@@ -39,5 +39,5 @@ export default async function AskPage({ params }: { params: Promise<{ locale: st
 
   if (!aiEnabled()) notFound();
 
-  return <AskBdoorPanel locale={locale as 'en' | 'bn'} variant="page" autoFocus />;
+  return <AskFromQuery locale={locale as 'en' | 'bn'} />;
 }
