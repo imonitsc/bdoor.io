@@ -1227,6 +1227,51 @@ export type Database = {
         }
         Relationships: []
       }
+      "business_profile_facts": {
+        Row: {
+          "id": string
+          "company_id": string
+          "field_key": string
+          "value": string
+          "supplied_by": string | null
+          "supplied_at": string
+          "source_document_id": string | null
+          "verification_status": string
+          "verified_by": string | null
+          "verified_at": string | null
+          "superseded_at": string | null
+          "created_at": string
+        }
+        Insert: {
+          "id"?: string
+          "company_id": string
+          "field_key": string
+          "value": string
+          "supplied_by"?: string | null
+          "supplied_at"?: string
+          "source_document_id"?: string | null
+          "verification_status"?: string
+          "verified_by"?: string | null
+          "verified_at"?: string | null
+          "superseded_at"?: string | null
+          "created_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "company_id"?: string
+          "field_key"?: string
+          "value"?: string
+          "supplied_by"?: string | null
+          "supplied_at"?: string
+          "source_document_id"?: string | null
+          "verification_status"?: string
+          "verified_by"?: string | null
+          "verified_at"?: string | null
+          "superseded_at"?: string | null
+          "created_at"?: string
+        }
+        Relationships: []
+      }
       "case_milestones": {
         Row: {
           "id": string

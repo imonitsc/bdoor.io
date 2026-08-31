@@ -1165,7 +1165,15 @@
       "responsible": "দায়িত্বপ্রাপ্ত",
       "evidence": "সম্পন্নের প্রমাণ",
       "markComplete": "সম্পন্ন চিহ্নিত করুন",
-      "startRenewal": "নবায়ন শুরু করুন"
+      "startRenewal": "নবায়ন শুরু করুন",
+      "groups": {
+        "due_now": "এখন বকেয়া",
+        "upcoming": "আসন্ন",
+        "under_review": "পর্যালোচনাধীন",
+        "overdue": "সময়সীমা অতিবাহিত",
+        "completed": "সম্পন্ন",
+        "not_applicable": "প্রযোজ্য নয়"
+      }
     },
     "messages": {
       "title": "বার্তা",

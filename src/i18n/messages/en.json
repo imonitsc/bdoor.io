@@ -1165,7 +1165,15 @@
       "responsible": "Responsible",
       "evidence": "Completion evidence",
       "markComplete": "Mark complete",
-      "startRenewal": "Start renewal"
+      "startRenewal": "Start renewal",
+      "groups": {
+        "due_now": "Due now",
+        "upcoming": "Upcoming",
+        "under_review": "Under review",
+        "overdue": "Overdue",
+        "completed": "Completed",
+        "not_applicable": "Not applicable"
+      }
     },
     "messages": {
       "title": "Messages",

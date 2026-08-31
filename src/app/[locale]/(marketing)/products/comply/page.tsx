@@ -46,9 +46,7 @@ function ComplyContent() {
     <>
       <Section>
         <div className="container-page max-w-3xl">
-          <p className="text-muted font-mono text-xs tracking-[0.14em] uppercase">
-            {t('eyebrow')}
-          </p>
+          <p className="text-muted font-mono text-xs tracking-[0.14em] uppercase">{t('eyebrow')}</p>
           <h1 className="text-ink mt-4 text-3xl leading-tight font-semibold md:text-4xl">
             {t('title')}
           </h1>
