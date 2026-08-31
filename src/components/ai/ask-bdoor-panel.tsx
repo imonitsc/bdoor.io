@@ -65,6 +65,7 @@ function AssistantTurn({
   isLast,
   streaming,
   stage,
+  fallbackFailure,
   onRate,
   onRegenerate,
   onFollowUp,
@@ -74,6 +75,7 @@ function AssistantTurn({
   isLast: boolean;
   streaming: boolean;
   stage: Stage | null;
+  fallbackFailure: string | null;
   onRate: (messageId: string, rating: 1 | -1) => void;
   onRegenerate: () => void;
   onFollowUp: (question: string) => void;
@@ -81,7 +83,9 @@ function AssistantTurn({
   const t = useTranslations('ask');
   const text = messageText(message);
   const citations = messageCitations(message);
-  const failed = Boolean(meta?.failure) && meta?.failure !== 'out_of_scope';
+  const failed =
+    (Boolean(meta?.failure) && meta?.failure !== 'out_of_scope') ||
+    Boolean(!text && fallbackFailure);
 
   return (
     <Message from="assistant">
@@ -93,6 +97,10 @@ function AssistantTurn({
           <Loader label={t(`stages.${stage ?? 'understanding'}`)} />
         ) : meta?.failureMessage ? (
           <p>{meta.failureMessage}</p>
+        ) : fallbackFailure ? (
+          // A failure the transport surfaced (no data-failure part reached the
+          // client) still belongs in the transcript, not only in the banner.
+          <p>{fallbackFailure}</p>
         ) : null}
 
         {citations.length ? (
@@ -363,6 +371,9 @@ export function AskBdoorPanel({
                 isLast={message.id === lastAssistantId}
                 streaming={streaming && index === messages.length - 1}
                 stage={stage}
+                fallbackFailure={
+                  message.id === lastAssistantId && !streaming ? (errorCopy ?? null) : null
+                }
                 onRate={(messageId, rating) => void rate(messageId, rating)}
                 onRegenerate={retry}
                 onFollowUp={submit}
