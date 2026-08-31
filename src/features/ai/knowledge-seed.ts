@@ -1,5 +1,9 @@
 import 'server-only';
 
+import {
+  BD_KNOWLEDGE_REVIEWED,
+  BD_REGISTRATION_KNOWLEDGE,
+} from '@/content/bd/registration-knowledge';
 import { COUNTRY_GUIDES } from '@/content/countries/guides';
 import {
   COMMERCIAL_REVIEW_DATE,
@@ -43,6 +47,10 @@ export type SeedSource = {
   /** The date a person last checked this content, carried from the content file. */
   lastReviewed: string;
   serviceCategory?: string;
+  /** Registry authority tier, for sources that summarise an official authority. */
+  authorityTier?: 1 | 2 | 3 | 4 | 5 | 6;
+  issuingInstitution?: string;
+  referenceNumber?: string;
 };
 
 const COUNTRY_CODE: Record<string, string> = {
@@ -260,7 +268,38 @@ Please do not paste identity documents, card numbers or passwords into any chat.
   },
 ];
 
+/**
+ * The Bangladesh registration knowledge: bdoor's end-to-end walkthrough plus
+ * bdoor-authored summaries of the official sources, each linking to the
+ * authority it describes and carrying that authority's registry tier. This is
+ * what lets a regulatory answer cite RJSC, NBR or the Gazette rather than only
+ * bdoor's own pages.
+ */
+function bdRegistrationSources(): SeedSource[] {
+  return BD_REGISTRATION_KNOWLEDGE.flatMap((entry) =>
+    (['en', 'bn'] as const).map((locale) => ({
+      slug: `${entry.slug}-${locale}`,
+      title: entry.title[locale],
+      country: 'bd',
+      locale,
+      sourceType: entry.sourceType,
+      sourceUrl: entry.sourceUrl,
+      body: entry.body[locale],
+      lastReviewed: BD_KNOWLEDGE_REVIEWED,
+      authorityTier: entry.authorityTier,
+      issuingInstitution: entry.issuingInstitution,
+      referenceNumber: entry.referenceNumber,
+    })),
+  );
+}
+
 /** Everything importable, in the order an admin will review it. */
 export function seedSources(): SeedSource[] {
-  return [...BOUNDARY_FAQ, ...countryGuideSources(), ...serviceSources(), ...packageScopeSources()];
+  return [
+    ...BOUNDARY_FAQ,
+    ...bdRegistrationSources(),
+    ...countryGuideSources(),
+    ...serviceSources(),
+    ...packageScopeSources(),
+  ];
 }

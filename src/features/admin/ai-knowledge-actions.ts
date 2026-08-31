@@ -7,9 +7,11 @@ import { z } from 'zod';
 import {
   importSeedSources,
   indexSource,
+  listSources,
   transitionSource,
   type SourceStatus,
 } from '@/features/ai/knowledge';
+import { seedSources } from '@/features/ai/knowledge-seed';
 import { recordAudit } from '@/lib/audit';
 import { requireCapability } from '@/lib/auth/session';
 
@@ -97,4 +99,59 @@ export async function importKnowledgeSeed(): Promise<ActionResult> {
   const { created, skipped } = await importSeedSources(session.userId);
   await refresh();
   return { ok: true, detail: `${created}/${skipped}` };
+}
+
+/**
+ * Publish and index every imported seed source still sitting in draft, in one
+ * audited action, then index any published seed source whose chunks are
+ * missing. The clicking admin is the recorded reviewer for every step — this
+ * walks each source through in_review → approved → published rather than
+ * shortcutting the workflow, and it touches ONLY sources whose slug comes from
+ * the repo's reviewed seed (never a source authored or edited in the admin).
+ */
+export async function publishImportedSeed(): Promise<ActionResult> {
+  const session = await requireCapability('content.publish');
+
+  const seedSlugs = new Set(seedSources().map((candidate) => candidate.slug));
+  const sources = await listSources();
+
+  let published = 0;
+  let indexed = 0;
+  let failed = 0;
+
+  for (const source of sources) {
+    if (!seedSlugs.has(source.slug)) continue;
+
+    let status: SourceStatus = source.status;
+    if (status === 'draft') {
+      for (const step of ['in_review', 'approved', 'published'] as const) {
+        const moved = await transitionSource(source.id, step, session.userId, 'bulk seed publish');
+        if (!moved.ok) {
+          failed += 1;
+          break;
+        }
+        status = step;
+      }
+      if (status === 'published') published += 1;
+    }
+
+    const needsIndex = status === 'published' && (source.status === 'draft' || !source.indexed_at);
+    if (needsIndex) {
+      const result = await indexSource(source.id, session.userId);
+      if (result.ok) indexed += 1;
+      else failed += 1;
+    }
+  }
+
+  if (published > 0) {
+    await recordAudit({
+      action: 'content.published',
+      targetType: 'ai_knowledge_source',
+      targetId: null,
+      metadata: { surface: 'ask_bdoor_ai', bulk: true, published, indexed, failed },
+    });
+  }
+
+  await refresh();
+  return { ok: true, detail: `${published} published, ${indexed} indexed, ${failed} failed` };
 }

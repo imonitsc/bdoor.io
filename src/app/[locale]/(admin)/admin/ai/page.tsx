@@ -2,7 +2,11 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Sparkles } from 'lucide-react';
 
-import { AiImportButton, AiSourceControls } from '@/components/admin/ai-source-controls';
+import {
+  AiImportButton,
+  AiPublishSeedButton,
+  AiSourceControls,
+} from '@/components/admin/ai-source-controls';
 import { PageHeading } from '@/components/dashboard/page-heading';
 import { Alert } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -60,7 +64,16 @@ export default async function AdminAiPage({ params }: { params: Promise<{ locale
 
   return (
     <div className="space-y-8">
-      <PageHeading title={t('title')} description={t('description')} actions={<AiImportButton />} />
+      <PageHeading
+        title={t('title')}
+        description={t('description')}
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <AiImportButton />
+            <AiPublishSeedButton />
+          </div>
+        }
+      />
 
       {/* The knowledge centre. Each screen owns one half of the pipeline. */}
       <nav aria-label={tRegistry('navLabel')} className="flex flex-wrap gap-2 text-sm">

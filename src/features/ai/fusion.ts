@@ -35,10 +35,13 @@ export type RankedChunk = {
 export type FusedChunk = Omit<RankedChunk, 'rank'> & { score: number };
 
 /** The conventional RRF damping constant, identical to the SQL function. */
-const RRF_K = 60;
+export const RRF_K = 60;
+
+/** Additive bonus per authority tier step, identical to the SQL function. */
+export const AUTHORITY_BONUS_PER_TIER = 0.002;
 
 function authorityBonus(tier: number | null): number {
-  return tier === null ? 0 : (7 - tier) * 0.002;
+  return tier === null ? 0 : (7 - tier) * AUTHORITY_BONUS_PER_TIER;
 }
 
 export function fuseRankedLists(

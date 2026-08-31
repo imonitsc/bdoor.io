@@ -143,6 +143,34 @@ figure, on a followed injection, and on an out-of-scope question that was not
 declined for free. It spends real model calls, so it runs against previews on
 demand, not in `pnpm run verify`.
 
+## The registration knowledge seed
+
+`src/content/bd/registration-knowledge.ts` carries the reviewed Bangladesh
+company-registration corpus: bdoor's end-to-end walkthrough (a `guide`), and
+bdoor-authored summaries of the official sources (`government_reference`
+entries for the Companies Act 1994, RJSC name clearance / incorporation /
+fees, NBR e-TIN and VAT/BIN, city-corporation trade licences, BIDA,
+Bangladesh Bank foreign exchange, CCI&E IRC/ERC, and the Gazette). Every
+government reference records its authority tier, issuing institution and
+official URL — that URL is the clickable citation a customer sees — and no
+entry states a taka figure: fees name the authority and the published
+schedule, and exact amounts live in the itemised quote.
+
+It flows through the same governed path as everything else: **Import** on
+`/admin/ai` creates the drafts, and **"Publish and index imported content"**
+walks each seed draft through in-review → approved → published and indexes
+it, in one audited click, with the clicking admin recorded as the reviewer
+at every step. The bulk action touches only repo-reviewed seed slugs.
+
+Retrieval note: the chunk index uses the `simple` text-search configuration
+(the price of one column indexing Bangla and English), and
+`websearch_to_tsquery` ANDs every literal word — so the application rewrites
+questions to their meaningful terms joined with OR (`keywordQuery` in
+`retrieval.ts`) before the keyword search runs. Without the rewrite, "How do
+I register a company in Bangladesh?" matches nothing. The admin testing
+console shows per-chunk ranks, score components and — for sources that look
+relevant but can never be retrieved — the exclusion reason.
+
 ## Operating notes
 
 - Models are env-configurable (`AI_ANSWER_MODEL`, `AI_EXTRACTION_MODEL`),
