@@ -414,7 +414,7 @@
     "authorityNote": "bdoor is not affiliated with this authority and does not act on its behalf.",
     "faq": "Common questions",
     "emptyState": "No services match these filters yet.",
-    "comingSoonNote": "This service is not open for new cases yet. Tell us you are interested and we will contact you when it opens.",
+    "comingSoonNote": "Not open yet. Leave your interest and we will tell you when it is.",
     "notifyMe": "Tell us you are interested",
     "feeCategories": {
       "platform_service_fee": "bdoor service fee",
@@ -430,7 +430,7 @@
   "pricingPage": {
     "title": "Packages and pricing",
     "description": "Six Bangladesh packages with published bdoor fees, and what your itemised quote separates.",
-    "intro": "Every figure below is the bdoor professional fee. Government, partner and third-party amounts are always shown separately in your quote, and nothing is payable until you accept it.",
+    "intro": "Every figure is the bdoor professional fee. Government and third-party amounts stay separate, and nothing is payable until you accept a quote.",
     "feesTitle": "What an itemised quote separates",
     "feesBody": "One example, using the Limited Company package. The same separation applies to every package and standalone service.",
     "layersTitle": "The fee layers",
@@ -441,21 +441,21 @@
       "third_party_cost": "Third-party costs — notary, translation, certification and similar"
     },
     "standaloneTitle": "Standalone services",
-    "standaloneBody": "Common registrations with published bdoor fees. Anything not listed is quoted after a short assessment.",
+    "standaloneBody": "Published bdoor fees for common registrations. Anything else is quoted after assessment.",
     "variableTitle": "Why some amounts are quoted, not listed",
-    "variableBody": "Statutory and partner costs depend on capital, location, sector and filings. We confirm them in your itemised quote before you accept anything — a fixed number printed here would be wrong for many businesses.",
+    "variableBody": "Statutory and partner costs vary by capital, location and sector. Your itemised quote confirms them before you accept.",
     "taxNote": "Applicable taxes, if any, are confirmed in your itemised quote.",
     "reviewedOn": "Prices last reviewed on {date}.",
     "browseServices": "Browse the full service catalogue",
     "cta": "Get your itemised quote",
-    "ctaBody": "The assessment takes a few minutes and produces a quote that separates every fee layer.",
+    "ctaBody": "A few minutes. An itemised quote.",
     "noPublishedFee": "Quoted after assessment"
   },
   "foreignFoundersPage": {
     "title": "Foreign founders",
     "description": "Ownership review, incorporation, investment registration, capital remittance and visa support — coordinated in one place.",
     "stepsTitle": "The order the steps have to happen in",
-    "stepsBody": "Most delays come from doing the right things in the wrong order. This is the sequence banks and authorities expect.",
+    "stepsBody": "The sequence banks and authorities expect.",
     "notTitle": "What this does not give you",
     "capitalTitle": "Where your investment capital goes",
     "capitalBody": "Investment and share capital is remitted to a bank account in the company’s name through the proper channel, and the bank issues an encashment certificate. It is never paid to bdoor, and bdoor never holds it.",
@@ -496,7 +496,7 @@
     "title": "Join our specialist network",
     "description": "How licensed advocates, chartered accountants and specialist firms work with bdoor — and how verification protects customers before any case is shared.",
     "applyTitle": "Work with us",
-    "applyBody": "If you are a licensed advocate, chartered accountant or specialist consultancy in Bangladesh, tell us about your practice. Every partner is verified before receiving a case.",
+    "applyBody": "Licensed advocates, chartered accountants and specialist firms. Every partner is verified before receiving a case.",
     "applyCta": "Apply to join",
     "howTitle": "How a partner joins a case",
     "canTitle": "What a partner can do",
@@ -566,12 +566,12 @@
   "industries": {
     "title": "Industries",
     "description": "Sector-specific routes for entity choice, licences, authorities and compliance in Bangladesh.",
-    "intro": "Each industry page explains likely entity types, licences, authorities and linked services. This is operational guidance, not legal advice.",
+    "intro": "Entity types, licences and authorities by sector. Guidance, not legal advice.",
     "learnMore": "Learn more",
     "reviewNote": "Industry guides are reviewed on a schedule. Dates appear on each page when published.",
     "draftNoticeTitle": "Guide in preparation",
-    "draftNoticeBody": "This industry route is being reviewed before publication. Book a consultation if you need help now.",
-    "detailPlaceholder": "Detailed licensing routes, authority dependencies and linked services will appear here after review."
+    "draftNoticeBody": "Under review before publication. Need help now? Book a consultation.",
+    "detailPlaceholder": "Full licensing routes appear here after review."
   },
   "authorities": {
     "title": "Authority directory",
@@ -596,10 +596,10 @@
     "missionTitle": "Why we built this",
     "howTitle": "How we work",
     "limitsTitle": "What we are not",
-    "mission1": "Starting a business in Bangladesh is not hard because the rules are secret. It is hard because they are scattered: different authorities, different offices, different forms, and no single place that tells you what actually applies to you and in what order.",
-    "mission2": "bdoor exists to be that place. One workspace where you explain what you want to build, get a clear list of what it needs, upload your documents once, see a quote that separates our fee from everyone else’s, and watch each step move.",
-    "how1": "We start by asking. The guided questionnaire branches on your answers, so a local founder with one shop is not asked about capital remittance, and a foreign investor is not left to guess about sector eligibility. From those answers we produce a preliminary recommendation using rules our operations team can inspect and change — not a black box.",
-    "how2": "Then a person takes over. A case manager scopes the work, requests exactly the documents that are needed, and where the matter requires legal or specialist authority, engages a verified partner advocate under a separate agreement with you. Every status change, document view and fee is recorded.",
+    "mission1": "Starting a business in Bangladesh is not hard because the rules are secret. It is hard because they are scattered — different authorities, offices and sequences, and no one place that holds it all.",
+    "mission2": "bdoor is that place: one workspace where you say what you want to build, see what it needs, upload documents once, and follow every step.",
+    "how1": "We start by asking. The assessment branches on your answers, so you are never asked what does not apply to you.",
+    "how2": "Then a person takes over: a case manager scopes the work, and regulated matters go to independent qualified professionals, named to you first.",
     "limits1": "We are not a government authority and we have no influence over any decision an authority makes. We do not present ourselves as a law firm, and we do not give legal advice. Where legal work is required it is done by independent advocates or partner firms under their own engagement with you, and we tell you who they are before anything is shared.",
     "limits2": "We do not guarantee approval, a visa, a bank account, or a completion date. We give you an estimate, we tell you what it assumes, and we tell you when it changes. Investment and share capital never passes through bdoor.",
     "founder": {
@@ -612,7 +612,7 @@
   },
   "contact": {
     "title": "Contact",
-    "description": "Ask a question before you start. We answer within two business days.",
+    "description": "Questions answered within two business days.",
     "nameLabel": "Your name",
     "emailLabel": "Email address",
     "phoneLabel": "Phone (optional)",
@@ -1988,8 +1988,8 @@
   },
   "countries": {
     "title": "Countries",
-    "description": "Applications are open for all seven countries. Every international case is reviewed and fulfilled through an appointed third-party provider before a final quote is issued.",
-    "intro": "Bangladesh is our flagship market and the most complete part of the platform. International applications are specialist-reviewed: bdoor coordinates your case, an appointed local provider performs the regulated work, and your itemised quote is confirmed before any engagement or payment.",
+    "description": "Seven countries. Every international case is specialist-reviewed before a final quote.",
+    "intro": "Bangladesh is our flagship market. International cases are coordinated by bdoor and fulfilled by appointed third-party providers.",
     "bangladesh": {
       "badge": "Open now",
       "body": "Company formation, licences, tax registrations and ongoing compliance are available today through the Bangladesh catalogue.",
@@ -2282,7 +2282,7 @@
     "start": {
       "eyebrow": "bdoor Start",
       "title": "Form or onboard a business, from one application.",
-      "tagline": "One adaptive assessment covers a new Bangladesh business, an already-registered one, or an international route — and becomes a specialist-reviewed managed application with an itemised quote before you commit.",
+      "tagline": "One assessment. A specialist-reviewed application. An itemised quote before you commit.",
       "cta": "Start now",
       "pricingCta": "See the packages",
       "how": {
@@ -2290,19 +2290,19 @@
         "title": "Assessment to workspace, without repeating yourself.",
         "assess": {
           "title": "One assessment",
-          "body": "Answer once — new or existing business, entity, activity, ownership. The recommendation is preliminary and subject to specialist review."
+          "body": "New or existing business — answer once."
         },
         "quote": {
           "title": "An itemised quote",
-          "body": "bdoor's professional fee is always separated from government charges and third-party costs. A government fee appears only with a verified figure; otherwise it is quoted after review."
+          "body": "bdoor's fee, government charges and third-party costs — always separate."
         },
         "run": {
           "title": "A managed application",
-          "body": "Specialists prepare and coordinate each step — name clearance, incorporation documents, registrations — with the status visible in your workspace throughout."
+          "body": "Specialists prepare each step; status stays visible in your workspace."
         },
         "handoff": {
           "title": "Straight into your workspace",
-          "body": "The finished case becomes a business profile with its documents, deadlines and history in one place — the starting point for continuing compliance."
+          "body": "The finished case becomes a business profile — documents, deadlines, history."
         }
       },
       "honesty": "bdoor is not affiliated with RJSC, NBR, BIDA or any other authority, and does not submit applications to any authority automatically. Every application is prepared and reviewed by people, and regulated work is done by independent qualified professionals engaged separately."
@@ -2310,7 +2310,7 @@
     "comply": {
       "eyebrow": "bdoor Comply",
       "title": "Continuing compliance, tracked in one place.",
-      "tagline": "Licence renewals, filings and deadlines for your business — visible in your workspace, with reminders before they fall due and preparation coordinated with specialists when you ask.",
+      "tagline": "Renewals, filings and deadlines — tracked, reminded, prepared on request.",
       "cta": "Start now",
       "signInCta": "Sign in to your workspace",
       "what": {
@@ -2318,19 +2318,19 @@
         "title": "The obligations, before they become emergencies.",
         "calendar": {
           "title": "An obligations calendar",
-          "body": "Every tracked obligation with its due date, the authority it belongs to and its current state — due now, upcoming, under review, filed or overdue."
+          "body": "Every obligation, its authority and its state — due now to filed."
         },
         "reminders": {
           "title": "Reminders that lead the deadline",
-          "body": "Notifications at sensible intervals before each due date, in the workspace and by email — never five at once for one deadline."
+          "body": "Ahead of every due date — never five at once."
         },
         "renewals": {
           "title": "Renewal cases",
-          "body": "A recurring obligation, such as a trade licence renewal, can become a managed case with its documents and history attached to the same business profile."
+          "body": "A recurring obligation becomes a managed case on the same profile."
         },
         "prepare": {
           "title": "Preparation on request",
-          "body": "Ask for an obligation to be prepared and a specialist takes it up — you review and approve before anything is filed anywhere."
+          "body": "A specialist takes it up; you approve before anything is filed."
         }
       },
       "honesty": "bdoor Comply shows the state of your obligations as bdoor tracks them; it is not an official government good-standing status. Nothing is filed without your information, your approval and, where the law requires it, an independent qualified professional."
