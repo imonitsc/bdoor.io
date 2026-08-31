@@ -2106,6 +2106,32 @@
     },
     "deleteConversation": "Delete this conversation",
     "page": "Page {page}",
-    "effectiveFrom": "Effective {date}"
+    "effectiveFrom": "Effective {date}",
+    "appHeading": "What do you want to start or solve?",
+    "appSupport": "Ask bdoor about starting, running, taxing or growing a business.",
+    "statusLine": "AI answers with current official sources",
+    "stages": {
+      "understanding": "Understanding your question",
+      "sources": "Checking current official sources",
+      "answering": "Preparing your answer"
+    },
+    "quick": {
+      "start": "Start a business",
+      "licences": "Find required licences",
+      "tax": "Understand tax and VAT",
+      "compliance": "Check annual compliance"
+    },
+    "legalLine": "General information, not professional advice.",
+    "disclaimerLink": "Service limits",
+    "copy": "Copy answer",
+    "copied": "Copied",
+    "regenerate": "Regenerate",
+    "stop": "Stop",
+    "retry": "Try again",
+    "stalled": "Still working — this is taking longer than usual.",
+    "voiceInput": "Speak your question",
+    "voiceStop": "Stop listening",
+    "followUps": "Ask next",
+    "startProcess": "Start this process"
   }
 }

@@ -1,11 +1,13 @@
 import 'server-only';
 
 import { detectCountry, LIMITS } from './config';
-import { aiDb, hasAiDatabase, type RetrievedChunk } from './db';
+import { aiDb, hasAiDatabase } from './db';
 import { embedQuery } from './embeddings';
+import { fuseRankedLists, type FusedChunk, type RankedChunk } from './fusion';
 import { renderRules, rulesForQuestion } from './registry/rules';
 import { AUTHORITY_TIER_NAMES, type AuthorityTier } from './registry/taxonomy';
 import { STRUCTURED_SOURCE, structuredRecordsFor } from './structured';
+import type { Timings } from './timings';
 import { logger } from '@/lib/logger';
 
 /**
@@ -16,6 +18,13 @@ import { logger } from '@/lib/logger';
  * which is what makes "the assistant cannot see a customer's case" a property
  * of the code rather than a promise in a prompt — there is no code path from
  * here to any customer table.
+ *
+ * Latency shape (the reason this file was rewritten): keyword search needs
+ * only the question text, so it fires immediately; the embedding call and the
+ * vector search run beside it, not after it; structured rules run beside both.
+ * Fusion happens here with the same arithmetic the old SQL used
+ * (`fusion.ts`), so the parallelism changes when work happens, not what is
+ * retrieved.
  */
 
 export type Citation = {
@@ -40,7 +49,7 @@ export type Citation = {
 export type RetrievalResult = {
   /** Numbered context, ready to paste into the system prompt. */
   context: string;
-  /** Live prices and fees, rendered. Empty when the catalogue has nothing to say. */
+  /** Live prices, fees and published rules, rendered. Empty when nothing applies. */
   structured: string;
   citations: Citation[];
   /** Distinct knowledge sources used, for `ai_messages.source_ids`. */
@@ -49,26 +58,23 @@ export type RetrievalResult = {
   empty: boolean;
 };
 
-function reviewDate(chunk: RetrievedChunk): string | null {
+function reviewDate(chunk: FusedChunk): string | null {
   const reviewed = chunk.last_reviewed_at ?? chunk.effective_from;
   return reviewed ? reviewed.slice(0, 10) : null;
 }
 
 /**
- * Turn chunks into a numbered block. Every entry carries its title and review
- * date inline, because the model is required to attribute a factual answer and
- * cannot attribute what it was not shown.
+ * Turn chunks into a numbered block. Every entry carries its title, authority
+ * and review date inline, because the model is required to attribute a factual
+ * answer and cannot attribute what it was not shown.
  */
-function renderContext(chunks: RetrievedChunk[], offset: number): string {
+function renderContext(chunks: FusedChunk[], offset: number): string {
   return chunks
     .map((chunk, i) => {
       const header = [
         `[${offset + i + 1}] ${chunk.title}`,
         `type: ${chunk.source_type}`,
         `country: ${chunk.country}`,
-        // The model is told what kind of authority it is reading, so it can
-        // distinguish law from guidance and prefer the gazette over a guide
-        // when they disagree.
         chunk.authority_tier
           ? `authority: ${AUTHORITY_TIER_NAMES[chunk.authority_tier as AuthorityTier] ?? `tier ${chunk.authority_tier}`}`
           : 'authority: bdoor content',
@@ -86,6 +92,83 @@ function renderContext(chunks: RetrievedChunk[], offset: number): string {
 }
 
 /**
+ * Cache for identical PUBLIC first-turn questions — the suggestion buttons
+ * are the hot path, and the corpus they retrieve from is the same for every
+ * visitor. Keyed only on question text, locale and country; nothing about the
+ * caller is in the key or the value, and conversations are never cached
+ * (the caller passes `cacheable: false` on any turn with history).
+ */
+const CACHE_TTL_MS = 10 * 60_000;
+const CACHE_MAX = 300;
+const cache = new Map<string, { expiresAt: number; result: RetrievalResult }>();
+
+function cacheGet(key: string): RetrievalResult | null {
+  const hit = cache.get(key);
+  if (!hit) return null;
+  if (hit.expiresAt <= Date.now()) {
+    cache.delete(key);
+    return null;
+  }
+  return hit.result;
+}
+
+function cacheSet(key: string, result: RetrievalResult): void {
+  if (cache.size >= CACHE_MAX) {
+    const oldest = cache.keys().next().value;
+    if (oldest !== undefined) cache.delete(oldest);
+  }
+  cache.set(key, { expiresAt: Date.now() + CACHE_TTL_MS, result });
+}
+
+type Rpc = (
+  fn: string,
+  args: Record<string, unknown>,
+) => PromiseLike<{ data: RankedChunk[] | null; error: { code?: string } | null }>;
+
+/** Candidate pool per list, matching the old hybrid function's inner limits. */
+const CANDIDATES = Math.max(LIMITS.retrievalCount * 4, 40);
+
+async function keywordCandidates(question: string, countries: string[]): Promise<RankedChunk[][]> {
+  const rpc = aiDb().rpc as unknown as Rpc;
+  const results = await Promise.all(
+    countries.map((code) =>
+      rpc('ai_search_keyword', {
+        query_text: question,
+        p_country: code,
+        candidate_count: CANDIDATES,
+      }),
+    ),
+  );
+  return results.map(({ data, error }) => {
+    if (error) logger.warn('ai.retrieval.keyword_failed', { code: error.code ?? null });
+    return data ?? [];
+  });
+}
+
+async function semanticCandidates(
+  question: string,
+  countries: string[],
+  timings?: Timings,
+): Promise<RankedChunk[][]> {
+  const embedding = await embedQuery(question);
+  timings?.mark('embedding');
+  const rpc = aiDb().rpc as unknown as Rpc;
+  const results = await Promise.all(
+    countries.map((code) =>
+      rpc('ai_search_semantic', {
+        query_embedding: JSON.stringify(embedding),
+        p_country: code,
+        candidate_count: CANDIDATES,
+      }),
+    ),
+  );
+  return results.map(({ data, error }) => {
+    if (error) logger.warn('ai.retrieval.semantic_failed', { code: error.code ?? null });
+    return data ?? [];
+  });
+}
+
+/**
  * Retrieve for one question.
  *
  * Failure here is not fatal: a database or embedding outage degrades the
@@ -98,24 +181,20 @@ export async function retrieveContext(
   question: string,
   locale: 'en' | 'bn',
   country: string,
+  options?: { timings?: Timings; cacheable?: boolean },
 ): Promise<RetrievalResult> {
-  const catalogue = structuredRecordsFor(country);
+  const timings = options?.timings;
+  const cacheKey = `${locale}|${country}|${question.trim().toLowerCase()}`;
 
-  // Published, in-date structured rules join the structured block for
-  // Bangladesh questions. Their own filters run inside rulesForQuestion —
-  // this read goes through the service role, so RLS is not on this path.
-  let rulesBlock = '';
-  if (country === 'bd') {
-    try {
-      const rules = await rulesForQuestion(question);
-      if (rules.length) {
-        rulesBlock = `VERIFIED REGULATORY RULES (published after human review; each names its legal basis):\n${renderRules(rules)}`;
-      }
-    } catch (error) {
-      logger.warn('ai.retrieval.rules_failed', { message: (error as Error).message });
+  if (options?.cacheable) {
+    const cached = cacheGet(cacheKey);
+    if (cached) {
+      timings?.mark('fused');
+      return cached;
     }
   }
-  const structured = [catalogue, rulesBlock].filter(Boolean).join('\n\n');
+
+  const catalogue = structuredRecordsFor(country);
 
   // The catalogue is source [1] whenever it has content, so a quoted price is
   // always attributable to the page a customer can check it on.
@@ -134,65 +213,63 @@ export async function retrieveContext(
       effectiveFrom: null,
     });
   }
-
   const offset = citations.length;
 
   if (!hasAiDatabase()) {
-    return { context: '', structured, citations, sourceIds: [], empty: true };
+    return { context: '', structured: catalogue, citations, sourceIds: [], empty: true };
   }
 
   // The page's country, plus any other country the question names. Both are
-  // searched; the context block labels each result with the country it came
-  // from, so the model can say which answer belongs where rather than blending
-  // them.
+  // searched; the context block labels each result with its country, so the
+  // model can say which answer belongs where rather than blending them.
   const mentioned = detectCountry(question);
   const countries = mentioned && mentioned !== country ? [country, mentioned] : [country];
 
-  let chunks: RetrievedChunk[] = [];
+  let chunks: FusedChunk[] = [];
+  let rulesBlock = '';
   try {
-    const embedding = await embedQuery(question);
+    // The three legs run beside each other. Keyword needs no embedding and
+    // fires first; semantic starts the moment the embedding lands; published
+    // structured rules are an independent read.
+    const [keywordLists, semanticLists, rules] = await Promise.all([
+      keywordCandidates(question, countries).then((lists) => {
+        timings?.mark('keyword');
+        return lists;
+      }),
+      semanticCandidates(question, countries, timings).then((lists) => {
+        timings?.mark('vector');
+        return lists;
+      }),
+      country === 'bd' ? rulesForQuestion(question).catch(() => []) : Promise.resolve([]),
+    ]);
 
-    // `src/types/database.ts` is generated with `Functions: Record<string,
-    // never>`, so RPC signatures are not inferred and this one call needs a
-    // cast. `RetrievedChunk` mirrors the function's `returns table (...)`
-    // clause; the integration test in tests/integration/ai-knowledge-rls.test.ts
-    // is what actually holds the two in step, by calling the real function.
-    const rpc = aiDb().rpc as unknown as (
-      fn: string,
-      args: Record<string, unknown>,
-    ) => PromiseLike<{ data: RetrievedChunk[] | null; error: { code?: string } | null }>;
-
-    const results = await Promise.all(
-      countries.map((code) =>
-        rpc('ai_search_knowledge', {
-          // pgvector accepts its text form, which a JSON array serialises to.
-          query_embedding: JSON.stringify(embedding),
-          query_text: question,
-          p_locale: locale,
-          p_country: code,
-          match_count: LIMITS.retrievalCount,
-        }),
-      ),
-    );
-
-    const seen = new Set<string>();
-    for (const { data, error } of results) {
-      if (error) {
-        logger.warn('ai.retrieval.failed', { code: error.code ?? null });
-        continue;
-      }
-      for (const chunk of data ?? []) {
-        // 'global' sources match every country, so the two searches overlap.
-        if (seen.has(chunk.chunk_id)) continue;
-        seen.add(chunk.chunk_id);
-        chunks.push(chunk);
-      }
+    if (rules.length) {
+      rulesBlock = `VERIFIED REGULATORY RULES (published after human review; each names its legal basis):\n${renderRules(rules)}`;
     }
 
-    // Scores are comparable across the two calls — same query vector, same
-    // fusion constant — so one sort gives the combined ranking.
-    chunks.sort((a, b) => b.score - a.score);
-    chunks = chunks.slice(0, LIMITS.retrievalCount);
+    // Fuse per country (ranks are per-list), then merge across countries the
+    // way the old per-country hybrid calls merged: dedupe on chunk id keeping
+    // the better score, one sort, one cut.
+    const merged = new Map<string, FusedChunk>();
+    countries.forEach((_, index) => {
+      const fused = fuseRankedLists(semanticLists[index] ?? [], keywordLists[index] ?? [], {
+        count: LIMITS.retrievalCount,
+        locale,
+      });
+      for (const chunk of fused) {
+        const existing = merged.get(chunk.chunk_id);
+        if (!existing || chunk.score > existing.score) merged.set(chunk.chunk_id, chunk);
+      }
+    });
+    chunks = [...merged.values()]
+      .sort((a, b) => {
+        const aLocale = a.locale === locale ? 1 : 0;
+        const bLocale = b.locale === locale ? 1 : 0;
+        if (aLocale !== bLocale) return bLocale - aLocale;
+        return b.score - a.score;
+      })
+      .slice(0, LIMITS.retrievalCount);
+    timings?.mark('fused');
   } catch (error) {
     // The question itself is never logged — only that retrieval failed.
     logger.warn('ai.retrieval.error', { message: (error as Error).message });
@@ -213,15 +290,16 @@ export async function retrieveContext(
     });
   }
 
-  const sourceIds = [...new Set(chunks.map((chunk) => chunk.source_id))];
-
-  return {
+  const result: RetrievalResult = {
     context: renderContext(chunks, offset),
-    structured,
+    structured: [catalogue, rulesBlock].filter(Boolean).join('\n\n'),
     citations,
-    sourceIds,
+    sourceIds: [...new Set(chunks.map((chunk) => chunk.source_id))],
     // "Empty" means no retrieved knowledge. The catalogue alone is not enough
     // to answer a regulatory question, so the gap is still worth recording.
     empty: chunks.length === 0,
   };
+
+  if (options?.cacheable && !result.empty) cacheSet(cacheKey, result);
+  return result;
 }

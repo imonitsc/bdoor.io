@@ -94,6 +94,32 @@ Retention: 90 days, swept nightly by `/api/ai/retention` (Vercel cron,
 `CRON_SECRET` bearer token). Customers can delete a conversation themselves from
 the panel.
 
+## Latency
+
+Every request logs one `ai.pipeline.timings` line: a request id plus
+millisecond marks for received, checks, classified, embedding, keyword,
+vector, fused, model_start, first_token, completed and persisted. That line
+is the ground truth for any performance claim.
+
+The measured bottleneck (Aug 2026) was topology, not compute: the SQL
+retrieval functions execute in 1–4ms, but the pipeline made six serial
+database round-trips from a us-east function to the ap-southeast-1 database
+before the model started. Three changes address it:
+
+- greetings ("hi", "সালাম") answer instantly from a canned bilingual reply —
+  no retrieval, no model call, no spend;
+- keyword search (`ai_search_keyword`) fires the moment the question arrives,
+  in parallel with the embedding + `ai_search_semantic`; fusion happens in
+  `fusion.ts` with the identical RRF arithmetic (integration-tested parity),
+  and budget/conversation/history reads run beside retrieval, with the
+  user-message write no longer blocking the model;
+- the chat route declares `preferredRegion = 'sin1'` — set the dashboard
+  function region to match — so each round-trip costs milliseconds, not an
+  ocean.
+
+Identical first-turn public questions (the suggestion buttons) may share a
+short-lived retrieval cache; conversations are never cached.
+
 ## Spending controls
 
 Two layers, and the second is the one that actually holds:

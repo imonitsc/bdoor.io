@@ -1,10 +1,11 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 
-import { answerQuestion, aiEnabled } from '@/features/ai/chat';
+import { streamAnswer, aiEnabled } from '@/features/ai/chat';
 import { LIMITS, SUPPORTED_COUNTRIES } from '@/features/ai/config';
 import { failureMessage, failureStatus } from '@/features/ai/errors';
 import { callerIp } from '@/features/ai/identity';
+import { startTimings } from '@/features/ai/timings';
 import { createClient } from '@/lib/supabase/server';
 import { serverEnv } from '@/lib/env';
 import { logger } from '@/lib/logger';
@@ -22,6 +23,12 @@ import { logger } from '@/lib/logger';
  */
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+// The Supabase project lives in ap-southeast-1, and this handler makes
+// several database round-trips per answer. Running the function beside the
+// database (Vercel sin1 = Singapore) turns each ~230ms cross-Pacific hop into
+// single-digit milliseconds; the dashboard's function-region setting is the
+// authoritative control and should match.
+export const preferredRegion = 'sin1';
 
 const bodySchema = z.object({
   message: z.string().min(1).max(LIMITS.maxMessageChars),
@@ -71,6 +78,7 @@ function refusal(failure: Parameters<typeof failureStatus>[0], locale: 'en' | 'b
 }
 
 export async function POST(request: NextRequest) {
+  const timings = startTimings();
   const parsed = bodySchema.safeParse(await request.json().catch(() => null));
 
   if (!parsed.success) {
@@ -123,30 +131,10 @@ export async function POST(request: NextRequest) {
     return refusal('rate_limited', locale);
   }
 
-  const result = await answerQuestion({ message, conversationId, locale, country, owner });
+  timings.mark('checks');
 
-  if (!result.ok) {
-    if (result.failure === 'out_of_scope') {
-      // A decline is a successful, complete answer — it is simply not one the
-      // model was paid to write.
-      return NextResponse.json({
-        error: 'out_of_scope',
-        message: result.message,
-        conversationId: result.conversationId,
-      });
-    }
-    return refusal(result.failure, locale);
-  }
-
-  return new Response(result.stream, {
-    status: 200,
-    headers: {
-      'Content-Type': 'text/event-stream; charset=utf-8',
-      'Cache-Control': 'no-cache, no-store, no-transform',
-      Connection: 'keep-alive',
-      // Nothing about this response may be cached or indexed.
-      'X-Accel-Buffering': 'no',
-      'X-Robots-Tag': 'noindex',
-    },
-  });
+  // Everything from here streams. Scope declines, budget refusals and
+  // upstream failures arrive as stream content with honest copy, so the
+  // customer sees an acknowledgement within one round-trip, always.
+  return streamAnswer({ message, conversationId, locale, country, owner, timings });
 }

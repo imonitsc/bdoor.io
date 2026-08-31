@@ -1,6 +1,12 @@
 import 'server-only';
 
-import { gateway, streamText } from 'ai';
+import {
+  createUIMessageStream,
+  createUIMessageStreamResponse,
+  gateway,
+  streamText,
+  type UIMessageStreamWriter,
+} from 'ai';
 
 import { checkBudget } from './budget';
 import {
@@ -11,6 +17,8 @@ import {
   usageTags,
 } from './config';
 import { classifyUpstreamError, failureMessage, type AiFailure } from './errors';
+import { FAST_PATH_MODEL, greetingReply, isGreeting } from './fast-path';
+import { actionsFor } from './follow-ups';
 import { safetyIdentifier } from './identity';
 import {
   ensureConversation,
@@ -19,27 +27,38 @@ import {
   recordUnanswered,
   recordUserMessage,
   type CompletionStatus,
+  type ConversationRef,
   type Owner,
 } from './persistence';
 import { messageTelemetry } from './redaction';
-import { retrieveContext, type Citation } from './retrieval';
+import { retrieveContext } from './retrieval';
 import { classifyScope, outOfScopeReply } from './scope';
 import { buildSystemPrompt, PROMPT_VERSION } from './system-prompt';
+import type { Timings } from './timings';
 import { serverEnv } from '@/lib/env';
 import { logger } from '@/lib/logger';
 
 /**
- * The answer pipeline.
+ * The answer pipeline, as an AI SDK UI-message stream.
  *
- * Order matters and is not an implementation detail:
+ * The response starts streaming the moment the route's cheap checks pass:
+ * every later refusal (scope, budget, upstream failure) arrives as stream
+ * content with honest copy, so the customer always sees an acknowledgement
+ * within the first network round-trip. Truthful stage parts — understanding /
+ * sources / answering — are written only when that work actually begins.
  *
- *   feature switch → rate limit → length → scope → budget
- *   → conversation row → question row → retrieval → Claude → answer row
+ * Latency order (the design, not an accident):
  *
- * Everything cheap and refusable happens before anything is spent, and the
- * conversation exists before the model is called so a failure is still
- * recorded. There is no branch in this file that answers from a model other
- * than Claude: if the gateway cannot serve `ANSWER_MODEL` from an Anthropic
+ *   classify (sync, free)
+ *   ├─ greeting → canned reply, no retrieval, no model, no gateway spend
+ *   ├─ out of scope → bilingual decline, no model
+ *   └─ else: budget check ∥ conversation+history ∥ retrieval
+ *            (keyword fires immediately; embedding+vector beside it)
+ *        → streamText the moment retrieval lands
+ *        → persistence during/after completion, never before first token
+ *
+ * There is no branch in this file that answers from a model other than
+ * Claude: if the gateway cannot serve the answer model from an Anthropic
  * route, the request fails visibly.
  */
 
@@ -49,236 +68,315 @@ export type ChatRequest = {
   locale: 'en' | 'bn';
   country: string;
   owner: Owner;
-};
-
-export type ChatRefusal = {
-  ok: false;
-  failure: AiFailure | 'out_of_scope';
-  message: string;
-  conversationId: string | null;
-};
-
-export type ChatStream = {
-  ok: true;
-  conversationId: string;
-  citations: Citation[];
-  /** Server-Sent-Events body: `text` deltas, then a final `done` frame. */
-  stream: ReadableStream<Uint8Array>;
+  timings: Timings;
 };
 
 export function aiEnabled(): boolean {
   return serverEnv().ASK_BDOOR_AI_ENABLED;
 }
 
-const encoder = new TextEncoder();
+/** Data parts the client renders. Names are part of the wire contract. */
+type StagePart = { stage: 'understanding' | 'sources' | 'answering' };
+type FinalPart = {
+  /** The UI message these actions belong to — the id sent on `start`. */
+  uiMessageId: string;
+  conversationId: string | null;
+  messageId: string | null;
+  followUps: string[];
+  startProcess: boolean;
+};
+type FailurePart = {
+  uiMessageId: string;
+  failure: AiFailure | 'out_of_scope';
+  message: string;
+};
 
-function frame(event: string, data: unknown): Uint8Array {
-  return encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+type Writer = UIMessageStreamWriter;
+
+function writeStage(writer: Writer, stage: StagePart['stage']) {
+  writer.write({ type: 'data-stage', data: { stage }, transient: true });
+}
+
+/** Stream a complete text answer that was not model-generated. */
+function writeText(writer: Writer, text: string) {
+  const id = crypto.randomUUID();
+  writer.write({ type: 'text-start', id });
+  writer.write({ type: 'text-delta', id, delta: text });
+  writer.write({ type: 'text-end', id });
 }
 
 /**
- * Cost and provider for one generation.
- *
- * The gateway settles a generation asynchronously, so this is a best-effort
- * lookup that must never delay or fail the customer's answer — it runs after
- * the stream has closed and a miss just leaves the ledger's cost at zero for
- * that row.
+ * Cost and provider for one generation. Best-effort, after the stream — the
+ * gateway settles asynchronously and a miss just leaves cost at zero.
  */
 async function generationInfo(generationId: string | null) {
   if (!generationId) return null;
   try {
     const info = await gateway.getGenerationInfo({ id: generationId });
-    return {
-      cost: info.totalCost,
-      provider: info.providerName,
-      latency: info.generationTime,
-    };
+    return { cost: info.totalCost, provider: info.providerName };
   } catch (error) {
     logger.debug('ai.generation_info.miss', { message: (error as Error).message });
     return null;
   }
 }
 
-export async function answerQuestion(request: ChatRequest): Promise<ChatStream | ChatRefusal> {
+export function streamAnswer(request: ChatRequest): Response {
+  const { timings } = request;
   const locale = request.locale;
   const country = isSupportedCountry(request.country) ? request.country : 'bd';
   const question = request.message.trim();
-
-  const refuse = (failure: AiFailure | 'out_of_scope', message: string): ChatRefusal => ({
-    ok: false,
-    failure,
-    message,
-    conversationId: request.conversationId ?? null,
-  });
-
-  if (!aiEnabled()) {
-    return refuse('disabled', '');
-  }
-
-  if (question.length === 0 || question.length > LIMITS.maxMessageChars) {
-    return refuse('too_long', '');
-  }
-
-  // Scope is checked before the budget so an obvious refusal is free.
-  const scope = classifyScope(question);
-  if (!scope.inScope) {
-    await recordUnanswered({
-      conversationId: request.conversationId ?? null,
-      question,
-      locale,
-      country,
-      reason: 'out_of_scope',
-    });
-    return refuse('out_of_scope', outOfScopeReply(locale));
-  }
-
-  const budget = await checkBudget();
-  if (!budget.allowed) {
-    logger.warn('ai.budget.exceeded', { scope: budget.scope });
-    return refuse('budget_exceeded', '');
-  }
-
-  const conversation = await ensureConversation({
-    conversationId: request.conversationId,
-    owner: request.owner,
-    country,
-    locale,
-  });
-
-  // History is read before the new question is written, so the model is not
-  // handed the question twice.
-  const history = await loadHistory(conversation);
-  await recordUserMessage(conversation, question);
-
-  const retrieval = await retrieveContext(question, locale, country);
-  if (retrieval.empty) {
-    await recordUnanswered({
-      conversationId: conversation.persisted ? conversation.id : null,
-      question,
-      locale,
-      country,
-      reason: 'no_match',
-    });
-  }
-
-  const system = buildSystemPrompt({
-    locale,
-    country,
-    context: retrieval.context,
-    structured: retrieval.structured,
-  });
-
-  const user =
-    request.owner.kind === 'user'
-      ? safetyIdentifier('user', request.owner.userId)
-      : safetyIdentifier('anon', request.owner.anonymousSessionId);
-
   const startedAt = Date.now();
 
-  logger.info('ai.answer.start', {
-    conversation: conversation.persisted ? conversation.id : null,
-    country,
-    locale,
-    sources: retrieval.sourceIds.length,
-    promptVersion: PROMPT_VERSION,
-    // The question itself is never logged: only its shape.
-    ...messageTelemetry(question),
-  });
-
-  const result = streamText({
-    model: answerModel(),
-    system,
-    messages: [...history, { role: 'user' as const, content: question }],
-    maxOutputTokens: LIMITS.maxOutputTokens,
-    maxRetries: LIMITS.maxRetries,
-    abortSignal: AbortSignal.timeout(LIMITS.requestTimeoutMs),
-    temperature: 0.2,
-    providerOptions: {
-      gateway: {
-        // Spend attribution and abuse tracing, hashed. Never a raw id.
-        user,
-        tags: usageTags(country, locale),
-        // Claude, from an Anthropic route, or not at all. `only` is what makes
-        // "no silent fallback to a non-Claude model" enforceable rather than
-        // aspirational: with it set, a total Claude outage is an error the
-        // customer is told about, not an answer from a substitute.
-        only: [...ANSWER_PROVIDER_ORDER],
-        order: [...ANSWER_PROVIDER_ORDER],
-        disallowPromptTraining: true,
-      },
+  const stream = createUIMessageStream({
+    onError: (error) => {
+      logger.error('ai.answer.stream_error', { message: (error as Error)?.message });
+      return failureMessage('unknown', locale);
     },
-  });
+    execute: async ({ writer }) => {
+      // The assistant message's UI id is minted here so the metadata parts
+      // written later can name the message they belong to.
+      const uiMessageId = crypto.randomUUID();
+      writer.write({ type: 'start', messageId: uiMessageId });
+      writeStage(writer, 'understanding');
 
-  const stream = new ReadableStream<Uint8Array>({
-    async start(controller) {
-      controller.enqueue(
-        frame('meta', { conversationId: conversation.id, citations: retrieval.citations }),
-      );
+      // -- Classification: free, synchronous, before anything is spent. -----
+      const greeting = isGreeting(question);
+      const scope = greeting ? { inScope: true } : classifyScope(question);
+      timings.mark('classified');
 
-      let answer = '';
+      if (greeting) {
+        // "hi" earns an instant answer, not a Singapore round-trip.
+        writeText(writer, greetingReply(locale));
+        timings.mark('completed');
+        const conversation = await ensureConversation({
+          conversationId: request.conversationId,
+          owner: request.owner,
+          country,
+          locale,
+        });
+        await recordUserMessage(conversation, question);
+        const messageId = await recordAnswer(conversation, {
+          content: greetingReply(locale),
+          sourceIds: [],
+          model: FAST_PATH_MODEL,
+          latencyMs: Date.now() - startedAt,
+          status: 'complete',
+          country,
+          locale,
+        });
+        timings.mark('persisted');
+        const final: FinalPart = {
+          uiMessageId,
+          conversationId: conversation.persisted ? conversation.id : null,
+          messageId,
+          followUps: actionsFor(question, locale).followUps,
+          startProcess: false,
+        };
+        writer.write({ type: 'data-final', data: final });
+        writer.write({ type: 'finish' });
+        timings.flush({ path: 'greeting', country, locale, status: 'complete' });
+        return;
+      }
+
+      if (!scope.inScope) {
+        // A decline is a successful, complete answer — simply not one the
+        // model was paid to write.
+        const message = outOfScopeReply(locale);
+        const failure: FailurePart = { uiMessageId, failure: 'out_of_scope', message };
+        writer.write({ type: 'data-failure', data: failure });
+        writeText(writer, message);
+        writer.write({ type: 'finish' });
+        timings.mark('completed');
+        await recordUnanswered({
+          conversationId: request.conversationId ?? null,
+          question,
+          locale,
+          country,
+          reason: 'out_of_scope',
+        });
+        timings.flush({ path: 'out_of_scope', country, locale, status: 'refused' });
+        return;
+      }
+
+      // -- The paid path. Budget, conversation and retrieval run beside each
+      // other; nothing waits on anything it does not need. ------------------
+      writeStage(writer, 'sources');
+
+      const budgetPromise = checkBudget();
+      const conversationPromise: Promise<{
+        conversation: ConversationRef;
+        history: { role: 'user' | 'assistant'; content: string }[];
+      }> = ensureConversation({
+        conversationId: request.conversationId,
+        owner: request.owner,
+        country,
+        locale,
+      }).then(async (conversation) => ({ conversation, history: await loadHistory(conversation) }));
+      const retrievalPromise = retrieveContext(question, locale, country, {
+        timings,
+        // Identical first-turn public questions (the suggestion buttons) may
+        // share a cached retrieval; anything with history never does.
+        cacheable: !request.conversationId,
+      });
+
+      const budget = await budgetPromise;
+      if (!budget.allowed) {
+        logger.warn('ai.budget.exceeded', { scope: budget.scope });
+        const message = failureMessage('budget_exceeded', locale);
+        writer.write({
+          type: 'data-failure',
+          data: { uiMessageId, failure: 'budget_exceeded', message } satisfies FailurePart,
+        });
+        writeText(writer, message);
+        writer.write({ type: 'finish' });
+        timings.flush({ path: 'budget_refused', country, locale, status: 'refused' });
+        return;
+      }
+
+      const [{ conversation, history }, retrieval] = await Promise.all([
+        conversationPromise,
+        retrievalPromise,
+      ]);
+
+      // The question row is written while the model runs, not before it —
+      // awaited only at the end so a crash cannot lose it silently.
+      const userMessagePromise = recordUserMessage(conversation, question);
+      const backgroundWrites: Promise<unknown>[] = [userMessagePromise];
+
+      if (retrieval.empty) {
+        backgroundWrites.push(
+          recordUnanswered({
+            conversationId: conversation.persisted ? conversation.id : null,
+            question,
+            locale,
+            country,
+            reason: 'no_match',
+          }),
+        );
+      }
+
+      writer.write({ type: 'data-citations', data: { citations: retrieval.citations } });
+      writeStage(writer, 'answering');
+
+      const system = buildSystemPrompt({
+        locale,
+        country,
+        context: retrieval.context,
+        structured: retrieval.structured,
+      });
+
+      const user =
+        request.owner.kind === 'user'
+          ? safetyIdentifier('user', request.owner.userId)
+          : safetyIdentifier('anon', request.owner.anonymousSessionId);
+
+      logger.info('ai.answer.start', {
+        requestId: timings.requestId,
+        conversation: conversation.persisted ? conversation.id : null,
+        country,
+        locale,
+        sources: retrieval.sourceIds.length,
+        promptVersion: PROMPT_VERSION,
+        // The question itself is never logged: only its shape.
+        ...messageTelemetry(question),
+      });
+
       let status: CompletionStatus = 'complete';
       let errorCode: string | null = null;
+      let failurePart: FailurePart | null = null;
 
-      try {
-        // fullStream, not textStream: the SDK delivers upstream failures as
-        // 'error' parts and ends textStream cleanly, which would hand the
-        // customer an empty answer marked complete — the silent non-answer
-        // this whole pipeline exists to prevent. The e2e outage test caught
-        // exactly that.
-        for await (const part of result.fullStream) {
-          if (part.type === 'text-delta') {
-            answer += part.text;
-            controller.enqueue(frame('text', { delta: part.text }));
-          } else if (part.type === 'error') {
-            throw part.error;
-          } else if (part.type === 'abort') {
-            throw new Error('generation aborted');
-          }
-        }
-        if (answer.length === 0) {
-          // Whatever ended the stream without a word was not an answer.
-          throw new Error('stream ended without any text');
-        }
-      } catch (error) {
+      const finished = new Promise<{
+        text: string;
+        inputTokens: number | null;
+        outputTokens: number | null;
+        generationId: string | null;
+      }>((resolve) => {
+        timings.mark('model_start');
+        const result = streamText({
+          model: answerModel(),
+          system,
+          messages: [...history, { role: 'user' as const, content: question }],
+          maxOutputTokens: LIMITS.maxOutputTokens,
+          maxRetries: LIMITS.maxRetries,
+          abortSignal: AbortSignal.timeout(LIMITS.requestTimeoutMs),
+          providerOptions: {
+            gateway: {
+              // Spend attribution and abuse tracing, hashed. Never a raw id.
+              user,
+              tags: usageTags(country, locale),
+              // Claude, from an Anthropic route, or not at all. `only` is
+              // what makes "no silent fallback to a non-Claude model"
+              // enforceable rather than aspirational.
+              only: [...ANSWER_PROVIDER_ORDER],
+              order: [...ANSWER_PROVIDER_ORDER],
+              disallowPromptTraining: true,
+            },
+          },
+          onChunk: () => {
+            timings.mark('first_token');
+          },
+          onError: ({ error }) => {
+            status = 'error';
+            const failure = classifyUpstreamError(error);
+            errorCode = failure;
+            failurePart = { uiMessageId, failure, message: failureMessage(failure, locale) };
+            logger.error('ai.answer.failed', {
+              requestId: timings.requestId,
+              failure,
+              conversation: conversation.id,
+            });
+            resolve({ text: '', inputTokens: null, outputTokens: null, generationId: null });
+          },
+          onFinish: ({ text, usage, providerMetadata }) => {
+            const raw = providerMetadata?.gateway?.generationId;
+            resolve({
+              text,
+              inputTokens: usage.inputTokens ?? null,
+              outputTokens: usage.outputTokens ?? null,
+              generationId: typeof raw === 'string' ? raw : null,
+            });
+          },
+        });
+
+        // The customer's stream: text deltas the moment they exist. The
+        // start/finish frames are ours, so this merge sends neither.
+        writer.merge(
+          result.toUIMessageStream({
+            sendStart: false,
+            sendFinish: false,
+            onError: (error) => failureMessage(classifyUpstreamError(error), locale),
+          }),
+        );
+      });
+
+      const outcome = await finished;
+      timings.mark('completed');
+
+      if (failurePart) {
+        // The upstream failure copy travels as data too, so the client can
+        // offer the specialist path prominently.
+        writer.write({ type: 'data-failure', data: failurePart });
+      }
+      if (status === 'complete' && outcome.text.length === 0) {
+        // Whatever ended the stream without a word was not an answer.
         status = 'error';
-        const failure = classifyUpstreamError(error);
-        errorCode = failure;
-        logger.error('ai.answer.failed', { failure, conversation: conversation.id });
-        // The copy travels with the frame. A stream that dies mid-answer is
-        // the one case the client cannot write its own message for — it does
-        // not know whether this was an outage, a budget cap or a timeout, and
-        // those need different things said.
-        controller.enqueue(frame('error', { failure, message: failureMessage(failure, locale) }));
+        errorCode = 'unknown';
+        writer.write({
+          type: 'data-failure',
+          data: { uiMessageId, failure: 'unknown', message: failureMessage('unknown', locale) },
+        });
       }
 
       const latencyMs = Date.now() - startedAt;
-
-      // Usage and metadata resolve once the stream has finished. A rejection
-      // here must not break a response the customer has already read.
-      let inputTokens: number | null = null;
-      let outputTokens: number | null = null;
-      let generationId: string | null = null;
-
-      try {
-        const usage = await result.usage;
-        inputTokens = usage.inputTokens ?? null;
-        outputTokens = usage.outputTokens ?? null;
-        const metadata = await result.providerMetadata;
-        const raw = metadata?.gateway?.generationId;
-        generationId = typeof raw === 'string' ? raw : null;
-      } catch {
-        // Already reflected in `status`; nothing further to report.
-      }
-
-      const info = await generationInfo(generationId);
+      const info = status === 'complete' ? await generationInfo(outcome.generationId) : null;
 
       const messageId = await recordAnswer(conversation, {
-        content: answer,
+        content: outcome.text,
         sourceIds: retrieval.sourceIds,
         model: answerModel(),
         provider: info?.provider ?? null,
-        inputTokens,
-        outputTokens,
+        inputTokens: outcome.inputTokens,
+        outputTokens: outcome.outputTokens,
         estimatedCostUsd: info?.cost ?? null,
         latencyMs,
         status,
@@ -286,24 +384,46 @@ export async function answerQuestion(request: ChatRequest): Promise<ChatStream |
         country,
         locale,
       });
+      await Promise.allSettled(backgroundWrites);
+      timings.mark('persisted');
+
+      const actions = actionsFor(question, locale);
+      const final: FinalPart = {
+        uiMessageId,
+        conversationId: conversation.persisted ? conversation.id : null,
+        messageId,
+        followUps: actions.followUps,
+        // Never offer to start a process off a failed answer.
+        startProcess: status === 'complete' && actions.startProcess,
+      };
+      writer.write({ type: 'data-final', data: final });
+      writer.write({ type: 'finish' });
 
       logger.info('ai.answer.finish', {
+        requestId: timings.requestId,
         conversation: conversation.id,
         status,
         latencyMs,
-        inputTokens,
-        outputTokens,
+        inputTokens: outcome.inputTokens,
+        outputTokens: outcome.outputTokens,
         provider: info?.provider ?? null,
       });
-
-      // `messageId` is the row feedback attaches to. It only exists once the
-      // answer has been written, which is why it arrives in the final frame
-      // rather than in `meta` — a thumbs-down on an answer that was never
-      // stored would have nothing to point at.
-      controller.enqueue(frame('done', { status, latencyMs, messageId }));
-      controller.close();
+      timings.flush({
+        path: 'answer',
+        country,
+        locale,
+        status,
+        sources: retrieval.sourceIds.length,
+      });
     },
   });
 
-  return { ok: true, conversationId: conversation.id, citations: retrieval.citations, stream };
+  return createUIMessageStreamResponse({
+    stream,
+    headers: {
+      'Cache-Control': 'no-cache, no-store, no-transform',
+      'X-Accel-Buffering': 'no',
+      'X-Robots-Tag': 'noindex',
+    },
+  });
 }
