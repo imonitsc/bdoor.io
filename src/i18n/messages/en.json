@@ -322,8 +322,8 @@
       }
     },
     "journey": {
-      "eyebrow": "From answer to action",
-      "title": "From answer to roadmap to managed case.",
+      "eyebrow": "Start or add your business",
+      "title": "One assessment becomes a roadmap and a profile.",
       "steps": {
         "one": {
           "title": "Ask",
@@ -331,7 +331,7 @@
         },
         "two": {
           "title": "Plan",
-          "body": "The free assessment turns your situation into a preliminary roadmap — always labelled preliminary and subject to specialist review."
+          "body": "The free assessment — for a new business or one you already run — turns your situation into a preliminary roadmap, always labelled preliminary and subject to specialist review."
         },
         "three": {
           "title": "Run",
@@ -340,9 +340,9 @@
       }
     },
     "workspace": {
-      "eyebrow": "bdoor ID & workspace",
-      "title": "One private workspace for your business.",
-      "body": "Your case history, documents, quotes and compliance dates live in one place, private to you and your case team.",
+      "eyebrow": "Run it from one workspace",
+      "title": "Your business, its deadlines and its documents in one place.",
+      "body": "Case history, documents, quotes, licence renewals and filing deadlines live in one workspace, private to you and your case team — with reminders before anything falls due.",
       "identity": "Inside it, your business carries a private bdoor ID — an internal reference that ties your history together. It is not a government identifier, not a credit rating and never public: nothing is published unless you opt in to verification."
     },
     "providers": {
