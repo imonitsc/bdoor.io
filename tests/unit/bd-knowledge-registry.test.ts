@@ -233,4 +233,18 @@ describe('extraction hygiene', () => {
     expect(text).toContain('- Item one');
     expect(text).not.toContain('steal');
   });
+
+  it('drops scripts even with a spaced end tag, and never double-unescapes', () => {
+    // `</script >` is valid HTML; a filter that misses it leaks script text.
+    const spaced = htmlToText('<p>Before</p><script>evil()</script ><p>After</p>');
+    expect(spaced).not.toContain('evil');
+    expect(spaced).toContain('Before');
+    expect(spaced).toContain('After');
+
+    // `&amp;lt;` is the ESCAPED text "&lt;" — decoding it twice would turn a
+    // quoted markup example in a legal text into a real angle bracket.
+    expect(htmlToText('<p>Use &amp;lt; in the form &amp; sign here.</p>')).toBe(
+      'Use &lt; in the form & sign here.',
+    );
+  });
 });
