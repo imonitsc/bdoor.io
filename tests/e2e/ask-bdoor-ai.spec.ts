@@ -24,9 +24,7 @@ test.describe('the homepage entry', () => {
     await expect(page.getByRole('heading', { level: 1 })).toContainText(
       'Bangladesh business intelligence, from first question to next action.',
     );
-    await expect(
-      page.getByPlaceholder('Ask about starting or running a business in Bangladesh'),
-    ).toBeVisible();
+    await expect(page.getByPlaceholder('Ask anything about business in Bangladesh')).toBeVisible();
     await expect(page.getByTestId('home-hero-ask').locator('svg').first()).toBeVisible();
 
     for (const starter of [
@@ -50,7 +48,7 @@ test.describe('the homepage entry', () => {
     await page.goto('/en');
 
     await page
-      .getByPlaceholder('Ask about starting or running a business in Bangladesh')
+      .getByPlaceholder('Ask anything about business in Bangladesh')
       .fill('How do I open a restaurant in Dhaka?');
     await page.getByTestId('home-hero-ask').click();
 

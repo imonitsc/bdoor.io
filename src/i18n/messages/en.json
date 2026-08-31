@@ -124,11 +124,11 @@
     "hero": {
       "eyebrow": "Business intelligence for Bangladesh",
       "headline": "Bangladesh business intelligence, from first question to next action.",
-      "support": "Ask about company formation, licences, tax, VAT and compliance. bdoor AI explains the official process and cites its sources — and when you are ready, bdoor runs the case with verified professionals.",
+      "support": "Formation, licences, tax and compliance. Ask, then act.",
       "primaryCta": "Start now",
       "askCta": "Ask bdoor AI",
       "secondaryCta": "See packages",
-      "trustLine": "Cited answers, general information only — not legal, tax or investment advice. The assessment is free and creates no obligation.",
+      "trustLine": "Answers cite official sources. General information, not professional advice.",
       "operatorLine": "Operated by bdoor compliance ltd.",
       "doorAlt": "An open doorway overlooking Dhaka's business district",
       "founderAlt": "Founder using the bdoor workspace on a laptop.",
@@ -148,7 +148,7 @@
       },
       "composer": {
         "label": "Your question",
-        "placeholder": "Ask about starting or running a business in Bangladesh",
+        "placeholder": "Ask anything about business in Bangladesh",
         "cta": "Ask bdoor AI"
       },
       "starters": {
@@ -222,8 +222,7 @@
       "cta": "Read how the whole process works"
     },
     "finalCta": {
-      "title": "Start with a question, or start the process.",
-      "body": "Ask bdoor AI anything about doing business in Bangladesh, or begin the free assessment and receive an itemised quote before you commit.",
+      "title": "Ask, or start.",
       "primary": "Start now",
       "secondary": "Ask bdoor AI"
     },
@@ -299,56 +298,51 @@
       "partnerCta": "How the partner model works"
     },
     "solve": {
-      "eyebrow": "What bdoor AI can solve",
       "title": "Ask a real question. Get the official process.",
-      "body": "Every answer draws on published sources and says which authority owns each step. Where professional advice is required, it says so and offers a specialist.",
       "items": {
         "formation": {
           "title": "Start a business",
-          "body": "Entity choice, name clearance, incorporation documents and the registration sequence — with the official references for each step."
+          "body": "Entity, name clearance, incorporation — step by step."
         },
         "licences": {
-          "title": "Licences and renewals",
-          "body": "Which trade licence, sector permits and registrations apply to your activity, who issues them and when they renew."
+          "title": "Licences",
+          "body": "What applies, who issues it, when it renews."
         },
         "tax": {
           "title": "Tax and VAT",
-          "body": "e-TIN, VAT registration and return filing — and the difference between a government fee and a service fee, explained, never invented."
+          "body": "e-TIN, VAT, returns — explained, never invented."
         },
         "investment": {
-          "title": "Investment and FX readiness",
-          "body": "What foreign shareholding, capital remittance and repatriation involve, and which parts need a bank, an authority or a professional."
+          "title": "Investment",
+          "body": "Foreign shareholding, remittance, repatriation — clearly."
         }
       }
     },
     "journey": {
-      "eyebrow": "Start or add your business",
-      "title": "One assessment becomes a roadmap and a profile.",
+      "title": "From answer to roadmap to managed case.",
       "steps": {
         "one": {
           "title": "Ask",
-          "body": "Start with a question. bdoor AI answers from published sources, with citations and honest limits."
+          "body": "Cited answers from published sources."
         },
         "two": {
           "title": "Plan",
-          "body": "The free assessment — for a new business or one you already run — turns your situation into a preliminary roadmap, always labelled preliminary and subject to specialist review."
+          "body": "A preliminary roadmap from one free assessment."
         },
         "three": {
           "title": "Run",
-          "body": "Accept an itemised quote — bdoor's fee separated from government charges — and follow milestones, documents and renewals in your workspace."
+          "body": "An itemised quote, then a managed case."
         }
       }
     },
     "workspace": {
-      "eyebrow": "Run it from one workspace",
-      "title": "Your business, its deadlines and its documents in one place.",
-      "body": "Case history, documents, quotes, licence renewals and filing deadlines live in one workspace, private to you and your case team — with reminders before anything falls due.",
-      "identity": "Inside it, your business carries a private bdoor ID — an internal reference that ties your history together. It is not a government identifier, not a credit rating and never public: nothing is published unless you opt in to verification."
+      "title": "Run it from one workspace.",
+      "body": "Documents, deadlines, renewals and your private bdoor ID — in one place.",
+      "identity": "The bdoor ID is private. Never a government identifier, never public."
     },
     "providers": {
-      "eyebrow": "Verified provider review",
-      "title": "Regulated work goes to verified independent professionals.",
-      "body": "Advocates and firms apply, are verified and pass conflict-of-interest checks before they can take an engagement — and they are identified to you before any document is shared. bdoor coordinates; it is not a law firm."
+      "title": "Regulated work goes to verified professionals.",
+      "body": "Verified, conflict-checked, and named to you before anything is shared."
     }
   },
   "howItWorksPage": {
