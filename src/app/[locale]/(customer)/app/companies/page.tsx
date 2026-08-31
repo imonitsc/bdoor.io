@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PageHeading } from '@/components/dashboard/page-heading';
 import { requireCustomerOrganization } from '@/lib/auth/require-organization';
+import { serverEnv } from '@/lib/env';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
@@ -21,16 +22,22 @@ export default async function CompaniesPage({ params }: { params: Promise<{ loca
     getFormatter(),
   ]);
 
+  // bdoor ID display is flag-gated for staged rollout; the column itself
+  // always exists and stays inside the table's tenancy either way.
+  const showBdoorId = serverEnv().BDOOR_ID_ENABLED;
+  const tBdoorId = await getTranslations('workspace.bdoorId');
+
   const supabase = await createClient();
   const { data } = await supabase
     .from('companies')
     .select(
-      'id, legal_name, trading_name, structure, status, registration_no, incorporation_date, company_people(id, full_name, role)',
+      'id, bdoor_id, legal_name, trading_name, structure, status, registration_no, incorporation_date, company_people(id, full_name, role)',
     )
     .order('created_at', { ascending: false });
 
   type Row = {
     id: string;
+    bdoor_id: string;
     legal_name: string;
     trading_name: string | null;
     structure: string;
@@ -45,6 +52,12 @@ export default async function CompaniesPage({ params }: { params: Promise<{ loca
   return (
     <div className="flex flex-col gap-6">
       <PageHeading title={t('companies')} />
+
+      {showBdoorId && companies.length > 0 ? (
+        // The §4.2 disclaimers travel with the identifier wherever it is
+        // shown: private, not a government identifier, never a rating.
+        <p className="text-muted text-sm">{tBdoorId('privacy')}</p>
+      ) : null}
 
       {companies.length === 0 ? (
         <EmptyState icon={<Building2 className="size-5" />} title={tCommon('noResults')} />
@@ -66,6 +79,12 @@ export default async function CompaniesPage({ params }: { params: Promise<{ loca
                 </div>
 
                 <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+                  {showBdoorId ? (
+                    <div>
+                      <dt className="text-muted text-xs">{tBdoorId('label')}</dt>
+                      <dd className="text-ink font-mono">{company.bdoor_id}</dd>
+                    </div>
+                  ) : null}
                   <div>
                     <dt className="text-muted text-xs">{tCommon('status')}</dt>
                     <dd className="text-ink">{company.structure.replace(/_/g, ' ')}</dd>

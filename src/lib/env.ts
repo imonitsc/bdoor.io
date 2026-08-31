@@ -77,6 +77,14 @@ const serverSchema = z.object({
   // Document OCR for scanned official documents. Disabled by default: the
   // ingestion pipeline records that OCR is needed rather than inventing text.
   AI_OCR_PROVIDER: z.enum(['disabled', 'external']).default('disabled'),
+  // bdoor ID (BI-OS §4.2): shows the private business identifier in the
+  // customer workspace. The database column exists either way; the flag gates
+  // display only, for the staged rollout §17 asks for. Off by default until
+  // the founder approves the surface.
+  BDOOR_ID_ENABLED: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((v) => v === 'true'),
   // Shared secret for scheduled jobs (Vercel cron sends it as a bearer token).
   CRON_SECRET: z.string().min(16).optional(),
   SENTRY_DSN: optionalUrl,

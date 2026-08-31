@@ -1540,6 +1540,8 @@ export type Database = {
         Row: {
           "id": string
           "organization_id": string
+          "bdoor_id": string
+          "public_verification_opt_in": boolean
           "legal_name": string
           "trading_name": string | null
           "structure": string
@@ -1557,6 +1559,8 @@ export type Database = {
         Insert: {
           "id"?: string
           "organization_id": string
+          "bdoor_id"?: string
+          "public_verification_opt_in"?: boolean
           "legal_name": string
           "trading_name"?: string | null
           "structure": string
@@ -1574,6 +1578,8 @@ export type Database = {
         Update: {
           "id"?: string
           "organization_id"?: string
+          "bdoor_id"?: string
+          "public_verification_opt_in"?: boolean
           "legal_name"?: string
           "trading_name"?: string | null
           "structure"?: string
