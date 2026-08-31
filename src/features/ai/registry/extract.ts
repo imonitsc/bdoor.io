@@ -76,13 +76,14 @@ export function encodingLooksBroken(text: string): boolean {
  * behind review, never instructions to a model.
  */
 export function htmlToText(html: string): string {
-  // `\s*` before the closing bracket: `</script >` is valid HTML and a
-  // script regex that misses it would leak script text into the corpus.
+  // `[^>]*` before the closing bracket: a browser treats `</script >` and
+  // even `</script bar>` as the end tag, so a stricter regex than the parser
+  // would leak script text into the corpus.
   let text = html
-    .replace(/<script\b[\s\S]*?<\/script\s*>/gi, ' ')
-    .replace(/<style\b[\s\S]*?<\/style\s*>/gi, ' ')
+    .replace(/<script\b[\s\S]*?<\/script\b[^>]*>/gi, ' ')
+    .replace(/<style\b[\s\S]*?<\/style\b[^>]*>/gi, ' ')
     .replace(/<!--[\s\S]*?-->/g, ' ')
-    .replace(/<(nav|header|footer|aside)\b[\s\S]*?<\/\1\s*>/gi, ' ');
+    .replace(/<(nav|header|footer|aside)\b[\s\S]*?<\/\1\b[^>]*>/gi, ' ');
 
   // Headings first, so the block-level strip below cannot eat them.
   text = text.replace(
