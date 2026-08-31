@@ -112,7 +112,9 @@
       "becomeProvider": "Become a provider",
       "providerSignIn": "Provider sign in",
       "providerStandards": "Provider standards",
-      "providerDisclosure": "Provider disclosure"
+      "providerDisclosure": "Provider disclosure",
+      "productStart": "bdoor Start",
+      "productComply": "bdoor Comply"
     },
     "socialHeading": "Follow bdoor",
     "bangladeshHeading": "Bangladesh",
@@ -2273,5 +2275,63 @@
     "voiceStop": "Stop listening",
     "followUps": "Ask next",
     "startProcess": "Start this process"
+  },
+  "products": {
+    "start": {
+      "eyebrow": "bdoor Start",
+      "title": "Form or onboard a business, from one application.",
+      "tagline": "One adaptive assessment covers a new Bangladesh business, an already-registered one, or an international route — and becomes a specialist-reviewed managed application with an itemised quote before you commit.",
+      "cta": "Start now",
+      "pricingCta": "See the packages",
+      "how": {
+        "eyebrow": "How it works",
+        "title": "Assessment to workspace, without repeating yourself.",
+        "assess": {
+          "title": "One assessment",
+          "body": "Answer once — new or existing business, entity, activity, ownership. The recommendation is preliminary and subject to specialist review."
+        },
+        "quote": {
+          "title": "An itemised quote",
+          "body": "bdoor's professional fee is always separated from government charges and third-party costs. A government fee appears only with a verified figure; otherwise it is quoted after review."
+        },
+        "run": {
+          "title": "A managed application",
+          "body": "Specialists prepare and coordinate each step — name clearance, incorporation documents, registrations — with the status visible in your workspace throughout."
+        },
+        "handoff": {
+          "title": "Straight into your workspace",
+          "body": "The finished case becomes a business profile with its documents, deadlines and history in one place — the starting point for continuing compliance."
+        }
+      },
+      "honesty": "bdoor is not affiliated with RJSC, NBR, BIDA or any other authority, and does not submit applications to any authority automatically. Every application is prepared and reviewed by people, and regulated work is done by independent qualified professionals engaged separately."
+    },
+    "comply": {
+      "eyebrow": "bdoor Comply",
+      "title": "Continuing compliance, tracked in one place.",
+      "tagline": "Licence renewals, filings and deadlines for your business — visible in your workspace, with reminders before they fall due and preparation coordinated with specialists when you ask.",
+      "cta": "Start now",
+      "signInCta": "Sign in to your workspace",
+      "what": {
+        "eyebrow": "What it does today",
+        "title": "The obligations, before they become emergencies.",
+        "calendar": {
+          "title": "An obligations calendar",
+          "body": "Every tracked obligation with its due date, the authority it belongs to and its current state — due now, upcoming, under review, filed or overdue."
+        },
+        "reminders": {
+          "title": "Reminders that lead the deadline",
+          "body": "Notifications at sensible intervals before each due date, in the workspace and by email — never five at once for one deadline."
+        },
+        "renewals": {
+          "title": "Renewal cases",
+          "body": "A recurring obligation, such as a trade licence renewal, can become a managed case with its documents and history attached to the same business profile."
+        },
+        "prepare": {
+          "title": "Preparation on request",
+          "body": "Ask for an obligation to be prepared and a specialist takes it up — you review and approve before anything is filed anywhere."
+        }
+      },
+      "honesty": "bdoor Comply shows the state of your obligations as bdoor tracks them; it is not an official government good-standing status. Nothing is filed without your information, your approval and, where the law requires it, an independent qualified professional."
+    }
   }
 }
