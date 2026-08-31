@@ -3,7 +3,13 @@ import { execFileSync } from 'node:child_process';
 import { describe, expect, it } from 'vitest';
 
 import { INTERNATIONAL_OFFERS } from '@/content/packages/catalog';
-import { ANSWER_MODEL, EMBEDDING_DIMENSIONS, LIMITS, usageTags } from '@/features/ai/config';
+import {
+  DEFAULT_ANSWER_MODEL,
+  DEFAULT_EXTRACTION_MODEL,
+  EMBEDDING_DIMENSIONS,
+  LIMITS,
+  usageTags,
+} from '@/features/ai/config';
 import { chunkText, normaliseVector } from '@/features/ai/embeddings';
 import { seedSources } from '@/features/ai/knowledge-seed';
 import { STRUCTURED_SOURCE, structuredRecordsFor } from '@/features/ai/structured';
@@ -15,11 +21,15 @@ import { buildSystemPrompt, PROMPT_VERSION } from '@/features/ai/system-prompt';
  */
 
 describe('the answer model', () => {
-  it('is Claude, and is not chosen at runtime', () => {
-    expect(ANSWER_MODEL).toBe('anthropic/claude-sonnet-5');
+  it('is Claude by default, and any override goes through the validated env layer', () => {
+    expect(DEFAULT_ANSWER_MODEL).toBe('anthropic/claude-sonnet-5');
+    // Extraction is never customer-facing, but it defaults to the same
+    // verified slug until a cheaper model passes the extraction evaluation.
+    expect(DEFAULT_EXTRACTION_MODEL).toBe('anthropic/claude-sonnet-5');
 
-    // No silent fallback: nothing in the feature may name a second answer
-    // model, and nothing may read one from the environment.
+    // No silent fallback: nothing in the feature may name a non-Claude answer
+    // model, and nothing may read a model from a bare process.env — overrides
+    // exist only as validated serverEnv() fields.
     const sources = execFileSync('grep', ['-rl', '', 'src/features/ai', '--include=*.ts'], {
       encoding: 'utf8',
     })

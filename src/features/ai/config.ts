@@ -1,5 +1,7 @@
 import 'server-only';
 
+import { serverEnv } from '@/lib/env';
+
 /**
  * Ask bdoor AI: the settings that are policy rather than preference.
  *
@@ -12,10 +14,30 @@ import 'server-only';
 
 /**
  * The answer model. Claude, always — the brief is explicit that there is no
- * silent fallback to a different answer model, so this constant is referenced
- * everywhere and never chosen at runtime.
+ * silent fallback to a different answer model. The default is the slug
+ * verified in production; `AI_ANSWER_MODEL` exists so a model *upgrade* is a
+ * configuration change with a rollback, not a deploy. It goes through
+ * `serverEnv()` (the validated layer), never a bare process.env read, and the
+ * provider `only` guard in chat.ts still refuses any non-Anthropic route.
  */
-export const ANSWER_MODEL = 'anthropic/claude-sonnet-5';
+export const DEFAULT_ANSWER_MODEL = 'anthropic/claude-sonnet-5';
+
+export function answerModel(): string {
+  return serverEnv().AI_ANSWER_MODEL ?? DEFAULT_ANSWER_MODEL;
+}
+
+/**
+ * Classification and document extraction. Never customer-facing: its output
+ * is a draft a reviewer sees, so a lower-cost model is acceptable here once
+ * it passes evaluation. Until a cheaper slug has been evaluated against the
+ * extraction test set, the default stays the verified answer model —
+ * `AI_EXTRACTION_MODEL` is how a cheaper model is adopted after it earns it.
+ */
+export const DEFAULT_EXTRACTION_MODEL = 'anthropic/claude-sonnet-5';
+
+export function extractionModel(): string {
+  return serverEnv().AI_EXTRACTION_MODEL ?? DEFAULT_EXTRACTION_MODEL;
+}
 
 /**
  * Retrieval only. The embedding model never writes a word the customer reads;

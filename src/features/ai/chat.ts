@@ -4,9 +4,9 @@ import { gateway, streamText } from 'ai';
 
 import { checkBudget } from './budget';
 import {
-  ANSWER_MODEL,
   ANSWER_PROVIDER_ORDER,
   LIMITS,
+  answerModel,
   isSupportedCountry,
   usageTags,
 } from './config';
@@ -186,7 +186,7 @@ export async function answerQuestion(request: ChatRequest): Promise<ChatStream |
   });
 
   const result = streamText({
-    model: ANSWER_MODEL,
+    model: answerModel(),
     system,
     messages: [...history, { role: 'user' as const, content: question }],
     maxOutputTokens: LIMITS.maxOutputTokens,
@@ -275,7 +275,7 @@ export async function answerQuestion(request: ChatRequest): Promise<ChatStream |
       const messageId = await recordAnswer(conversation, {
         content: answer,
         sourceIds: retrieval.sourceIds,
-        model: ANSWER_MODEL,
+        model: answerModel(),
         provider: info?.provider ?? null,
         inputTokens,
         outputTokens,

@@ -75,6 +75,60 @@ export type Database = {
         }
         Relationships: []
       }
+      "ai_ingestion_jobs": {
+        Row: {
+          "id": string
+          "job_type": Database["public"]["Enums"]["ai_job_type"]
+          "registry_source_id": string | null
+          "registry_document_id": string | null
+          "status": Database["public"]["Enums"]["ai_job_status"]
+          "attempt": number
+          "max_attempts": number
+          "run_after": string
+          "started_at": string | null
+          "finished_at": string | null
+          "error_code": string | null
+          "error_detail": string | null
+          "checkpoint": Json
+          "dedupe_key": string | null
+          "created_at": string
+        }
+        Insert: {
+          "id"?: string
+          "job_type": Database["public"]["Enums"]["ai_job_type"]
+          "registry_source_id"?: string | null
+          "registry_document_id"?: string | null
+          "status"?: Database["public"]["Enums"]["ai_job_status"]
+          "attempt"?: number
+          "max_attempts"?: number
+          "run_after"?: string
+          "started_at"?: string | null
+          "finished_at"?: string | null
+          "error_code"?: string | null
+          "error_detail"?: string | null
+          "checkpoint"?: Json
+          "dedupe_key"?: string | null
+          "created_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "job_type"?: Database["public"]["Enums"]["ai_job_type"]
+          "registry_source_id"?: string | null
+          "registry_document_id"?: string | null
+          "status"?: Database["public"]["Enums"]["ai_job_status"]
+          "attempt"?: number
+          "max_attempts"?: number
+          "run_after"?: string
+          "started_at"?: string | null
+          "finished_at"?: string | null
+          "error_code"?: string | null
+          "error_detail"?: string | null
+          "checkpoint"?: Json
+          "dedupe_key"?: string | null
+          "created_at"?: string
+        }
+        Relationships: []
+      }
       "ai_knowledge_audit_log": {
         Row: {
           "id": string
@@ -126,6 +180,10 @@ export type Database = {
           "embedding_dimensions": number
           "search_vector": unknown | null
           "created_at": string
+          "heading": string | null
+          "section_ref": string | null
+          "page_start": number | null
+          "page_end": number | null
         }
         Insert: {
           "id"?: string
@@ -138,6 +196,10 @@ export type Database = {
           "embedding_dimensions"?: number
           "search_vector"?: unknown | null
           "created_at"?: string
+          "heading"?: string | null
+          "section_ref"?: string | null
+          "page_start"?: number | null
+          "page_end"?: number | null
         }
         Update: {
           "id"?: string
@@ -150,6 +212,10 @@ export type Database = {
           "embedding_dimensions"?: number
           "search_vector"?: unknown | null
           "created_at"?: string
+          "heading"?: string | null
+          "section_ref"?: string | null
+          "page_start"?: number | null
+          "page_end"?: number | null
         }
         Relationships: []
       }
@@ -176,6 +242,12 @@ export type Database = {
           "created_by": string | null
           "created_at": string
           "updated_at": string
+          "authority_tier": number | null
+          "topics": Database["public"]["Enums"]["ai_topic"][]
+          "issuing_institution": string | null
+          "reference_number": string | null
+          "publication_date": string | null
+          "registry_document_id": string | null
         }
         Insert: {
           "id"?: string
@@ -199,6 +271,12 @@ export type Database = {
           "created_by"?: string | null
           "created_at"?: string
           "updated_at"?: string
+          "authority_tier"?: number | null
+          "topics"?: Database["public"]["Enums"]["ai_topic"][]
+          "issuing_institution"?: string | null
+          "reference_number"?: string | null
+          "publication_date"?: string | null
+          "registry_document_id"?: string | null
         }
         Update: {
           "id"?: string
@@ -222,6 +300,12 @@ export type Database = {
           "created_by"?: string | null
           "created_at"?: string
           "updated_at"?: string
+          "authority_tier"?: number | null
+          "topics"?: Database["public"]["Enums"]["ai_topic"][]
+          "issuing_institution"?: string | null
+          "reference_number"?: string | null
+          "publication_date"?: string | null
+          "registry_document_id"?: string | null
         }
         Relationships: []
       }
@@ -270,6 +354,405 @@ export type Database = {
           "status"?: Database["public"]["Enums"]["ai_completion_status"]
           "error_code"?: string | null
           "created_at"?: string
+        }
+        Relationships: []
+      }
+      "ai_registry_audit_log": {
+        Row: {
+          "id": string
+          "registry_source_id": string | null
+          "registry_document_id": string | null
+          "rule_id": string | null
+          "action": string
+          "from_state": string | null
+          "to_state": string | null
+          "actor_id": string | null
+          "note": string | null
+          "created_at": string
+        }
+        Insert: {
+          "id"?: string
+          "registry_source_id"?: string | null
+          "registry_document_id"?: string | null
+          "rule_id"?: string | null
+          "action": string
+          "from_state"?: string | null
+          "to_state"?: string | null
+          "actor_id"?: string | null
+          "note"?: string | null
+          "created_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "registry_source_id"?: string | null
+          "registry_document_id"?: string | null
+          "rule_id"?: string | null
+          "action"?: string
+          "from_state"?: string | null
+          "to_state"?: string | null
+          "actor_id"?: string | null
+          "note"?: string | null
+          "created_at"?: string
+        }
+        Relationships: []
+      }
+      "ai_registry_documents": {
+        Row: {
+          "id": string
+          "registry_source_id": string
+          "issuing_institution": string
+          "source_kind": string
+          "official_title": string
+          "reference_number": string | null
+          "canonical_url": string
+          "language": string
+          "publication_date": string | null
+          "effective_date": string | null
+          "expiry_date": string | null
+          "jurisdiction": string
+          "geographic_scope": string | null
+          "entity_types": string[]
+          "sectors": string[]
+          "topics": Database["public"]["Enums"]["ai_topic"][]
+          "authority_tier": number
+          "currency": Database["public"]["Enums"]["ai_document_currency"]
+          "checksum": string | null
+          "retrieved_at": string | null
+          "storage_path": string | null
+          "mime_type": string | null
+          "byte_size": number | null
+          "page_count": number | null
+          "previous_version_id": string | null
+          "replaced_by_id": string | null
+          "lifecycle": Database["public"]["Enums"]["ai_registry_lifecycle"]
+          "extracted_text": string | null
+          "extraction_method": string | null
+          "ocr_applied": boolean
+          "language_detected": string | null
+          "extracted_at": string | null
+          "review_due_on": string | null
+          "reviewed_by": string | null
+          "reviewed_at": string | null
+          "published_by": string | null
+          "published_at": string | null
+          "knowledge_source_id": string | null
+          "last_error": string | null
+          "failed_at": string | null
+          "notes": string | null
+          "created_by": string | null
+          "created_at": string
+          "updated_at": string
+        }
+        Insert: {
+          "id"?: string
+          "registry_source_id": string
+          "issuing_institution": string
+          "source_kind": string
+          "official_title": string
+          "reference_number"?: string | null
+          "canonical_url": string
+          "language"?: string
+          "publication_date"?: string | null
+          "effective_date"?: string | null
+          "expiry_date"?: string | null
+          "jurisdiction"?: string
+          "geographic_scope"?: string | null
+          "entity_types"?: string[]
+          "sectors"?: string[]
+          "topics"?: Database["public"]["Enums"]["ai_topic"][]
+          "authority_tier": number
+          "currency"?: Database["public"]["Enums"]["ai_document_currency"]
+          "checksum"?: string | null
+          "retrieved_at"?: string | null
+          "storage_path"?: string | null
+          "mime_type"?: string | null
+          "byte_size"?: number | null
+          "page_count"?: number | null
+          "previous_version_id"?: string | null
+          "replaced_by_id"?: string | null
+          "lifecycle"?: Database["public"]["Enums"]["ai_registry_lifecycle"]
+          "extracted_text"?: string | null
+          "extraction_method"?: string | null
+          "ocr_applied"?: boolean
+          "language_detected"?: string | null
+          "extracted_at"?: string | null
+          "review_due_on"?: string | null
+          "reviewed_by"?: string | null
+          "reviewed_at"?: string | null
+          "published_by"?: string | null
+          "published_at"?: string | null
+          "knowledge_source_id"?: string | null
+          "last_error"?: string | null
+          "failed_at"?: string | null
+          "notes"?: string | null
+          "created_by"?: string | null
+          "created_at"?: string
+          "updated_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "registry_source_id"?: string
+          "issuing_institution"?: string
+          "source_kind"?: string
+          "official_title"?: string
+          "reference_number"?: string | null
+          "canonical_url"?: string
+          "language"?: string
+          "publication_date"?: string | null
+          "effective_date"?: string | null
+          "expiry_date"?: string | null
+          "jurisdiction"?: string
+          "geographic_scope"?: string | null
+          "entity_types"?: string[]
+          "sectors"?: string[]
+          "topics"?: Database["public"]["Enums"]["ai_topic"][]
+          "authority_tier"?: number
+          "currency"?: Database["public"]["Enums"]["ai_document_currency"]
+          "checksum"?: string | null
+          "retrieved_at"?: string | null
+          "storage_path"?: string | null
+          "mime_type"?: string | null
+          "byte_size"?: number | null
+          "page_count"?: number | null
+          "previous_version_id"?: string | null
+          "replaced_by_id"?: string | null
+          "lifecycle"?: Database["public"]["Enums"]["ai_registry_lifecycle"]
+          "extracted_text"?: string | null
+          "extraction_method"?: string | null
+          "ocr_applied"?: boolean
+          "language_detected"?: string | null
+          "extracted_at"?: string | null
+          "review_due_on"?: string | null
+          "reviewed_by"?: string | null
+          "reviewed_at"?: string | null
+          "published_by"?: string | null
+          "published_at"?: string | null
+          "knowledge_source_id"?: string | null
+          "last_error"?: string | null
+          "failed_at"?: string | null
+          "notes"?: string | null
+          "created_by"?: string | null
+          "created_at"?: string
+          "updated_at"?: string
+        }
+        Relationships: []
+      }
+      "ai_source_change_alerts": {
+        Row: {
+          "id": string
+          "alert_type": Database["public"]["Enums"]["ai_alert_type"]
+          "registry_source_id": string | null
+          "registry_document_id": string | null
+          "previous_document_id": string | null
+          "summary": string
+          "detail": Json
+          "resolved_at": string | null
+          "resolved_by": string | null
+          "created_at": string
+        }
+        Insert: {
+          "id"?: string
+          "alert_type": Database["public"]["Enums"]["ai_alert_type"]
+          "registry_source_id"?: string | null
+          "registry_document_id"?: string | null
+          "previous_document_id"?: string | null
+          "summary": string
+          "detail"?: Json
+          "resolved_at"?: string | null
+          "resolved_by"?: string | null
+          "created_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "alert_type"?: Database["public"]["Enums"]["ai_alert_type"]
+          "registry_source_id"?: string | null
+          "registry_document_id"?: string | null
+          "previous_document_id"?: string | null
+          "summary"?: string
+          "detail"?: Json
+          "resolved_at"?: string | null
+          "resolved_by"?: string | null
+          "created_at"?: string
+        }
+        Relationships: []
+      }
+      "ai_source_registry": {
+        Row: {
+          "id": string
+          "code": string
+          "institution": string
+          "institution_bn": string | null
+          "kind": string
+          "base_url": string
+          "authority_tier": number
+          "topics": Database["public"]["Enums"]["ai_topic"][]
+          "check_frequency_hours": number
+          "enabled": boolean
+          "robots_state": string | null
+          "notes": string | null
+          "last_checked_at": string | null
+          "last_changed_at": string | null
+          "last_content_checksum": string | null
+          "consecutive_failures": number
+          "created_by": string | null
+          "created_at": string
+          "updated_at": string
+        }
+        Insert: {
+          "id"?: string
+          "code": string
+          "institution": string
+          "institution_bn"?: string | null
+          "kind": string
+          "base_url": string
+          "authority_tier": number
+          "topics"?: Database["public"]["Enums"]["ai_topic"][]
+          "check_frequency_hours"?: number
+          "enabled"?: boolean
+          "robots_state"?: string | null
+          "notes"?: string | null
+          "last_checked_at"?: string | null
+          "last_changed_at"?: string | null
+          "last_content_checksum"?: string | null
+          "consecutive_failures"?: number
+          "created_by"?: string | null
+          "created_at"?: string
+          "updated_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "code"?: string
+          "institution"?: string
+          "institution_bn"?: string | null
+          "kind"?: string
+          "base_url"?: string
+          "authority_tier"?: number
+          "topics"?: Database["public"]["Enums"]["ai_topic"][]
+          "check_frequency_hours"?: number
+          "enabled"?: boolean
+          "robots_state"?: string | null
+          "notes"?: string | null
+          "last_checked_at"?: string | null
+          "last_changed_at"?: string | null
+          "last_content_checksum"?: string | null
+          "consecutive_failures"?: number
+          "created_by"?: string | null
+          "created_at"?: string
+          "updated_at"?: string
+        }
+        Relationships: []
+      }
+      "ai_structured_rules": {
+        Row: {
+          "id": string
+          "registry_document_id": string | null
+          "knowledge_source_id": string | null
+          "topic": Database["public"]["Enums"]["ai_topic"]
+          "title": string
+          "applies_to": string
+          "entity_types": string[]
+          "sectors": string[]
+          "trigger_event": string | null
+          "required_action": string
+          "required_documents": string[]
+          "responsible_authority": string
+          "government_fee_text": string | null
+          "government_fee_minor": number | null
+          "government_fee_currency": string
+          "government_fee_verified": boolean
+          "professional_fee_note": string | null
+          "submission_channel": string | null
+          "processing_time_official": string | null
+          "deadline_text": string | null
+          "penalty": string | null
+          "exemptions": string | null
+          "legal_authority": string
+          "effective_from": string | null
+          "effective_to": string | null
+          "status": Database["public"]["Enums"]["ai_rule_status"]
+          "extracted_by_model": string | null
+          "superseded_by_id": string | null
+          "reviewed_by": string | null
+          "reviewed_at": string | null
+          "published_by": string | null
+          "published_at": string | null
+          "created_by": string | null
+          "created_at": string
+          "updated_at": string
+        }
+        Insert: {
+          "id"?: string
+          "registry_document_id"?: string | null
+          "knowledge_source_id"?: string | null
+          "topic": Database["public"]["Enums"]["ai_topic"]
+          "title": string
+          "applies_to": string
+          "entity_types"?: string[]
+          "sectors"?: string[]
+          "trigger_event"?: string | null
+          "required_action": string
+          "required_documents"?: string[]
+          "responsible_authority": string
+          "government_fee_text"?: string | null
+          "government_fee_minor"?: number | null
+          "government_fee_currency"?: string
+          "government_fee_verified"?: boolean
+          "professional_fee_note"?: string | null
+          "submission_channel"?: string | null
+          "processing_time_official"?: string | null
+          "deadline_text"?: string | null
+          "penalty"?: string | null
+          "exemptions"?: string | null
+          "legal_authority": string
+          "effective_from"?: string | null
+          "effective_to"?: string | null
+          "status"?: Database["public"]["Enums"]["ai_rule_status"]
+          "extracted_by_model"?: string | null
+          "superseded_by_id"?: string | null
+          "reviewed_by"?: string | null
+          "reviewed_at"?: string | null
+          "published_by"?: string | null
+          "published_at"?: string | null
+          "created_by"?: string | null
+          "created_at"?: string
+          "updated_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "registry_document_id"?: string | null
+          "knowledge_source_id"?: string | null
+          "topic"?: Database["public"]["Enums"]["ai_topic"]
+          "title"?: string
+          "applies_to"?: string
+          "entity_types"?: string[]
+          "sectors"?: string[]
+          "trigger_event"?: string | null
+          "required_action"?: string
+          "required_documents"?: string[]
+          "responsible_authority"?: string
+          "government_fee_text"?: string | null
+          "government_fee_minor"?: number | null
+          "government_fee_currency"?: string
+          "government_fee_verified"?: boolean
+          "professional_fee_note"?: string | null
+          "submission_channel"?: string | null
+          "processing_time_official"?: string | null
+          "deadline_text"?: string | null
+          "penalty"?: string | null
+          "exemptions"?: string | null
+          "legal_authority"?: string
+          "effective_from"?: string | null
+          "effective_to"?: string | null
+          "status"?: Database["public"]["Enums"]["ai_rule_status"]
+          "extracted_by_model"?: string | null
+          "superseded_by_id"?: string | null
+          "reviewed_by"?: string | null
+          "reviewed_at"?: string | null
+          "published_by"?: string | null
+          "published_at"?: string | null
+          "created_by"?: string | null
+          "created_at"?: string
+          "updated_at"?: string
         }
         Relationships: []
       }
@@ -4952,10 +5435,17 @@ export type Database = {
     Functions: Record<string, never>
     Enums: {
       "ai_access_scope": "public" | "restricted"
+      "ai_alert_type": "new_document" | "new_version" | "fee_change" | "deadline_change" | "form_change" | "withdrawn_notice" | "fetch_failed"
       "ai_completion_status": "pending" | "streaming" | "complete" | "stopped" | "error" | "refused"
+      "ai_document_currency": "current" | "amended" | "superseded" | "withdrawn" | "proposed"
+      "ai_job_status": "queued" | "running" | "succeeded" | "failed" | "abandoned"
+      "ai_job_type": "check_source" | "fetch_document" | "extract_document" | "extract_rules"
       "ai_message_role": "user" | "assistant"
+      "ai_registry_lifecycle": "discovered" | "downloaded" | "extracted" | "review_required" | "approved" | "published" | "superseded" | "withdrawn"
+      "ai_rule_status": "draft" | "in_review" | "approved" | "published" | "superseded" | "withdrawn"
       "ai_source_status": "draft" | "in_review" | "approved" | "published" | "withdrawn"
       "ai_source_type": "website_page" | "service_page" | "country_page" | "package" | "faq" | "requirement" | "legal_policy" | "provider_disclosure" | "procedure" | "guide" | "government_reference" | "internal_article"
+      "ai_topic": "formation_structure" | "governance_rjsc" | "tax_vat" | "banking_fx_investment" | "employment_labour" | "import_export_customs" | "trade_licence_local" | "environment_factory_fire" | "intellectual_property" | "procurement" | "startup_funding" | "sector_licensing" | "international_expansion"
       "assignment_status": "offered" | "accepted" | "declined" | "withdrawn" | "completed"
       "case_status": "draft" | "awaiting_kyc" | "kyc_review" | "quote_ready" | "awaiting_acceptance" | "awaiting_payment" | "documents_required" | "partner_review" | "ready_to_submit" | "submitted" | "authority_query" | "customer_action_required" | "approved" | "rejected" | "closed" | "cancelled"
       "case_waiting_on": "none" | "customer" | "partner" | "authority" | "payment"

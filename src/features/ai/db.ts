@@ -39,4 +39,9 @@ export type RetrievedChunk = {
   last_reviewed_at: string | null;
   effective_from: string;
   score: number;
+  authority_tier: number | null;
+  issuing_institution: string | null;
+  reference_number: string | null;
+  section_ref: string | null;
+  page_start: number | null;
 };

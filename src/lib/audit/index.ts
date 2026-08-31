@@ -60,6 +60,7 @@ export type AuditAction =
   | 'metrics.snapshot_recorded'
   | 'partner.export'
   | 'content.published'
+  | 'content.unpublished'
   | 'service.updated'
   | 'settings.changed'
   | 'integration.configured'

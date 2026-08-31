@@ -3,8 +3,9 @@ import 'server-only';
 import { EMBEDDING_DIMENSIONS, EMBEDDING_MODEL } from './config';
 import { aiDb, hasAiDatabase } from './db';
 import type { Database } from '@/types/database';
-import { chunkText, embedDocuments } from './embeddings';
+import { embedDocuments } from './embeddings';
 import { seedSources } from './knowledge-seed';
+import { chunkStructured } from './registry/chunker';
 import { logger } from '@/lib/logger';
 
 /**
@@ -182,7 +183,10 @@ export async function indexSource(id: string, actorId: string): Promise<IndexRes
   if (!isPublishable(source.status)) return { ok: false, reason: 'not_published' };
 
   const db = aiDb();
-  const pieces = chunkText(source.body);
+  // Structure-aware chunking: sections keep their headings, provisos stay
+  // with the text they qualify, and page/section references ride along for
+  // citations. Plain prose degrades to paragraph chunks, as before.
+  const pieces = chunkStructured(source.body);
 
   if (pieces.length === 0) {
     return { ok: false, reason: 'failed', detail: 'source body is empty' };
@@ -192,7 +196,7 @@ export async function indexSource(id: string, actorId: string): Promise<IndexRes
   try {
     // Each chunk is prefixed with its title so a fragment retrieved on its own
     // still carries what it is about — retrieval returns chunks, not documents.
-    vectors = await embedDocuments(pieces.map((piece) => `${source.title}\n\n${piece}`));
+    vectors = await embedDocuments(pieces.map((piece) => `${source.title}\n\n${piece.content}`));
   } catch (error) {
     logger.error('ai.index.embed_failed', { source: id, message: (error as Error).message });
     return { ok: false, reason: 'failed', detail: (error as Error).message };
@@ -201,14 +205,18 @@ export async function indexSource(id: string, actorId: string): Promise<IndexRes
   const { error: clearError } = await db.from('ai_knowledge_chunks').delete().eq('source_id', id);
   if (clearError) return { ok: false, reason: 'failed', detail: clearError.message };
 
-  const rows = pieces.map((content, index) => ({
+  const rows = pieces.map((piece, index) => ({
     source_id: id,
     chunk_index: index,
-    content,
-    token_estimate: Math.ceil(content.length / 4),
+    content: piece.content,
+    token_estimate: Math.ceil(piece.content.length / 4),
     embedding: JSON.stringify(vectors[index]),
     embedding_model: EMBEDDING_MODEL,
     embedding_dimensions: EMBEDDING_DIMENSIONS,
+    heading: piece.heading,
+    section_ref: piece.sectionRef,
+    page_start: piece.pageStart,
+    page_end: piece.pageEnd,
   }));
 
   const { error: insertError } = await db.from('ai_knowledge_chunks').insert(rows);

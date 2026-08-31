@@ -61,6 +61,14 @@ const serverSchema = z.object({
   AI_MONTHLY_BUDGET_USD: z.coerce.number().positive().default(400),
   // Salt for the hashed safety identifier sent to AI Gateway.
   AI_IDENTITY_SALT: z.string().min(16).optional(),
+  // Model routes, as AI Gateway slugs. Overrides exist so a model change is a
+  // configuration decision with a rollback, not a deploy; the defaults live in
+  // src/features/ai/config.ts beside the reasoning for each choice.
+  AI_ANSWER_MODEL: z.string().min(3).optional(),
+  AI_EXTRACTION_MODEL: z.string().min(3).optional(),
+  // Document OCR for scanned official documents. Disabled by default: the
+  // ingestion pipeline records that OCR is needed rather than inventing text.
+  AI_OCR_PROVIDER: z.enum(['disabled', 'external']).default('disabled'),
   // Shared secret for scheduled jobs (Vercel cron sends it as a bearer token).
   CRON_SECRET: z.string().min(16).optional(),
   SENTRY_DSN: optionalUrl,

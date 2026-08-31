@@ -4,6 +4,10 @@
     {
       "path": "/api/ai/retention",
       "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/ai/ingestion",
+      "schedule": "15 4 * * *"
     }
   ]
 }
