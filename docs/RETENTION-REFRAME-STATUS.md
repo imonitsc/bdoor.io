@@ -73,3 +73,20 @@ wrong-actor integration tests; documents are private-bucket, signed-URL.
    because it grew out of the Ask feature. The data already behaves as §4
    requires, so no migration is done for naming alone — a rename can ride
    the jurisdiction refactor if the founder wants it.
+
+## Addendum — 1 Sep 2026, evening
+
+The founder's site-grounded contract revision and `docs/ROADMAP.md` now
+govern. Two things change against this document:
+
+1. **Order.** The roadmap puts P0 — a purchasable Comply subscription —
+   ahead of the rules/obligation engine (its P1, this document's gap #1).
+   The engine remains the retention machinery; purchasability comes first.
+2. **P0's "done" sits behind two founder inputs** that cannot be produced
+   here: the BDT monthly/annual subscription amounts (prices are published
+   only with founder approval), and the recorded approval to collect live
+   payment (the standing legal gate). The machinery — plans, pricing-page
+   section, attach-at-formation, existing-business entry — is buildable
+   ahead of both.
+
+The domain mapping and remaining flags above stand unchanged.
