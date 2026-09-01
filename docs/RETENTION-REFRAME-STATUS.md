@@ -263,3 +263,47 @@ entities carry no jurisdiction column yet (BD by construction), so the
 dimension would be a hardcoded constant; it becomes real with the
 jurisdiction-typed entity work (P5). Today "BD Comply subscribers" is
 all subscribers, and the query still answers exactly.
+
+## Addendum — P5 increment shipped (one country template, confirmed and finished)
+
+The roadmap premise was wrong and the code was right. "UAE is fully
+built and is the right shape; the other five vary" — in fact all six
+international pages already rendered from one template
+(`countries/[country]/page.tsx`, `generateStaticParams` over the
+catalog) with zero country-specific components. Per the contract's own
+rule (the code is the fact and the doc is the bug), CLAUDE.md §6 and
+ROADMAP P5 are corrected in this increment rather than a rebuild
+performed. What actually varied was data completeness and drift around
+the template:
+
+1. **Navigation and sitemap now derive from the catalog.** The footer's
+   six country rows and the sitemap's seven country paths were hardcoded
+   in `src/lib/navigation.ts` — the exact edit surface that made a
+   seventh country a multi-file task. `countryFooterLinks()` and
+   `countrySitemapEntries()` in `src/content/international.ts` now feed
+   both, and `tests/unit/country-navigation.test.ts` is the tripwire:
+   it fails if a `/countries/*` path is ever hardcoded back into
+   `SITEMAP_ROUTES`, and it pins the six footer names the e2e audit
+   checks, at unit speed.
+2. **Ongoing obligations become a view over published rules.** The
+   section on each country page now renders the jurisdiction's published
+   rules corpus — each rule with its responsible authority and its own
+   review date (P1.3's per-rule review dates reach the public pages) —
+   and falls back to the human-reviewed guide prose while the corpus is
+   empty. Today it is empty for every jurisdiction, so every rendered
+   page is byte-identical until analysts publish rules; the read is
+   through the cookie-free public client, so the pages stay statically
+   renderable, and a build-time query failure degrades to the prose.
+3. **Dead module removed.** `src/features/countries/queries.ts` — a
+   zero-import Supabase read with a five-country all-"coming soon"
+   snapshot fallback that contradicted the catalog — is deleted.
+
+Flagged for the founder, not changed: the KSA and Qatar route fees are
+quoted in USD, which violates §6's local-currency rule — but restating
+them in SAR/QAR is a new price figure, and prices publish only with
+founder approval. Named local providers on country pages remain
+unimplemented (the provider section is a generic disclosure); the
+jurisdiction-typed entity vocabulary that unblocks UAE import and the
+retention jurisdiction dimension remains open.
+
+No migration in this increment; nothing to apply post-merge.

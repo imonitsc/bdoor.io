@@ -92,3 +92,29 @@ export function internationalCountryBySlug(slug: string): InternationalCountry |
 export function pickText(value: { en: string; bn: string }, locale: 'en' | 'bn'): string {
   return locale === 'bn' ? value.bn : value.en;
 }
+
+/**
+ * Footer and sitemap derive their country entries from here (ROADMAP P5), so
+ * adding a country to the catalog propagates everywhere without touching
+ * navigation by hand. A drift test pins that no country child path is ever
+ * re-hardcoded in SITEMAP_ROUTES.
+ */
+export function countryFooterLinks(): ReadonlyArray<{
+  href: string;
+  name: { en: string; bn: string };
+}> {
+  return internationalCountries().map((country) => ({
+    href: `/countries/${country.slug}`,
+    name: country.name,
+  }));
+}
+
+export function countrySitemapEntries(): ReadonlyArray<{ path: string; priority: number }> {
+  return [
+    { path: `/countries/${BANGLADESH_COUNTRY.slug}`, priority: 0.7 },
+    ...internationalCountries().map((country) => ({
+      path: `/countries/${country.slug}`,
+      priority: 0.6,
+    })),
+  ];
+}

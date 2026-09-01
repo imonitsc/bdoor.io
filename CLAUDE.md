@@ -151,10 +151,18 @@ Non-negotiables:
 
 ## 6. Never hardcode Bangladesh
 
-Six country routes are live. The UAE page is the reference implementation: routes in local
-currency with a BDT conversion, named local providers, requirements, documents, ongoing
-obligations, FAQ, review date. Every other country page should be generated from the same
-shape. If adding a country needs a new component file, the abstraction is wrong.
+Six country routes are live, and all six render from one template —
+`src/app/[locale]/(marketing)/countries/[country]/page.tsx` over the commercial catalog
+(`src/content/international.ts`, `src/content/packages/catalog.ts`) and the guide data
+(`src/content/countries/guides.ts`): routes with published fees and qualifiers,
+requirements, documents, ongoing obligations, FAQ, review date. Footer and sitemap country
+entries derive from the same catalog, so a seventh country is a data task. The provider
+line is currently a generic disclosure — named local providers are not yet implemented.
+If adding a country needs a new component file, the abstraction is wrong.
+
+_Correction applied 1 Sep 2026: the previous text called the UAE page "the reference
+implementation" that the other five should be generated from — the code already shares one
+template across all six, so the paragraph now records that fact._
 
 - Every rule, obligation, fee and provider query is scoped by jurisdiction
 - Money is **minor units + ISO 4217**, never a float, never assumed BDT. The "About ৳314,000"
