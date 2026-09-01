@@ -1263,6 +1263,29 @@
         "ownerOnly": "Only an organisation owner can start a subscription.",
         "notFound": "That plan is no longer available.",
         "alreadySubscribed": "Your organisation already has a subscription."
+      },
+      "track": {
+        "title": "Add your existing company",
+        "intro": "Tell us the company you already run. The obligations calendar is generated from published, human-reviewed rules — no specialist needed to get started.",
+        "legalName": "Legal name",
+        "structure": "Structure",
+        "incorporationDate": "Incorporation date",
+        "incorporationDateHint": "Optional. Anniversary-based obligations need it; you can add it later.",
+        "submit": "Add company",
+        "submitting": "Adding…",
+        "added": "Your company was added. Obligations from published rules appear in the calendar below.",
+        "ruleTitle": "Obligation to track",
+        "reviewed": "last reviewed {date}",
+        "calendarNote": "Your calendar below is generated from published rules for your company.",
+        "addCompanyNote": "Add your company below and its calendar is generated from published rules.",
+        "errors": {
+          "generic": "Something went wrong. Please try again.",
+          "nameTooShort": "Enter the company's legal name.",
+          "nameTooLong": "That name is too long.",
+          "structureInvalid": "Choose the company's structure.",
+          "dateInvalid": "Enter the date as YYYY-MM-DD.",
+          "dateInFuture": "The incorporation date cannot be in the future."
+        }
       }
     }
   },
@@ -2309,7 +2332,8 @@
     "voiceInput": "Speak your question",
     "voiceStop": "Stop listening",
     "followUps": "Ask next",
-    "startProcess": "Start this process"
+    "startProcess": "Start this process",
+    "trackComply": "Track this for your company"
   },
   "products": {
     "start": {

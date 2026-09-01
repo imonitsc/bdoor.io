@@ -10,10 +10,9 @@ import { ANALYTICS_EVENTS, isTestActorEmail } from '@/lib/analytics/taxonomy';
  * to their SQL.
  */
 
-const MIGRATION = join(
-  process.cwd(),
-  'supabase/migrations/20260101002600_analytics_metrics_subscriptions.sql',
-);
+// The constraint's current definition — the P2 funnel migration re-created it
+// in full, so that file is now the authority this test reads.
+const MIGRATION = join(process.cwd(), 'supabase/migrations/20260101003500_ask_comply_funnel.sql');
 
 function eventNamesFromMigration(): string[] {
   const sql = readFileSync(MIGRATION, 'utf8');

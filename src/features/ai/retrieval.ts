@@ -4,7 +4,12 @@ import { detectCountry, LIMITS } from './config';
 import { aiDb, hasAiDatabase } from './db';
 import { embedQuery } from './embeddings';
 import { fuseRankedLists, type FusedChunk, type RankedChunk } from './fusion';
-import { renderRules, rulesForQuestion } from './registry/rules';
+import {
+  renderRules,
+  ruleReviewDate,
+  rulesForQuestion,
+  type StructuredRule,
+} from './registry/rules';
 import { AUTHORITY_TIER_NAMES, type AuthorityTier } from './registry/taxonomy';
 import { STRUCTURED_SOURCE, structuredRecordsFor } from './structured';
 import type { Timings } from './timings';
@@ -44,7 +49,13 @@ export type Citation = {
   page: number | null;
   /** ISO date the source took effect — the "applicable date" of the answer. */
   effectiveFrom: string | null;
+  /** Set when the citation is a published structured rule, not a document. */
+  ruleId: string | null;
 };
+
+/** The Comply exit an answer can offer (ROADMAP P2): the cited rule whose
+ *  analyst-set recurrence says the obligation comes back. */
+export type ComplyTrack = { ruleId: string; title: string };
 
 export type RetrievalResult = {
   /** Numbered context, ready to paste into the system prompt. */
@@ -54,9 +65,44 @@ export type RetrievalResult = {
   citations: Citation[];
   /** Distinct knowledge sources used, for `ai_messages.source_ids`. */
   sourceIds: string[];
+  /** Published rules used, for `ai_messages.rule_ids`. */
+  ruleIds: string[];
+  complyTrack: ComplyTrack | null;
   /** True when nothing matched — the caller logs an unanswered question. */
   empty: boolean;
 };
+
+/**
+ * Citations for the rules block, numbered after the document citations.
+ * A rule cites its legal instrument rather than a URL, and its review date is
+ * the reviewer's sign-off — the per-rule date ROADMAP P2 requires deadline
+ * answers to carry. Recurrence is an analyst-entered fact (P1); a rule
+ * without it never claims to recur, so the Comply exit is offered only on
+ * the first rule whose recurrence is set.
+ */
+export function ruleCitations(
+  rules: StructuredRule[],
+  offset: number,
+): { citations: Citation[]; complyTrack: ComplyTrack | null } {
+  const citations = rules.map((rule, i): Citation => ({
+    index: offset + i + 1,
+    sourceId: null,
+    title: rule.title,
+    url: null,
+    lastReviewed: ruleReviewDate(rule),
+    institution: rule.responsible_authority,
+    referenceNumber: rule.legal_authority,
+    sectionRef: null,
+    page: null,
+    effectiveFrom: rule.effective_from,
+    ruleId: rule.id,
+  }));
+  const recurring = rules.find((rule) => rule.recurrence !== null);
+  return {
+    citations,
+    complyTrack: recurring ? { ruleId: recurring.id, title: recurring.title } : null,
+  };
+}
 
 function reviewDate(chunk: FusedChunk): string | null {
   const reviewed = chunk.last_reviewed_at ?? chunk.effective_from;
@@ -317,12 +363,21 @@ export async function retrieveContext(
       sectionRef: null,
       page: null,
       effectiveFrom: null,
+      ruleId: null,
     });
   }
   const offset = citations.length;
 
   if (!hasAiDatabase()) {
-    return { context: '', structured: catalogue, citations, sourceIds: [], empty: true };
+    return {
+      context: '',
+      structured: catalogue,
+      citations,
+      sourceIds: [],
+      ruleIds: [],
+      complyTrack: null,
+      empty: true,
+    };
   }
 
   // The page's country, plus any other country the question names. Both are
@@ -332,12 +387,12 @@ export async function retrieveContext(
   const countries = mentioned && mentioned !== country ? [country, mentioned] : [country];
 
   let chunks: FusedChunk[] = [];
-  let rulesBlock = '';
+  let rules: StructuredRule[] = [];
   try {
     // The three legs run beside each other. Keyword needs no embedding and
     // fires first; semantic starts the moment the embedding lands; published
     // structured rules are an independent read.
-    const [keywordLists, semanticLists, rules] = await Promise.all([
+    const [keywordLists, semanticLists, ruleRows] = await Promise.all([
       keywordCandidates(question, countries).then((lists) => {
         timings?.mark('keyword');
         return lists;
@@ -349,9 +404,7 @@ export async function retrieveContext(
       country === 'bd' ? rulesForQuestion(question).catch(() => []) : Promise.resolve([]),
     ]);
 
-    if (rules.length) {
-      rulesBlock = `VERIFIED REGULATORY RULES (published after human review; each names its legal basis):\n${renderRules(rules)}`;
-    }
+    rules = ruleRows;
 
     // Fuse per country (ranks are per-list), then merge across countries the
     // way the old per-country hybrid calls merged: dedupe on chunk id keeping
@@ -404,17 +457,31 @@ export async function retrieveContext(
       sectionRef: chunk.section_ref,
       page: chunk.page_start,
       effectiveFrom: chunk.effective_from?.slice(0, 10) ?? null,
+      ruleId: null,
     });
   }
+
+  // Rules are numbered after the documents, in prompt and citation list
+  // alike, so a deadline the model states carries the rule's own review date
+  // rather than borrowing a page's (ROADMAP P2).
+  const ruleOffset = citations.length;
+  const { citations: ruleCites, complyTrack } = ruleCitations(rules, ruleOffset);
+  citations.push(...ruleCites);
+  const rulesBlock = rules.length
+    ? `VERIFIED REGULATORY RULES (published after human review; each names its legal basis):\n${renderRules(rules, ruleOffset)}`
+    : '';
 
   const result: RetrievalResult = {
     context: renderContext(chunks, offset),
     structured: [catalogue, rulesBlock].filter(Boolean).join('\n\n'),
     citations,
     sourceIds: [...new Set(chunks.map((chunk) => chunk.source_id))],
+    ruleIds: rules.map((rule) => rule.id),
+    complyTrack,
     // "Empty" means no retrieved knowledge. The catalogue alone is not enough
-    // to answer a regulatory question, so the gap is still worth recording.
-    empty: chunks.length === 0,
+    // to answer a regulatory question, so the gap is still worth recording —
+    // but a published rule is retrieved knowledge, not a gap.
+    empty: chunks.length === 0 && rules.length === 0,
   };
 
   if (options?.cacheable && !result.empty) cacheSet(cacheKey, result);
