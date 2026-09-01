@@ -118,3 +118,42 @@ Still gated or deliberately absent:
   the offer opens the calendar the team maintains per case.
 - Customer-side cancellation is an admin/contact path for now; only
   finance can change a subscription's status.
+
+## Addendum — P1 increment shipped (rules as data)
+
+The corpus can now say _when_, not only _what_. `ai_structured_rules`
+carries `jurisdiction_code` plus five scheduling fields — a recurrence
+(one_off / monthly / quarterly / annual) and a deadline anchor
+(incorporation / fiscal_year_end / fixed_date / period_end) with an offset
+in days — all nullable: a rule stays prose-only until the analyst who
+verifies it structures the deadline, exactly as with fees. A new
+`public_holidays` table (world-readable, compliance-writable) ships
+empty because holiday dates are regulatory facts.
+
+The engine (`src/features/compliance/rules-engine.ts`, pure and
+table-tested) implements the /newobligation playbook: an ambiguous rule
+never fires and is surfaced as "may apply"; due dates are calendar dates
+computed against the jurisdiction's July–June fiscal year and
+Friday–Saturday weekend; day-past-month-end clamps rather than rolling
+over; weekend/holiday rolls refuse loudly (`missing_holiday_data`) for
+any year the analyst-entered holiday set does not cover; plans are
+deterministic and the unique index on (company, rule version, due date)
+makes regeneration a no-op. Subscription activation in the payment
+webhook now calls generation for the organisation's companies.
+
+What this deliberately does not do yet:
+
+- **Generates nothing today.** No published rule carries scheduling
+  fields and `public_holidays` is empty; the first analyst pass over the
+  corpus (structure the deadline, enter the gazetted holidays) is the
+  switch that turns the calendar on. Verification remains a human act.
+- **Supersession regeneration is manual.** Publishing a superseding rule
+  does not yet rewrite future obligations from the old version; past
+  periods are never touched by design.
+- **Sector scoping waits on entity data.** Companies carry no sector, so
+  any sector-scoped rule resolves "may apply — confirm" rather than
+  firing. Companies also carry no jurisdiction column yet — they are
+  Bangladesh by construction (RJSC structure vocabulary) and generation
+  states that assumption in one place.
+- **Bengali rule labels ride P2.** Both obligation labels carry the
+  reviewed English title; regulatory terms are never machine-translated.

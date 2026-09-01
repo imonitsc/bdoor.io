@@ -671,6 +671,12 @@ export type Database = {
           "effective_to": string | null
           "status": Database["public"]["Enums"]["ai_rule_status"]
           "extracted_by_model": string | null
+          "jurisdiction_code": string
+          "recurrence": string | null
+          "deadline_anchor": string | null
+          "deadline_offset_days": number
+          "deadline_month": number | null
+          "deadline_day": number | null
           "superseded_by_id": string | null
           "reviewed_by": string | null
           "reviewed_at": string | null
@@ -708,6 +714,12 @@ export type Database = {
           "effective_to"?: string | null
           "status"?: Database["public"]["Enums"]["ai_rule_status"]
           "extracted_by_model"?: string | null
+          "jurisdiction_code"?: string
+          "recurrence"?: string | null
+          "deadline_anchor"?: string | null
+          "deadline_offset_days"?: number
+          "deadline_month"?: number | null
+          "deadline_day"?: number | null
           "superseded_by_id"?: string | null
           "reviewed_by"?: string | null
           "reviewed_at"?: string | null
@@ -745,6 +757,12 @@ export type Database = {
           "effective_to"?: string | null
           "status"?: Database["public"]["Enums"]["ai_rule_status"]
           "extracted_by_model"?: string | null
+          "jurisdiction_code"?: string
+          "recurrence"?: string | null
+          "deadline_anchor"?: string | null
+          "deadline_offset_days"?: number
+          "deadline_month"?: number | null
+          "deadline_day"?: number | null
           "superseded_by_id"?: string | null
           "reviewed_by"?: string | null
           "reviewed_at"?: string | null
@@ -4269,6 +4287,42 @@ export type Database = {
           "created_at"?: string
           "updated_at"?: string
           "application_reference"?: string | null
+        }
+        Relationships: []
+      }
+      "public_holidays": {
+        Row: {
+          "id": string
+          "jurisdiction_code": string
+          "holiday_date": string
+          "label": string
+          "source_authority": string | null
+          "source_url": string | null
+          "verified_by": string | null
+          "verified_at": string | null
+          "created_at": string
+        }
+        Insert: {
+          "id"?: string
+          "jurisdiction_code": string
+          "holiday_date": string
+          "label": string
+          "source_authority"?: string | null
+          "source_url"?: string | null
+          "verified_by"?: string | null
+          "verified_at"?: string | null
+          "created_at"?: string
+        }
+        Update: {
+          "id"?: string
+          "jurisdiction_code"?: string
+          "holiday_date"?: string
+          "label"?: string
+          "source_authority"?: string | null
+          "source_url"?: string | null
+          "verified_by"?: string | null
+          "verified_at"?: string | null
+          "created_at"?: string
         }
         Relationships: []
       }
