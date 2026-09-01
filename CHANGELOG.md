@@ -5,6 +5,15 @@ first; each entry names its merged pull requests. Dates are merge dates.
 
 ## 2026-09-01
 
+- **The site-grounded contract and the roadmap** — the founder's revised
+  CLAUDE.md (written against the live site: product vocabulary, positioning
+  lines, the Entity–Obligation–Rule–Case diagram, source-ledger
+  non-negotiables) becomes Part I, with corrections its own code-is-the-fact
+  rule requires (production branch filled in, `bn` live alongside `en`,
+  brand ink `#081633`, the multi-model Gateway AI row, scripts verified).
+  `docs/ROADMAP.md` installed: P0 purchasable Comply → P1 rules as data →
+  P2 Ask-to-Comply funnel → P3 entity import → P4 retention instrumentation
+  → P5 one country template. The earlier same-day contract is archived.
 - **§2 revised: stack facts and the permissions philosophy** — the founder's
   §2 replacement lands with its placeholders filled from the repo (production
   branch `claude/new-session-0n73z6`, script names verified): pnpm declared
