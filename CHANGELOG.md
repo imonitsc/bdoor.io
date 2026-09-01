@@ -3,6 +3,15 @@
 Running record of shipped changes (CLAUDE.md Part I, Working Rule 6). Newest
 first; each entry names its merged pull requests. Dates are merge dates.
 
+## 2026-09-01
+
+- **The retention reframe governs the repository** — the founder's 1 Sep
+  contract (recurring compliance product; formation as the free wedge;
+  six-object domain model; rules corpus as the moat; never hardcode
+  Bangladesh) replaces the 31 Aug master instructions as Part I of
+  `CLAUDE.md`; the old contract is archived in `docs/`, the schema mapping
+  and flagged conflicts are in `docs/RETENTION-REFRAME-STATUS.md`.
+
 ## 2026-08-31
 
 - **The whole site says less** — premium copy pass across every public page:
