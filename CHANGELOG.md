@@ -5,6 +5,20 @@ first; each entry names its merged pull requests. Dates are merge dates.
 
 ## 2026-09-01
 
+- **Import an existing entity from its identifiers (P3)** — the
+  existing-entity Comply entry now takes what the company already has:
+  RJSC registration number, e-TIN and BIN (permissive validation — registry
+  formats are regulatory facts, and over-strict patterns would lock real
+  companies out), plus a sector from a new shared vocabulary enforced by
+  the database on both companies and rules. The vocabulary is a
+  correctness requirement, not tidiness: the engine excludes silently on
+  a sector mismatch, so customer and analyst sectors may only ever meet
+  on the same tokens; "unsure" stays NULL and sector-scoped rules then
+  surface "may apply — confirm". A duplicate registration number returns
+  an honest error, generation now matches on sector, and the companies
+  page gains the add-your-company door. Registry lookup pre-fill is
+  deliberately absent — no public API exists to build an adapter against.
+
 - **Ask becomes the top of the Comply funnel (P2)** — published rules are
   now citable sources in Ask answers, numbered beside the documents and
   carrying their own reviewer sign-off date; an answer that cites an

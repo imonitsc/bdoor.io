@@ -1611,6 +1611,7 @@ export type Database = {
           "legal_name": string
           "trading_name": string | null
           "structure": string
+          "sector": string | null
           "registration_no": string | null
           "incorporation_date": string | null
           "etin": string | null
@@ -1630,6 +1631,7 @@ export type Database = {
           "legal_name": string
           "trading_name"?: string | null
           "structure": string
+          "sector"?: string | null
           "registration_no"?: string | null
           "incorporation_date"?: string | null
           "etin"?: string | null
@@ -1649,6 +1651,7 @@ export type Database = {
           "legal_name"?: string
           "trading_name"?: string | null
           "structure"?: string
+          "sector"?: string | null
           "registration_no"?: string | null
           "incorporation_date"?: string | null
           "etin"?: string | null

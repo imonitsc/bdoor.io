@@ -38,7 +38,11 @@ export async function trackCompany(
   const parsed = trackCompanySchema.safeParse({
     legalName: String(formData.get('legalName') ?? ''),
     structure: String(formData.get('structure') ?? ''),
+    sector: String(formData.get('sector') ?? ''),
     incorporationDate: String(formData.get('incorporationDate') ?? ''),
+    registrationNo: String(formData.get('registrationNo') ?? ''),
+    etin: String(formData.get('etin') ?? ''),
+    bin: String(formData.get('bin') ?? ''),
   });
   if (!parsed.success) {
     return { status: 'error', message: parsed.error.issues[0]?.message ?? 'generic' };
@@ -56,16 +60,25 @@ export async function trackCompany(
       organization_id: membership.organizationId,
       legal_name: parsed.data.legalName,
       structure: parsed.data.structure,
+      sector: parsed.data.sector ?? null,
       incorporation_date: parsed.data.incorporationDate ?? null,
+      registration_no: parsed.data.registrationNo ?? null,
+      etin: parsed.data.etin ?? null,
+      bin: parsed.data.bin ?? null,
       // The customer is telling us about a company that already exists;
-      // 'incorporated' is this schema's word for that. Registration numbers
-      // and tax identifiers arrive with P3's identifier-led import.
+      // 'incorporated' is this schema's word for that.
       status: 'incorporated',
     })
     .select('id')
     .maybeSingle();
 
   if (insertError || !created) {
+    // The one duplicate worth naming: the registration number is unique
+    // across the platform, so a collision usually means the company is
+    // already tracked (possibly by another workspace).
+    if (insertError?.code === '23505') {
+      return { status: 'error', message: 'registrationExists' };
+    }
     logger.error('comply.track_company_failed', { message: insertError?.message });
     return { status: 'error', message: 'generic' };
   }

@@ -82,10 +82,24 @@ describe('matchRule — the over-firing asymmetry', () => {
   });
 
   it('a sector-scoped rule against an entity of unknown sector is ambiguous', () => {
-    expect(matchRule(rule({ sectors: ['banking (sample)'] }), entity({ sector: null }))).toEqual({
+    expect(matchRule(rule({ sectors: ['financial_services'] }), entity({ sector: null }))).toEqual({
       outcome: 'ambiguous',
       reason: 'sector_unknown',
     });
+  });
+
+  it('sector scoping resolves both ways once the sector is known (P3)', () => {
+    expect(
+      matchRule(
+        rule({ sectors: ['financial_services'] }),
+        entity({ sector: 'financial_services' }),
+      ),
+    ).toEqual({ outcome: 'matched' });
+    // Silent exclusion is only safe because both sides are constrained to
+    // the same vocabulary — the sector-vocabulary test pins that contract.
+    expect(
+      matchRule(rule({ sectors: ['financial_services'] }), entity({ sector: 'it_software' })),
+    ).toEqual({ outcome: 'not_applicable', reason: 'sector' });
   });
 });
 

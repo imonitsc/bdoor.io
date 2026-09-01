@@ -126,6 +126,43 @@ describe('track-company schema', () => {
     if (parsed.success) expect(parsed.data.incorporationDate).toBeUndefined();
   });
 
+  it('accepts the identifiers and sector, treating empties as absent (P3)', () => {
+    const parsed = trackCompanySchema.safeParse({
+      legalName: 'Padma Textiles Limited (sample)',
+      structure: 'private_limited',
+      sector: 'garments_textiles',
+      registrationNo: 'C-SAMPLE-000042',
+      etin: '',
+      bin: '',
+    });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.sector).toBe('garments_textiles');
+      expect(parsed.data.registrationNo).toBe('C-SAMPLE-000042');
+      expect(parsed.data.etin).toBeUndefined();
+      expect(parsed.data.bin).toBeUndefined();
+    }
+  });
+
+  it('rejects an off-vocabulary sector and an implausible identifier with keys', () => {
+    const badSector = trackCompanySchema.safeParse({
+      legalName: 'Valid Name',
+      structure: 'private_limited',
+      sector: 'banking',
+    });
+    expect(badSector.success).toBe(false);
+    if (!badSector.success) expect(badSector.error.issues[0]?.message).toBe('sectorInvalid');
+
+    const badIdentifier = trackCompanySchema.safeParse({
+      legalName: 'Valid Name',
+      structure: 'private_limited',
+      etin: 'not;an;identifier',
+    });
+    expect(badIdentifier.success).toBe(false);
+    if (!badIdentifier.success)
+      expect(badIdentifier.error.issues[0]?.message).toBe('identifierInvalid');
+  });
+
   it('rejects with translation keys, never prose', () => {
     const cases: Array<[Record<string, string>, string]> = [
       [{ legalName: 'A', structure: 'private_limited' }, 'nameTooShort'],
