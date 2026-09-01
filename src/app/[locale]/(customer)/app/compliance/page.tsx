@@ -12,7 +12,7 @@ import { requireCustomerOrganization } from '@/lib/auth/require-organization';
 import { createClient } from '@/lib/supabase/server';
 import { daysUntil } from '@/features/cases/deadlines';
 import { groupObligations } from '@/features/compliance/groups';
-import { recordComplyExit, trackedRule } from '@/features/compliance/funnel';
+import { recordComplyExit, recordReminderOpened, trackedRule } from '@/features/compliance/funnel';
 import { getComplySubscriptionState } from '@/features/comply/queries';
 import { listComplyPlans } from '@/features/comply/plans';
 import { bangladeshCheckoutStatus, paymentsStatus } from '@/lib/launch/gates';
@@ -30,15 +30,19 @@ export default async function CompliancePage({
     payment?: string | string[];
     track?: string | string[];
     tracked?: string | string[];
+    n?: string | string[];
   }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
   const { session, active } = await requireCustomerOrganization();
-  const { payment, track, tracked } = await searchParams;
+  const { payment, track, tracked, n } = await searchParams;
   const paymentResult = typeof payment === 'string' ? payment : undefined;
   const trackRuleId = typeof track === 'string' && UUID.test(track) ? track : undefined;
   const justTracked = tracked === '1';
+  // Arriving from a reminder: the notification id it carried is the funnel's
+  // "opened" stamp (metrics_obligation_engagement).
+  const openedNotificationId = typeof n === 'string' && UUID.test(n) ? n : undefined;
 
   const [t, tComply, tCommon, format, subscriptionState, plans] = await Promise.all([
     getTranslations('workspace.compliance'),
@@ -68,6 +72,10 @@ export default async function CompliancePage({
   // so "answered but not converted" is countable (ROADMAP P2.4).
   if (rule) {
     await recordComplyExit(active.organizationId, rule.id, session.email);
+  }
+
+  if (openedNotificationId) {
+    await recordReminderOpened(openedNotificationId);
   }
 
   const obligations = data ?? [];

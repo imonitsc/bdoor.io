@@ -2,6 +2,8 @@ import 'server-only';
 
 import { recordAnalyticsEvent } from '@/lib/analytics';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient, hasServiceRole } from '@/lib/supabase/admin';
+import { logger } from '@/lib/logger';
 import type { StructuredRule } from '@/features/ai/registry/rules';
 
 /**
@@ -80,4 +82,50 @@ export async function recordComplyExit(
     organizationId,
     properties: { ruleId },
   });
+}
+
+/**
+ * The reminder funnel's "opened" leg.
+ *
+ * A dispatched reminder links a customer to their calendar through a
+ * notification id, and following that link is what stamps `opened_at` —
+ * a truer signal than a bulk mark-all-read, and the step between "reminded"
+ * and "acted" in `metrics_obligation_engagement`.
+ *
+ * Ownership is proved with the caller's own client first: `notifications_self`
+ * only returns the signed-in user's rows, so an id belonging to someone else
+ * resolves to nothing and stamps nothing. The stamp itself needs the service
+ * role, because `compliance_reminders` accepts staff writes only — the same
+ * split as the track-company entry, and the narrowest possible use of it.
+ */
+export async function recordReminderOpened(notificationId: string): Promise<void> {
+  const supabase = await createClient();
+  const { data: notification } = await supabase
+    .from('notifications')
+    .select('id, read_at')
+    .eq('id', notificationId)
+    .eq('kind', 'compliance_reminder')
+    .maybeSingle();
+
+  if (!notification) return;
+
+  if (!notification.read_at) {
+    await supabase
+      .from('notifications')
+      .update({ read_at: new Date().toISOString() })
+      .eq('id', notification.id);
+  }
+
+  if (!hasServiceRole()) return;
+
+  // Idempotent: the first open is the one the funnel counts.
+  const { error } = await createAdminClient()
+    .from('compliance_reminders')
+    .update({ opened_at: new Date().toISOString() })
+    .eq('notification_id', notification.id)
+    .is('opened_at', null);
+
+  if (error) {
+    logger.error('reminders.opened_stamp_failed', { message: error.message });
+  }
 }
