@@ -28,6 +28,10 @@ do $$ begin
 end $$;
 
 grant usage on schema public to anon, authenticated, service_role;
+-- Supabase grants the extensions schema to every API role by default;
+-- without this, a column default calling extensions.gen_random_bytes()
+-- (companies.bdoor_id) fails locally with 42501 while working in production.
+grant usage on schema extensions to anon, authenticated, service_role;
 
 -- Supabase grants table privileges to anon/authenticated automatically, and RLS
 -- is what actually restricts rows. Without these grants the policies never get

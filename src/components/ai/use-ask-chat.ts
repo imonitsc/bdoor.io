@@ -29,6 +29,7 @@ export type Citation = {
   sectionRef?: string | null;
   page?: number | null;
   effectiveFrom?: string | null;
+  ruleId?: string | null;
 };
 
 export type Stage = 'understanding' | 'sources' | 'answering';
@@ -37,6 +38,8 @@ export type AnswerMeta = {
   messageId: string | null;
   followUps: string[];
   startProcess: boolean;
+  /** The Comply exit: present when the answer cited a recurring rule. */
+  complyTrack: { ruleId: string; title: string } | null;
   failure?: string;
   failureMessage?: string;
 };
@@ -145,6 +148,7 @@ export function useAskChat({ locale, country }: Options) {
           messageId: string | null;
           followUps: string[];
           startProcess: boolean;
+          complyTrack?: { ruleId: string; title: string } | null;
         };
         conversationRef.current = data.conversationId ?? conversationRef.current;
         setMetaByMessage((previous) => ({
@@ -154,6 +158,7 @@ export function useAskChat({ locale, country }: Options) {
             messageId: data.messageId,
             followUps: data.followUps,
             startProcess: data.startProcess,
+            complyTrack: data.complyTrack ?? null,
           },
         }));
       } else if (part.type === 'data-failure') {
@@ -164,6 +169,7 @@ export function useAskChat({ locale, country }: Options) {
             messageId: previous[data.uiMessageId]?.messageId ?? null,
             followUps: previous[data.uiMessageId]?.followUps ?? [],
             startProcess: previous[data.uiMessageId]?.startProcess ?? false,
+            complyTrack: previous[data.uiMessageId]?.complyTrack ?? null,
             failure: data.failure,
             failureMessage: data.message,
           },

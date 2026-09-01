@@ -49,6 +49,7 @@ export type AuditAction =
   | 'payment.reconciled'
   | 'subscription.checkout_started'
   | 'subscription.activated'
+  | 'company.tracked'
   | 'refund.requested'
   | 'refund.approved'
   | 'disbursement.recorded'

@@ -50,6 +50,8 @@ explains each event; the code decides.
 | `case_completed`                 | case transition action     | a case reaches its terminal completed state                                                                               |
 | `subscription_started`           | (reserved for Phase 3)     | a subscription becomes `active` (verified payment / recorded offline payment)                                             |
 | `subscription_renewed`           | (reserved for Phase 3)     | a new paid service period begins                                                                                          |
+| `ask_comply_exit`                | /app/compliance render     | an Ask answer's "track this" exit landed on the Comply entry (once per organisation and rule)                             |
+| `comply_company_tracked`         | `trackCompany` action      | an existing company was added through the Comply entry (once per company)                                                 |
 
 Events named in the brief but **deliberately not recorded yet**:
 `homepage_viewed`, `start_flow_opened`, `market_scope_selected`,

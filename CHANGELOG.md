@@ -5,6 +5,19 @@ first; each entry names its merged pull requests. Dates are merge dates.
 
 ## 2026-09-01
 
+- **Ask becomes the top of the Comply funnel (P2)** — published rules are
+  now citable sources in Ask answers, numbered beside the documents and
+  carrying their own reviewer sign-off date; an answer that cites an
+  analyst-scheduled recurring rule ends with "Track this for your
+  company", a one-form existing-entity entry on /app/compliance that adds
+  the company and generates its calendar from published rules; the
+  "Check annual compliance" starter on /ask routes to that entry instead
+  of the answer pipeline; and the funnel is measured end to end —
+  `ai_messages.rule_ids` records which rules grounded each answer, and
+  `ask_comply_exit` / `comply_company_tracked` join the analytics
+  taxonomy. A retrieval that finds only rules no longer logs a false
+  "unanswered question".
+
 - **Rules learn to schedule (P1 machinery)** — the structured-rules corpus
   gains machine-readable scheduling (`recurrence`, a deadline anchor with an
   offset in days, `jurisdiction_code`), an analyst-maintained

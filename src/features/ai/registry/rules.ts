@@ -272,13 +272,22 @@ export async function rulesForQuestion(question: string, limit = 4): Promise<Str
   return data ?? [];
 }
 
+/** The date a customer should read as "when a person last checked this rule":
+ * the reviewer's sign-off, falling back to publication. */
+export function ruleReviewDate(rule: StructuredRule): string | null {
+  const reviewed = rule.reviewed_at ?? rule.published_at;
+  return reviewed ? reviewed.slice(0, 10) : null;
+}
+
 /** Render rules for the system prompt's structured block. Only verified fees
- * are rendered as fees; everything else states its own absence. */
-export function renderRules(rules: StructuredRule[]): string {
+ * are rendered as fees; everything else states its own absence. Each rule is
+ * numbered from `offset` with the same bracketed index its citation carries,
+ * so the model can attribute a deadline to the rule the customer sees. */
+export function renderRules(rules: StructuredRule[], offset = 0): string {
   return rules
-    .map((rule) => {
+    .map((rule, i) => {
       const lines = [
-        `RULE: ${rule.title}`,
+        `[${offset + i + 1}] RULE: ${rule.title}`,
         `applies to: ${rule.applies_to}`,
         `required action: ${rule.required_action}`,
         `authority: ${rule.responsible_authority}`,
@@ -299,6 +308,8 @@ export function renderRules(rules: StructuredRule[]): string {
       if (rule.penalty) lines.push(`penalty: ${rule.penalty}`);
       if (rule.exemptions) lines.push(`exemptions: ${rule.exemptions}`);
       if (rule.effective_from) lines.push(`effective from: ${rule.effective_from}`);
+      const reviewed = ruleReviewDate(rule);
+      if (reviewed) lines.push(`last reviewed: ${reviewed}`);
       return lines.join('\n');
     })
     .join('\n\n');

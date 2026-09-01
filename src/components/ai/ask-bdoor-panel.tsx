@@ -141,8 +141,24 @@ function AssistantTurn({
                 when bdoor's /start journey genuinely covers the topic; the
                 specialist path is always there, prominent on any failure. */}
             <div className="mt-2 flex flex-wrap items-center gap-2">
-              {meta?.startProcess ? (
+              {/* The Comply exit leads (ROADMAP P2): a recurring obligation's
+                  next step is tracking it, and formation — when offered at
+                  all — steps back to second place. */}
+              {meta?.complyTrack ? (
                 <Button asChild size="sm" variant="primary">
+                  <Link
+                    href={{
+                      pathname: '/app/compliance',
+                      query: { track: meta.complyTrack.ruleId },
+                    }}
+                  >
+                    {t('trackComply')}
+                    <ArrowRight className="size-4" aria-hidden="true" />
+                  </Link>
+                </Button>
+              ) : null}
+              {meta?.startProcess ? (
+                <Button asChild size="sm" variant={meta?.complyTrack ? 'subtle' : 'primary'}>
                   <Link href={MARKETING_ROUTES.start}>
                     {t('startProcess')}
                     <ArrowRight className="size-4" aria-hidden="true" />
@@ -340,9 +356,23 @@ export function AskBdoorPanel({
           <div className="mt-5">{composer}</div>
 
           <Suggestions className="mt-4">
-            {QUICK_SUGGESTIONS.map((key) => (
-              <Suggestion key={key} suggestion={t(`quick.${key}`)} onClick={submit} />
-            ))}
+            {QUICK_SUGGESTIONS.map((key) =>
+              key === 'compliance' ? (
+                // "Check annual compliance" is a Comply lead (CLAUDE.md §7,
+                // ROADMAP P2): it opens the existing-entity Comply entry
+                // rather than sending the label into the answer pipeline.
+                <Link
+                  key={key}
+                  href="/app/compliance"
+                  data-testid="ask-quick-compliance"
+                  className="border-border bg-surface text-ink hover:border-primary hover:bg-primary-soft rounded-full border px-3.5 py-2 text-sm transition-colors"
+                >
+                  {t(`quick.${key}`)}
+                </Link>
+              ) : (
+                <Suggestion key={key} suggestion={t(`quick.${key}`)} onClick={submit} />
+              ),
+            )}
           </Suggestions>
 
           <p className="text-muted mt-4 flex items-center justify-center gap-1.5 text-xs">

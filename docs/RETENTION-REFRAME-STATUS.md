@@ -157,3 +157,43 @@ What this deliberately does not do yet:
   states that assumption in one place.
 - **Bengali rule labels ride P2.** Both obligation labels carry the
   reviewed English title; regulatory terms are never machine-translated.
+
+## Addendum — P2 increment shipped (Ask as the Comply funnel)
+
+Ask's exits stop pointing only at formation. What changed:
+
+1. **Rules are citable.** `rulesForQuestion` already fed published rules
+   into the prompt; they now appear in the citation list too, numbered
+   after the documents, each carrying its responsible authority, legal
+   basis and the reviewer's sign-off date — the per-rule review date the
+   roadmap requires deadline answers to carry. A retrieval that finds
+   only rules no longer records a false `no_match`.
+2. **The Comply exit.** When a cited rule carries an analyst-set
+   recurrence, the answer ends with "Track this for your company" →
+   `/app/compliance?track=<ruleId>`. The exit never fires off an
+   inference: recurrence is a P1 scheduling fact a human entered, so
+   today — with the corpus unscheduled — the button exists and waits for
+   the first structured rules, exactly like the P1 engine.
+3. **The existing-entity entry.** /app/compliance shows the tracked rule
+   and, for an organisation with no company yet, a one-form entry (legal
+   name, structure, optional incorporation date) that inserts the company
+   under the existing `companies_org_member` RLS and immediately runs P1
+   generation. The "Check annual compliance" starter on /ask routes here
+   instead of submitting its label as a question.
+4. **The funnel is measured.** `ai_messages.rule_ids` records which rules
+   grounded each answer (question → retrieval was already logged);
+   `ask_comply_exit` stamps one arrival per organisation and rule;
+   `comply_company_tracked` stamps each company added. Unanswered
+   questions continue to land in `ai_unanswered_questions` as the ledger
+   backlog.
+
+One harness correction found on the way: the local `supabase-shim.sql`
+never granted `usage on schema extensions` to the API roles, so any
+customer insert touching `companies.bdoor_id` (whose default calls
+`extensions.gen_random_bytes`) failed locally with 42501 while working on
+real Supabase. The shim now mirrors Supabase's default grant.
+
+Deliberately absent: identifier-led import (RJSC number, e-TIN, BIN) is
+P3; the tracked-rule card names the rule but never invents an obligation
+for it — the calendar shows only what published, scheduled rules
+generate.

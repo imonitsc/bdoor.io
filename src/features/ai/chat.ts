@@ -81,6 +81,8 @@ type FinalPart = {
   messageId: string | null;
   followUps: string[];
   startProcess: boolean;
+  /** The Comply exit (ROADMAP P2): set when a cited rule recurs. */
+  complyTrack: { ruleId: string; title: string } | null;
 };
 type FailurePart = {
   uiMessageId: string;
@@ -168,6 +170,7 @@ export function streamAnswer(request: ChatRequest): Response {
           messageId,
           followUps: actionsFor(question, locale).followUps,
           startProcess: false,
+          complyTrack: null,
         };
         writer.write({ type: 'data-final', data: final });
         writer.write({ type: 'finish' });
@@ -436,6 +439,7 @@ export function streamAnswer(request: ChatRequest): Response {
       const messageId = await recordAnswer(conversation, {
         content: outcome.text,
         sourceIds: retrieval.sourceIds,
+        ruleIds: retrieval.ruleIds,
         model: modelUsed,
         modelRole: route.role,
         riskClass: risk,
@@ -461,6 +465,9 @@ export function streamAnswer(request: ChatRequest): Response {
         followUps: actions.followUps,
         // Never offer to start a process off a failed answer.
         startProcess: status === 'complete' && actions.startProcess,
+        // Same rule for the Comply exit — a recurring obligation the answer
+        // never delivered is not something to offer tracking for.
+        complyTrack: status === 'complete' ? retrieval.complyTrack : null,
       };
       writer.write({ type: 'data-final', data: final });
       writer.write({ type: 'finish' });

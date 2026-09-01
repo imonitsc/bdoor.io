@@ -18,6 +18,8 @@ export const ANALYTICS_EVENTS = [
   'case_completed',
   'subscription_started',
   'subscription_renewed',
+  'ask_comply_exit',
+  'comply_company_tracked',
 ] as const;
 
 export type AnalyticsEvent = (typeof ANALYTICS_EVENTS)[number];

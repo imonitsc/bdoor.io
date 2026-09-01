@@ -116,16 +116,21 @@ test.describe('the /ask application shell', () => {
     ).toBeVisible();
   });
 
-  test('offers the four quick suggestions', async ({ page }) => {
+  test('offers the four quick suggestions, with compliance as a Comply lead', async ({ page }) => {
     await page.goto('/en/ask');
     for (const suggestion of [
       'Start a business',
       'Find required licences',
       'Understand tax and VAT',
-      'Check annual compliance',
     ]) {
       await expect(page.getByRole('button', { name: suggestion, exact: true })).toBeVisible();
     }
+    // "Check annual compliance" is the Comply funnel's entrance (ROADMAP P2):
+    // a link into the existing-entity entry, not a question submitted to the
+    // model — an existing company needs its obligations loaded, not Start.
+    const complianceLead = page.getByTestId('ask-quick-compliance');
+    await expect(complianceLead).toHaveText('Check annual compliance');
+    await expect(complianceLead).toHaveAttribute('href', /\/app\/compliance$/);
   });
 
   test('serves Bangla when the locale is bn', async ({ page }) => {

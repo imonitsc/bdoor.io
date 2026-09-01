@@ -121,6 +121,8 @@ export async function recordUserMessage(
 export type AnswerRecord = {
   content: string;
   sourceIds: string[];
+  /** Published structured rules that grounded the answer (ROADMAP P2). */
+  ruleIds?: string[];
   model: string;
   /** Which role served this answer, and at what risk class (§6.2 tagging).
    *  Optional so the model-free fast paths default to the plain answer role. */
@@ -162,6 +164,7 @@ export async function recordAnswer(
       role: 'assistant',
       content: text,
       source_ids: answer.sourceIds,
+      rule_ids: answer.ruleIds ?? [],
       model: answer.model,
       input_tokens: answer.inputTokens ?? null,
       output_tokens: answer.outputTokens ?? null,

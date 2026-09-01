@@ -316,6 +316,7 @@ export type Database = {
           "role": Database["public"]["Enums"]["ai_message_role"]
           "content": string
           "source_ids": string[]
+          "rule_ids": string[]
           "model": string | null
           "input_tokens": number | null
           "output_tokens": number | null
@@ -331,6 +332,7 @@ export type Database = {
           "role": Database["public"]["Enums"]["ai_message_role"]
           "content": string
           "source_ids"?: string[]
+          "rule_ids"?: string[]
           "model"?: string | null
           "input_tokens"?: number | null
           "output_tokens"?: number | null
@@ -346,6 +348,7 @@ export type Database = {
           "role"?: Database["public"]["Enums"]["ai_message_role"]
           "content"?: string
           "source_ids"?: string[]
+          "rule_ids"?: string[]
           "model"?: string | null
           "input_tokens"?: number | null
           "output_tokens"?: number | null
