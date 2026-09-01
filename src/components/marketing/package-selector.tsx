@@ -101,10 +101,21 @@ function PackageCards({
                 <div className="flex-1" />
               )}
               <Button asChild className="mt-5 w-full" variant="secondary">
-                <Link href={`${MARKETING_ROUTES.start}?package=${pkg.slug}`}>
-                  {t('cardCta')}
-                  <ArrowRight className="size-4" aria-hidden="true" />
-                </Link>
+                {version.billingPeriod ? (
+                  // A recurring package is bdoor Comply: the door leads to the
+                  // workspace subscribe flow, not to a formation assessment.
+                  // The (customer) layout redirects a signed-out visitor to
+                  // sign-in and back.
+                  <Link href="/app/compliance">
+                    {t('subscribeCta')}
+                    <ArrowRight className="size-4" aria-hidden="true" />
+                  </Link>
+                ) : (
+                  <Link href={`${MARKETING_ROUTES.start}?package=${pkg.slug}`}>
+                    {t('cardCta')}
+                    <ArrowRight className="size-4" aria-hidden="true" />
+                  </Link>
+                )}
               </Button>
             </Card>
           </li>
@@ -118,15 +129,18 @@ export function PackageSelector({
   locale,
   usdNotes,
   compact,
+  initialSegment,
 }: {
   locale: Locale;
   /** From `packageUsdNotes()` — absent when no reviewed FX rate exists. */
   usdNotes?: Record<string, string>;
   /** Homepage compact cards: three inclusions only, details live on Pricing. */
   compact?: boolean;
+  /** Deep link (?segment=existing_business): an existing business lands on its own tab. */
+  initialSegment?: PackageSegment;
 }) {
   const t = useTranslations('packages');
-  const [segment, setSegment] = useState<PackageSegment>('new_business');
+  const [segment, setSegment] = useState<PackageSegment>(initialSegment ?? 'new_business');
 
   return (
     <div>

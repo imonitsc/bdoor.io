@@ -30,7 +30,7 @@ export class MockPaymentProvider implements PaymentProvider {
       session: sessionId,
       amount: String(request.amountMinor),
       currency: request.currency,
-      invoice: request.invoiceId,
+      invoice: request.invoiceId ?? request.subscriptionId ?? '',
       return: request.returnUrl,
       cancel: request.cancelUrl,
     });

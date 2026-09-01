@@ -90,3 +90,31 @@ govern. Two things change against this document:
    ahead of both.
 
 The domain mapping and remaining flags above stand unchanged.
+
+## Addendum — P0 increment shipped (machinery)
+
+The purchase path now exists end to end: a customer owner subscribes from
+/app/compliance, the subscription is born `pending_activation`, checkout
+runs through the payments abstraction, and the webhook activates on a
+verified payment (`activation_payment_id` + period row + `active`). The
+prices needed no founder input after all — `subscription_plans` and the
+catalogue have carried the approved figures (BDT 49,900/year; from BDT
+11,900/month) since the fundable-core increment, and a parity test now
+pins the two sources together. Surfaces: recurring pricing cards carry a
+Subscribe door, `?segment=existing_business` deep-links the tab,
+/products/comply publishes the two figures, and the dashboard offers
+Comply when a case reaches approved/closed and no subscription exists.
+
+Still gated or deliberately absent:
+
+- **Payment go-live** remains behind `PAYMENTS_STATUS` /
+  `BANGLADESH_CHECKOUT_STATUS` (both default disabled) and the recorded
+  legal approval — the one founder input P0 still needs. Until then the
+  workspace shows the plans with an honest "online payment is not open
+  yet" line and no charge CTA.
+- **P0.3 (Comply-included formation option)** is not built: a reduced or
+  waived formation fee is a new price, and no approved figure exists.
+- **Obligation pre-population at attach** rides P1's rules engine; today
+  the offer opens the calendar the team maintains per case.
+- Customer-side cancellation is an admin/contact path for now; only
+  finance can change a subscription's status.

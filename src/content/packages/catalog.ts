@@ -201,6 +201,7 @@ export const BANGLADESH_PACKAGES: ServicePackage[] = [
         status: 'published',
         checkoutEnabled: true,
         priceType: 'fixed',
+        billingPeriod: 'year',
         publicLabel: {
           en: 'BDT 49,900/year + official, audit and specialist fees',
           bn: '৪৯,৯০০ টাকা/বছর + সরকারি, অডিট ও বিশেষজ্ঞ ফি',
@@ -238,6 +239,7 @@ export const BANGLADESH_PACKAGES: ServicePackage[] = [
         status: 'published',
         checkoutEnabled: true,
         priceType: 'from',
+        billingPeriod: 'month',
         publicLabel: {
           en: 'From BDT 11,900/month',
           bn: '১১,৯০০ টাকা/মাস থেকে',

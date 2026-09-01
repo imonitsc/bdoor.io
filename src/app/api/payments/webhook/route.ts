@@ -67,7 +67,9 @@ export async function POST(request: NextRequest) {
 
   const { data: payment } = await admin
     .from('payments')
-    .select('id, invoice_id, amount_minor, organization_id, case_id, status, is_sandbox')
+    .select(
+      'id, invoice_id, subscription_id, amount_minor, currency, organization_id, case_id, status, is_sandbox',
+    )
     .eq('checkout_session_id', verification.sessionId)
     .maybeSingle();
 
@@ -118,6 +120,98 @@ export async function POST(request: NextRequest) {
         .from('invoices')
         .update({ paid_minor: paid, status: paid >= invoice.total_minor ? 'paid' : 'part_paid' })
         .eq('id', invoice.id);
+    }
+  }
+
+  if (verification.status === 'paid' && payment.subscription_id) {
+    // Subscription activation (ROADMAP P0). Only a verified payment reaches
+    // this branch, which is exactly what subscriptions_active_needs_verified_
+    // payment demands; a replayed webhook finds the row already active and
+    // leaves it alone, because the status trigger forbids active → active
+    // being re-entered with different fields via this narrow update filter.
+    const { data: subscriptionRaw } = await admin
+      .from('subscriptions')
+      .select('id, status, plan_id, organization_id, subscription_plans(billing_period)')
+      .eq('id', payment.subscription_id)
+      .maybeSingle();
+
+    // The generated types carry no relationship metadata, so the embedded
+    // plan join needs the same explicit cast the billing page uses.
+    type SubscriptionRow = {
+      id: string;
+      status: string;
+      plan_id: string;
+      organization_id: string;
+      subscription_plans: { billing_period: string } | null;
+    };
+    const subscription = subscriptionRaw as unknown as SubscriptionRow | null;
+
+    if (subscription && subscription.status === 'pending_activation') {
+      const periodStart = new Date().toISOString().slice(0, 10);
+      const end = new Date();
+      const billingPeriod = subscription.subscription_plans?.billing_period ?? 'year';
+      if (billingPeriod === 'month') end.setMonth(end.getMonth() + 1);
+      else end.setFullYear(end.getFullYear() + 1);
+      const periodEnd = end.toISOString().slice(0, 10);
+
+      const { error: activateError } = await admin
+        .from('subscriptions')
+        .update({
+          status: 'active',
+          started_at: new Date().toISOString(),
+          activation_payment_id: payment.id,
+          current_period_start: periodStart,
+          current_period_end: periodEnd,
+        })
+        .eq('id', subscription.id)
+        .eq('status', 'pending_activation');
+
+      if (activateError) {
+        logger.error('subscription.activation_failed', {
+          subscriptionId: subscription.id,
+          message: activateError.message,
+        });
+      } else {
+        // The billed period; unique (subscription_id, period_start) makes a
+        // replay a no-op via 23505.
+        const { error: periodError } = await admin.from('subscription_periods').insert({
+          subscription_id: subscription.id,
+          period_start: periodStart,
+          period_end: periodEnd,
+          amount_minor: payment.amount_minor,
+          currency: payment.currency,
+          status: 'paid',
+          payment_id: payment.id,
+        });
+        if (periodError && periodError.code !== '23505') {
+          logger.error('subscription.period_insert_failed', {
+            subscriptionId: subscription.id,
+            message: periodError.message,
+          });
+        }
+
+        await recordAnalyticsEvent({
+          event: 'subscription_started',
+          idempotencyKey: `subscription_started:${subscription.id}`,
+          isTest: payment.is_sandbox,
+          organizationId: subscription.organization_id,
+          subscriptionId: subscription.id,
+          paymentId: payment.id,
+          properties: { amountMinor: payment.amount_minor, billingPeriod },
+        });
+
+        await admin.from('audit_logs').insert({
+          actor_id: null,
+          actor_role: 'system',
+          action: 'subscription.activated',
+          target_type: 'subscription',
+          target_id: subscription.id,
+          organization_id: subscription.organization_id,
+          correlation_id: verification.eventId,
+          metadata: { provider: provider.name, paymentId: payment.id },
+          origin: 'webhook',
+        });
+      }
     }
   }
 
