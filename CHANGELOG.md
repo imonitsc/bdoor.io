@@ -14,6 +14,11 @@ first; each entry names its merged pull requests. Dates are merge dates.
   `docs/ROADMAP.md` installed: P0 purchasable Comply → P1 rules as data →
   P2 Ask-to-Comply funnel → P3 entity import → P4 retention instrumentation
   → P5 one country template. The earlier same-day contract is archived.
+  With it, the design brief: `docs/DESIGN.md` (Stripe/Mercury reference
+  class; the product as the visual; the obligations calendar as the one
+  signature element; the §8 generic-default tells) and the `/redesign`
+  command that enforces its audit-plan-critique process; §9 of the contract
+  now holds all UI work to the brief.
 - **§2 revised: stack facts and the permissions philosophy** — the founder's
   §2 replacement lands with its placeholders filled from the repo (production
   branch `claude/new-session-0n73z6`, script names verified): pnpm declared

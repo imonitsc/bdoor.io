@@ -200,6 +200,8 @@ shareholding structures, and we have a published AML/KYC policy.
 
 ## 9. Supabase and frontend conventions
 
+- **Any UI work is held to `docs/DESIGN.md`.** Read it before touching a component. Use
+  `/redesign <route>` for page-level work; it enforces the audit-plan-critique process
 - Schema changes are migrations in the repo, reversible, with generated types committed
 - Prefer constraints, generated columns and RLS over application-layer validation
 - Run the security and performance advisors after any DDL
