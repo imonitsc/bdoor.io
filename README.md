@@ -152,31 +152,31 @@ that needs an account will tell you it is unavailable rather than crashing.
 Every variable is declared and validated in `src/lib/env.ts`. `.env.example`
 carries names and comments only — never a value.
 
-| Variable                               | Required          | Notes                                                                                                             |
-| -------------------------------------- | ----------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_SITE_URL`                 | production        | Absolute origin, no trailing slash. Canonical URLs, OG images, auth redirects. Blank counts as unset — see below. |
-| `NEXT_PUBLIC_SUPABASE_URL`             | production        | Project URL.                                                                                                      |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | production        | The anon key. Safe in the browser — RLS is what protects the data.                                                |
-| `SUPABASE_SECRET_KEY`                  | production        | **Server only.** Bypasses RLS. Never prefix with `NEXT_PUBLIC_`.                                                  |
-| `PAYMENT_PROVIDER`                     | no                | `mock` (default), `sslcommerz`, `stripe`.                                                                         |
-| `PAYMENT_WEBHOOK_SECRET`               | when not mock     | HMAC secret for inbound webhooks, ≥16 chars.                                                                      |
-| `PAYMENT_RETURN_URL`                   | no                | Overrides where the gateway returns the customer.                                                                 |
-| `EMAIL_PROVIDER`                       | no                | `mock` (default), `resend`, `smtp`.                                                                               |
-| `EMAIL_FROM`                           | when not mock     | Sending address.                                                                                                  |
-| `SCREENING_PROVIDER`                   | no                | `mock` (default) or `live`.                                                                                       |
-| `MALWARE_SCAN_PROVIDER`                | no                | `mock` (default) or `live`.                                                                                       |
-| `AI_PROVIDER`                          | no                | `disabled` (default) or `anthropic`. The recommendation engine, not the assistant.                                |
-| `AI_API_KEY`                           | when AI enabled   |                                                                                                                   |
-| `ASK_BDOOR_AI_ENABLED`                 | no                | `false` (default). Switches on the customer assistant — see [docs/ASK_BDOOR_AI.md](docs/ASK_BDOOR_AI.md).         |
-| `AI_GATEWAY_API_KEY`                   | local only        | **Refused in production**: deployed environments authenticate to AI Gateway with Vercel OIDC.                     |
-| `AI_DAILY_BUDGET_USD`                  | no                | Application-side cap, default 25. The enforced cap is the AI Gateway budget.                                      |
-| `AI_MONTHLY_BUDGET_USD`                | no                | Application-side cap, default 400.                                                                                |
-| `AI_IDENTITY_SALT`                     | when assistant on | Salts the hashed safety identifier sent to the gateway.                                                           |
-| `CRON_SECRET`                          | when assistant on | Bearer token for the nightly conversation-retention sweep.                                                        |
-| `SENTRY_DSN`                           | no                |                                                                                                                   |
-| `RATE_LIMIT_DISABLED`                  | no                | `true` turns the limiter off. Never in production.                                                                |
-| `STRICT_ENV`                           | no                | Defaults to on. Set `false` only on a preview that deliberately runs without production secrets.                  |
-| `NEXT_PUBLIC_ANALYTICS_ENABLED`        | no                |                                                                                                                   |
+| Variable                               | Required           | Notes                                                                                                                             |
+| -------------------------------------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL`                 | production         | Absolute origin, no trailing slash. Canonical URLs, OG images, auth redirects. Blank counts as unset — see below.                 |
+| `NEXT_PUBLIC_SUPABASE_URL`             | production         | Project URL.                                                                                                                      |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | production         | The anon key. Safe in the browser — RLS is what protects the data.                                                                |
+| `SUPABASE_SECRET_KEY`                  | production         | **Server only.** Bypasses RLS. Never prefix with `NEXT_PUBLIC_`.                                                                  |
+| `PAYMENT_PROVIDER`                     | no                 | `mock` (default), `sslcommerz`, `stripe`.                                                                                         |
+| `PAYMENT_WEBHOOK_SECRET`               | when not mock      | HMAC secret for inbound webhooks, ≥16 chars.                                                                                      |
+| `PAYMENT_RETURN_URL`                   | no                 | Overrides where the gateway returns the customer.                                                                                 |
+| `EMAIL_PROVIDER`                       | no                 | `mock` (default), `resend`, `smtp`.                                                                                               |
+| `EMAIL_FROM`                           | when not mock      | Sending address.                                                                                                                  |
+| `SCREENING_PROVIDER`                   | no                 | `mock` (default) or `live`.                                                                                                       |
+| `MALWARE_SCAN_PROVIDER`                | no                 | `mock` (default) or `live`.                                                                                                       |
+| `AI_PROVIDER`                          | no                 | `disabled` (default) or `anthropic`. The recommendation engine, not the assistant.                                                |
+| `AI_API_KEY`                           | when AI enabled    |                                                                                                                                   |
+| `ASK_BDOOR_AI_ENABLED`                 | no                 | `false` (default). Switches on the customer assistant — see [docs/ASK_BDOOR_AI.md](docs/ASK_BDOOR_AI.md).                         |
+| `AI_GATEWAY_API_KEY`                   | local only         | **Refused in production**: deployed environments authenticate to AI Gateway with Vercel OIDC.                                     |
+| `AI_DAILY_BUDGET_USD`                  | no                 | Application-side cap, default 25. The enforced cap is the AI Gateway budget.                                                      |
+| `AI_MONTHLY_BUDGET_USD`                | no                 | Application-side cap, default 400.                                                                                                |
+| `AI_IDENTITY_SALT`                     | when assistant on  | Salts the hashed safety identifier sent to the gateway.                                                                           |
+| `CRON_SECRET`                          | for scheduled jobs | Bearer token for the nightly jobs: the conversation-retention sweep and the compliance reminder run. Unset, both refuse with 503. |
+| `SENTRY_DSN`                           | no                 |                                                                                                                                   |
+| `RATE_LIMIT_DISABLED`                  | no                 | `true` turns the limiter off. Never in production.                                                                                |
+| `STRICT_ENV`                           | no                 | Defaults to on. Set `false` only on a preview that deliberately runs without production secrets.                                  |
+| `NEXT_PUBLIC_ANALYTICS_ENABLED`        | no                 |                                                                                                                                   |
 
 `src/instrumentation.ts` runs the production completeness check once at boot. An
 incomplete production environment fails to start rather than returning 500s at

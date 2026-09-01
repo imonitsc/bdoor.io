@@ -228,7 +228,7 @@ export function productionEnvWarnings(): string[] {
     }
     if (!env.CRON_SECRET) {
       warnings.push(
-        'CRON_SECRET — unset; the AI retention sweep stays locked (503) and expired conversations are not deleted',
+        'CRON_SECRET — unset; the scheduled jobs stay locked (503): expired AI conversations are not \ndeleted and no compliance reminder is ever sent',
       );
     }
     if (env.AI_GATEWAY_API_KEY) {

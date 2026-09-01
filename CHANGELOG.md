@@ -5,6 +5,26 @@ first; each entry names its merged pull requests. Dates are merge dates.
 
 ## 2026-09-01
 
+- **Reminders actually send (R1)** — the gap P4's own instrumentation
+  exposed: obligations were generated and engagement was measured, but
+  nothing between them ever sent anything, so the funnel read zero by
+  construction. A daily job now materialises `compliance_reminders` rows
+  from the scheduling logic that had been written, pure and unwired, since
+  the lifecycle migration, then delivers the in-app ones as a single
+  notification per recipient per run — honouring the published promise
+  ("ahead of every due date — never five at once") in code, with a unit
+  test pinning each half. Both phases are idempotent: materialisation
+  leans on the table's own unique key, and sending is claim-guarded on
+  `sent_at`, so an overlapping cron tick cannot remind anyone twice.
+  Reminders are retired rather than sent when the obligation was filed or
+  waived, when the deadline has passed, or when a backlog would arrive as
+  a burst after an outage. Following the reminder into the calendar stamps
+  `opened_at`, closing reminded → opened → acted with a click-through
+  rather than a bulk mark-all-read. Email stays deliberately unsent: the
+  only implemented adapter is the mock, and stamping `sent_at` because a
+  mock logged a line would make the engagement metric report reminders
+  that reached nobody.
+
 - **Country pages become one template — confirmed, then finished (P5)** — the
   roadmap premise was wrong and the code was right: all six international
   pages already rendered from one `countries/[country]/page.tsx` over the

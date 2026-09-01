@@ -307,3 +307,61 @@ jurisdiction-typed entity vocabulary that unblocks UAE import and the
 retention jurisdiction dimension remains open.
 
 No migration in this increment; nothing to apply post-merge.
+
+## Addendum — R1 shipped (the reminder dispatcher)
+
+P4 instrumented reminded → opened → acted → filed and recorded that the
+first two columns would read zero until a dispatcher existed. This is
+that dispatcher, and it is the first increment where the machine acts on
+a customer rather than only recording one.
+
+What was actually missing was smaller than it looked and more damaging.
+`scheduleReminders()` — which offsets, on which channel, on which date —
+had been written, tested and left unwired since the lifecycle migration.
+Nothing inserted a `compliance_reminders` row. Nothing inserted a
+`notifications` row anywhere in the codebase. So Comply's published
+promise, "Reminders that lead the deadline", was carried entirely by an
+obligations page the customer had to remember to visit.
+
+1. **Materialise, then send** (`reminder-dispatch.ts`), the two-phase
+   shape the ingestion queue already established. A daily cron
+   (`/api/compliance/reminders`, `30 2 * * *`) creates the reminder rows
+   for obligations coming due, then delivers the in-app ones. Both
+   phases are idempotent — materialisation on the table's own
+   `unique (obligation_id, offset_days, channel)`, sending on a
+   `sent_at is null` claim guard — so a retry or two overlapping ticks
+   cost nothing and can never remind anyone twice. The route refuses
+   (503) without `CRON_SECRET` rather than defaulting open.
+2. **The published promise is the specification.** "Ahead of every due
+   date — never five at once" is now two testable properties:
+   `triageReminders` (pure, unit-tested) retires rather than sends when
+   the deadline has passed, when the obligation was filed or waived, or
+   when a backlog would arrive as a burst after an outage; and
+   everything due for one recipient in one run becomes a single
+   notification listing the deadlines, not one per obligation.
+3. **"Opened" is a click-through**, stamped when the customer follows
+   the reminder link into their calendar — the same landing-stamp
+   precedent the Ask→Comply exit uses — rather than a bulk
+   mark-all-read, which would measure a button instead of attention.
+   An integration test pins that a customer can read their reminders
+   but can write neither `sent_at` nor `opened_at`: the subject of a
+   metric must not be able to inflate it.
+
+**Email is deliberately still unsent.** The only implemented email
+adapter is the mock, and stamping `sent_at` because a mock logged a line
+would make `metrics_obligation_engagement` report reminders that reached
+nobody — the precise failure P4 was built to avoid. `channel = 'email'`
+rows are created and left pending; they begin sending when the owner
+configures `EMAIL_PROVIDER`/`EMAIL_FROM` and the email leg is wired. That
+is now the clearest operational gap, and the runbook says so in place of
+the line claiming reminders had no scheduler at all.
+
+Still open, unchanged: renewal-case generation (so
+`metrics_renewal_conversion` still reads zero by construction), the
+jurisdiction-typed entity vocabulary, and named local providers. And the
+whole chain remains dark until analysts structure rule scheduling and
+enter gazetted holidays — with no rules there are no obligations, and
+with no obligations there is nothing to remind anyone about.
+
+No migration in this increment; nothing to apply post-merge. `CRON_SECRET`
+must be set in production for the job to run at all.

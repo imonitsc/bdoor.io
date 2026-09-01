@@ -92,8 +92,11 @@ scanned. Configuring a real scanner is a launch blocker.
 
 Honest list. Each is manual today:
 
-- Compliance reminders have no scheduler. `compliance_reminders` rows are
-  created but nothing sends them; `CRON_SECRET` is reserved for the job endpoint.
+- Compliance reminder **email** is not sent. The daily job
+  (`/api/compliance/reminders`, `CRON_SECRET`) materialises reminder rows and
+  delivers the in-app ones; `channel = 'email'` rows stay pending because the
+  only implemented email adapter is the mock. They start sending when
+  `EMAIL_PROVIDER` and `EMAIL_FROM` are configured and the email leg is wired.
 - No transactional outbox. A notification side-effect that fails is lost.
 - Retention rules are recorded but no job enforces them.
 - No uptime monitoring or alerting beyond Vercel's defaults.
