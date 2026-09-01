@@ -1,7 +1,16 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { Client } from 'pg';
 
-import { asUser, connect, disconnect, expectRejected, ORGS, USERS } from './helpers/db';
+import {
+  asUser,
+  connect,
+  disconnect,
+  expectRejected,
+  inRolledBackTransaction,
+  ORGS,
+  setIdentity,
+  USERS,
+} from './helpers/db';
 
 /**
  * The existing-entity Comply entry (ROADMAP P2) rides the companies RLS as it
@@ -68,6 +77,78 @@ describe('tracking a company under companies RLS', () => {
     ]);
     expect(result.rejected).toBe(true);
     expect(result.code).toBe('23514');
+  });
+});
+
+describe('entity import (P3): identifiers and the sector vocabulary', () => {
+  const IMPORT_INSERT = `
+    insert into public.companies
+      (organization_id, legal_name, structure, status, sector, registration_no, etin, bin)
+    values ($1, $2, 'private_limited', 'incorporated', $3, $4, $5, $6)
+    returning id`;
+
+  it('accepts a fully-identified company with an in-vocabulary sector', async () => {
+    const rows = await asUser(client, USERS.localFounder, async (c) => {
+      const { rows: created } = await c.query(IMPORT_INSERT, [
+        ORGS.padma,
+        'Imported Company (sample)',
+        'garments_textiles',
+        'C-SAMPLE-777001',
+        'SAMPLE-ETIN-1',
+        'SAMPLE-BIN-1',
+      ]);
+      return created;
+    });
+    expect(rows[0]?.id).toBeTruthy();
+  });
+
+  it('refuses a sector outside the shared vocabulary', async () => {
+    const result = await expectRejected(client, USERS.localFounder, IMPORT_INSERT, [
+      ORGS.padma,
+      'Odd Sector Company (sample)',
+      'banking',
+      null,
+      null,
+      null,
+    ]);
+    expect(result.rejected).toBe(true);
+    expect(result.code).toBe('23514');
+  });
+
+  it('refuses a duplicate registration number across the platform', async () => {
+    await inRolledBackTransaction(client, async (c) => {
+      await setIdentity(c, USERS.localFounder);
+      await c.query(IMPORT_INSERT, [
+        ORGS.padma,
+        'First Holder (sample)',
+        null,
+        'C-SAMPLE-777002',
+        null,
+        null,
+      ]);
+      await expect(
+        c.query(IMPORT_INSERT, [
+          ORGS.padma,
+          'Second Holder (sample)',
+          null,
+          'C-SAMPLE-777002',
+          null,
+          null,
+        ]),
+      ).rejects.toMatchObject({ code: '23505' });
+    });
+  });
+
+  it('holds rules to the same sector vocabulary', async () => {
+    await inRolledBackTransaction(client, async (c) => {
+      const RULE = `
+        insert into public.ai_structured_rules
+          (topic, title, applies_to, required_action, responsible_authority, legal_authority, sectors)
+        values ('governance_rjsc', 'Sector fixture (sample)', 'Sample entities', 'File it',
+                'Registrar (sample)', 'Sample Act, s 1', $1::text[])`;
+      await c.query(RULE, ['{financial_services}']);
+      await expect(c.query(RULE, ['{banking}'])).rejects.toMatchObject({ code: '23514' });
+    });
   });
 });
 

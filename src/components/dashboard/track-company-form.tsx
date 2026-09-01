@@ -6,6 +6,7 @@ import { Building2 } from 'lucide-react';
 
 import { trackCompany, type TrackCompanyState } from '@/features/compliance/actions';
 import { COMPANY_STRUCTURES } from '@/features/compliance/track-schema';
+import { SECTORS } from '@/features/compliance/sectors';
 import { STRUCTURE_LABELS, localized } from '@/features/intake/recommendation-copy';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -32,6 +33,9 @@ export function TrackCompanyForm({ trackRuleId }: { trackRuleId?: string | null 
       'nameTooShort',
       'nameTooLong',
       'structureInvalid',
+      'sectorInvalid',
+      'identifierInvalid',
+      'registrationExists',
       'dateInvalid',
       'dateInFuture',
       'generic',
@@ -73,12 +77,51 @@ export function TrackCompanyForm({ trackRuleId }: { trackRuleId?: string | null 
           </Field>
 
           <Field>
+            <FieldLabel>{t('sector')}</FieldLabel>
+            <FieldControl>
+              <NativeSelect name="sector" defaultValue="">
+                {/* Unknown is a real answer: sector-scoped rules then surface
+                    as "may apply" instead of silently deciding either way. */}
+                <option value="">{t('sectorUnsure')}</option>
+                {SECTORS.map((sector) => (
+                  <option key={sector} value={sector}>
+                    {t(`sectors.${sector}`)}
+                  </option>
+                ))}
+              </NativeSelect>
+            </FieldControl>
+          </Field>
+
+          <Field>
             <FieldLabel>{t('incorporationDate')}</FieldLabel>
             <FieldControl>
               <Input name="incorporationDate" type="date" />
             </FieldControl>
             <FieldDescription>{t('incorporationDateHint')}</FieldDescription>
           </Field>
+
+          <fieldset className="flex flex-col gap-4">
+            <legend className="text-ink text-sm font-medium">{t('identifiers')}</legend>
+            <p className="text-muted -mt-2 text-sm">{t('identifiersHint')}</p>
+            <Field>
+              <FieldLabel>{t('registrationNo')}</FieldLabel>
+              <FieldControl hasDescription={false}>
+                <Input name="registrationNo" maxLength={40} autoComplete="off" />
+              </FieldControl>
+            </Field>
+            <Field>
+              <FieldLabel>{t('etin')}</FieldLabel>
+              <FieldControl hasDescription={false}>
+                <Input name="etin" maxLength={40} autoComplete="off" />
+              </FieldControl>
+            </Field>
+            <Field>
+              <FieldLabel>{t('bin')}</FieldLabel>
+              <FieldControl hasDescription={false}>
+                <Input name="bin" maxLength={40} autoComplete="off" />
+              </FieldControl>
+            </Field>
+          </fieldset>
 
           <div>
             <Button type="submit" disabled={pending}>

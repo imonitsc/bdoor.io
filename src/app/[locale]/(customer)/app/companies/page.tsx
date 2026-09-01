@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import { getFormatter, getTranslations, setRequestLocale } from 'next-intl/server';
 import { Building2 } from 'lucide-react';
+import { Link } from '@/i18n/navigation';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PageHeading } from '@/components/dashboard/page-heading';
@@ -16,9 +18,10 @@ export default async function CompaniesPage({ params }: { params: Promise<{ loca
   setRequestLocale(locale);
   await requireCustomerOrganization();
 
-  const [t, tCommon, format] = await Promise.all([
+  const [t, tCommon, tTrack, format] = await Promise.all([
     getTranslations('workspace.nav'),
     getTranslations('common'),
+    getTranslations('workspace.comply.track'),
     getFormatter(),
   ]);
 
@@ -60,7 +63,17 @@ export default async function CompaniesPage({ params }: { params: Promise<{ loca
       ) : null}
 
       {companies.length === 0 ? (
-        <EmptyState icon={<Building2 className="size-5" />} title={tCommon('noResults')} />
+        // The existing-entity entry (ROADMAP P3) lives on the compliance
+        // page, where the calendar it generates appears.
+        <EmptyState
+          icon={<Building2 className="size-5" />}
+          title={tCommon('noResults')}
+          action={
+            <Button asChild>
+              <Link href="/app/compliance">{tTrack('title')}</Link>
+            </Button>
+          }
+        />
       ) : (
         <ul className="grid gap-4 lg:grid-cols-2">
           {companies.map((company) => (

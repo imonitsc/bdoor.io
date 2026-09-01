@@ -79,7 +79,7 @@ export async function generateObligationsForOrganization(
 
   const { data: companies, error: companiesError } = await admin
     .from('companies')
-    .select('id, organization_id, structure, incorporation_date')
+    .select('id, organization_id, structure, sector, incorporation_date')
     .eq('organization_id', organizationId)
     .neq('status', 'dissolved');
 
@@ -165,7 +165,9 @@ export async function generateObligationsForOrganization(
       organizationId: company.organization_id,
       jurisdictionCode: 'BD',
       structure: company.structure,
-      sector: null,
+      // From the shared vocabulary (P3) when the customer set it; null =
+      // unknown, and sector-scoped rules surface "may apply — confirm".
+      sector: company.sector,
       incorporationDate: company.incorporation_date,
     };
 

@@ -197,3 +197,38 @@ Deliberately absent: identifier-led import (RJSC number, e-TIN, BIN) is
 P3; the tracked-rule card names the rule but never invents an obligation
 for it — the calendar shows only what published, scheduled rules
 generate.
+
+## Addendum — P3 increment shipped (identifier-led import)
+
+The existing-entity entry now imports, not just names, a company:
+
+1. **Identifiers.** The track form collects the RJSC registration number,
+   e-TIN and BIN into the columns the schema has carried since day one.
+   Validation is deliberately permissive — registry formats are regulatory
+   facts, and an over-strict pattern would lock a real company out of its
+   own calendar. The platform-wide unique registration number returns an
+   honest "already tracked" error instead of a silent failure.
+2. **Sector, as a data contract.** `companies.sector` and
+   `ai_structured_rules.sectors` are both constrained to one shared
+   vocabulary (fourteen tokens, `src/features/compliance/sectors.ts`,
+   drift-tested against both check constraints). This is a correctness
+   requirement: the engine excludes silently on a sector mismatch, so an
+   out-of-vocabulary spelling on either side would invisibly suppress a
+   real obligation. "Unsure" maps to NULL and sector-scoped rules then
+   surface "may apply — confirm". The production corpus held zero
+   sector-scoped rules, so the constraint binds from day one.
+3. **Generation matches on sector** — `EntityFacts.sector` is now the
+   company's own answer rather than a hardcoded null.
+
+Deliberately absent, and why:
+
+- **Registry lookup pre-fill (roadmap P3.2 first clause).** RJSC/NBR
+  expose no public lookup API; per the no-invented-credentials rule this
+  ships as customer-confirmed facts, and a lookup adapter (mock default)
+  can be added the day an official interface exists.
+- **UAE same-shape import (P3.3).** Blocked on jurisdiction-typed entity
+  vocabulary: `companies.structure` is check-constrained to the six RJSC
+  tokens and companies carry no jurisdiction column, so a UAE entity
+  cannot yet be represented at all. That refactor (typed identifier
+  collection per §6 included) belongs with the P5 jurisdiction template
+  work, not squeezed in here.
