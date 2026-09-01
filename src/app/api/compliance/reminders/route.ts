@@ -43,7 +43,10 @@ export async function GET(request: NextRequest) {
   const now = new Date();
 
   const scheduled = await materializeReminders(admin, { now });
-  const dispatched = await dispatchDueReminders(admin, { now });
+  // Each channel runs its own bounded batch, so a provider outage on the
+  // email leg cannot stop in-app reminders reaching the workspace.
+  const dispatched = await dispatchDueReminders(admin, { now, channel: 'in_app' });
+  const emailed = await dispatchDueReminders(admin, { now, channel: 'email' });
 
   logger.info('reminders.run', {
     obligationsConsidered: scheduled.obligationsConsidered,
@@ -52,7 +55,10 @@ export async function GET(request: NextRequest) {
     sent: dispatched.sent,
     notified: dispatched.notified,
     retired: dispatched.retired,
+    emailClaimed: emailed.claimed,
+    emailSent: emailed.sent,
+    emailRetired: emailed.retired,
   });
 
-  return NextResponse.json({ scheduled, dispatched });
+  return NextResponse.json({ scheduled, dispatched, emailed });
 }

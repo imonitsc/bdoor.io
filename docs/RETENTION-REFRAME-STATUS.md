@@ -425,3 +425,47 @@ gazetted holidays.
 No migration in this increment; nothing to apply post-merge. Verified
 this session: `CRON_SECRET` is **not set in production** — the reminder
 and renewal jobs both answer 503 and neither will run until it is.
+
+## Addendum — R3 shipped (email leaves the building)
+
+R1 shipped the reminder dispatcher with its email leg deliberately dark,
+because the only implemented adapter was the mock and stamping `sent_at`
+for a mock would have made `metrics_obligation_engagement` report
+reminders that reached nobody. The owner has connected a provider, so
+that objection is gone.
+
+Worth recording, because it was latent and would have surfaced badly:
+`getEmailProvider()` **threw** for any non-mock `EMAIL_PROVIDER`. Setting
+the variable in production without this change would not have started
+sending mail — it would have broken every mail path in the product at
+once (invitations, acknowledgements, provider applications), some of
+which do not wrap the call. `EMAIL_API_KEY` was likewise documented in
+`.env.example` and absent from the env schema, so it was never validated
+or read.
+
+1. **Resend, behind the existing interface**, over `fetch` — one POST
+   with a bearer token is the whole integration, and a dependency that
+   ships its own HTTP stack is not worth adding for it. Failure is
+   returned, never thrown: several callers send mail as a side-effect of
+   a customer action and do not wrap it, and failing an invitation
+   because a message bounced is the wrong trade. A ten-second timeout
+   keeps a hung provider off a Server Action. Recipient and subject are
+   redacted in every log line and the body never appears — a unit test
+   pins that, alongside the provider-error, no-id, timeout and network
+   cases, all with `fetch` stubbed so no test can ever send.
+2. **The reminder email leg.** Each channel is its own bounded batch, so
+   an email outage cannot stop in-app reminders; members are written to
+   in the locale their profile carries; a member with no address is
+   skipped rather than guessed at; and only what the provider actually
+   accepted is stamped.
+3. **The mock stays the default and stays honest.** With
+   `EMAIL_PROVIDER=mock` the email batch returns immediately and touches
+   nothing, so those rows go out on the first run after a real provider
+   is configured rather than being silently consumed.
+
+SMTP remains unimplemented — it needs a mail library, and §11 says a new
+dependency is the owner's call.
+
+No migration in this increment. Still true, and still the thing that
+gates everything: `CRON_SECRET` is not set in production, so neither
+compliance job runs at all yet.
