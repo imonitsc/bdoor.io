@@ -5,6 +5,14 @@ first; each entry names its merged pull requests. Dates are merge dates.
 
 ## 2026-09-01
 
+- **Claude Code tooling for the retention contract** — the founder's uploaded
+  kit installed under `.claude/`: six slash commands (`/add-rule`,
+  `/add-jurisdiction`, `/audit-rls`, `/verify-rules`, `/ship`,
+  `/newobligation` — the Rule→Obligation instantiation playbook), the
+  `compliance-reviewer` subagent, and a permissions policy; installed
+  verbatim except recorded corrections (npm→pnpm, the production branch in
+  place of a nonexistent `main`, and an `.env` deny that no longer blocks
+  the secret-free `.env.example`).
 - **The retention reframe governs the repository** — the founder's 1 Sep
   contract (recurring compliance product; formation as the free wedge;
   six-object domain model; rules corpus as the moat; never hardcode
