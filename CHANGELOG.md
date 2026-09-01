@@ -5,6 +5,19 @@ first; each entry names its merged pull requests. Dates are merge dates.
 
 ## 2026-09-01
 
+- **Rules learn to schedule (P1 machinery)** — the structured-rules corpus
+  gains machine-readable scheduling (`recurrence`, a deadline anchor with an
+  offset in days, `jurisdiction_code`), an analyst-maintained
+  `public_holidays` table that ships empty, and a pure obligation engine:
+  scope matching where an ambiguous rule never fires (surfaced as
+  "may apply" instead), due dates computed as calendar dates against the
+  jurisdiction's fiscal year and Friday–Saturday weekend, month-end
+  clamping, working-day rolls that refuse loudly when holiday data is
+  missing, and a deterministic plan made idempotent by a database unique
+  key on (company, rule version, due date). Subscription activation now
+  generates the obligations calendar from published rules — zero rows
+  until analysts structure the corpus, zero manual entry once they do.
+
 - **bdoor Comply is purchasable (P0 machinery)** — a customer owner can
   subscribe from the workspace: narrow RLS lets them create their own
   `pending_activation` subscription and pending payment, checkout runs

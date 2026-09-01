@@ -3,6 +3,7 @@ import { getPaymentProvider } from '@/lib/payments';
 import { createAdminClient, hasServiceRole } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { recordAnalyticsEvent } from '@/lib/analytics';
+import { generateObligationsForOrganization } from '@/features/compliance/generate';
 
 /**
  * Payment webhook.
@@ -211,6 +212,20 @@ export async function POST(request: NextRequest) {
           metadata: { provider: provider.name, paymentId: payment.id },
           origin: 'webhook',
         });
+
+        // Comply's first deliverable (ROADMAP P1): the obligations calendar,
+        // generated from published rules the moment the subscription is live.
+        // Never allowed to fail the webhook — the activation above is already
+        // committed and the generation is idempotent, so a retry or the next
+        // publication run picks up anything missed here.
+        try {
+          await generateObligationsForOrganization(admin, subscription.organization_id);
+        } catch (generationError) {
+          logger.error('subscription.obligation_generation_failed', {
+            subscriptionId: subscription.id,
+            message: generationError instanceof Error ? generationError.message : 'unknown_error',
+          });
+        }
       }
     }
   }
