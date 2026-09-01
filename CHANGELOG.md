@@ -5,6 +5,29 @@ first; each entry names its merged pull requests. Dates are merge dates.
 
 ## 2026-09-01
 
+- **A recurring obligation becomes a managed case (R2)** — the second gap
+  P4's instrumentation exposed, and the same shape as the first: the
+  `renewal_cases` table, its RLS, the conversion view and the admin card
+  all shipped months ago, but nothing had ever created a renewal case —
+  or, it turns out, any case at all. This is the first code in the app
+  that creates one. A daily job opens a draft renewal case for each
+  obligation coming due on a subscribed company's profile, sixty days
+  ahead so the offer arrives with the first reminder rather than as a
+  second message. It is an offer, not work: created in `draft`, unpriced,
+  with no provider assigned, exactly as /products/comply promises ("a
+  specialist takes it up; you approve before anything is filed") — and
+  because the view counts `accepted` as any case past `draft`, generating
+  anything further along would have made every offer instantly accepted
+  and the take rate meaningless. Idempotent on the table's own
+  `(obligation_id, period_label)` key, checked against both that key and
+  the obligation's own shortcut column, with a compensating delete if a
+  concurrent run wins the race so no phantom case is left in a customer's
+  workspace. The offer surfaces on the obligations calendar. Found and
+  documented, not worked around: a customer cannot yet accept, because
+  `case_status_transitions` authorises `draft → awaiting_kyc` for a
+  customer while the RLS policy forbids any status change (verified,
+  SQLSTATE 42501), so acceptance needs staff until that is reconciled.
+
 - **Reminders actually send (R1)** — the gap P4's own instrumentation
   exposed: obligations were generated and engagement was measured, but
   nothing between them ever sent anything, so the funnel read zero by

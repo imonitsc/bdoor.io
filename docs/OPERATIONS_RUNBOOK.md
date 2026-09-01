@@ -97,6 +97,12 @@ Honest list. Each is manual today:
   delivers the in-app ones; `channel = 'email'` rows stay pending because the
   only implemented email adapter is the mock. They start sending when
   `EMAIL_PROVIDER` and `EMAIL_FROM` are configured and the email leg is wired.
+- A customer cannot accept a renewal offer themselves. `case_status_transitions`
+  authorises `draft → awaiting_kyc` for the actor `customer`, but the
+  `cases_customer_update_draft` RLS policy's `with check (status = 'draft')`
+  rejects any status change (verified: SQLSTATE 42501). Until that is
+  reconciled, a generated offer is advanced by staff, and
+  `metrics_renewal_conversion.accepted` moves only when they do.
 - No transactional outbox. A notification side-effect that fails is lost.
 - Retention rules are recorded but no job enforces them.
 - No uptime monitoring or alerting beyond Vercel's defaults.

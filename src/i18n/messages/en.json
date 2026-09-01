@@ -1166,6 +1166,7 @@
       "evidence": "Completion evidence",
       "markComplete": "Mark complete",
       "startRenewal": "Start renewal",
+      "renewalOpened": "A renewal case is open for this deadline — nothing is priced or filed until you take it up.",
       "groups": {
         "due_now": "Due now",
         "upcoming": "Upcoming",
@@ -1633,8 +1634,8 @@
         "offered": "Offered",
         "accepted": "Accepted",
         "completed": "Completed",
-        "noRenewals": "No renewal cases yet. Instrumented ahead of the generator so the take rate is measured from case one.",
-        "renewalNote": "Accepted = the case moved past draft and was not cancelled. A later authority rejection still counts as accepted."
+        "noRenewals": "No renewal cases yet. Offers are generated for subscribed companies as deadlines approach.",
+        "renewalNote": "Accepted = the case moved past draft and was not cancelled. A later authority rejection still counts as accepted. Acceptance currently requires staff: RLS does not yet let a customer move their own case out of draft."
       }
     },
     "ai": {
