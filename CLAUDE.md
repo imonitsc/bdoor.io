@@ -26,17 +26,79 @@ If a proposed change makes formation better but retention no better, say so befo
 | Layer                     | Choice                                                                                                                                               |
 | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | App                       | Next.js (App Router), TypeScript, React Server Components by default                                                                                 |
+| Package manager           | **pnpm**. Never `npm` or `yarn` — a stray `npm install` rewrites the lockfile                                                                        |
 | Hosting                   | Vercel                                                                                                                                               |
 | Database / auth / storage | Supabase (Postgres, RLS, Auth, Storage)                                                                                                              |
 | Styling                   | Tailwind                                                                                                                                             |
 | AI                        | Multi-model via Vercel AI Gateway (Anthropic default), server routes only — per the founder’s BI-OS instruction §6.1; no key ever reaches the client |
 | Repo                      | `imonitsc/bdoor.io`                                                                                                                                  |
+| Production branch         | **`claude/new-session-0n73z6`** — there is no `main`. Diff and PR against this.                                                                      |
 
-House preference across all ventures: **lean and cost-efficient**. Do not add a paid service, a queue, a vector database or a new framework without asking. Postgres can usually do it.
+**Scripts** — use these exact names; verified against `package.json` 1 Sep 2026:
 
-> If any of the above is stale, correct this file in the same PR — do not silently work against a wrong description.
+```
+pnpm dev          pnpm lint
+pnpm build        pnpm test
+pnpm typecheck    pnpm verify   ← the gate: format:check → lint → typecheck → unit → build
+```
+
+**MCP server names are case-sensitive and vary by machine.** On this project they are
+capitalised: `mcp__Supabase__*`, `mcp__Vercel__*`. Run `/mcp` to confirm before adding any
+entry to a permissions file. A mismatched name in an `allow` list merely prompts; a
+mismatched name in a `deny` list **silently does nothing** — the gate you think you have is
+not there.
+
+House preference across all ventures: **lean and cost-efficient**. Do not add a paid
+service, a queue, a vector database or a new framework without asking. Postgres can usually
+do it.
+
+> If any row above is stale, correct it in the same PR — do not silently work against a
+> wrong description.
 >
-> _Correction applied 1 Sep 2026: the AI row originally read “Anthropic API via server routes only”; the repository has run multi-model routing through the Vercel AI Gateway since PR #50, as the founder’s Business Intelligence OS instruction (§6.1) directed. The server-only rule is unchanged._
+> _Correction applied 1 Sep 2026 (carried into this §2 revision): the AI row originally
+> read “Anthropic API via server routes only”; the repository has run multi-model routing
+> through the Vercel AI Gateway since PR #50, as the founder’s Business Intelligence OS
+> instruction (§6.1) directed. The server-only rule is unchanged._
+
+---
+
+## 2.1 Permissions: two files, and what they are actually for
+
+`.claude/settings.json` is **committed**. It holds only what is true on every machine:
+read-only tools, safe git reads, pnpm scripts, and the deny list. No MCP entries — those
+names vary by machine.
+
+`.claude/settings.local.json` is **gitignored and per-machine**. It holds MCP entries and
+any allowances a particular machine needs — for example, permitting `git commit` and
+`git push` on a box that runs unattended sessions, where an ask-gate would stall the run.
+
+Add to `.gitignore`:
+
+```
+.claude/settings.local.json
+```
+
+### Two deliberate decisions in the committed file
+
+**Env denies are enumerated, not globbed.** `Read(./.env.*)` also blocks `.env.example` —
+the secret-free template that §12 requires updating. The deny list names real env files
+individually so the template stays readable.
+
+**Force-push is in `ask`, not `deny`.** `deny` wins over `ask`, and a `git push --force`
+deny also catches `--force-with-lease`, which the merged-branch restart convention uses.
+Rather than pattern-matching around it, both forms sit behind a human confirm. If you want
+a hard block, test the pattern against a throwaway branch first — do not assume it matches.
+
+### The thing to actually rely on
+
+Claude Code permissions are a convenience layer, not a security boundary. They are local,
+per-machine, silently fallible on a name mismatch, and dependent on pattern-matching
+subtleties.
+
+The controls that protect this repo are **server-side**: branch protection on
+`claude/new-session-0n73z6`, and a migration path that requires a human to apply. Get those
+right and the local config can afford to be permissive — which is the correct fix for an
+autonomous session stalling on a prompt. Loosening a deny rule is not.
 
 ---
 

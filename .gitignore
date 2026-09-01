@@ -35,3 +35,6 @@ next-env.d.ts
 .idea/
 .vscode/*
 !.vscode/extensions.json
+
+# Per-machine Claude Code permissions (CLAUDE.md §2.1)
+.claude/settings.local.json

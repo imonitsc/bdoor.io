@@ -5,6 +5,14 @@ first; each entry names its merged pull requests. Dates are merge dates.
 
 ## 2026-09-01
 
+- **§2 revised: stack facts and the permissions philosophy** — the founder's
+  §2 replacement lands with its placeholders filled from the repo (production
+  branch `claude/new-session-0n73z6`, script names verified): pnpm declared
+  in the stack table, the MCP case-sensitivity warning, and a new §2.1
+  splitting committed vs per-machine permission files. The committed
+  `settings.json` drops its MCP entries, force-push moves from deny to ask
+  (deny caught `--force-with-lease`), and `.claude/settings.local.json` is
+  gitignored.
 - **Claude Code tooling for the retention contract** — the founder's uploaded
   kit installed under `.claude/`: six slash commands (`/add-rule`,
   `/add-jurisdiction`, `/audit-rls`, `/verify-rules`, `/ship`,
