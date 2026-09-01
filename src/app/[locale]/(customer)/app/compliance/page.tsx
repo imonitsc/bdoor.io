@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { getFormatter, getTranslations, setRequestLocale } from 'next-intl/server';
 import { CalendarCheck, ScrollText } from 'lucide-react';
+import { Link } from '@/i18n/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -60,7 +61,7 @@ export default async function CompliancePage({
     supabase
       .from('compliance_obligations')
       .select(
-        'id, label_en, label_bn, authority_name, due_on, status, responsible_kind, required_documents, source',
+        'id, label_en, label_bn, authority_name, due_on, status, responsible_kind, required_documents, source, renewal_case_id',
       )
       .order('due_on'),
     supabase.from('companies').select('id', { count: 'exact', head: true }),
@@ -173,6 +174,19 @@ export default async function CompliancePage({
                             </Badge>
                           ) : null}
                         </p>
+                        {obligation.renewal_case_id ? (
+                          // The offer bdoor opened for this deadline. A draft
+                          // case: nothing is priced, assigned or filed until
+                          // the customer takes it up.
+                          <p className="mt-2 text-sm">
+                            <Link
+                              href={`/app/applications/${obligation.renewal_case_id}`}
+                              className="text-accent font-medium underline underline-offset-4"
+                            >
+                              {t('renewalOpened')}
+                            </Link>
+                          </p>
+                        ) : null}
                       </div>
                       <div className="text-end">
                         <p className="text-ink text-sm font-medium">

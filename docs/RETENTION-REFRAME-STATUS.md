@@ -365,3 +365,63 @@ with no obligations there is nothing to remind anyone about.
 
 No migration in this increment; nothing to apply post-merge. `CRON_SECRET`
 must be set in production for the job to run at all.
+
+## Addendum — R2 shipped (renewal cases)
+
+The second of the two gaps P4 exposed, and the same shape as the first.
+`renewal_cases`, its RLS, `metrics_renewal_conversion` and the admin card
+have existed since P4; nothing had ever inserted a row. Tracing it back
+turned up something larger: **no code in the application had ever created
+a `case`.** Cases existed only as seed fixtures. This increment writes the
+first one.
+
+1. **An offer, not work.** A daily job (`/api/compliance/renewals`,
+   `45 2 * * *`) opens a draft renewal case for each obligation coming due
+   on a subscribed company's profile, sixty days ahead — deliberately the
+   longest reminder lead, so the offer arrives in the same run as the
+   first reminder about that deadline rather than as a second message on
+   a different day. The case is created in `draft`, unpriced, with no
+   provider assigned, which is exactly what /products/comply promises:
+   "a specialist takes it up; you approve before anything is filed."
+   This is also a measurement requirement, not only a product one — the
+   view counts `accepted` as any case past `draft`, so generating
+   anything further along would make every offer instantly accepted and
+   the take rate meaningless. An integration test pins that property.
+2. **Idempotent, and safe under a race.** `renewal_cases (obligation_id,
+period_label)` is the key; both it and the obligation's own
+   `renewal_case_id` shortcut are checked, so a half-written previous run
+   cannot produce a second offer. The case row must be created before the
+   link row that references it, so if a concurrent run wins the unique
+   key the just-created draft is deleted — there is no multi-statement
+   transaction through this client, and a phantom case in a customer's
+   workspace is worse than a compensating delete.
+3. **Subscribers only.** Obligations exist for any tracked company (P2/P3
+   generate them without a subscription), but a renewal case is a Comply
+   benefit. Opening unsolicited managed cases for a company that never
+   subscribed would be an unasked-for offer rather than a service.
+
+**Found, reported, not worked around: a customer cannot accept the offer.**
+`public.case_status_transitions` authorises `draft → awaiting_kyc` for the
+actor `customer`, and `state-machine.ts` agrees — but the
+`cases_customer_update_draft` RLS policy's `with check (status = 'draft')`
+rejects any status change at all. Verified against the database, not
+inferred: SQLSTATE 42501, "new row violates row-level security policy".
+So two authorization sources disagree, and today acceptance requires
+staff. `metrics_renewal_conversion.offered` becomes real with this
+increment; `accepted` moves only when staff advance a case.
+
+Reconciling that is an RLS change, which the contract (§11) says to ask
+about rather than decide. The minimal fix, for the owner to approve:
+widen the customer update policy's `with check` to the statuses the
+transitions table already authorises for `customer`, and let the existing
+`app.enforce_case_transition()` trigger keep validating the edge — the
+trigger, not the policy, is what should decide which move is legal.
+
+Still open, unchanged: the email leg of reminders, the jurisdiction-typed
+entity vocabulary, and named local providers. And the whole chain still
+produces nothing until analysts structure rule scheduling and enter
+gazetted holidays.
+
+No migration in this increment; nothing to apply post-merge. Verified
+this session: `CRON_SECRET` is **not set in production** — the reminder
+and renewal jobs both answer 503 and neither will run until it is.
