@@ -5,6 +5,25 @@ first; each entry names its merged pull requests. Dates are merge dates.
 
 ## 2026-09-01
 
+- **Country pages become one template — confirmed, then finished (P5)** — the
+  roadmap premise was wrong and the code was right: all six international
+  pages already rendered from one `countries/[country]/page.tsx` over the
+  catalog and guide data, so the increment corrects the contract docs
+  (CLAUDE.md §6, ROADMAP P5) and removes the real drift instead. Footer and
+  sitemap country entries now derive from the catalog
+  (`countryFooterLinks()`, `countrySitemapEntries()`), with a unit tripwire
+  that fails if a country path is ever hardcoded back into navigation — a
+  seventh country is now a data task. The ongoing-obligations section
+  becomes a progressive view over the published rules corpus, each rule
+  carrying its own review date (P1.3 per-rule review dates reach the public
+  pages), falling back to the human-reviewed guide prose while a
+  jurisdiction's corpus is empty — which today is every jurisdiction, so
+  the rendered pages are unchanged until analysts publish rules. A dead
+  countries module contradicting the catalog (five countries, all
+  "coming soon") is deleted. Flagged, not changed: KSA and Qatar route fees
+  are quoted in USD, and restating them in SAR/QAR is a new price figure
+  requiring founder approval.
+
 - **Retention is instrumented before anything scales (P4)** — three
   SECURITY INVOKER views make the numbers the reframe depends on
   queryable from customer one: monthly cohort logo retention for Comply,

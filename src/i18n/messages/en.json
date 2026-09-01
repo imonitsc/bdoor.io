@@ -554,6 +554,8 @@
       "documentsTitle": "Documents you should expect to provide",
       "documentsNote": "The appointed provider confirms the exact list for your case; nothing is uploaded until identity collection opens for your engagement.",
       "obligationsTitle": "Ongoing obligations after formation",
+      "obligationsFromRules": "Generated from our published rules corpus. Each rule shows its own review date; regulatory titles are shown as published and are not machine-translated.",
+      "ruleReviewed": "last reviewed {date}",
       "faqTitle": "Common questions",
       "guideReviewed": "Guide content last reviewed {date}. Authority sources are kept in our source ledger and re-verified before any quotation.",
       "applyTitle": "Start your application",

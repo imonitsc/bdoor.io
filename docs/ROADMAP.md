@@ -151,11 +151,16 @@ subscribers who onboarded in July?"
 
 ## P5 — Country pages become one template
 
-**Exists:** UAE is fully built and is the right shape. The other five vary.
+**Exists:** all six international pages already render from one template
+(`countries/[country]/page.tsx`) over the catalog and guide data — the premise "UAE is
+fully built, the other five vary" was wrong; the variance was data completeness plus
+country lists hardcoded in navigation and the sitemap. _(Corrected 1 Sep 2026 per the
+code-is-the-fact rule.)_
 
-**Build:** generate all six from the same jurisdiction + routes + rules data. A new country
+**Build:** derive footer and sitemap country entries from the catalog so a new country
 becomes a data task (see `/add-jurisdiction`). Ongoing-obligations sections render from P1
-rules.
+rules, each with its own review date, falling back to the human-reviewed guide prose while
+a jurisdiction's corpus is empty.
 
 **Done when:** adding a seventh country requires no new component.
 

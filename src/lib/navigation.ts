@@ -119,14 +119,13 @@ export const FOOTER_BANGLADESH_LINKS = [
   { href: MARKETING_ROUTES.industries, labelKey: 'nav.industries' },
 ] as const;
 
+/**
+ * Only the overview lives here; the per-country rows derive from the
+ * catalog via `countryFooterLinks()` (src/content/international.ts), so a
+ * new country is a data task, not a navigation edit (ROADMAP P5).
+ */
 export const FOOTER_COUNTRY_LINKS = [
   { href: MARKETING_ROUTES.countries, labelKey: 'footer.links.countriesOverview' },
-  { href: '/countries/usa', labelKey: 'footer.links.unitedStates' },
-  { href: '/countries/uk', labelKey: 'footer.links.unitedKingdom' },
-  { href: '/countries/uae', labelKey: 'footer.links.uae' },
-  { href: '/countries/saudi-arabia', labelKey: 'footer.links.saudiArabia' },
-  { href: '/countries/qatar', labelKey: 'footer.links.qatar' },
-  { href: '/countries/singapore', labelKey: 'footer.links.singapore' },
 ] as const;
 
 export const FOOTER_COMPANY_LINKS = [
@@ -186,14 +185,9 @@ export const SITEMAP_ROUTES: ReadonlyArray<{
   { path: '/products/comply', priority: 0.7, changeFrequency: 'monthly' },
   { path: '/services', priority: 0.9, changeFrequency: 'weekly' },
   { path: '/industries', priority: 0.8, changeFrequency: 'monthly' },
+  // Country child paths derive from the catalog in src/app/sitemap.ts
+  // (countrySitemapEntries) — never hardcoded here; a drift test enforces it.
   { path: '/countries', priority: 0.7, changeFrequency: 'monthly' },
-  { path: '/countries/bangladesh', priority: 0.7, changeFrequency: 'monthly' },
-  { path: '/countries/usa', priority: 0.6, changeFrequency: 'monthly' },
-  { path: '/countries/uk', priority: 0.6, changeFrequency: 'monthly' },
-  { path: '/countries/uae', priority: 0.6, changeFrequency: 'monthly' },
-  { path: '/countries/saudi-arabia', priority: 0.6, changeFrequency: 'monthly' },
-  { path: '/countries/qatar', priority: 0.6, changeFrequency: 'monthly' },
-  { path: '/countries/singapore', priority: 0.6, changeFrequency: 'monthly' },
   { path: '/authorities', priority: 0.6, changeFrequency: 'monthly' },
   { path: '/foreign-founders', priority: 0.8, changeFrequency: 'monthly' },
   { path: '/pricing', priority: 0.8, changeFrequency: 'monthly' },

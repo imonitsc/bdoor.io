@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { locales } from '@/i18n/routing';
 import { SITEMAP_ROUTES } from '@/lib/navigation';
+import { countrySitemapEntries } from '@/content/international';
 import { getResources, getServices } from '@/features/catalog/queries';
 import { localizedUrl } from '@/lib/site';
 
@@ -21,6 +22,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: undefined as Date | undefined,
   }));
 
+  // Country pages derive from the catalog (ROADMAP P5): a new country
+  // reaches the sitemap without a navigation edit.
+  const countryPaths = countrySitemapEntries().map((entry) => ({
+    path: entry.path,
+    priority: entry.priority,
+    changeFrequency: 'monthly' as const,
+    lastModified: undefined as Date | undefined,
+  }));
+
   const servicePaths = services
     .filter((service) => service.status === 'published')
     .map((service) => ({
@@ -37,7 +47,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: resource.publishedAt ? new Date(resource.publishedAt) : undefined,
   }));
 
-  return [...staticPaths, ...servicePaths, ...resourcePaths].flatMap((entry) =>
+  return [...staticPaths, ...countryPaths, ...servicePaths, ...resourcePaths].flatMap((entry) =>
     locales.map((locale) => ({
       url: localizedUrl(locale, entry.path),
       lastModified: entry.lastModified,

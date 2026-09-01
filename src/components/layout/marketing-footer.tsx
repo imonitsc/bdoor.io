@@ -1,4 +1,4 @@
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Mail } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import {
@@ -9,6 +9,7 @@ import {
   FOOTER_PROFESSIONALS_LINKS,
   MARKETING_ROUTES,
 } from '@/lib/navigation';
+import { countryFooterLinks } from '@/content/international';
 import { activeSocialProfiles } from '@/lib/social/profiles';
 import { BDoorLogo } from './logo';
 import { LocaleSwitcher } from './locale-switcher';
@@ -46,6 +47,7 @@ function FooterColumn({
 
 export function MarketingFooter() {
   const t = useTranslations();
+  const locale = useLocale();
   const year = new Date().getFullYear();
   const socialProfiles = activeSocialProfiles();
 
@@ -74,7 +76,15 @@ export function MarketingFooter() {
           />
           <FooterColumn
             heading={t('footer.countriesHeading')}
-            links={FOOTER_COUNTRY_LINKS.map((l) => ({ href: l.href, label: t(l.labelKey) }))}
+            links={[
+              ...FOOTER_COUNTRY_LINKS.map((l) => ({ href: l.href, label: t(l.labelKey) })),
+              // Derived from the catalog (ROADMAP P5): a new country appears
+              // here without touching navigation.
+              ...countryFooterLinks().map((l) => ({
+                href: l.href,
+                label: locale === 'bn' ? l.name.bn : l.name.en,
+              })),
+            ]}
           />
           <div className="flex flex-col gap-8">
             <FooterColumn

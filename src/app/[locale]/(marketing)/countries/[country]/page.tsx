@@ -16,6 +16,7 @@ import {
 } from '@/content/international';
 import { offersForCountry } from '@/content/packages/catalog';
 import { countryGuideBySlug } from '@/content/countries/guides';
+import { publishedRulesForJurisdiction } from '@/features/compliance/published-rules';
 import type { Locale } from '@/features/catalog/types';
 import { MARKETING_ROUTES } from '@/lib/navigation';
 import { localizedUrl } from '@/lib/site';
@@ -79,6 +80,11 @@ export default async function InternationalCountryPage({
   const { offer } = country;
   const routes = offersForCountry(country.slug);
   const guide = countryGuideBySlug(country.slug);
+  // ROADMAP P5.3 / P1.3: the ongoing-obligations section is a view over the
+  // published rules corpus wherever a jurisdiction has one, each rule with
+  // its own review date; the human-reviewed guide prose remains the fallback
+  // until analysts populate the corpus for this jurisdiction.
+  const jurisdictionRules = await publishedRulesForJurisdiction(country.code);
 
   return (
     <>
@@ -207,14 +213,38 @@ export default async function InternationalCountryPage({
                 <p className="text-muted mt-3 text-xs leading-relaxed">{t('documentsNote')}</p>
 
                 <h2 className="text-ink mt-10 text-xl font-semibold">{t('obligationsTitle')}</h2>
-                <ul className="mt-3 flex flex-col gap-2.5">
-                  {guide.obligations.map((item) => (
-                    <li key={item.en} className="text-ink flex items-start gap-2.5 text-sm">
-                      <Check className="text-accent mt-1 size-4 shrink-0" aria-hidden="true" />
-                      <span className="leading-relaxed">{pickText(item, loc)}</span>
-                    </li>
-                  ))}
-                </ul>
+                {jurisdictionRules.length > 0 ? (
+                  <>
+                    <ul className="mt-3 flex flex-col gap-2.5">
+                      {jurisdictionRules.map((rule) => (
+                        <li key={rule.id} className="text-ink flex items-start gap-2.5 text-sm">
+                          <Check className="text-accent mt-1 size-4 shrink-0" aria-hidden="true" />
+                          <span className="leading-relaxed">
+                            {rule.title}
+                            <span className="text-muted block text-xs">
+                              {rule.authority}
+                              {rule.lastReviewed
+                                ? ` · ${t('ruleReviewed', { date: rule.lastReviewed })}`
+                                : ''}
+                            </span>
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="text-muted mt-3 text-xs leading-relaxed">
+                      {t('obligationsFromRules')}
+                    </p>
+                  </>
+                ) : (
+                  <ul className="mt-3 flex flex-col gap-2.5">
+                    {guide.obligations.map((item) => (
+                      <li key={item.en} className="text-ink flex items-start gap-2.5 text-sm">
+                        <Check className="text-accent mt-1 size-4 shrink-0" aria-hidden="true" />
+                        <span className="leading-relaxed">{pickText(item, loc)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
 
                 <h2 className="text-ink mt-10 text-xl font-semibold">{t('faqTitle')}</h2>
                 <div className="mt-3 flex flex-col gap-2">
