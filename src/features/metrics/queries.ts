@@ -135,3 +135,84 @@ export async function loadSnapshots(limit = 12): Promise<SnapshotRow[]> {
     .limit(limit);
   return (data ?? []) as SnapshotRow[];
 }
+
+// ---------------------------------------------------------------------------
+// Retention instrumentation (ROADMAP P4). All three read SECURITY INVOKER
+// views, so the caller's staff RLS is what aggregates — same posture as
+// every other read in this module. Definitions: docs/METRIC_DEFINITIONS.md.
+// ---------------------------------------------------------------------------
+
+export type RetentionCohortRow = {
+  cohortMonth: string;
+  monthsSince: number;
+  retained: number;
+  cohort: number;
+  rate: number;
+};
+
+export async function loadRetentionCohorts(): Promise<RetentionCohortRow[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from('metrics_comply_retention')
+    .select(
+      'cohort_month, months_since, retained_organizations, cohort_organizations, retention_rate',
+    )
+    .order('cohort_month')
+    .order('months_since')
+    .limit(ROW_CAP);
+  return (data ?? []).map((row) => ({
+    cohortMonth: row.cohort_month ?? '',
+    monthsSince: row.months_since ?? 0,
+    retained: row.retained_organizations ?? 0,
+    cohort: row.cohort_organizations ?? 0,
+    rate: Number(row.retention_rate ?? 0),
+  }));
+}
+
+export type ObligationEngagementRow = {
+  dueMonth: string;
+  obligations: number;
+  reminded: number;
+  opened: number;
+  acted: number;
+  filed: number;
+};
+
+export async function loadObligationEngagement(limit = 12): Promise<ObligationEngagementRow[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from('metrics_obligation_engagement')
+    .select('due_month, obligations, reminded, opened, acted, filed')
+    .order('due_month', { ascending: false })
+    .limit(limit);
+  return (data ?? []).map((row) => ({
+    dueMonth: row.due_month ?? '',
+    obligations: row.obligations ?? 0,
+    reminded: row.reminded ?? 0,
+    opened: row.opened ?? 0,
+    acted: row.acted ?? 0,
+    filed: row.filed ?? 0,
+  }));
+}
+
+export type RenewalConversionRow = {
+  offeredMonth: string;
+  offered: number;
+  accepted: number;
+  completed: number;
+};
+
+export async function loadRenewalConversion(limit = 12): Promise<RenewalConversionRow[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from('metrics_renewal_conversion')
+    .select('offered_month, offered, accepted, completed')
+    .order('offered_month', { ascending: false })
+    .limit(limit);
+  return (data ?? []).map((row) => ({
+    offeredMonth: row.offered_month ?? '',
+    offered: row.offered ?? 0,
+    accepted: row.accepted ?? 0,
+    completed: row.completed ?? 0,
+  }));
+}

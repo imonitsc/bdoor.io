@@ -1852,6 +1852,8 @@ export type Database = {
           "sent_at": string | null
           "failed_at": string | null
           "failure_reason": string | null
+          "notification_id": string | null
+          "opened_at": string | null
           "created_at": string
         }
         Insert: {
@@ -1863,6 +1865,8 @@ export type Database = {
           "sent_at"?: string | null
           "failed_at"?: string | null
           "failure_reason"?: string | null
+          "notification_id"?: string | null
+          "opened_at"?: string | null
           "created_at"?: string
         }
         Update: {
@@ -1874,6 +1878,8 @@ export type Database = {
           "sent_at"?: string | null
           "failed_at"?: string | null
           "failure_reason"?: string | null
+          "notification_id"?: string | null
+          "opened_at"?: string | null
           "created_at"?: string
         }
         Relationships: []
@@ -5551,6 +5557,36 @@ export type Database = {
           "name": string | null
           "practice_type": string | null
           "geographic_coverage": string[] | null
+        }
+        Relationships: []
+      }
+      "metrics_comply_retention": {
+        Row: {
+          "cohort_month": string | null
+          "months_since": number | null
+          "retained_organizations": number | null
+          "cohort_organizations": number | null
+          "retention_rate": number | null
+        }
+        Relationships: []
+      }
+      "metrics_obligation_engagement": {
+        Row: {
+          "due_month": string | null
+          "obligations": number | null
+          "reminded": number | null
+          "opened": number | null
+          "acted": number | null
+          "filed": number | null
+        }
+        Relationships: []
+      }
+      "metrics_renewal_conversion": {
+        Row: {
+          "offered_month": string | null
+          "offered": number | null
+          "accepted": number | null
+          "completed": number | null
         }
         Relationships: []
       }

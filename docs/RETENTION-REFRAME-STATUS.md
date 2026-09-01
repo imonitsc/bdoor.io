@@ -232,3 +232,34 @@ Deliberately absent, and why:
   cannot yet be represented at all. That refactor (typed identifier
   collection per §6 included) belongs with the P5 jurisdiction template
   work, not squeezed in here.
+
+## Addendum — P4 increment shipped (retention instrumentation)
+
+The numbers the reframe stands on are now queryable from customer one:
+
+1. **Cohort logo retention** (`metrics_comply_retention`). Cohort = the
+   month an organisation's first subscription activated; retained at
+   month N = a paid or waived service period overlaps that calendar
+   month. Computed from `subscription_periods` — the billed record —
+   never from the mutable status column, so the figure is
+   reconstructable forever; sandbox activations are excluded. The
+   roadmap's "done when" is literally one query (docs/METRIC_DEFINITIONS.md).
+2. **Obligation engagement** (`metrics_obligation_engagement`): reminded
+   → opened → acted → filed per due month. `compliance_reminders` gains
+   `notification_id` and `opened_at` ahead of the reminder dispatcher —
+   which still does not exist (scheduling logic does, sending does not)
+   and is now the clearest operational gap the funnel itself exposes.
+3. **Renewal conversion** (`metrics_renewal_conversion`): offered →
+   accepted → completed. Renewal-case generation also does not exist
+   yet; the take rate is instrumented first, per the P4 ordering, so it
+   is measured from the very first case.
+
+All three are SECURITY INVOKER views (staff RLS aggregates; no new
+grants, no SECURITY DEFINER), rendered on /admin/metrics behind
+`metrics.read`, and fixture-asserted in integration tests.
+
+Not included, and why: a jurisdiction dimension on the cohort view —
+entities carry no jurisdiction column yet (BD by construction), so the
+dimension would be a hardcoded constant; it becomes real with the
+jurisdiction-typed entity work (P5). Today "BD Comply subscribers" is
+all subscribers, and the query still answers exactly.
