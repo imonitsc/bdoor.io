@@ -47,6 +47,8 @@ export type AuditAction =
   | 'payment.created'
   | 'payment.status_changed'
   | 'payment.reconciled'
+  | 'subscription.checkout_started'
+  | 'subscription.activated'
   | 'refund.requested'
   | 'refund.approved'
   | 'disbursement.recorded'

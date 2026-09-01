@@ -3808,7 +3808,8 @@ export type Database = {
         Row: {
           "id": string
           "invoice_id": string | null
-          "case_id": string
+          "case_id": string | null
+          "subscription_id": string | null
           "organization_id": string
           "provider": string
           "provider_ref": string | null
@@ -3827,7 +3828,8 @@ export type Database = {
         Insert: {
           "id"?: string
           "invoice_id"?: string | null
-          "case_id": string
+          "case_id"?: string | null
+          "subscription_id"?: string | null
           "organization_id": string
           "provider": string
           "provider_ref"?: string | null
@@ -3846,7 +3848,8 @@ export type Database = {
         Update: {
           "id"?: string
           "invoice_id"?: string | null
-          "case_id"?: string
+          "case_id"?: string | null
+          "subscription_id"?: string | null
           "organization_id"?: string
           "provider"?: string
           "provider_ref"?: string | null

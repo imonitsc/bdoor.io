@@ -5,6 +5,16 @@ first; each entry names its merged pull requests. Dates are merge dates.
 
 ## 2026-09-01
 
+- **bdoor Comply is purchasable (P0 machinery)** — a customer owner can
+  subscribe from the workspace: narrow RLS lets them create their own
+  `pending_activation` subscription and pending payment, checkout runs
+  through the payments abstraction, and the webhook activates on a
+  verified payment. Recurring pricing cards gain a Subscribe door,
+  `?segment=existing_business` deep-links the pricing tab, /products/comply
+  publishes the two approved recurring figures, and the dashboard offers
+  Comply after a delivered case. Live charging stays behind the launch
+  gates and recorded approval.
+
 - **The site-grounded contract and the roadmap** — the founder's revised
   CLAUDE.md (written against the live site: product vocabulary, positioning
   lines, the Entity–Obligation–Rule–Case diagram, source-ledger

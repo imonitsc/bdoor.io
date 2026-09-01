@@ -42,6 +42,13 @@ export type PackageVersion = {
   status: PackageStatus;
   checkoutEnabled: boolean;
   priceType: PriceType;
+  /**
+   * Present only on recurring packages: the cadence the published figure
+   * bills at, mirroring `subscription_plans.billing_period`. Its absence
+   * means a one-off fee. A card with a billingPeriod renders a subscribe
+   * path, not "Start assessment".
+   */
+  billingPeriod?: 'month' | 'year';
   publicLabel: { en: string; bn: string };
   summary: { en: string; bn: string };
   inclusions: Array<{ en: string; bn: string }>;

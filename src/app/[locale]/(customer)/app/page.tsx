@@ -20,6 +20,7 @@ import { CaseCard } from '@/components/dashboard/case-card';
 import { DocumentStatusBadge } from '@/components/dashboard/status-badge';
 import { requireCustomerOrganization } from '@/lib/auth/require-organization';
 import { listCases } from '@/features/cases/queries';
+import { getComplySubscriptionState } from '@/features/comply/queries';
 import { createClient } from '@/lib/supabase/server';
 import { needsCustomerAction } from '@/features/cases/state-machine';
 import { daysUntil } from '@/features/cases/deadlines';
@@ -31,7 +32,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [{ session, active }, t, tCommon, tCompliance, tDocuments, tCase, format] =
+  const [{ session, active }, t, tCommon, tCompliance, tDocuments, tCase, tComply, format] =
     await Promise.all([
       requireCustomerOrganization(),
       getTranslations('workspace.dashboard'),
@@ -39,36 +40,46 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
       getTranslations('workspace.compliance'),
       getTranslations('workspace.documents'),
       getTranslations('workspace.case'),
+      getTranslations('workspace.comply'),
       getFormatter(),
     ]);
 
   const supabase = await createClient();
 
-  const [cases, requestsResult, obligationsResult, receiptsResult, unreadResult] =
-    await Promise.all([
-      listCases(),
-      supabase
-        .from('document_requests')
-        .select('id, label_en, label_bn, status, due_on, case_id')
-        .in('status', ['requested', 'replacement_requested'])
-        .order('due_on', { nullsFirst: false })
-        .limit(6),
-      supabase
-        .from('compliance_obligations')
-        .select('id, label_en, label_bn, due_on, status, authority_name')
-        .in('status', ['upcoming', 'due', 'overdue'])
-        .order('due_on')
-        .limit(5),
-      supabase
-        .from('receipts')
-        .select('id, kind, number, issued_on, amount_minor, currency')
-        .order('issued_on', { ascending: false })
-        .limit(4),
-      supabase
-        .from('notifications')
-        .select('id', { count: 'exact', head: true })
-        .is('read_at', null),
-    ]);
+  const [
+    cases,
+    subscriptionState,
+    doneCasesResult,
+    requestsResult,
+    obligationsResult,
+    receiptsResult,
+    unreadResult,
+  ] = await Promise.all([
+    listCases(),
+    getComplySubscriptionState(),
+    supabase
+      .from('cases')
+      .select('id', { count: 'exact', head: true })
+      .in('status', ['approved', 'closed']),
+    supabase
+      .from('document_requests')
+      .select('id, label_en, label_bn, status, due_on, case_id')
+      .in('status', ['requested', 'replacement_requested'])
+      .order('due_on', { nullsFirst: false })
+      .limit(6),
+    supabase
+      .from('compliance_obligations')
+      .select('id, label_en, label_bn, due_on, status, authority_name')
+      .in('status', ['upcoming', 'due', 'overdue'])
+      .order('due_on')
+      .limit(5),
+    supabase
+      .from('receipts')
+      .select('id, kind, number, issued_on, amount_minor, currency')
+      .order('issued_on', { ascending: false })
+      .limit(4),
+    supabase.from('notifications').select('id', { count: 'exact', head: true }).is('read_at', null),
+  ]);
 
   const requests = requestsResult.data ?? [];
   const obligations = obligationsResult.data ?? [];
@@ -76,6 +87,12 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
   const unread = unreadResult.count ?? 0;
 
   const actionCases = cases.filter((c) => needsCustomerAction(c.status));
+  // Attach at formation (ROADMAP P0.2): a case that reached the authority and
+  // came back approved — or was closed as delivered — is the moment Comply is
+  // the next step. Counted directly because listCases() hides closed cases
+  // from the display list. Offered only while no subscription exists; never
+  // a nag on an organisation that already pays.
+  const offerComply = (doneCasesResult.count ?? 0) > 0 && subscriptionState.kind === 'none';
   const nextMilestoneCase = cases.find((c) => c.estimate.available && !c.estimate.paused);
   const now = new Date();
   const label = (en: string, bn: string) => (locale === 'bn' ? bn : en);
@@ -141,6 +158,20 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
               </li>
             ))}
           </ul>
+        </Alert>
+      ) : null}
+
+      {offerComply ? (
+        <Alert tone="info" title={tComply('offerTitle')}>
+          <p className="mt-1">{tComply('offerBody')}</p>
+          <p className="mt-2">
+            <Link
+              href="/app/compliance"
+              className="rounded font-medium underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+            >
+              {tComply('offerCta')}
+            </Link>
+          </p>
         </Alert>
       ) : null}
 

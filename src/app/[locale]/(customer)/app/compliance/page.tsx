@@ -5,23 +5,41 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PageHeading } from '@/components/dashboard/page-heading';
+import { Alert } from '@/components/ui/alert';
+import { ComplyPanel } from '@/components/dashboard/comply-panel';
 import { requireCustomerOrganization } from '@/lib/auth/require-organization';
 import { createClient } from '@/lib/supabase/server';
 import { daysUntil } from '@/features/cases/deadlines';
 import { groupObligations } from '@/features/compliance/groups';
+import { getComplySubscriptionState } from '@/features/comply/queries';
+import { listComplyPlans } from '@/features/comply/plans';
+import { bangladeshCheckoutStatus, paymentsStatus } from '@/lib/launch/gates';
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
-export default async function CompliancePage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function CompliancePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ payment?: string | string[] }>;
+}) {
   const { locale } = await params;
   setRequestLocale(locale);
-  await requireCustomerOrganization();
+  const { active } = await requireCustomerOrganization();
+  const { payment } = await searchParams;
+  const paymentResult = typeof payment === 'string' ? payment : undefined;
 
-  const [t, tCommon, format] = await Promise.all([
+  const [t, tComply, tCommon, format, subscriptionState, plans] = await Promise.all([
     getTranslations('workspace.compliance'),
+    getTranslations('workspace.comply'),
     getTranslations('common'),
     getFormatter(),
+    getComplySubscriptionState(),
+    listComplyPlans(),
   ]);
+
+  const paymentsOpen = paymentsStatus() === 'enabled' && bangladeshCheckoutStatus() === 'enabled';
 
   const supabase = await createClient();
   const { data } = await supabase
@@ -45,6 +63,19 @@ export default async function CompliancePage({ params }: { params: Promise<{ loc
   return (
     <div className="flex flex-col gap-6">
       <PageHeading title={t('title')} />
+
+      {paymentResult === 'success' ? (
+        <Alert tone="success">{tComply('paymentSuccess')}</Alert>
+      ) : paymentResult === 'cancelled' ? (
+        <Alert tone="warning">{tComply('paymentCancelled')}</Alert>
+      ) : null}
+
+      <ComplyPanel
+        state={subscriptionState}
+        plans={plans}
+        canSubscribe={active.role === 'customer_owner'}
+        paymentsOpen={paymentsOpen}
+      />
 
       {obligations.length === 0 ? (
         <EmptyState icon={<CalendarCheck className="size-5" />} title={t('noObligations')} />

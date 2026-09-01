@@ -1,6 +1,8 @@
 export type CheckoutRequest = {
-  invoiceId: string;
-  caseId: string;
+  /** Exactly one target: an invoice on a case, or a subscription activation. */
+  invoiceId?: string;
+  caseId?: string;
+  subscriptionId?: string;
   organizationId: string;
   amountMinor: number;
   currency: 'BDT' | 'USD';

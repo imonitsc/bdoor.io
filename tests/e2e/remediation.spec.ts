@@ -95,6 +95,35 @@ test.describe('one commercial source of truth', () => {
       page.getByText('BDT 49,900/year + official, audit and specialist fees'),
     ).toBeVisible();
     await expect(page.getByText('From BDT 11,900/month')).toBeVisible();
+
+    // ROADMAP P0: the recurring packages are bdoor Comply and their door is
+    // the subscription, not a formation assessment — while the one-off
+    // Compliance Check keeps the assessment CTA.
+    await expect(page.getByRole('link', { name: 'Subscribe' })).toHaveCount(2);
+    const complianceCheckCard = page
+      .getByRole('article')
+      .filter({ has: page.getByRole('heading', { name: 'Compliance Check' }) });
+    await expect(complianceCheckCard.getByRole('link', { name: 'Start assessment' })).toBeVisible();
+  });
+
+  test('?segment=existing_business deep-links an existing business to its tab', async ({
+    page,
+  }) => {
+    await page.goto('/en/pricing?segment=existing_business');
+    await expect(page.getByRole('heading', { name: 'Annual Compliance' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Solo Start' })).toHaveCount(0);
+  });
+
+  test('/products/comply publishes the two approved recurring figures, nothing else', async ({
+    page,
+  }) => {
+    await page.goto('/en/products/comply');
+    await expect(
+      page.getByText('BDT 49,900/year + official, audit and specialist fees'),
+    ).toBeVisible();
+    await expect(page.getByText('From BDT 11,900/month')).toBeVisible();
+    // The fee-layer line and the §4.8 honesty line both survive.
+    await expect(page.getByText('the only line bdoor keeps').first()).toBeVisible();
   });
 
   test('the old 25,000 incorporation price is gone from public pages', async ({ page }) => {

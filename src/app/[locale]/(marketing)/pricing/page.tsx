@@ -44,10 +44,20 @@ export async function generateMetadata({
   };
 }
 
-export default async function PricingPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function PricingPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ segment?: string | string[] }>;
+}) {
   const { locale } = await params;
   setRequestLocale(locale);
   const loc = locale as Locale;
+  // ?segment=existing_business deep-links an existing business straight to
+  // its own tab — the entry the Comply funnel and the ROADMAP P0 rely on.
+  const { segment } = await searchParams;
+  const initialSegment = segment === 'existing_business' ? 'existing_business' : undefined;
 
   const [t, format, usdNotes] = await Promise.all([
     getTranslations('pricingPage'),
@@ -69,7 +79,7 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
       <Section className="py-12 md:py-16">
         <div className="container-page">
           <p className="text-muted max-w-2xl text-base leading-relaxed">{t('intro')}</p>
-          <PackageSelector locale={loc} usdNotes={usdNotes} />
+          <PackageSelector locale={loc} usdNotes={usdNotes} initialSegment={initialSegment} />
           <p className="text-muted mt-6 text-xs">
             {t('reviewedOn', {
               date: format.dateTime(new Date(COMMERCIAL_REVIEW_DATE), 'long'),

@@ -391,7 +391,8 @@
     "seeDetails": "See full details",
     "includes": "Included",
     "excludes": "Not included",
-    "approxUsd": "About ${amount} · Rate checked {date}"
+    "approxUsd": "About ${amount} · Rate checked {date}",
+    "subscribeCta": "Subscribe"
   },
   "services": {
     "indexTitle": "Services",
@@ -1231,6 +1232,38 @@
     "bdoorId": {
       "label": "bdoor ID",
       "privacy": "Your bdoor ID is a private bdoor platform reference for this business. It is not a government identifier or a credit rating, and it is never published — verification, if you ever want it, is a separate opt-in."
+    },
+    "comply": {
+      "title": "bdoor Comply",
+      "pitch": "A subscription keeps the obligations calendar, reminders and renewal cases running for your company.",
+      "subscribe": "Subscribe",
+      "subscribing": "Redirecting…",
+      "per": {
+        "month": "/month",
+        "year": "/year"
+      },
+      "status": {
+        "active": "{plan} is active.",
+        "pending": "{plan} is awaiting payment confirmation.",
+        "past_due": "{plan} has a payment past due.",
+        "paused": "{plan} is paused."
+      },
+      "pendingNote": "The subscription activates when the payment is confirmed. Retrying uses the same checkout — nothing is charged twice.",
+      "paymentsClosed": "Online payment is not open yet. Contact us to arrange onboarding for your company.",
+      "ownerOnlyNote": "Only an organisation owner can start a subscription.",
+      "feeLayerNote": "The subscription is the bdoor professional fee — the only line bdoor keeps. Government, audit and specialist amounts are itemised separately on each filing.",
+      "paymentSuccess": "Payment received. The subscription activates as soon as the provider confirms it.",
+      "paymentCancelled": "The payment was cancelled. Nothing was charged.",
+      "offerTitle": "Formation is done — keep the company compliant",
+      "offerBody": "The obligations calendar can now run under bdoor Comply: reminders, renewals and annual filings for your company.",
+      "offerCta": "See Comply plans",
+      "errors": {
+        "generic": "Something went wrong. Please try again.",
+        "paymentsNotOpen": "Online payment is not open yet.",
+        "ownerOnly": "Only an organisation owner can start a subscription.",
+        "notFound": "That plan is no longer available.",
+        "alreadySubscribed": "Your organisation already has a subscription."
+      }
     }
   },
   "partnerWorkspace": {
@@ -2333,7 +2366,14 @@
           "body": "A specialist takes it up; you approve before anything is filed."
         }
       },
-      "honesty": "bdoor Comply shows the state of your obligations as bdoor tracks them; it is not an official government good-standing status. Nothing is filed without your information, your approval and, where the law requires it, an independent qualified professional."
+      "honesty": "bdoor Comply shows the state of your obligations as bdoor tracks them; it is not an official government good-standing status. Nothing is filed without your information, your approval and, where the law requires it, an independent qualified professional.",
+      "subscribeCta": "Subscribe in your workspace",
+      "plans": {
+        "eyebrow": "Pricing",
+        "title": "Two published plans",
+        "note": "The subscription is the bdoor professional fee — the only line bdoor keeps. Government, audit and specialist amounts are itemised separately on each filing before you approve it.",
+        "seePricing": "See pricing"
+      }
     }
   }
 }
