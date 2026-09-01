@@ -5,6 +5,19 @@ first; each entry names its merged pull requests. Dates are merge dates.
 
 ## 2026-09-01
 
+- **Retention is instrumented before anything scales (P4)** — three
+  SECURITY INVOKER views make the numbers the reframe depends on
+  queryable from customer one: monthly cohort logo retention for Comply,
+  computed from paid/waived service periods (never the mutable status
+  column) with sandbox activations excluded; the obligation engagement
+  funnel (reminded → opened → acted → filed, with instrumentation-ready
+  `opened_at`/`notification_id` columns on reminders ahead of the
+  dispatcher); and renewal-case offered → accepted → completed — the
+  take rate, measured before the generator exists so it is never
+  retrofitted. All three render on /admin/metrics, every figure is
+  fixture-asserted, and the roadmap's "done when" is one SQL query in
+  docs/METRIC_DEFINITIONS.md.
+
 - **Import an existing entity from its identifiers (P3)** — the
   existing-entity Comply entry now takes what the company already has:
   RJSC registration number, e-TIN and BIN (permissive validation — registry

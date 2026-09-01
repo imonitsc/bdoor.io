@@ -42,3 +42,22 @@ values with the definition version used, who computed it and when. Snapshots
 are the numbers used in investor conversations; the live dashboard recomputes
 on demand and may differ from a snapshot as late data arrives — the snapshot
 is never edited to match.
+
+## Retention instrumentation (ROADMAP P4)
+
+Three SECURITY INVOKER views, added 1 Sep 2026; the caller's staff RLS is
+what aggregates. Fixture-asserted in `tests/integration/retention-metrics.test.ts`.
+
+| Metric                          | Definition                                                                                                                                                                                                                                                                                                                                                                                  |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `metrics_comply_retention`      | Monthly cohort **logo retention**. Cohort = the month an organisation's first subscription activated (`started_at`), sandbox activations excluded. Retained at month N = some `subscription_periods` row with status `paid` or `waived` overlaps calendar month (cohort + N). Computed from the billed record, never the mutable `status` column, so the number is reconstructable forever. |
+| `metrics_obligation_engagement` | Per due month: obligations, reminded (a reminder with `sent_at`), opened (`opened_at`; zero until the reminder dispatcher and read handler land — the columns ship first so the funnel is never retrofitted), acted (status `in_progress`/`completed`/`waived`), filed (`completed`).                                                                                                       |
+| `metrics_renewal_conversion`    | Per offered month: offered = renewal cases created; accepted = case moved past `draft` and not `cancelled` (an authority rejection still counts as accepted — the filing failing is not the offer failing); completed = `approved` or `closed`. Reads zero until renewal-case generation exists.                                                                                            |
+
+The P4 "done when" query — month-3 logo retention for subscribers who
+onboarded in July:
+
+```sql
+select retention_rate from public.metrics_comply_retention
+where cohort_month = '2026-07-01' and months_since = 3;
+```

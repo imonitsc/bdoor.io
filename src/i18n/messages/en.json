@@ -1607,7 +1607,30 @@
       "snapshotNote": "Note (optional)",
       "recordSnapshot": "Record snapshot",
       "snapshotRecorded": "Snapshot recorded. Snapshots are append-only; a recomputation adds a new row.",
-      "invalidMonth": "Enter the month as YYYY-MM."
+      "invalidMonth": "Enter the month as YYYY-MM.",
+      "retention": {
+        "cohorts": "Comply cohort retention",
+        "cohort": "Cohort",
+        "size": "Orgs",
+        "noCohorts": "No subscription cohorts yet. The table populates from the first activated subscription.",
+        "cohortNote": "Logo retention per onboarding month, from paid or waived service periods — never from the mutable status column. Sandbox activations excluded.",
+        "engagement": "Obligation engagement",
+        "dueMonth": "Due month",
+        "obligations": "Total",
+        "reminded": "Reminded",
+        "opened": "Opened",
+        "acted": "Acted",
+        "filed": "Filed",
+        "noEngagement": "No obligations yet. Rows appear as the calendar is generated from published rules.",
+        "engagementNote": "Reminded and opened stay at zero until the reminder dispatcher lands; the drop-off between columns is the product roadmap.",
+        "renewals": "Renewal conversion",
+        "month": "Month",
+        "offered": "Offered",
+        "accepted": "Accepted",
+        "completed": "Completed",
+        "noRenewals": "No renewal cases yet. Instrumented ahead of the generator so the take rate is measured from case one.",
+        "renewalNote": "Accepted = the case moved past draft and was not cancelled. A later authority rejection still counts as accepted."
+      }
     },
     "ai": {
       "title": "AI Management",
