@@ -69,16 +69,42 @@ test.describe('signing up', () => {
 });
 
 test.describe('signing in', () => {
+  // Two forms on the page, an email field in each. Everything here scopes to
+  // one of them by its accessible name rather than by `input[name="email"]`.
   test('submits without hitting the error boundary', async ({ page }) => {
     await page.goto('/en/login');
 
-    await page.fill('input[name="email"]', 'e2e-login@example.test');
-    await page.fill('input[name="password"]', 'a-long-enough-password');
-    await page.getByRole('button', { name: /sign in|log in/i }).click();
+    // `exact` matters: accessible-name matching is a substring match, so
+    // plain 'Sign in' also matches 'Sign in with a link'.
+    const form = page.getByRole('form', { name: 'Sign in', exact: true });
+    await form.locator('input[name="email"]').fill('e2e-login@example.test');
+    await form.locator('input[name="password"]').fill('a-long-enough-password');
+    await form.getByRole('button', { name: /sign in|log in/i }).click();
 
     // The credentials are wrong and there is no database; what matters is that
     // the action module loads and the page handles it.
     await expect(page.getByText('Something went wrong')).toHaveCount(0);
     await expect(page).toHaveURL(/\/en\/login/);
+  });
+
+  test('offers a magic link without displacing the password form', async ({ page }) => {
+    await page.goto('/en/login');
+
+    // Password sign-in stays the first thing on the page and keeps its own h1.
+    await expect(page.getByRole('heading', { level: 1, name: 'Sign in' })).toBeVisible();
+
+    const magic = page.getByRole('form', { name: 'Sign in with a link', exact: true });
+    await expect(magic).toBeVisible();
+    // A link is never a way to open an account: the form takes an address and
+    // nothing else, and says so.
+    await expect(magic.locator('input[name="password"]')).toHaveCount(0);
+
+    await magic.locator('input[name="email"]').fill('e2e-magic@example.test');
+    await magic.getByRole('button', { name: /link/i }).click();
+
+    // Registered or not, the caller sees the same conditional answer — the
+    // form must not become a way to find out who has an account.
+    await expect(page.getByText(/if an account exists/i)).toBeVisible();
+    await expect(page.getByText('Something went wrong')).toHaveCount(0);
   });
 });

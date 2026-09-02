@@ -11,6 +11,7 @@ import { Field, FieldControl, FieldDescription, FieldLabel } from '@/components/
 import { Input } from '@/components/ui/input';
 import { useAnnounce } from '@/components/ui/announcer';
 import {
+  requestMagicLink,
   requestPasswordReset,
   signIn,
   signUp,
@@ -60,6 +61,11 @@ export function SignInForm({ next }: { next?: string }) {
   const tCommon = useTranslations('common');
   const [state, action, pending] = useActionState(signIn, INITIAL);
   const { errorRef, tErrors } = useAuthFeedback(state);
+  // The sign-in page now carries two forms with an email field each. Naming
+  // both from their own heading is what keeps them distinguishable to a
+  // screen reader moving by landmark, and to anything else that has to pick
+  // one of them out.
+  const titleId = useId();
 
   const fieldError = (name: string) =>
     state.fieldErrors?.[name] ? tErrors(state.fieldErrors[name]!) : undefined;
@@ -67,11 +73,13 @@ export function SignInForm({ next }: { next?: string }) {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-ink text-2xl font-semibold">{t('signInTitle')}</h1>
+        <h1 id={titleId} className="text-ink text-2xl font-semibold">
+          {t('signInTitle')}
+        </h1>
         <p className="text-muted mt-1.5 text-sm">{t('signInSubtitle')}</p>
       </div>
 
-      <form action={action} className="flex flex-col gap-4" noValidate>
+      <form action={action} aria-labelledby={titleId} className="flex flex-col gap-4" noValidate>
         {next ? <input type="hidden" name="next" value={next} /> : null}
         <FormError state={state} errorRef={errorRef} tErrors={tErrors} />
 
@@ -112,6 +120,69 @@ export function SignInForm({ next }: { next?: string }) {
           </Link>
         </p>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Magic-link sign-in, offered beneath the password form rather than instead of
+ * it. It carries its own email field on purpose: the two forms post to
+ * different actions, and a shared field would make the password form's
+ * required-password validation fire when the caller only wanted a link.
+ *
+ * The success copy is the same whether or not the address has an account —
+ * see `requestMagicLink` for why.
+ */
+export function MagicLinkForm({ next }: { next?: string }) {
+  const t = useTranslations('auth');
+  const tCommon = useTranslations('common');
+  const [state, action, pending] = useActionState(requestMagicLink, INITIAL);
+  const { errorRef, tErrors } = useAuthFeedback(state);
+  const titleId = useId();
+
+  if (state.status === 'success') {
+    return (
+      <Alert tone="info" live="polite">
+        {t('magicLinkSent')}
+      </Alert>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center gap-3">
+        <span className="bg-border h-px flex-1" aria-hidden="true" />
+        <span className="text-muted text-xs font-medium tracking-wide uppercase">
+          {t('orContinueWith')}
+        </span>
+        <span className="bg-border h-px flex-1" aria-hidden="true" />
+      </div>
+
+      <div>
+        <h2 id={titleId} className="text-ink text-base font-semibold">
+          {t('magicLinkTitle')}
+        </h2>
+        <p className="text-muted mt-1 text-sm">{t('magicLinkSubtitle')}</p>
+      </div>
+
+      <form action={action} aria-labelledby={titleId} className="flex flex-col gap-4" noValidate>
+        {next ? <input type="hidden" name="next" value={next} /> : null}
+        <FormError state={state} errorRef={errorRef} tErrors={tErrors} />
+
+        <Field error={state.fieldErrors?.email ? tErrors(state.fieldErrors.email) : undefined}>
+          <FieldLabel required>{t('email')}</FieldLabel>
+          <FieldControl hasDescription={false}>
+            <Input name="email" type="email" autoComplete="email" required />
+          </FieldControl>
+        </Field>
+
+        <Button type="submit" variant="secondary" size="lg" block disabled={pending}>
+          {pending ? tCommon('loading') : t('magicLinkCta')}
+          <Mail className="size-4" aria-hidden="true" />
+        </Button>
+      </form>
+
+      <p className="text-muted text-sm">{t('magicLinkNoAccount')}</p>
     </div>
   );
 }
