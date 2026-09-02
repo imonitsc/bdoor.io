@@ -40,10 +40,23 @@ export const resetRequestSchema = z.object({ email: emailSchema });
 
 /**
  * Magic-link sign-in takes an address and nothing else. It deliberately has no
- * "create my account" affordance: signup is the only path that records the
- * terms and privacy consent versions, so an account may never begin here.
+ * "create my account" affordance: the sign-in link never creates an account,
+ * so consent is always recorded by a signup that asked for it.
  */
 export const magicLinkSchema = z.object({ email: emailSchema });
+
+/**
+ * Passwordless signup: the password form's fields minus the password.
+ *
+ * The terms checkbox stays, and stays required. It is the whole reason this is
+ * a separate schema from `magicLinkSchema` — an account may only ever begin
+ * from a form that asked for consent.
+ */
+export const magicSignUpSchema = z.object({
+  fullName: z.string().trim().min(2, 'nameTooShort').max(120),
+  email: emailSchema,
+  acceptTerms: z.literal(true, { message: 'termsRequired' }),
+});
 
 export const updatePasswordSchema = z
   .object({

@@ -15,11 +15,13 @@ import { POLICY_VERSIONS, recordPolicyConsent } from '@/features/legal/consent';
 import { absoluteUrl } from '@/lib/site';
 import {
   magicLinkSchema,
+  magicSignUpSchema,
   resetRequestSchema,
   signInSchema,
   signUpSchema,
   updatePasswordSchema,
 } from './schema';
+import { authMode, modeAllows, type AuthAction } from './mode';
 
 export type AuthState = {
   status: 'idle' | 'error' | 'success';
@@ -48,12 +50,29 @@ function fieldErrorsFrom(issues: { path: PropertyKey[]; message: string }[]) {
 }
 
 /**
+ * Refuse an action the configured mode does not accept.
+ *
+ * A Server Action is a callable endpoint, so removing the password form from
+ * the page does not remove `signIn` from the deployment. Every action starts
+ * here — the mode is enforced on the server and the UI only decides what to
+ * draw (CLAUDE.md security rule 1).
+ */
+function wrongMode(action: AuthAction): AuthState | null {
+  if (modeAllows(authMode(), action)) return null;
+  logger.warn('auth.action_wrong_mode', { action });
+  return { status: 'error', message: 'generic' };
+}
+
+/**
  * Sign in.
  *
  * The error message is deliberately identical for "no such account" and "wrong
  * password" so the form cannot be used to enumerate registered addresses.
  */
 export async function signIn(_previous: AuthState, formData: FormData): Promise<AuthState> {
+  const refused = wrongMode('signIn');
+  if (refused) return refused;
+
   const parsed = signInSchema.safeParse({
     email: formData.get('email'),
     password: formData.get('password'),
@@ -92,6 +111,9 @@ export async function signIn(_previous: AuthState, formData: FormData): Promise<
 }
 
 export async function signUp(_previous: AuthState, formData: FormData): Promise<AuthState> {
+  const refused = wrongMode('signUp');
+  if (refused) return refused;
+
   const parsed = signUpSchema.safeParse({
     fullName: formData.get('fullName'),
     email: formData.get('email'),
@@ -192,6 +214,9 @@ export async function requestMagicLink(
   _previous: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  const refused = wrongMode('requestMagicLink');
+  if (refused) return refused;
+
   const parsed = magicLinkSchema.safeParse({ email: formData.get('email') });
   if (!parsed.success) {
     return { status: 'error', fieldErrors: fieldErrorsFrom(parsed.error.issues) };
@@ -225,10 +250,84 @@ export async function requestMagicLink(
   return { status: 'success', message: 'magicLinkSent', email: parsed.data.email };
 }
 
+/**
+ * Passwordless signup.
+ *
+ * The one path in the product that may create an account, and the reason the
+ * sign-in link sets `shouldCreateUser: false`. The terms checkbox is required
+ * by the schema, so an account can only ever begin from a form that asked for
+ * consent.
+ *
+ * Consent is recorded when the link is opened, not here, and this is the part
+ * worth understanding: `consent_records` is append-only and keyed on a user
+ * id, and with a one-time link no user exists yet. So the accepted-terms fact
+ * travels in `options.data`, which Supabase applies only when it creates the
+ * user, and `/api/auth/confirm` writes the two rows once the account exists.
+ * The policy VERSIONS are never taken from that metadata — the server reads
+ * them from POLICY_VERSIONS at the moment it writes, so a forged metadata
+ * value cannot invent a version that was never shown.
+ */
+export async function requestSignUpLink(
+  _previous: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
+  const refused = wrongMode('requestSignUpLink');
+  if (refused) return refused;
+
+  const parsed = magicSignUpSchema.safeParse({
+    fullName: formData.get('fullName'),
+    email: formData.get('email'),
+    acceptTerms: formData.get('acceptTerms') === 'on',
+  });
+  if (!parsed.success) {
+    return { status: 'error', fieldErrors: fieldErrorsFrom(parsed.error.issues) };
+  }
+
+  try {
+    await enforceRateLimit('auth.sign_up', await clientKey());
+  } catch (error) {
+    if (error instanceof RateLimitError) return { status: 'error', message: 'rateLimited' };
+    throw error;
+  }
+
+  const locale = await getLocale();
+  const supabase = await createClient();
+
+  const { error } = await supabase.auth.signInWithOtp({
+    email: parsed.data.email,
+    options: {
+      shouldCreateUser: true,
+      emailRedirectTo: absoluteUrl(`/api/auth/confirm?next=/${locale}/app/onboarding`),
+      // Applied by Supabase only when it creates the user. Never read for an
+      // authorization decision — roles live in platform_roles and
+      // organization_memberships (CLAUDE.md security rule 2).
+      data: {
+        full_name: parsed.data.fullName,
+        preferred_locale: locale,
+        signup_consent: true,
+      },
+    },
+  });
+
+  if (error) {
+    if (error.code === 'over_email_send_rate_limit') {
+      return { status: 'error', message: 'rateLimited' };
+    }
+    logger.warn('auth.sign_up_link_failed', { code: error.code ?? null });
+  }
+
+  // Registered already or not, the same screen comes back: this must not
+  // become a way to find out who has an account.
+  return { status: 'success', message: 'checkEmail', email: parsed.data.email };
+}
+
 export async function requestPasswordReset(
   _previous: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  const refused = wrongMode('requestPasswordReset');
+  if (refused) return refused;
+
   const parsed = resetRequestSchema.safeParse({ email: formData.get('email') });
   if (!parsed.success) {
     return { status: 'error', fieldErrors: fieldErrorsFrom(parsed.error.issues) };
@@ -252,6 +351,9 @@ export async function requestPasswordReset(
 }
 
 export async function updatePassword(_previous: AuthState, formData: FormData): Promise<AuthState> {
+  const refused = wrongMode('updatePassword');
+  if (refused) return refused;
+
   const parsed = updatePasswordSchema.safeParse({
     password: formData.get('password'),
     confirmPassword: formData.get('confirmPassword'),

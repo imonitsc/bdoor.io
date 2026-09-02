@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { redirect } from 'next/navigation';
 import { ResetPasswordForm } from '@/components/forms/auth-forms';
+import { authMode } from '@/features/auth/mode';
 
 export async function generateMetadata({
   params,
@@ -19,5 +21,6 @@ export async function generateMetadata({
 export default async function Page({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  if (authMode() === 'passwordless') redirect(`/${locale}/login`);
   return <ResetPasswordForm />;
 }

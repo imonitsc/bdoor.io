@@ -5,6 +5,42 @@ first; each entry names its merged pull requests. Dates are merge dates.
 
 ## 2026-09-01
 
+- **Passwordless as a switch, not a leap (M2)** — the owner asked to keep
+  login and signup on magic link only. Both shapes now exist and
+  `AUTH_PASSWORDLESS` picks between them at runtime, because the honest
+  reading of "only" is that it removes a credential from a live product:
+  with it on, every sign-in — customers, partners and platform staff — depends
+  on Supabase Auth email, which Supabase sends through its own SMTP settings
+  and not through the Resend adapter connected in R3. Until that is
+  configured, Supabase's built-in sender is rate limited and its limit
+  becomes the sign-in limit. A variable makes turning it back a configuration
+  change rather than a deploy, which is the property worth having on the day
+  mail stops. It ships off.
+
+  The part that needed design rather than deletion is consent.
+  `consent_records` is append-only and keyed on a user id, and a one-time link
+  creates no user until it is opened — so a row cannot be written when the box
+  is ticked and patched later. The accepted-terms fact travels in the link's
+  metadata, which Supabase applies only when it creates the user, and
+  `provisionOnFirstConfirm` writes the profile, claims the questionnaire draft
+  and records both consents when the link is opened. The policy versions are
+  read from `POLICY_VERSIONS` on the server at that moment and never from the
+  metadata, so a forged flag can still only consent on its own behalf and
+  never to a version that was not the live one. Only one mode may create
+  accounts at a time, so there is never a second signup path with a different
+  consent story.
+
+  Enforcement is server-side, not visual: a Server Action stays callable after
+  its form is gone, so every auth action checks `modeAllows()` before doing
+  anything. `/forgot-password` and `/reset-password` redirect to `/login` when
+  there are no passwords to reset, and the security page stops showing a
+  password-change date for a credential that no longer signs anyone in.
+  Existing password credentials stay in `auth.users`, dormant; purging them is
+  a separate decision. The confirm callback also learned to accept `signup` —
+  Supabase sends the confirm-signup template, not the magic-link one, when
+  `signInWithOtp` creates the user, so without it every passwordless signup
+  would have bounced as an invalid link.
+
 - **Sign in with a link, without a way to open an account (M1)** — the
   owner asked for magic-link sign-in as an _option_, and that word did the
   design work. Password sign-in stays first on `/login` and keeps the
