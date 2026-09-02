@@ -56,6 +56,7 @@ export const RATE_LIMITS = {
   'auth.sign_in': { limit: 8, windowSeconds: 300 },
   'auth.sign_up': { limit: 5, windowSeconds: 3600 },
   'auth.password_reset': { limit: 5, windowSeconds: 3600 },
+  'auth.magic_link': { limit: 5, windowSeconds: 3600 },
   'auth.mfa_verify': { limit: 10, windowSeconds: 300 },
   'contact.submit': { limit: 3, windowSeconds: 3600 },
   'questionnaire.save': { limit: 120, windowSeconds: 3600 },

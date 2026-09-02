@@ -388,6 +388,12 @@ with `EMAIL_FROM` and `EMAIL_API_KEY`. SMTP is not — it would need a mail
 library added as a dependency. `emailIsMock()` is what the admin area reads to say "email is not
 configured" instead of pretending a notification went out.
 
+**Authentication mail is separate.** Signup confirmation, password reset and
+magic-link sign-in are sent by Supabase Auth, not by `src/lib/email/`, so
+`EMAIL_PROVIDER=resend` does not affect them. Configure Supabase →
+Authentication → SMTP Settings, or those three go through Supabase's built-in
+service and its rate limits.
+
 ### Sanctions / PEP screening
 
 `src/lib/screening/` defines `ScreeningProvider.screen()`. The mock **never

@@ -38,6 +38,13 @@ export const signUpSchema = z
 
 export const resetRequestSchema = z.object({ email: emailSchema });
 
+/**
+ * Magic-link sign-in takes an address and nothing else. It deliberately has no
+ * "create my account" affordance: signup is the only path that records the
+ * terms and privacy consent versions, so an account may never begin here.
+ */
+export const magicLinkSchema = z.object({ email: emailSchema });
+
 export const updatePasswordSchema = z
   .object({
     password: passwordSchema,

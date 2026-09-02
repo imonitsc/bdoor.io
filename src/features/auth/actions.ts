@@ -13,7 +13,13 @@ import { logger } from '@/lib/logger';
 import { claimDraftForUser } from '@/features/intake/session';
 import { POLICY_VERSIONS, recordPolicyConsent } from '@/features/legal/consent';
 import { absoluteUrl } from '@/lib/site';
-import { resetRequestSchema, signInSchema, signUpSchema, updatePasswordSchema } from './schema';
+import {
+  magicLinkSchema,
+  resetRequestSchema,
+  signInSchema,
+  signUpSchema,
+  updatePasswordSchema,
+} from './schema';
 
 export type AuthState = {
   status: 'idle' | 'error' | 'success';
@@ -161,6 +167,62 @@ export async function signUp(_previous: AuthState, formData: FormData): Promise<
   }
 
   return { status: 'success', message: 'checkEmail', email: parsed.data.email };
+}
+
+/**
+ * Magic-link sign-in.
+ *
+ * A one-time link instead of a password. Three things make it safe to offer
+ * alongside the password form rather than in place of it:
+ *
+ *  - **It never creates an account.** `shouldCreateUser: false` is the whole
+ *    reason this is not simply "sign in or sign up". Signup is the only path
+ *    that records the terms and privacy consent versions the legal suite
+ *    depends on; an account minted by clicking a link would exist with no
+ *    consent record at all.
+ *  - **It does not weaken MFA.** The link produces an aal1 session exactly as
+ *    a password does, and `requireSession` derives the MFA requirement from
+ *    the session's real assurance level, not from how it was created — so a
+ *    staff or partner account still has to clear its second factor.
+ *  - **It answers identically either way.** An unregistered address gets the
+ *    same screen as a registered one, so this cannot be used to enumerate who
+ *    has an account — the same rule the sign-in and reset flows already keep.
+ */
+export async function requestMagicLink(
+  _previous: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
+  const parsed = magicLinkSchema.safeParse({ email: formData.get('email') });
+  if (!parsed.success) {
+    return { status: 'error', fieldErrors: fieldErrorsFrom(parsed.error.issues) };
+  }
+
+  try {
+    await enforceRateLimit('auth.magic_link', await clientKey(parsed.data.email));
+  } catch (error) {
+    if (error instanceof RateLimitError) return { status: 'error', message: 'rateLimited' };
+    throw error;
+  }
+
+  const locale = await getLocale();
+  const next = safeNextPath(String(formData.get('next') ?? ''), `/${locale}/app`);
+  const supabase = await createClient();
+
+  const { error } = await supabase.auth.signInWithOtp({
+    email: parsed.data.email,
+    options: {
+      shouldCreateUser: false,
+      emailRedirectTo: absoluteUrl(`/api/auth/confirm?next=${encodeURIComponent(next)}`),
+    },
+  });
+
+  if (error) {
+    // Logged without the address, and never surfaced: "no such user" and
+    // "provider refused" must look the same to the caller.
+    logger.warn('auth.magic_link_failed', { code: error.code ?? null });
+  }
+
+  return { status: 'success', message: 'magicLinkSent', email: parsed.data.email };
 }
 
 export async function requestPasswordReset(

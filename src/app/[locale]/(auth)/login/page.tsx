@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Alert } from '@/components/ui/alert';
-import { SignInForm } from '@/components/forms/auth-forms';
+import { MagicLinkForm, SignInForm } from '@/components/forms/auth-forms';
 import { safeNextPath } from '@/lib/auth/safe-next';
 
 export async function generateMetadata({
@@ -40,6 +40,9 @@ export default async function LoginPage({
         </Alert>
       ) : null}
       <SignInForm next={next} />
+      {/* An option, never a replacement: the password form stays first and keeps
+          the page's only h1. */}
+      <MagicLinkForm next={next} />
     </div>
   );
 }

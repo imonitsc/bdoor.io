@@ -5,6 +5,36 @@ first; each entry names its merged pull requests. Dates are merge dates.
 
 ## 2026-09-01
 
+- **Sign in with a link, without a way to open an account (M1)** — the
+  owner asked for magic-link sign-in as an _option_, and that word did the
+  design work. Password sign-in stays first on `/login` and keeps the
+  page's only `h1`; the link form sits beneath it with its own address
+  field, because the two post to different actions and a shared field
+  would fire the password form's validation on someone who only wanted a
+  link. `shouldCreateUser: false` is not a detail: signup is the only path
+  that records the terms and privacy consent versions the legal suite
+  depends on, so an account minted by clicking a link would exist with no
+  consent record at all — the copy says so in both languages rather than
+  letting a caller discover it. The link does not weaken MFA, because
+  `requireSession` derives the requirement from the session's real
+  assurance level rather than from how the session was created: a staff or
+  partner account still clears its second factor. The reply is the same
+  whether or not the address has an account, matching what sign-in and
+  password reset already do, so the form cannot be used to find out who
+  has one; failures are logged by code alone, never with the address. The
+  callback that exchanges the token stopped casting `type` and now checks
+  it against an allow-list — it arrives in the query string, and an
+  unverified string let the caller choose which verification path
+  `verifyOtp` runs. Rate limited at the same five an hour as password
+  reset. Both sign-in forms are now named from their own heading, which is
+  what keeps them apart for anyone moving by landmark.
+
+  Operationally: Supabase Auth sends this mail through **its own SMTP
+  settings**, not through the app's Resend adapter. Until Supabase →
+  Authentication → SMTP Settings is configured, magic link, signup
+  confirmation and password reset all go through the built-in service and
+  its rate limits.
+
 - **Email actually leaves the building (R3)** — the owner connected a
   provider, so the deliberate gap R1 left is closed. `src/lib/email/` had
   defined an `EmailProvider` interface and implemented exactly one
