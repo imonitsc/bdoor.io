@@ -222,11 +222,17 @@ test.describe('marketing site', () => {
     await expect(page.getByText('Coming soon')).toHaveCount(0);
   });
 
-  test('marks a coming-soon service detail as not open when reached directly', async ({ page }) => {
-    await page.goto('/en/services/travel-agency-registration');
-    // Detail may still exist for deep links; the public index must not promote it.
-    const body = await page.locator('main').innerText();
-    expect(body.toLowerCase()).toMatch(/coming soon|not open|enquiry|assessment/);
+  test('a coming-soon service has no detail page at all', async ({ page }) => {
+    // This used to render with a Coming soon badge and a Notify me button, on
+    // the reasoning that "detail may still exist for deep links". That is the
+    // interest-only door CLAUDE.md §8.3 forbids: hiding it from the index left
+    // it reachable by URL and by search. A service is an open application or
+    // published information, or it has no public page.
+    const response = await page.goto('/en/services/travel-agency-registration');
+    expect(response?.status()).toBe(404);
+
+    const body = (await page.locator('body').innerText()).toLowerCase();
+    expect(body).not.toMatch(/notify me|coming soon/);
   });
 
   test('legal pages are published: substantive, versioned, no draft banner', async ({ page }) => {

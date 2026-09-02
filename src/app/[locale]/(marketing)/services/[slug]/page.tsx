@@ -14,6 +14,7 @@ import { getFaqs, getService, getServices } from '@/features/catalog/queries';
 import {
   displayableEstimate,
   displayableFee,
+  isPubliclyVisible,
   pick,
   type Locale,
   type Service,
@@ -22,7 +23,7 @@ import { localizedUrl } from '@/lib/site';
 
 export async function generateStaticParams() {
   const { data } = await getServices();
-  return data.map((service) => ({ slug: service.slug }));
+  return data.filter(isPubliclyVisible).map((service) => ({ slug: service.slug }));
 }
 
 export async function generateMetadata({
@@ -32,7 +33,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale, slug } = await params;
   const { data: service } = await getService(slug);
-  if (!service) return {};
+  if (!service || !isPubliclyVisible(service)) return {};
 
   const name = pick(service.name, locale as Locale) ?? service.slug;
   const summary = pick(service.summary, locale as Locale) ?? '';
@@ -149,11 +150,14 @@ export default async function ServiceDetailPage({
     getFormatter(),
   ]);
 
-  if (!service) notFound();
+  // A service the public may not see has no page. It used to render with a
+  // "Coming soon" badge and a Notify me button — an interest-only door, which
+  // is what CLAUDE.md §8.3 forbids. The index and the sitemap already excluded
+  // these; only this route still served them.
+  if (!service || !isPubliclyVisible(service)) notFound();
 
   const loc = locale as Locale;
   const estimate = displayableEstimate(service);
-  const comingSoon = service.status === 'coming_soon';
   const faqs = allFaqs.filter((f) => f.serviceSlug === service.slug || f.isGlobal);
   const included = pick(service.included, loc) ?? [];
   const notIncluded = pick(service.notIncluded, loc) ?? [];
@@ -182,7 +186,6 @@ export default async function ServiceDetailPage({
           <div className="grid gap-8 lg:grid-cols-[1.5fr_1fr] lg:gap-12">
             <div>
               <div className="mb-4 flex flex-wrap gap-2">
-                {comingSoon ? <Badge tone="neutral">{tCommon('comingSoon')}</Badge> : null}
                 {service.requiresPartner ? <Badge tone="accent">{t('authority')}</Badge> : null}
                 {service.isRegulated ? <Badge tone="warning">{t('eligibility')}</Badge> : null}
               </div>
@@ -222,15 +225,9 @@ export default async function ServiceDetailPage({
                 ) : null}
               </dl>
 
-              <Button
-                asChild
-                block
-                size="lg"
-                className="mt-5"
-                variant={comingSoon ? 'secondary' : 'primary'}
-              >
-                <Link href={comingSoon ? '/contact' : `/start?service=${service.slug}`}>
-                  {comingSoon ? t('notifyMe') : t('cta')}
+              <Button asChild block size="lg" className="mt-5">
+                <Link href={`/start?service=${service.slug}`}>
+                  {t('cta')}
                   <ArrowRight className="size-4" aria-hidden="true" />
                 </Link>
               </Button>
@@ -246,8 +243,6 @@ export default async function ServiceDetailPage({
       <Section className="py-12 md:py-16">
         <div className="container-page grid gap-12 lg:grid-cols-[1.5fr_1fr] lg:gap-16">
           <div className="flex flex-col gap-10">
-            {comingSoon ? <Alert tone="neutral">{t('comingSoonNote')}</Alert> : null}
-
             {service.whoFor ? (
               <section>
                 <h2 className="text-ink text-xl font-semibold">{t('whoFor')}</h2>

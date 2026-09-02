@@ -168,7 +168,7 @@ export type QuestionKind =
 
 export type QuestionDefinition = {
   key: QuestionKey;
-  section: 'about_you' | 'the_business' | 'ownership' | 'operations' | 'timing' | 'contact';
+  section: Stage;
   kind: QuestionKind;
   options?: readonly string[];
   /** Renders the "Why we ask" disclosure. Required for anything sensitive. */
@@ -221,7 +221,7 @@ export function marketScopeFromPreset(country?: TargetCountry): MarketScope | un
 export const QUESTIONS: readonly QuestionDefinition[] = [
   {
     key: 'market_scope',
-    section: 'about_you',
+    section: 'market',
     kind: 'choice',
     options: MARKET_SCOPES,
     showWhy: true,
@@ -230,7 +230,7 @@ export const QUESTIONS: readonly QuestionDefinition[] = [
   },
   {
     key: 'target_country',
-    section: 'about_you',
+    section: 'market',
     kind: 'choice',
     options: TARGET_COUNTRIES,
     showWhy: true,
@@ -539,6 +539,13 @@ export function applicableQuestions(answers: PartialAnswers): QuestionDefinition
  * ever moves when the founder actually crosses a stage boundary.
  */
 export const STAGES = [
+  // Where the founder wants to operate, and which country. These were in
+  // `about_you` and drew the label "Stage 1 of 6: About you" over two screens
+  // that ask nothing about the person — the label was right and the model was
+  // wrong. Their own stage fixes the description without touching the
+  // property the counter depends on: QUESTIONS is declared in stage order and
+  // these two are still the first asked.
+  'market',
   'about_you',
   'the_business',
   'ownership',
