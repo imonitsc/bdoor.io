@@ -1,0 +1,270 @@
+# P0 current-state mapping
+
+Produced under `CLAUDE.md` §27, on the instruction file the owner installed on
+2 September 2026. It maps the repository and production as they actually are against the
+fifteen P0 items in §22, and names the owner blockers from §26.
+
+Every "verified" line below was checked against the code, the database schema, the Vercel
+deployment record or the production runtime logs during this pass. Nothing here is carried
+over from an earlier document on trust; where a claim in `CLAUDE.md` §2.2 turned out to be
+imprecise, that is recorded rather than repeated.
+
+Baseline commit: `5e5b8c4` on `claude/new-session-0n73z6`.
+
+---
+
+## Summary
+
+| P0 item                                                          | State                                             | Weight |
+| ---------------------------------------------------------------- | ------------------------------------------------- | ------ |
+| 1. Production branch, deployment, migration truth                | **Verified**                                      | —      |
+| 2. Start stage labels and progress                               | **Open — needs an owner decision, not a bug fix** | S      |
+| 3. Deep-link precedence and async draft saving                   | **In place**                                      | —      |
+| 4. Public `Coming soon` / interest-only doors                    | **Partially open**                                | S      |
+| 5. Gateway multi-model routing, budgets, failover, telemetry     | **Partially in place, renamed contract**          | M      |
+| 6. Versioned official-domain allowlist + safe fetcher            | **Absent**                                        | L      |
+| 7. Gateway web-search behind a research adapter                  | **Absent**                                        | L      |
+| 8. Freshness, live research, evidence labels, review queue       | **Absent**                                        | L      |
+| 9. Legal-instrument / provision / coverage schema                | **Absent**                                        | L      |
+| 10. Official-source retrieval, amendments, claim-level citations | **Partial**                                       | M      |
+| 11. Scheduled source monitoring and change alerts                | **Partial — and currently inert**                 | M      |
+| 12. AI evaluation, web-content security, performance gates       | **Partial**                                       | M      |
+| 13. Funnel, research-quality and investor analytics              | **Substantially in place**                        | S      |
+| 14. Policy routes at Version 1.0, indexed                        | **In place**                                      | —      |
+| 15. Preview and P0 evidence report                               | **Not started**                                   | —      |
+
+Six of fifteen are effectively unbuilt (items 6–9 plus the parts of 10–11 that depend on
+them), and they are the ones that carry the product claim in §1.1. Everything upstream of
+them — retrieval, chunking, admin review, analytics — already exists and should be extended,
+not rebuilt.
+
+---
+
+## 1. Production, deployment and migration truth — verified
+
+| Fact               | Value                                                                                    |
+| ------------------ | ---------------------------------------------------------------------------------------- |
+| Production branch  | `claude/new-session-0n73z6` — there is no `main`                                         |
+| Head at this pass  | `5e5b8c4`                                                                                |
+| Development branch | `claude/deployment-status-check-ucci3m`                                                  |
+| Branch protection  | **None.** Any push to the production branch deploys                                      |
+| Hosting            | Vercel `prj_rCwzaAIa8tTxxjHGV16UWzABWCVK`, team `team_phKwNtsLM35oBgO9wD1cEBS3`          |
+| Database           | Supabase `wtdogszssofiqcdrthnl`, `ACTIVE_HEALTHY`, Postgres 17.6                         |
+| Migrations         | Repository migrations are the source of truth; applied to production by hand after merge |
+| Scheduled jobs     | Four, in `vercel.json`                                                                   |
+
+**Conflict to resolve.** §3.1 requires that production promotion follow owner approval after
+the §24 release gates pass, and §24 requires an evidence report per release. The pipeline in
+force does the opposite: merging a PR into the production branch triggers a production
+deployment immediately, frequently before CI finishes. Either the gates or the pipeline has
+to change. The cheapest reconciliation is branch protection plus a release branch; that is an
+owner decision and is listed as a blocker below.
+
+**All four scheduled jobs are inert.** `CRON_SECRET` is unset in production, so each job
+fails closed and logs a refusal rather than running. Verified from production runtime logs
+over the last seven hours:
+
+| Job                         | Schedule     | Last observed                              |
+| --------------------------- | ------------ | ------------------------------------------ |
+| `/api/compliance/reminders` | `30 2 * * *` | `reminders.no_secret` at 02:30:21          |
+| `/api/compliance/renewals`  | `45 2 * * *` | `renewals.no_secret` at 02:44:27, 02:45:13 |
+| `/api/ai/retention`         | `0 3 * * *`  | `ai.retention.no_secret` at 03:00:34       |
+| `/api/ai/ingestion`         | `15 4 * * *` | `ai.ingestion.no_secret` at 04:15:41       |
+
+This is the single highest-leverage unblock in the whole list: one environment variable
+turns four built, tested and deployed jobs from refusing to working. It also means the
+compliance email leg shipped in R3 has **never executed in production** and is therefore
+unproven end to end, however green its unit tests are.
+
+---
+
+## 2. Start stage labels — the baseline's diagnosis is wrong, the observation is right
+
+§2.2 records that the location and international-country questions display
+`Stage 1 of 6: About you` and calls the visible stage name incorrect.
+
+The label is **correct against the current model**. `src/features/intake/questions.ts`
+declares `market_scope` (Bangladesh / Outside Bangladesh) and `target_country` (the six-country
+selector) both with `section: 'about_you'`, and `stageProgress()` renders the section name of
+the question on screen. There is no bug: the code does exactly what it says.
+
+What is actually wrong is the **stage model**. "Where do you want to operate" and "which
+country" are not facts about the person, so naming that stage _About you_ misdescribes the
+first two screens. Fixing it means changing `STAGES` — either splitting a new first stage or
+renaming the existing one — which changes the denominator (`of 6`) and touches
+`start.sections.*` in both locales.
+
+That is a content and information-architecture decision, not a defect, so it is proposed
+rather than assumed. Recommended: introduce a `market` stage ahead of `about_you`, making the
+first two screens `Stage 1 of 7: Market`. `tests/unit/stage-progress.test.ts` already proves
+the counter never regresses and will hold the change honest.
+
+---
+
+## 3. Deep-link precedence and asynchronous draft saving — in place
+
+URL-seed precedence over stored drafts, package seeding and the incompatible-parameter
+redirect were implemented and are covered by `tests/unit/intake-preset.test.ts`. Continue and
+Back do not wait on persistence; drafts save in the background. No change proposed.
+
+---
+
+## 4. Public `Coming soon` doors — partially open
+
+Three catalogue entries carry `status: 'coming_soon'`.
+
+`src/app/[locale]/(marketing)/services/page.tsx` already excludes them from the services
+index, with a comment recording that as a production fix. But
+`src/app/[locale]/(marketing)/services/[slug]/page.tsx` still renders the `Coming soon` badge,
+the `Notify me` call to action and the coming-soon note, so **a direct or indexed URL is still
+a live interest-only door** — which is what §8.3 forbids. The index fix hid the entrance and
+left the room.
+
+`src/features/packages/types.ts` separately documents that anything earlier than a given
+availability rung "is honest only as register interest", so the ladder is intentional; the
+question §8.3 forces is whether such a door should be reachable at all.
+
+Proposed: a coming-soon service slug returns 404 or redirects to the nearest published
+service, and the three entries stay in the catalogue as data for when they open.
+
+---
+
+## 5. AI model configuration — working, but not the contract §4.1 specifies
+
+Multi-model routing, fallback chains, budgets and a verifier role already exist (shipped as
+BIOS-1, through the Vercel AI Gateway, server-side only). The gap is that §4.1 specifies a
+different and wider environment contract. Of the nineteen names it requires, **two are
+present**:
+
+- Present: `AI_DAILY_BUDGET_USD`, `AI_IDENTITY_SALT`.
+- Missing: `AI_PRIMARY_MODEL`, `AI_SECONDARY_MODEL`, `AI_FAST_MODEL`, `AI_EMBEDDING_MODEL`,
+  `AI_TRANSCRIPTION_MODEL`, `AI_SPEECH_MODEL`, `AI_REQUEST_TIMEOUT_MS`,
+  `AI_MAX_COST_USD_PER_ANSWER`, `AI_MAX_RETRIEVAL_CHUNKS`, `AI_MIN_GROUNDING_SCORE`,
+  `AI_WEB_RESEARCH_ENABLED`, `AI_WEB_SEARCH_TOOL`, `AI_WEB_SECONDARY_SEARCH_TOOL`,
+  `AI_WEB_MAX_SEARCHES_PER_ANSWER`, `AI_WEB_MAX_FETCHES_PER_ANSWER`,
+  `AI_WEB_RESEARCH_TIMEOUT_MS`, `AI_OFFICIAL_DOMAIN_POLICY_VERSION`.
+
+The existing scheme (`AI_ANSWER_MODEL`, `AI_EXPERT_MODEL`, `AI_VERIFIER_MODEL`,
+`AI_EXTRACTION_MODEL`, `AI_ANSWER_FALLBACK_MODELS`, `AI_MONTHLY_BUDGET_USD`) covers the same
+ground under different names for the roles that overlap. This is a rename-and-extend, not a
+rebuild, and it should be done in one migration of the env schema so the two vocabularies
+never coexist. `AI_MONTHLY_BUDGET_USD` has no counterpart in §4.1 and is worth keeping.
+
+§4.1 also requires that model IDs and tool names be discovered from the installed SDK and the
+live Gateway catalogue rather than copied from the specification. That discipline is already
+the repo's practice — the fallback chains ship empty precisely so an admin configures them
+from the runtime model listing — and should carry over unchanged.
+
+---
+
+## 6–9. Controlled official-web research and the legal corpus — absent
+
+These four items are the substance of §1.1's claim and none of them exists yet. Searched the
+whole of `src/` and `supabase/migrations/`:
+
+- **No official-domain allowlist**, versioned or otherwise, and no safe exact-page fetcher.
+- **No web-search adapter.** No search tool is wired behind a server-side boundary.
+- **No evidence states.** Nothing implements `official_live`, fetch-time labelling, or a
+  candidate-source review queue. Every fact currently reaching an answer comes from the
+  ingested ledger only.
+- **No legal-instrument or provision schema, and no coverage domain schema.** The knowledge
+  tables that exist — `ai_source_registry`, `ai_registry_documents`, `ai_knowledge_sources`,
+  `ai_knowledge_chunks`, `ai_structured_rules`, `ai_source_change_alerts`,
+  `ai_knowledge_audit_log`, `content_sources` — are document-and-chunk shaped. They model
+  _a page that was ingested_, not _an Act, its sections, their amendments and their coverage_.
+
+The honest reading: retrieval over ingested documents works; the instrument-level legal graph
+§6.4 describes does not exist, and no code currently distinguishes a verified ledger fact from
+a live-fetched one — because nothing can fetch live.
+
+This is the largest block of genuinely new work in P0 and the one where §3.3 bites hardest:
+none of it may be seeded with facts from model memory, and §6.7's controlled workflow has to
+exist before any live source can be quoted.
+
+---
+
+## 10–11. Retrieval quality and source monitoring — partial
+
+Official sources already outrank bdoor commercial content in retrieval, and answers about
+recurring obligations already carry a rule version and review date (shipped as KR-2 and P2-a).
+What is missing is **claim-level** citation — an answer cites its sources, not each individual
+assertion — and any amendment awareness, which cannot exist before the provision schema in
+item 9.
+
+`ai_source_change_alerts` exists and `/api/ai/ingestion` runs on a schedule, so the skeleton of
+monitoring is there. It is inert for the `CRON_SECRET` reason above, and there is no separate
+high-value source monitor with its own cadence.
+
+---
+
+## 12–14. Evaluation, analytics, policies
+
+- **Evaluation:** a Bangladesh knowledge eval set exists (`tests/unit/bd-knowledge-eval.test.ts`)
+  along with retrieval and citation tests. There are no web-content security tests — there is
+  no web content path to secure yet — and no enforced latency or cost gate in CI. §7.3 and §7.4
+  specify thresholds that nothing currently fails a build on.
+- **Analytics:** the funnel, quote lifecycle, subscription, cohort retention, obligation
+  engagement and renewal conversion instrumentation all exist and are surfaced in the admin
+  area. This item is substantially satisfied. Research-quality metrics specifically (§19)
+  arrive with items 6–9.
+- **Policies:** ten policies are public at Version 1.0, effective 30 August 2026, indexed and
+  reachable, with consent recorded at signup. Verified in place.
+
+---
+
+## 15. Evidence report
+
+Not started. This document is its input, not the report itself; §24 defines what the report
+must contain, and several of its required lines (AI evaluation, official-domain policy,
+web-search security, coverage report) cannot be produced until items 6–12 exist.
+
+---
+
+## Owner blockers — §26
+
+Work stops at these boundaries. Everything before each boundary can be built as safe,
+disabled infrastructure.
+
+1. **`CRON_SECRET` is unset in production.** Four built jobs refuse to run. Highest leverage
+   item on this page; needs one Vercel environment variable.
+2. **Release governance conflicts with §3.1 and §24.** No branch protection on
+   `claude/new-session-0n73z6`, and merging deploys production immediately. A gated release
+   process is an owner decision.
+3. **Supabase Auth SMTP is not configured.** Signup confirmation, password reset and
+   magic-link sign-in all go through Supabase's rate-limited built-in sender. This also gates
+   turning `AUTH_PASSWORDLESS` on.
+4. **`EMAIL_PROVIDER`, `EMAIL_FROM`, `EMAIL_API_KEY` not set in Vercel**, so the Resend adapter
+   is deployed but unexercised.
+5. **Stage-model change for Start** (item 2) — a naming and information-architecture decision.
+6. **Coming-soon service doors** (item 4) — confirm they should 404 rather than offer interest.
+7. **Search tool and official-domain policy** (items 6–7) — which Gateway web-search tool, and
+   the initial authoritative domain list, are owner-approved facts, not model output.
+8. **Analyst capacity for the legal corpus** (item 9). §3.3 forbids creating legal facts from
+   memory and §6.2 makes verification a human act. Without an analyst entering instruments,
+   provisions and gazetted holidays, the rules and obligation chain produces zero rows however
+   complete the code is.
+9. **Comply, personal-return and Address prices**, payment provider and production credentials
+   — unchanged, all still owner facts.
+10. **The RLS / `case_status_transitions` contradiction.** `public.case_status_transitions`
+    authorises `draft → awaiting_kyc` for a customer and `state-machine.ts` agrees, but the
+    `cases_customer_update_draft` policy's `with check (status = 'draft')` rejects any status
+    change. Verified by executing the transition as a customer in psql: rejected,
+    `sqlstate=42501`. A customer therefore cannot accept a renewal offer. The fix is small but
+    §3.2 requires owner approval to change RLS.
+
+---
+
+## Recommended first increment
+
+Items 6–9 are one architecture and should not be started piecemeal. The right first move is
+the smallest thing that unblocks the most and invents nothing:
+
+1. Migrate the AI environment contract to §4.1's names (item 5) — mechanical, testable, and a
+   prerequisite for every web-research variable that follows.
+2. Land the versioned official-domain allowlist and the safe exact-page fetcher (item 6) with
+   the allowlist **empty** pending owner approval, so the security boundary exists before
+   anything can fetch through it.
+3. Close the coming-soon doors (item 4) and settle the stage model (item 2), both small and
+   independent of the AI work.
+
+Items 7–9 follow once the owner supplies the search tool and the initial domain list.
