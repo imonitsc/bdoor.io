@@ -6,3 +6,8 @@ test-results
 coverage
 supabase/.temp
 src/types/database.ts
+
+# Owner-authored governance. CLAUDE.md is the production implementation authority and its
+# own header forbids rewriting it; keeping it byte-identical to the supplied file means the
+# next replacement diffs cleanly instead of against our table padding.
+CLAUDE.md
