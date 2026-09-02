@@ -183,7 +183,7 @@ model to a role registry (`src/features/ai/models.ts`) — see
   "router" is the deterministic classifier and the "reranker" is the RRF
   fusion — code, not paid model calls.
 - Each role resolves to a fallback chain of AI Gateway slugs, configured with
-  `AI_ANSWER_MODEL` + `AI_ANSWER_FALLBACK_MODELS`, `AI_EXPERT_MODEL` and
+  `AI_PRIMARY_MODEL` + `AI_SECONDARY_MODEL`, `AI_EXPERT_MODEL` and
   `AI_VERIFIER_MODEL` (comma-separated). Defaults stay the
   production-verified `anthropic/claude-sonnet-5`; cross-provider fallbacks
   ship empty and are configured from the live gateway model list on

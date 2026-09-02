@@ -60,22 +60,85 @@ const serverSchema = z.object({
   // Application-side spend caps. The enforced caps are the AI Gateway budgets
   // (`vercel ai-gateway budgets set ...`); these stop the app before it spends.
   AI_DAILY_BUDGET_USD: z.coerce.number().positive().default(25),
+  // No counterpart in CLAUDE.md §4.1, kept because a daily cap alone lets a
+  // slow leak run for a month.
   AI_MONTHLY_BUDGET_USD: z.coerce.number().positive().default(400),
+  // Ceiling for a single answer, so one pathological question cannot spend a
+  // meaningful share of the daily cap on its own.
+  AI_MAX_COST_USD_PER_ANSWER: z.coerce.number().positive().default(0.5),
   // Salt for the hashed safety identifier sent to AI Gateway.
   AI_IDENTITY_SALT: z.string().min(16).optional(),
-  // Model routes, as AI Gateway slugs. Overrides exist so a model change is a
-  // configuration decision with a rollback, not a deploy; the defaults live in
-  // src/features/ai/config.ts beside the reasoning for each choice.
-  AI_ANSWER_MODEL: z.string().min(3).optional(),
-  AI_EXTRACTION_MODEL: z.string().min(3).optional(),
-  // Multi-model fallback chains, as comma-separated AI Gateway slugs. All
-  // three ship EMPTY: cross-provider fallbacks are configured by an admin
-  // from the gateway's runtime model listing (/admin/ai/models), never
-  // hardcoded — a slug written here in code would only go stale. The chain
-  // semantics live in src/features/ai/models.ts.
-  AI_ANSWER_FALLBACK_MODELS: z.string().min(3).optional(),
+
+  // --- Model routes (CLAUDE.md §4.1) -------------------------------------
+  // AI Gateway slugs. Overrides exist so a model change is a configuration
+  // decision with a rollback, not a deploy; the defaults live in
+  // src/features/ai/config.ts beside the reasoning for each choice. Never
+  // copy a slug from the specification or from memory — §4.1 requires them to
+  // be discovered from the installed SDK and the live Gateway catalogue.
+  AI_PRIMARY_MODEL: z.string().min(3).optional(),
+  // The single automatic failover. §4.1 allows "maximum one automatic
+  // answer-model failover per request", which is why this is one slug and not
+  // the comma-separated chain it replaces. Ships EMPTY: a cross-provider
+  // fallback is chosen by an admin from the gateway's runtime model listing
+  // (/admin/ai/models), never hardcoded, because a slug written here would
+  // only go stale.
+  AI_SECONDARY_MODEL: z.string().min(3).optional(),
+  // Classification, query rewriting and extraction. Never customer-facing.
+  AI_FAST_MODEL: z.string().min(3).optional(),
+  // DANGEROUS TO CHANGE, and configurable only because §4.1 requires it.
+  // A different embedding model is a different vector space, so switching it
+  // without reindexing does not degrade retrieval — it silently corrupts it,
+  // with queries and stored documents living in different spaces. The stored
+  // corpus records what produced it in `ai_knowledge_chunks.embedding_model`;
+  // `embeddingCorpusMismatch` in src/features/ai/models.ts is the guard. Changing this is a migration plus a full reindex.
+  AI_EMBEDDING_MODEL: z.string().min(3).optional(),
+  // Voice, for the WhatsApp channel in §18. Declared here so the contract is
+  // complete; nothing reads them until P0W.
+  AI_TRANSCRIPTION_MODEL: z.string().min(3).optional(),
+  AI_SPEECH_MODEL: z.string().min(3).optional(),
+  // Roles §4.1 describes without naming a variable. The expert chain answers
+  // high-risk questions; the verifier ships empty and turns on by
+  // configuration once it has been evaluated, never by code default.
   AI_EXPERT_MODEL: z.string().min(3).optional(),
   AI_VERIFIER_MODEL: z.string().min(3).optional(),
+
+  // --- Answer limits (CLAUDE.md §4.1) ------------------------------------
+  // These were constants in src/features/ai/config.ts, on the reasoning that
+  // "a limit that can be raised by editing a dashboard field is a limit that
+  // gets raised at 2am during an incident". §4.1 requires them as
+  // configuration, so they are configuration — with the constants kept as the
+  // defaults, so an unset environment behaves exactly as before.
+  AI_REQUEST_TIMEOUT_MS: z.coerce.number().int().positive().default(45_000),
+  AI_MAX_RETRIEVAL_CHUNKS: z.coerce.number().int().positive().max(50).default(8),
+  // Below this, retrieval is treated as insufficient and the answer narrows or
+  // refuses rather than reaching for ungrounded model knowledge (§7.1 step 10).
+  AI_MIN_GROUNDING_SCORE: z.coerce.number().min(0).max(1).default(0.35),
+
+  // --- Controlled live-web research (CLAUDE.md §6.7) ----------------------
+  // OFF by default, and off is the safe state: with this false the assistant
+  // answers only from the reviewed ledger, which is what it does today.
+  // Turning it on lets the assistant fetch from the open web, so it stays a
+  // deliberate act.
+  AI_WEB_RESEARCH_ENABLED: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((v) => v === 'true'),
+  // Search tool identifiers, resolved against the live AI Gateway catalogue —
+  // §6.7 requires the selection be read from current Vercel documentation and
+  // owner-approved configuration, never hardcoded into the domain layer, so
+  // these ship EMPTY and there is no default to go stale.
+  AI_WEB_SEARCH_TOOL: z.string().min(2).optional(),
+  AI_WEB_SECONDARY_SEARCH_TOOL: z.string().min(2).optional(),
+  // Per-answer budgets. A research run that cannot answer within these stops
+  // and says so, rather than crawling: §6.7 forbids recursive crawling and
+  // §7.3 puts a latency gate on live-research answers.
+  AI_WEB_MAX_SEARCHES_PER_ANSWER: z.coerce.number().int().positive().max(10).default(2),
+  AI_WEB_MAX_FETCHES_PER_ANSWER: z.coerce.number().int().positive().max(20).default(4),
+  AI_WEB_RESEARCH_TIMEOUT_MS: z.coerce.number().int().positive().default(15_000),
+  // Which version of the official-domain allowlist a research run was made
+  // under. Recorded on every fetch so an answer can be re-judged later against
+  // the policy that actually applied when it was produced.
+  AI_OFFICIAL_DOMAIN_POLICY_VERSION: z.string().min(1).default('0'),
   // Document OCR for scanned official documents. Disabled by default: the
   // ingestion pipeline records that OCR is needed rather than inventing text.
   AI_OCR_PROVIDER: z.enum(['disabled', 'external']).default('disabled'),

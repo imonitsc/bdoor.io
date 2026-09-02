@@ -24,11 +24,11 @@ export const metadata: Metadata = { robots: { index: false, follow: false } };
  */
 
 const CHAIN_ROLES: Array<{ role: ModelRole; configuredVia: string | null }> = [
-  { role: 'answer', configuredVia: 'AI_ANSWER_MODEL, AI_ANSWER_FALLBACK_MODELS' },
+  { role: 'answer', configuredVia: 'AI_PRIMARY_MODEL, AI_SECONDARY_MODEL' },
   { role: 'expert', configuredVia: 'AI_EXPERT_MODEL' },
   { role: 'verifier', configuredVia: 'AI_VERIFIER_MODEL' },
-  { role: 'extraction', configuredVia: 'AI_EXTRACTION_MODEL' },
-  { role: 'embedding', configuredVia: null },
+  { role: 'extraction', configuredVia: 'AI_FAST_MODEL' },
+  { role: 'embedding', configuredVia: 'AI_EMBEDDING_MODEL' },
 ];
 
 /** The two roles served by code rather than a model, listed for honesty. */

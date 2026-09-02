@@ -5,6 +5,41 @@ first; each entry names its merged pull requests. Dates are merge dates.
 
 ## 2026-09-02
 
+- **The AI configuration contract, and one variable that needed a guard rather
+  than obedience (P0 item 5)** — CLAUDE.md §4.1 names nineteen environment
+  variables; two existed. All nineteen exist now — twelve model and limit
+  names, plus the seven live-web-research names §6.7 consumes, which ship with
+  research off and both search tools empty. The survey called this a mechanical
+  rename. It was not, and the interesting part is where the specification and
+  the code disagreed on purpose.
+
+  Three of the required variables override deliberate decisions rather than
+  fill gaps. `AI_REQUEST_TIMEOUT_MS` and `AI_MAX_RETRIEVAL_CHUNKS` were
+  constants in `config.ts`, whose header argues that "a limit that can be
+  raised by editing a dashboard field is a limit that gets raised at 2am
+  during an incident". §4.1 wants them configurable, so they are — with the
+  old constants as defaults, so an unset environment behaves exactly as
+  before.
+
+  `AI_EMBEDDING_MODEL` was the one worth slowing down for. `models.ts` had
+  already written down why it was not configurable: a different embedding
+  model is a different vector space, so switching it does not degrade
+  retrieval, it silently corrupts it — queries and stored documents stop
+  living in the same space and the system returns confident nonsense instead
+  of an error. That reasoning is right, and the contract wants the variable
+  anyway. It is now configurable _and_ guarded: every chunk already recorded
+  the model that produced it in `ai_knowledge_chunks.embedding_model`, so
+  `embeddingCorpusMismatch()` turns an invisible failure into a detectable
+  disagreement. An empty corpus is accepted, because reindexing from empty is
+  the supported way to change it.
+
+  The open-ended `AI_ANSWER_FALLBACK_MODELS` chain became the single
+  `AI_SECONDARY_MODEL`: §4.1 allows "maximum one automatic answer-model
+  failover per request" and the old shape allowed more. The chain ships empty
+  in production, so no live behaviour changes; the test that had asserted a
+  multi-hop chain now asserts the one-hop contract, including that a secondary
+  equal to the primary collapses rather than retrying the same model twice.
+
 - **Two public doors told the truth (P0 items 2 and 4)** — the first work under
   the new CLAUDE.md, and both turned out to be misdiagnosed in its §2.2
   baseline.

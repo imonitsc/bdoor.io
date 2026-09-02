@@ -77,7 +77,7 @@ substance in place.
 
 ## Model changes
 
-`AI_EXTRACTION_MODEL` may move to a cheaper slug only after that slug passes
+`AI_FAST_MODEL` may move to a cheaper slug only after that slug passes
 an extraction evaluation: run it over at least ten already-reviewed documents
 spanning Bangla, English, PDF and HTML, and compare its drafts against the
 approved rules. Adopt it when its drafts need no _more_ correction than the

@@ -4,7 +4,7 @@ import {
   ANSWER_PROVIDER_ORDER,
   DEFAULT_ANSWER_MODEL,
   DEFAULT_EXTRACTION_MODEL,
-  EMBEDDING_MODEL,
+  embeddingModel,
 } from './config';
 import { detectTopics, type Topic } from './registry/taxonomy';
 import { serverEnv } from '@/lib/env';
@@ -87,17 +87,24 @@ export function modelChain(role: ModelRole): string[] {
   const env = serverEnv();
   switch (role) {
     case 'answer':
-      return [
-        env.AI_ANSWER_MODEL ?? DEFAULT_ANSWER_MODEL,
-        ...parseChain(env.AI_ANSWER_FALLBACK_MODELS),
-      ];
+      // Primary, then at most one automatic failover — CLAUDE.md §4.1 allows
+      // "maximum one automatic answer-model failover per request", which is
+      // why this is a single secondary and not the open-ended chain it
+      // replaces. `parseChain` still de-duplicates, so setting the secondary
+      // to the primary is a no-op rather than a wasted retry against the same
+      // model.
+      return parseChain(
+        [env.AI_PRIMARY_MODEL ?? DEFAULT_ANSWER_MODEL, env.AI_SECONDARY_MODEL]
+          .filter(Boolean)
+          .join(','),
+      );
     // The expert chain answers high-risk questions. Unconfigured, it is the
     // answer chain — a high-risk question must never get a *weaker* route
     // than a standard one just because no expert model is set.
     case 'expert': {
       const chain = parseChain(env.AI_EXPERT_MODEL);
       return chain.length > 0
-        ? [...chain, ...parseChain(env.AI_ANSWER_FALLBACK_MODELS)]
+        ? parseChain([...chain, env.AI_SECONDARY_MODEL].filter(Boolean).join(','))
         : modelChain('answer');
     }
     // Empty by default: the verifier turns on by configuration once it has
@@ -105,12 +112,13 @@ export function modelChain(role: ModelRole): string[] {
     case 'verifier':
       return parseChain(env.AI_VERIFIER_MODEL);
     case 'extraction':
-      return [env.AI_EXTRACTION_MODEL ?? DEFAULT_EXTRACTION_MODEL];
+      return [env.AI_FAST_MODEL ?? DEFAULT_EXTRACTION_MODEL];
     // Never a chain. A different embedding model is a different vector space;
     // "failing over" would silently corrupt retrieval. Changing it is a
-    // migration plus a full reindex.
+    // migration plus a full reindex — which is what
+    // `assertEmbeddingModelMatchesCorpus` exists to catch.
     case 'embedding':
-      return [EMBEDDING_MODEL];
+      return [embeddingModel()];
   }
 }
 
@@ -123,4 +131,30 @@ export function answerRoute(risk: RiskClass): { role: ModelRole; chain: string[]
   return risk === 'high'
     ? { role: 'expert', chain: modelChain('expert') }
     : { role: 'answer', chain: modelChain('answer') };
+}
+
+/**
+ * Whether the configured embedding model can read the stored corpus.
+ *
+ * `AI_EMBEDDING_MODEL` is configurable because CLAUDE.md §4.1 requires it, and
+ * it is the one model variable where a wrong value fails *silently*: a query
+ * embedded by a different model lands in a different vector space, so
+ * retrieval returns confident nonsense rather than an error. Every chunk
+ * records the model that produced it, so the mismatch is detectable — this is
+ * the detection.
+ *
+ * Pure so it can be tested without a database; the caller supplies the models
+ * actually present in `ai_knowledge_chunks.embedding_model`.
+ */
+export function embeddingCorpusMismatch(
+  configured: string,
+  corpusModels: readonly string[],
+): { ok: true } | { ok: false; configured: string; corpus: string[] } {
+  // An empty corpus cannot disagree: a fresh index will be written with
+  // whatever is configured now, which is exactly the intended way to change it.
+  const distinct = [...new Set(corpusModels.filter((m) => m.length > 0))];
+  if (distinct.length === 0 || (distinct.length === 1 && distinct[0] === configured)) {
+    return { ok: true };
+  }
+  return { ok: false, configured, corpus: distinct };
 }
