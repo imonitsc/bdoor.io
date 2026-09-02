@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { safeNextPath } from '@/lib/auth/safe-next';
 import { confirmType } from '@/lib/auth/confirm-type';
+import { provisionOnFirstConfirm } from '@/features/auth/provision';
 
 /**
  * Email confirmation, magic-link and password-recovery callback.
@@ -14,6 +15,10 @@ import { confirmType } from '@/lib/auth/confirm-type';
  * `type` is validated by `confirmType` rather than cast: it arrives from the
  * query string, and handing an unverified string to `verifyOtp` would let the
  * caller choose which verification path runs.
+ *
+ * It is also where a passwordless account is finished. A one-time link creates
+ * the auth user only when it is opened, so the profile row, the questionnaire
+ * draft and the consent records are written here rather than at the form.
  */
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
@@ -26,11 +31,18 @@ export async function GET(request: NextRequest) {
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash });
+  const { data, error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash });
 
   if (error) {
     logger.warn('auth.confirm_failed', { code: error.code, type });
     return NextResponse.redirect(new URL('/en/login?error=expired_link', request.url));
+  }
+
+  // Idempotent, and a no-op for an account that was already provisioned — a
+  // password signup writes its own profile, so only a link-created account
+  // reaches the work inside.
+  if (data.user) {
+    await provisionOnFirstConfirm(supabase, data.user);
   }
 
   return NextResponse.redirect(new URL(next, request.url));

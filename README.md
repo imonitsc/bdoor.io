@@ -394,6 +394,41 @@ magic-link sign-in are sent by Supabase Auth, not by `src/lib/email/`, so
 Authentication → SMTP Settings, or those three go through Supabase's built-in
 service and its rate limits.
 
+### Passwordless authentication
+
+`AUTH_PASSWORDLESS` chooses what credentials the product accepts, and it is a
+runtime variable so switching back is a configuration change, not a deploy.
+
+| Value             | `/login`                          | `/signup`                        |
+| ----------------- | --------------------------------- | -------------------------------- |
+| `false` (default) | password form + magic link beside | name, email, password, terms     |
+| `true`            | magic link only                   | name, email, terms — no password |
+
+With `true`, `/forgot-password` and `/reset-password` redirect to `/login`
+(there is nothing to reset), and the "last password change" line disappears
+from the security page.
+
+**Do not turn this on before Supabase SMTP is configured.** Passwordless makes
+every sign-in — customers, partners and platform staff alike — depend on
+Supabase Auth email, and Supabase's built-in sender is rate limited. Without
+custom SMTP that rate limit becomes the sign-in rate limit for everyone.
+
+Two things enforce the mode on the server rather than in the page. Every auth
+Server Action checks `modeAllows()` in `src/features/auth/mode.ts` first, so
+removing a form does not leave its endpoint callable; and only one mode may
+create accounts at a time, so consent is always recorded by whichever signup
+asked for it. Passwordless signup records that consent when the link is opened
+(`provisionOnFirstConfirm`), because `consent_records` is append-only and keyed
+on a user id that does not exist until then. The policy versions are read from
+`POLICY_VERSIONS` on the server at that moment, never from the link's metadata.
+
+MFA is unaffected either way: `requireSession` derives the requirement from the
+session's assurance level, not from how the session was created.
+
+`pnpm run test:e2e:passwordless` runs the passwordless journeys against a
+server started with the flag on; the default E2E suite covers the password
+shape that production serves.
+
 ### Sanctions / PEP screening
 
 `src/lib/screening/` defines `ScreeningProvider.screen()`. The mock **never

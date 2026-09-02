@@ -33,7 +33,9 @@ describe('magicLinkSchema', () => {
   });
 
   it('is rate limited per hour, like the other unauthenticated mail triggers', () => {
-    expect(RATE_LIMITS['auth.magic_link']).toEqual(RATE_LIMITS['auth.password_reset']);
+    // Anyone can make this send mail, so it gets the same hourly budget as
+    // signup — which survives password sign-in being switched off.
+    expect(RATE_LIMITS['auth.magic_link']).toEqual(RATE_LIMITS['auth.sign_up']);
   });
 });
 
@@ -42,12 +44,18 @@ describe('confirmType', () => {
     for (const type of CONFIRM_TYPES) {
       expect(confirmType(type)).toBe(type);
     }
+    // A sign-in link and a passwordless signup arrive on the same callback,
+    // and Supabase labels them differently: `signInWithOtp` sends the
+    // confirm-signup template, not the magic-link one, when it creates the
+    // user. Dropping either would break one of the two flows.
     expect(CONFIRM_TYPES).toContain('magiclink');
+    expect(CONFIRM_TYPES).toContain('signup');
   });
 
   it('refuses anything else, so the caller cannot choose the verification path', () => {
-    for (const value of ['sms', 'phone_change', 'signup', 'MAGICLINK', '', ' email', null]) {
-      expect(confirmType(value)).toBeNull();
+    // bdoor sends no SMS, so the phone types must never reach verifyOtp.
+    for (const value of ['sms', 'phone_change', 'MAGICLINK', 'Signup', '', ' email', null]) {
+      expect(confirmType(value), String(value)).toBeNull();
     }
   });
 });

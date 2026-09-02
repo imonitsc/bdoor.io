@@ -7,6 +7,7 @@ import { MfaSetup } from '@/components/forms/mfa-setup';
 import { SignOutOtherSessions } from '@/components/dashboard/session-controls';
 import { requireSession } from '@/lib/auth/session';
 import { createClient } from '@/lib/supabase/server';
+import { authMode } from '@/features/auth/mode';
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
@@ -105,7 +106,10 @@ export default async function SecurityPage({
               ))}
             </ul>
           )}
-          {settings?.last_password_change ? (
+          {/* A historical fact about a credential that no longer signs anyone
+              in. Passwordless mode hides it rather than inviting a change the
+              product no longer offers. */}
+          {authMode() === 'password' && settings?.last_password_change ? (
             <p className="text-muted mt-4 text-xs">
               {t('changePassword')}:{' '}
               {format.dateTime(new Date(settings.last_password_change), 'long')}

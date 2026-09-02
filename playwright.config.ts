@@ -52,6 +52,11 @@ export default defineConfig({
           // The suite walks the questionnaire end to end several times from one
           // address, which is exactly the shape the limiter is there to stop.
           RATE_LIMIT_DISABLED: 'true',
+          // Passed through so the passwordless shape can be exercised against
+          // a server configured for it: `pnpm run test:e2e:passwordless`.
+          // The default run keeps the shipped (password) shape, which is the
+          // one production serves.
+          AUTH_PASSWORDLESS: process.env.AUTH_PASSWORDLESS ?? 'false',
           // The provider application journey is under test; the gate's
           // disabled default is covered by tests/unit/launch-gates.test.ts.
           PROVIDER_APPLICATIONS_STATUS: 'enabled',

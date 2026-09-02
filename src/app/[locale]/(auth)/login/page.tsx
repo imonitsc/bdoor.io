@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Alert } from '@/components/ui/alert';
 import { MagicLinkForm, SignInForm } from '@/components/forms/auth-forms';
 import { safeNextPath } from '@/lib/auth/safe-next';
+import { authMode } from '@/features/auth/mode';
 
 export async function generateMetadata({
   params,
@@ -39,10 +40,16 @@ export default async function LoginPage({
           {t(query.error === 'expired_link' ? 'linkExpired' : 'generic')}
         </Alert>
       ) : null}
-      <SignInForm next={next} />
-      {/* An option, never a replacement: the password form stays first and keeps
-          the page's only h1. */}
-      <MagicLinkForm next={next} />
+      {authMode() === 'passwordless' ? (
+        <MagicLinkForm next={next} standalone />
+      ) : (
+        <>
+          <SignInForm next={next} />
+          {/* An option, never a replacement: the password form stays first and
+              keeps the page's only h1. */}
+          <MagicLinkForm next={next} />
+        </>
+      )}
     </div>
   );
 }

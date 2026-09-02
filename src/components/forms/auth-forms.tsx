@@ -13,6 +13,7 @@ import { useAnnounce } from '@/components/ui/announcer';
 import {
   requestMagicLink,
   requestPasswordReset,
+  requestSignUpLink,
   signIn,
   signUp,
   updatePassword,
@@ -125,15 +126,28 @@ export function SignInForm({ next }: { next?: string }) {
 }
 
 /**
- * Magic-link sign-in, offered beneath the password form rather than instead of
- * it. It carries its own email field on purpose: the two forms post to
- * different actions, and a shared field would make the password form's
- * required-password validation fire when the caller only wanted a link.
+ * Magic-link sign-in, in two shapes.
+ *
+ * Beside the password form (`standalone` false, the default) it is the second
+ * option on the page: a divider, a sub-heading, its own email field. The
+ * separate field is deliberate — the two forms post to different actions, and
+ * a shared field would make the password form's required-password validation
+ * fire on someone who only wanted a link.
+ *
+ * On its own (`standalone`, when AUTH_PASSWORDLESS is on) it *is* sign-in, so
+ * it takes the page's h1 and drops the divider that would separate it from
+ * nothing.
  *
  * The success copy is the same whether or not the address has an account —
  * see `requestMagicLink` for why.
  */
-export function MagicLinkForm({ next }: { next?: string }) {
+export function MagicLinkForm({
+  next,
+  standalone = false,
+}: {
+  next?: string;
+  standalone?: boolean;
+}) {
   const t = useTranslations('auth');
   const tCommon = useTranslations('common');
   const [state, action, pending] = useActionState(requestMagicLink, INITIAL);
@@ -149,20 +163,30 @@ export function MagicLinkForm({ next }: { next?: string }) {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-3">
-        <span className="bg-border h-px flex-1" aria-hidden="true" />
-        <span className="text-muted text-xs font-medium tracking-wide uppercase">
-          {t('orContinueWith')}
-        </span>
-        <span className="bg-border h-px flex-1" aria-hidden="true" />
-      </div>
+    <div className={standalone ? 'flex flex-col gap-6' : 'flex flex-col gap-4'}>
+      {standalone ? null : (
+        <div className="flex items-center gap-3">
+          <span className="bg-border h-px flex-1" aria-hidden="true" />
+          <span className="text-muted text-xs font-medium tracking-wide uppercase">
+            {t('orContinueWith')}
+          </span>
+          <span className="bg-border h-px flex-1" aria-hidden="true" />
+        </div>
+      )}
 
       <div>
-        <h2 id={titleId} className="text-ink text-base font-semibold">
-          {t('magicLinkTitle')}
-        </h2>
-        <p className="text-muted mt-1 text-sm">{t('magicLinkSubtitle')}</p>
+        {standalone ? (
+          <h1 id={titleId} className="text-ink text-2xl font-semibold">
+            {t('signInTitle')}
+          </h1>
+        ) : (
+          <h2 id={titleId} className="text-ink text-base font-semibold">
+            {t('magicLinkTitle')}
+          </h2>
+        )}
+        <p className="text-muted mt-1.5 text-sm">
+          {standalone ? t('signInPasswordlessSubtitle') : t('magicLinkSubtitle')}
+        </p>
       </div>
 
       <form action={action} aria-labelledby={titleId} className="flex flex-col gap-4" noValidate>
@@ -182,7 +206,19 @@ export function MagicLinkForm({ next }: { next?: string }) {
         </Button>
       </form>
 
-      <p className="text-muted text-sm">{t('magicLinkNoAccount')}</p>
+      {standalone ? (
+        <p className="text-muted text-sm">
+          {t('noAccount')}{' '}
+          <Link
+            href={MARKETING_ROUTES.signup}
+            className="text-primary hover:text-primary-hover rounded underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+          >
+            {t('signUpCta')}
+          </Link>
+        </p>
+      ) : (
+        <p className="text-muted text-sm">{t('magicLinkNoAccount')}</p>
+      )}
     </div>
   );
 }
@@ -282,6 +318,100 @@ export function SignUpForm() {
         <Button type="submit" size="lg" block disabled={pending}>
           {pending ? tCommon('loading') : t('signUpCta')}
           <UserPlus className="size-4" aria-hidden="true" />
+        </Button>
+      </form>
+
+      <p className="text-muted text-sm">
+        {t('haveAccount')}{' '}
+        <Link
+          href={MARKETING_ROUTES.login}
+          className="text-primary hover:text-primary-hover rounded underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+        >
+          {t('signInCta')}
+        </Link>
+      </p>
+    </div>
+  );
+}
+
+/**
+ * Passwordless signup: the password form minus the password, and nothing else
+ * removed. The terms checkbox in particular stays and stays required — an
+ * account may only ever begin from a form that asked for consent, and the
+ * consent rows are written when the link is opened (see
+ * `provisionOnFirstConfirm`).
+ */
+export function MagicSignUpForm() {
+  const t = useTranslations('auth');
+  const tCommon = useTranslations('common');
+  const tLegal = useTranslations('legal');
+  const [state, action, pending] = useActionState(requestSignUpLink, INITIAL);
+  const { errorRef, tErrors } = useAuthFeedback(state);
+  const termsId = useId();
+
+  const fieldError = (name: string) =>
+    state.fieldErrors?.[name] ? tErrors(state.fieldErrors[name]!) : undefined;
+
+  if (state.status === 'success') {
+    return (
+      <Alert tone="success" title={t('verifyTitle')} live="polite">
+        <p>{t('signUpLinkSent', { email: state.email ?? '' })}</p>
+      </Alert>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div>
+        <h1 className="text-ink text-2xl font-semibold">{t('signUpTitle')}</h1>
+        <p className="text-muted mt-1.5 text-sm">{t('signUpPasswordlessSubtitle')}</p>
+      </div>
+
+      <form action={action} className="flex flex-col gap-4" noValidate>
+        <FormError state={state} errorRef={errorRef} tErrors={tErrors} />
+
+        <Field error={fieldError('fullName')}>
+          <FieldLabel required>{t('fullName')}</FieldLabel>
+          <FieldControl hasDescription={false}>
+            <Input name="fullName" autoComplete="name" required autoFocus maxLength={120} />
+          </FieldControl>
+        </Field>
+
+        <Field error={fieldError('email')}>
+          <FieldLabel required>{t('email')}</FieldLabel>
+          <FieldControl hasDescription={false}>
+            <Input name="email" type="email" autoComplete="email" required />
+          </FieldControl>
+        </Field>
+
+        <div className="flex items-start gap-3">
+          <Checkbox id={termsId} name="acceptTerms" required />
+          <label htmlFor={termsId} className="text-ink text-sm leading-relaxed">
+            {t('termsNotice')}{' '}
+            <Link
+              href={MARKETING_ROUTES.terms}
+              className="text-primary underline underline-offset-4"
+            >
+              {tLegal('terms')}
+            </Link>
+            {' · '}
+            <Link
+              href={MARKETING_ROUTES.privacy}
+              className="text-primary underline underline-offset-4"
+            >
+              {tLegal('privacy')}
+            </Link>
+          </label>
+        </div>
+        {state.fieldErrors?.acceptTerms ? (
+          <p className="text-danger text-sm font-medium">
+            {tErrors(state.fieldErrors.acceptTerms)}
+          </p>
+        ) : null}
+
+        <Button type="submit" size="lg" block disabled={pending}>
+          {pending ? tCommon('loading') : t('signUpLinkCta')}
+          <Mail className="size-4" aria-hidden="true" />
         </Button>
       </form>
 

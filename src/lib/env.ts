@@ -87,6 +87,20 @@ const serverSchema = z.object({
     .enum(['true', 'false'])
     .default('false')
     .transform((v) => v === 'true'),
+  // Passwordless authentication. When true, /login and /signup drop passwords
+  // entirely and run on one-time email links.
+  //
+  // OFF BY DEFAULT ON PURPOSE. Passwordless makes every sign-in — customers,
+  // partners and platform staff alike — depend on Supabase Auth email, which
+  // is sent by Supabase's own SMTP settings and NOT by src/lib/email/. Turning
+  // this on before Supabase → Authentication → SMTP Settings is configured
+  // means the built-in sender's rate limits become the sign-in rate limit.
+  // The variable is the rollback: flipping it back restores password sign-in
+  // without a deploy.
+  AUTH_PASSWORDLESS: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((v) => v === 'true'),
   // Shared secret for scheduled jobs (Vercel cron sends it as a bearer token).
   CRON_SECRET: z.string().min(16).optional(),
   SENTRY_DSN: optionalUrl,
