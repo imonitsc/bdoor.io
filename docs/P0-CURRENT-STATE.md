@@ -174,6 +174,36 @@ from the runtime model listing — and should carry over unchanged.
 
 ---
 
+**Resolved, and it was not the mechanical rename this survey called it.** All nineteen names
+now exist: twelve model and limit names, plus the seven `AI_WEB_*` and
+`AI_OFFICIAL_DOMAIN_POLICY_VERSION` names §6.7 consumes. Those seven ship inert —
+`AI_WEB_RESEARCH_ENABLED=false`, both search tools empty — so the assistant still answers
+only from the reviewed ledger until item 6 lands and the owner supplies a tool and a domain
+list. Three of them turned out to override _deliberate_ engineering decisions rather
+than fill gaps, which is the part worth recording:
+
+- `AI_REQUEST_TIMEOUT_MS` and `AI_MAX_RETRIEVAL_CHUNKS` were constants in
+  `src/features/ai/config.ts`, whose header argues that "a limit that can be raised by
+  editing a dashboard field is a limit that gets raised at 2am during an incident". §4.1
+  requires them as configuration, so they are configuration — with the old constants kept as
+  the defaults, so an unset environment behaves exactly as it did.
+- `AI_EMBEDDING_MODEL` is the dangerous one. `models.ts` already recorded why the embedding
+  model was _not_ configurable: "a different embedding model is a different vector space;
+  failing over would silently corrupt retrieval". That reasoning is correct, and §4.1 wants
+  the variable anyway. It is now configurable **and guarded**: every chunk records the model
+  that produced it in `ai_knowledge_chunks.embedding_model`, and `embeddingCorpusMismatch()`
+  turns a silent corruption into a detectable disagreement. An empty corpus is accepted,
+  because reindexing from empty is the supported way to change it.
+
+`AI_ANSWER_FALLBACK_MODELS` — an open-ended comma-separated chain — became the single
+`AI_SECONDARY_MODEL`, because §4.1 allows "maximum one automatic answer-model failover per
+request" and the old shape allowed more. The chain ships empty in production, so this
+changes no live behaviour. `AI_EXPERT_MODEL` and `AI_VERIFIER_MODEL` are kept: §4.1 describes
+both roles without naming variables for them. `AI_MONTHLY_BUDGET_USD` is kept because a daily
+cap alone lets a slow leak run for a month.
+
+---
+
 ## 6–9. Controlled official-web research and the legal corpus — absent
 
 These four items are the substance of §1.1's claim and none of them exists yet. Searched the

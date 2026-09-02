@@ -32,21 +32,30 @@ describe('chain resolution', () => {
   });
 
   it('builds the answer chain from the validated env, primary first', async () => {
-    const models = await registryWith({
-      AI_ANSWER_FALLBACK_MODELS: ' acme/backup-1 , acme/backup-2 ,acme/backup-1,, ',
-    });
-    // Trimmed, ordered, de-duplicated.
-    expect(models.modelChain('answer')).toEqual([
-      DEFAULT_ANSWER_MODEL,
-      'acme/backup-1',
-      'acme/backup-2',
-    ]);
+    const models = await registryWith({ AI_SECONDARY_MODEL: '  acme/backup-1  ' });
+    // Trimmed, and exactly one hop past the primary: CLAUDE.md §4.1 allows a
+    // maximum of one automatic answer-model failover per request, so the
+    // open-ended fallback chain this replaced is deliberately gone.
+    expect(models.modelChain('answer')).toEqual([DEFAULT_ANSWER_MODEL, 'acme/backup-1']);
   });
 
-  it('gives a configured expert chain the shared fallbacks too', async () => {
+  it('never retries the same model twice when primary and secondary agree', async () => {
+    const models = await registryWith({
+      AI_PRIMARY_MODEL: 'acme/only-1',
+      AI_SECONDARY_MODEL: 'acme/only-1',
+    });
+    expect(models.modelChain('answer')).toEqual(['acme/only-1']);
+  });
+
+  it('answers with the primary alone when no secondary is configured', async () => {
+    const models = await registryWith({ AI_PRIMARY_MODEL: 'acme/only-1' });
+    expect(models.modelChain('answer')).toEqual(['acme/only-1']);
+  });
+
+  it('gives a configured expert chain the same single failover', async () => {
     const models = await registryWith({
       AI_EXPERT_MODEL: 'acme/expert-1',
-      AI_ANSWER_FALLBACK_MODELS: 'acme/backup-1',
+      AI_SECONDARY_MODEL: 'acme/backup-1',
     });
     expect(models.modelChain('expert')).toEqual(['acme/expert-1', 'acme/backup-1']);
     expect(models.answerRoute('high')).toEqual({
@@ -90,5 +99,47 @@ describe('risk classification', () => {
     expect(riskClassFor(['tax_vat'])).toBe('high');
     expect(riskClassFor(['formation_structure'])).toBe('standard');
     expect(riskClassFor([])).toBe('standard');
+  });
+});
+
+/**
+ * `AI_EMBEDDING_MODEL` is the one model variable whose wrong value fails
+ * silently: a query embedded by a different model lands in a different vector
+ * space, so retrieval returns confident nonsense instead of an error. Every
+ * stored chunk records what produced it, which is what makes the mismatch
+ * detectable at all.
+ */
+describe('embeddingCorpusMismatch', () => {
+  it('accepts a corpus built by the configured model', async () => {
+    const { embeddingCorpusMismatch } = await import('@/features/ai/models');
+    expect(
+      embeddingCorpusMismatch('google/gemini-embedding-001', [
+        'google/gemini-embedding-001',
+        'google/gemini-embedding-001',
+      ]),
+    ).toEqual({ ok: true });
+  });
+
+  it('accepts an empty corpus — a fresh index adopts whatever is configured', () => {
+    // This is the supported way to change the model: reindex from empty.
+    return import('@/features/ai/models').then(({ embeddingCorpusMismatch }) => {
+      expect(embeddingCorpusMismatch('acme/new-embedder', [])).toEqual({ ok: true });
+      expect(embeddingCorpusMismatch('acme/new-embedder', ['', ''])).toEqual({ ok: true });
+    });
+  });
+
+  it('refuses when the corpus was built by anything else, and says by what', async () => {
+    const { embeddingCorpusMismatch } = await import('@/features/ai/models');
+    expect(embeddingCorpusMismatch('acme/new-embedder', ['google/gemini-embedding-001'])).toEqual({
+      ok: false,
+      configured: 'acme/new-embedder',
+      corpus: ['google/gemini-embedding-001'],
+    });
+  });
+
+  it('refuses a corpus that is itself mixed, even if one part matches', async () => {
+    const { embeddingCorpusMismatch } = await import('@/features/ai/models');
+    const result = embeddingCorpusMismatch('a/one', ['a/one', 'b/two']);
+    expect(result.ok).toBe(false);
   });
 });
