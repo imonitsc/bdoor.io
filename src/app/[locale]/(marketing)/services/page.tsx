@@ -10,7 +10,7 @@ import {
   FormationDocumentsImage,
 } from '@/components/marketing/formation-documents-image';
 import { getCategories, getServices } from '@/features/catalog/queries';
-import { pick, type Locale } from '@/features/catalog/types';
+import { isPubliclyVisible, pick, type Locale } from '@/features/catalog/types';
 import { localizedUrl } from '@/lib/site';
 import { cn } from '@/lib/utils/cn';
 
@@ -51,8 +51,7 @@ export default async function ServicesPage({
   ]);
 
   const activeCategory = categories.some((c) => c.slug === category) ? category : undefined;
-  // Production-fix: do not display Coming soon services publicly.
-  const published = services.filter((s) => s.status === 'published');
+  const published = services.filter(isPubliclyVisible);
   const visible = activeCategory
     ? published.filter((s) => s.categorySlug === activeCategory)
     : published;

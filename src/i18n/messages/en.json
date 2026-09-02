@@ -999,6 +999,7 @@
       "consentRequired": "Please tick the consent box to submit your application."
     },
     "sections": {
+      "market": "Market",
       "about_you": "About you",
       "the_business": "The business",
       "ownership": "Ownership",

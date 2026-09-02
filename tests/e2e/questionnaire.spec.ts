@@ -85,7 +85,10 @@ test.describe('application flow', () => {
         .first()
         .textContent();
 
-    await expect(page.locator('p', { hasText: /^Stage 1 of 6/ })).toBeVisible();
+    // The first two screens ask where the founder wants to operate and which
+    // country, so the stage is Market — they used to be labelled "About you",
+    // which described neither of them.
+    await expect(page.locator('p', { hasText: /^Stage 1 of 7: Market/ })).toBeVisible();
     const totals = new Set<string>();
     const seen: number[] = [];
 
@@ -109,7 +112,10 @@ test.describe('application flow', () => {
 
     // The denominator never changes, and the stage number never decreases —
     // the two properties the old "Step 1 of 16 → Step 3 of 15" model broke.
-    expect([...totals]).toEqual(['6']);
+    // Asserted as "exactly one denominator was ever shown" rather than against
+    // a literal: the literal was 6, went stale the moment a stage was added,
+    // and pinned a number the test does not actually care about.
+    expect([...totals], `denominator changed mid-flow: ${[...totals].join(', ')}`).toHaveLength(1);
     for (let i = 1; i < seen.length; i += 1) {
       expect(seen[i]!, `stage decreased at step ${i}`).toBeGreaterThanOrEqual(seen[i - 1]!);
     }

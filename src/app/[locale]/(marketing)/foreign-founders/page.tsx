@@ -9,6 +9,7 @@ import { Section } from '@/components/ui/section';
 import { PageHeader } from '@/components/marketing/page-header';
 import { ServiceCard } from '@/components/marketing/service-card';
 import { getResource, getServices } from '@/features/catalog/queries';
+import { isPubliclyVisible } from '@/features/catalog/types';
 import { pick, type Locale } from '@/features/catalog/types';
 import { MARKETING_ROUTES } from '@/lib/navigation';
 import { localizedUrl } from '@/lib/site';
@@ -60,9 +61,14 @@ export default async function ForeignFoundersPage({
     getResource('foreign-investment-first-steps'),
   ]);
 
+  // Category membership is not permission to show a service: this page listed
+  // by category alone, so an unpublished service in the foreign-founders
+  // category reached the public here even after the services index stopped
+  // listing it.
   const relevant = services.filter(
     (s) =>
-      s.categorySlug === 'foreign-founders' || s.slug === 'private-limited-company-incorporation',
+      isPubliclyVisible(s) &&
+      (s.categorySlug === 'foreign-founders' || s.slug === 'private-limited-company-incorporation'),
   );
 
   return (

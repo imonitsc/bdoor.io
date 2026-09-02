@@ -3,6 +3,7 @@ import { locales } from '@/i18n/routing';
 import { SITEMAP_ROUTES } from '@/lib/navigation';
 import { countrySitemapEntries } from '@/content/international';
 import { getResources, getServices } from '@/features/catalog/queries';
+import { isPubliclyVisible } from '@/features/catalog/types';
 import { localizedUrl } from '@/lib/site';
 
 /**
@@ -31,14 +32,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: undefined as Date | undefined,
   }));
 
-  const servicePaths = services
-    .filter((service) => service.status === 'published')
-    .map((service) => ({
-      path: `/services/${service.slug}`,
-      priority: 0.7,
-      changeFrequency: 'monthly' as const,
-      lastModified: service.timeReviewedAt ? new Date(service.timeReviewedAt) : undefined,
-    }));
+  const servicePaths = services.filter(isPubliclyVisible).map((service) => ({
+    path: `/services/${service.slug}`,
+    priority: 0.7,
+    changeFrequency: 'monthly' as const,
+    lastModified: service.timeReviewedAt ? new Date(service.timeReviewedAt) : undefined,
+  }));
 
   const resourcePaths = resources.map((resource) => ({
     path: `/resources/${resource.slug}`,

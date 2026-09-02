@@ -75,8 +75,15 @@ describe('target_country', () => {
     expect(targetCountryFromSlug('')).toBeUndefined();
   });
 
-  it('stays in the about_you stage, so stage progress does not jump', () => {
-    expect(stageProgress({}, 0)).toMatchObject({ current: 1, stage: 'about_you' });
+  it('shares the first stage with the market question, so progress does not jump', () => {
+    // The property is that both opening screens sit in stage one, not what
+    // that stage is called. They moved from `about_you` to `market` because
+    // neither asks anything about the person.
+    expect(stageProgress({}, 0)).toMatchObject({ current: 1, stage: 'market' });
+    expect(stageProgress({ market_scope: 'outside' }, 1)).toMatchObject({
+      current: 1,
+      stage: 'market',
+    });
   });
 
   it('never lets an international target skip manual review', () => {

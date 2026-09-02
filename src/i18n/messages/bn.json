@@ -997,6 +997,7 @@
       "consentRequired": "আবেদন জমা দিতে সম্মতির ঘরে টিক দিন।"
     },
     "sections": {
+      "market": "বাজার",
       "about_you": "আপনার সম্পর্কে",
       "the_business": "ব্যবসা",
       "ownership": "মালিকানা",

@@ -15,23 +15,23 @@ Baseline commit: `5e5b8c4` on `claude/new-session-0n73z6`.
 
 ## Summary
 
-| P0 item                                                          | State                                             | Weight |
-| ---------------------------------------------------------------- | ------------------------------------------------- | ------ |
-| 1. Production branch, deployment, migration truth                | **Verified**                                      | —      |
-| 2. Start stage labels and progress                               | **Open — needs an owner decision, not a bug fix** | S      |
-| 3. Deep-link precedence and async draft saving                   | **In place**                                      | —      |
-| 4. Public `Coming soon` / interest-only doors                    | **Partially open**                                | S      |
-| 5. Gateway multi-model routing, budgets, failover, telemetry     | **Partially in place, renamed contract**          | M      |
-| 6. Versioned official-domain allowlist + safe fetcher            | **Absent**                                        | L      |
-| 7. Gateway web-search behind a research adapter                  | **Absent**                                        | L      |
-| 8. Freshness, live research, evidence labels, review queue       | **Absent**                                        | L      |
-| 9. Legal-instrument / provision / coverage schema                | **Absent**                                        | L      |
-| 10. Official-source retrieval, amendments, claim-level citations | **Partial**                                       | M      |
-| 11. Scheduled source monitoring and change alerts                | **Partial — and currently inert**                 | M      |
-| 12. AI evaluation, web-content security, performance gates       | **Partial**                                       | M      |
-| 13. Funnel, research-quality and investor analytics              | **Substantially in place**                        | S      |
-| 14. Policy routes at Version 1.0, indexed                        | **In place**                                      | —      |
-| 15. Preview and P0 evidence report                               | **Not started**                                   | —      |
+| P0 item                                                          | State                                     | Weight |
+| ---------------------------------------------------------------- | ----------------------------------------- | ------ |
+| 1. Production branch, deployment, migration truth                | **Verified**                              | —      |
+| 2. Start stage labels and progress                               | **Done** — a `market` stage; Stage 1 of 7 | S      |
+| 3. Deep-link precedence and async draft saving                   | **In place**                              | —      |
+| 4. Public `Coming soon` / interest-only doors                    | **Done** — no interest-only page remains  | S      |
+| 5. Gateway multi-model routing, budgets, failover, telemetry     | **Partially in place, renamed contract**  | M      |
+| 6. Versioned official-domain allowlist + safe fetcher            | **Absent**                                | L      |
+| 7. Gateway web-search behind a research adapter                  | **Absent**                                | L      |
+| 8. Freshness, live research, evidence labels, review queue       | **Absent**                                | L      |
+| 9. Legal-instrument / provision / coverage schema                | **Absent**                                | L      |
+| 10. Official-source retrieval, amendments, claim-level citations | **Partial**                               | M      |
+| 11. Scheduled source monitoring and change alerts                | **Partial — and currently inert**         | M      |
+| 12. AI evaluation, web-content security, performance gates       | **Partial**                               | M      |
+| 13. Funnel, research-quality and investor analytics              | **Substantially in place**                | S      |
+| 14. Policy routes at Version 1.0, indexed                        | **In place**                              | —      |
+| 15. Preview and P0 evidence report                               | **Not started**                           | —      |
 
 Six of fifteen are effectively unbuilt (items 6–9 plus the parts of 10–11 that depend on
 them), and they are the ones that carry the product claim in §1.1. Everything upstream of
@@ -94,10 +94,15 @@ first two screens. Fixing it means changing `STAGES` — either splitting a new 
 renaming the existing one — which changes the denominator (`of 6`) and touches
 `start.sections.*` in both locales.
 
-That is a content and information-architecture decision, not a defect, so it is proposed
-rather than assumed. Recommended: introduce a `market` stage ahead of `about_you`, making the
-first two screens `Stage 1 of 7: Market`. `tests/unit/stage-progress.test.ts` already proves
-the counter never regresses and will hold the change honest.
+That is a content and information-architecture decision, not a defect, so it was proposed
+rather than assumed.
+
+**Resolved.** The owner approved, and `STAGES` now opens with `market`: the two screens read
+`Stage 1 of 7: Market`. `tests/unit/stage-progress.test.ts` is property-based and held the
+change honest without edits — the counter still never regresses and every question still
+belongs to a known stage. `tests/unit/target-country.test.ts` had pinned the old stage _name_
+where it meant to pin "both opening screens sit in stage one", and now asserts that
+property instead.
 
 ---
 
@@ -124,8 +129,20 @@ left the room.
 availability rung "is honest only as register interest", so the ladder is intentional; the
 question §8.3 forces is whether such a door should be reachable at all.
 
-Proposed: a coming-soon service slug returns 404 or redirects to the nearest published
-service, and the three entries stay in the catalogue as data for when they open.
+**Resolved, and wider than the survey found.** A service that is not published now has no
+public page: the detail route returns 404, does not prerender and returns empty metadata.
+Auditing for the fix turned up a fourth surface the survey had missed — the
+foreign-founders page listed services by _category alone_, with no status check, so an
+unpublished service in that category reached the public there regardless of the index.
+
+The root cause was that four surfaces each open-coded `status === 'published'` and one of
+them drifted. There is now a single `isPubliclyVisible` predicate in
+`src/features/catalog/types.ts` that all four use. The coming-soon badge and the "Notify me"
+action are deleted outright rather than left unreachable, so no future list can render the
+door by forgetting to filter, and `tests/unit/service-visibility.test.ts` fails if any of
+these surfaces reintroduces either one or goes back to open-coding the status check.
+
+The three `coming_soon` entries stay in the catalogue as data for when they open.
 
 ---
 

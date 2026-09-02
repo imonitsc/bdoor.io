@@ -64,6 +64,21 @@ export type Service = {
   feeComponents: ServiceFeeComponent[];
 };
 
+/**
+ * Whether a service may be shown to the public at all.
+ *
+ * One predicate for three surfaces — the services index, the sitemap and the
+ * service detail route — because they had each open-coded it and the detail
+ * route drifted: the index stopped listing `coming_soon` services but the
+ * route kept serving them, so a direct or indexed URL still offered a
+ * "Notify me" door for work operations cannot accept. CLAUDE.md §8.3 allows a
+ * service to be an open application or published information, never an
+ * interest form.
+ */
+export function isPubliclyVisible(service: Pick<Service, 'status'>): boolean {
+  return service.status === 'published';
+}
+
 export type Faq = {
   id: string;
   serviceSlug: string | null;

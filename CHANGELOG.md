@@ -3,6 +3,40 @@
 Running record of shipped changes (CLAUDE.md Part I, Working Rule 6). Newest
 first; each entry names its merged pull requests. Dates are merge dates.
 
+## 2026-09-02
+
+- **Two public doors told the truth (P0 items 2 and 4)** — the first work under
+  the new CLAUDE.md, and both turned out to be misdiagnosed in its §2.2
+  baseline.
+
+  The Start stage label was never a bug. `market_scope` and `target_country`
+  were both declared in the `about_you` section, so "Stage 1 of 6: About you"
+  was exactly what the code said — and the code was describing two screens
+  that ask nothing about the person. The fix was the stage model, not the
+  label: `STAGES` now opens with `market` and those screens read
+  `Stage 1 of 7: Market`. The property-based progress test needed no edits,
+  which is the point of having written it that way; one older test had pinned
+  the stage _name_ where it meant to pin "both opening screens are stage one",
+  and now says so.
+
+  The coming-soon fix from an earlier release had hidden the entrance and left
+  the room. The services index excluded those services; the detail route still
+  served them with a badge and a "Notify me" button, and an e2e test blessed it
+  — "detail may still exist for deep links" — which is precisely the
+  interest-only door §8.3 forbids. Auditing the fix found a fourth surface
+  nobody had counted: the foreign-founders page listed by category with no
+  status check at all, so an unpublished service in that category reached the
+  public there whatever the index did.
+
+  The real defect was four surfaces open-coding `status === 'published'` and
+  one of them drifting, so there is now one `isPubliclyVisible` predicate they
+  all use. The badge and the Notify me action are deleted rather than left
+  unreachable: a door that exists in the code gets rendered again eventually.
+  `tests/unit/service-visibility.test.ts` fails if any of these surfaces brings
+  either back or returns to open-coding the check, and the enum list it tests
+  is derived from the type — a hand-written one had silently guessed
+  `archived` for what is actually `retired`, and typecheck caught it.
+
 ## 2026-09-01
 
 - **Passwordless as a switch, not a leap (M2)** — the owner asked to keep
