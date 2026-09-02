@@ -161,8 +161,9 @@ carries names and comments only — never a value.
 | `PAYMENT_PROVIDER`                     | no                 | `mock` (default), `sslcommerz`, `stripe`.                                                                                                                    |
 | `PAYMENT_WEBHOOK_SECRET`               | when not mock      | HMAC secret for inbound webhooks, ≥16 chars.                                                                                                                 |
 | `PAYMENT_RETURN_URL`                   | no                 | Overrides where the gateway returns the customer.                                                                                                            |
-| `EMAIL_PROVIDER`                       | no                 | `mock` (default), `resend`, `smtp`.                                                                                                                          |
+| `EMAIL_PROVIDER`                       | no                 | `mock` (default) or `resend`. `smtp` is not implemented — it needs a mail dependency.                                                                        |
 | `EMAIL_FROM`                           | when not mock      | Sending address.                                                                                                                                             |
+| `EMAIL_API_KEY`                        | when not mock      | Provider API key. Server-only — never `NEXT_PUBLIC_`.                                                                                                        |
 | `SCREENING_PROVIDER`                   | no                 | `mock` (default) or `live`.                                                                                                                                  |
 | `MALWARE_SCAN_PROVIDER`                | no                 | `mock` (default) or `live`.                                                                                                                                  |
 | `AI_PROVIDER`                          | no                 | `disabled` (default) or `anthropic`. The recommendation engine, not the assistant.                                                                           |
@@ -382,8 +383,9 @@ questionnaire and the case UI both say so.
 ### Email
 
 `src/lib/email/` defines `EmailProvider.send()`. The mock logs a redacted
-summary and sends nothing. Implement Resend or SMTP, set `EMAIL_PROVIDER` and
-`EMAIL_FROM`. `emailIsMock()` is what the admin area reads to say "email is not
+summary and sends nothing. Resend is implemented: set `EMAIL_PROVIDER=resend`
+with `EMAIL_FROM` and `EMAIL_API_KEY`. SMTP is not — it would need a mail
+library added as a dependency. `emailIsMock()` is what the admin area reads to say "email is not
 configured" instead of pretending a notification went out.
 
 ### Sanctions / PEP screening

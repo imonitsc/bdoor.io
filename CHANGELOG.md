@@ -5,6 +5,29 @@ first; each entry names its merged pull requests. Dates are merge dates.
 
 ## 2026-09-01
 
+- **Email actually leaves the building (R3)** — the owner connected a
+  provider, so the deliberate gap R1 left is closed. `src/lib/email/` had
+  defined an `EmailProvider` interface and implemented exactly one
+  provider — the mock — and `getEmailProvider()` threw for anything else,
+  which meant a non-mock `EMAIL_PROVIDER` would have broken every mail
+  path in the product. Resend is now implemented behind that interface
+  over `fetch`, with no new dependency: failures are returned rather than
+  thrown (several callers send mail as a side-effect of a customer action
+  and do not wrap the call, so a throw would fail the thing the customer
+  actually asked for), a ten-second timeout keeps a hung provider from
+  holding a Server Action open, and no log line carries the recipient or
+  the body. `EMAIL_API_KEY` was documented in `.env.example` but had never
+  been in the env schema; it is now, and required for any non-mock
+  provider. Compliance reminders gained their email leg: each channel
+  runs its own bounded batch, so a provider outage cannot stop in-app
+  reminders reaching the workspace, and each member is written to in the
+  locale their profile chose. The honesty rule from R1 is unchanged and
+  now enforced in one place — while the provider is the mock, email rows
+  are left pending and never stamped, because `sent_at` is what the
+  engagement metric counts and it may only ever mean delivered. SMTP
+  stays unimplemented: it needs a mail library, which is a dependency
+  decision for the owner.
+
 - **A recurring obligation becomes a managed case (R2)** — the second gap
   P4's instrumentation exposed, and the same shape as the first: the
   `renewal_cases` table, its RLS, the conversion view and the admin card

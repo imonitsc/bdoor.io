@@ -4,6 +4,9 @@ import { getTranslations } from 'next-intl/server';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/database';
 import { logger } from '@/lib/logger';
+import { emailIsMock, getEmailProvider } from '@/lib/email';
+import { absoluteUrl } from '@/lib/site';
+import type { NotificationChannel } from './reminders';
 import {
   ACTIONABLE_STATUSES,
   DEFAULT_REMINDER_OFFSETS,
@@ -33,11 +36,12 @@ import {
  *   "never five at once"      → one notification per recipient per run,
  *                               however many obligations came due together.
  *
- * Only the in-app channel is dispatched here. An in-app notification is a real
- * delivery, so stamping `sent_at` for it is honest today. Email reminders stay
- * pending until an email provider is configured: the only implemented adapter
- * is the mock, and stamping `sent_at` because a mock logged a line would make
- * `metrics_obligation_engagement` report reminders that never reached anyone.
+ * Both channels are dispatched, each in its own bounded batch. `sent_at` may
+ * only ever mean "delivered": an in-app notification always is, and an email
+ * counts only once a real provider accepted it. While `EMAIL_PROVIDER` is the
+ * mock the email rows are left pending rather than stamped, because a mock
+ * logging a line would make `metrics_obligation_engagement` report reminders
+ * that reached nobody.
  */
 
 /** Longest lead time we schedule, and so the window worth materialising. */
@@ -176,18 +180,33 @@ type ReminderObligation = {
  */
 export async function dispatchDueReminders(
   admin: SupabaseClient<Database>,
-  options: { now?: Date; limit?: number; titles?: ReminderTitles } = {},
+  options: {
+    now?: Date;
+    limit?: number;
+    titles?: ReminderTitles;
+    channel?: NotificationChannel;
+  } = {},
 ): Promise<DispatchReport> {
   const now = options.now ?? new Date();
   const titles = options.titles ?? i18nTitles;
+  const channel = options.channel ?? 'in_app';
   const today = isoDate(now);
+
+  // Nothing to do for email until a real provider is configured. Returning
+  // here leaves the rows pending, so they go out on the first run after the
+  // owner sets one rather than being consumed by a mock.
+  if (channel === 'email' && emailIsMock()) {
+    logger.info('reminders.email_skipped_mock');
+    return { claimed: 0, sent: 0, notified: 0, retired: 0 };
+  }
+
   const limit = options.limit ?? 200;
   const report: DispatchReport = { claimed: 0, sent: 0, notified: 0, retired: 0 };
 
   const { data: dueRows, error: dueError } = await admin
     .from('compliance_reminders')
     .select('id, obligation_id, scheduled_for')
-    .eq('channel', 'in_app')
+    .eq('channel', channel)
     .is('sent_at', null)
     .is('failed_at', null)
     .lte('scheduled_for', today)
@@ -301,6 +320,38 @@ export async function dispatchDueReminders(
     // unambiguous meaning. Every member still receives their own copy.
     let primaryNotificationId: string | null = null;
 
+    if (channel === 'email') {
+      const delivered = await sendEmailDigest(admin, {
+        memberIds: members.map((member) => member.user_id),
+        organizationId,
+        title,
+        bodyEn,
+        bodyBn,
+      });
+      // Nothing reached anyone: leave the rows pending rather than stamping a
+      // send that did not happen. `sent_at` is what the engagement metric
+      // counts, so it may only ever mean "delivered".
+      if (delivered === 0) continue;
+      report.notified += delivered;
+      for (const item of items) {
+        const { data: claimed, error: claimError } = await admin
+          .from('compliance_reminders')
+          .update({ sent_at: now.toISOString() })
+          .eq('id', item.reminder.id)
+          .is('sent_at', null)
+          .select('id');
+        if (claimError) {
+          logger.error('reminders.stamp_failed', {
+            reminderId: item.reminder.id,
+            message: claimError.message,
+          });
+          continue;
+        }
+        report.sent += claimed?.length ?? 0;
+      }
+      continue;
+    }
+
     for (const member of members) {
       // The id is chosen here rather than by the default so the link can carry
       // it: following the reminder into the calendar is what stamps
@@ -354,4 +405,69 @@ export async function dispatchDueReminders(
   }
 
   return report;
+}
+
+type DigestInput = {
+  memberIds: readonly string[];
+  organizationId: string;
+  title: { en: string; bn: string };
+  bodyEn: string;
+  bodyBn: string;
+};
+
+/**
+ * One email per member who has an address, in the locale they chose.
+ *
+ * Returns how many were actually accepted by the provider, because that is
+ * what the caller is allowed to stamp `sent_at` against. A member with no
+ * address on their profile is skipped rather than guessed at.
+ */
+async function sendEmailDigest(
+  admin: SupabaseClient<Database>,
+  input: DigestInput,
+): Promise<number> {
+  const { data: profiles, error } = await admin
+    .from('profiles')
+    .select('id, email, preferred_locale')
+    .in('id', [...input.memberIds]);
+
+  if (error) {
+    logger.error('reminders.profiles_failed', {
+      organizationId: input.organizationId,
+      message: error.message,
+    });
+    return 0;
+  }
+
+  let provider;
+  try {
+    provider = getEmailProvider();
+  } catch (providerError) {
+    // A misconfigured provider must not take the whole run down; the rows
+    // stay pending and the next run retries.
+    logger.error('reminders.email_provider_unavailable', {
+      message: providerError instanceof Error ? providerError.message : 'unknown',
+    });
+    return 0;
+  }
+
+  let delivered = 0;
+  for (const profile of profiles ?? []) {
+    if (!profile.email) continue;
+    const locale = profile.preferred_locale === 'bn' ? 'bn' : 'en';
+    const subject = locale === 'bn' ? input.title.bn : input.title.en;
+    const body = locale === 'bn' ? input.bodyBn : input.bodyEn;
+
+    const result = await provider.send({
+      to: profile.email,
+      subject,
+      text: `${body}\n\n${absoluteUrl(`/${locale}/app/compliance`)}`,
+      template: 'compliance_reminder',
+      locale,
+    });
+
+    if (result.ok) delivered += 1;
+  }
+
+  return delivered;
 }

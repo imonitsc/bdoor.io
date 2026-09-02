@@ -39,6 +39,8 @@ const serverSchema = z.object({
   PAYMENT_RETURN_URL: optionalUrl,
   EMAIL_PROVIDER: z.enum(['mock', 'resend', 'smtp']).default('mock'),
   EMAIL_FROM: z.string().email().optional(),
+  /** Provider API key. Server-only; required for any non-mock provider. */
+  EMAIL_API_KEY: z.string().min(1).optional(),
   SCREENING_PROVIDER: providerMode,
   MALWARE_SCAN_PROVIDER: providerMode,
   AI_PROVIDER: z.enum(['disabled', 'anthropic']).default('disabled'),
@@ -199,6 +201,9 @@ export function productionEnvProblems(): string[] {
   }
   if (env.EMAIL_PROVIDER !== 'mock' && !env.EMAIL_FROM) {
     problems.push('EMAIL_FROM — required when EMAIL_PROVIDER is not "mock"');
+  }
+  if (env.EMAIL_PROVIDER !== 'mock' && !env.EMAIL_API_KEY) {
+    problems.push('EMAIL_API_KEY — required when EMAIL_PROVIDER is not "mock"');
   }
   if (env.AI_PROVIDER !== 'disabled' && !env.AI_API_KEY) {
     problems.push('AI_API_KEY — required when AI_PROVIDER is not "disabled"');

@@ -3,6 +3,7 @@ import 'server-only';
 import { serverEnv } from '@/lib/env';
 import { logger } from '@/lib/logger';
 import { redactMetadata } from '@/lib/audit/redact';
+import { ResendEmailProvider } from './resend';
 
 export type EmailMessage = {
   to: string;
@@ -41,14 +42,27 @@ class MockEmailProvider implements EmailProvider {
 }
 
 export function getEmailProvider(): EmailProvider {
-  const configured = serverEnv().EMAIL_PROVIDER;
+  const env = serverEnv();
 
-  if (configured === 'mock') return new MockEmailProvider();
+  if (env.EMAIL_PROVIDER === 'mock') return new MockEmailProvider();
+
+  if (env.EMAIL_PROVIDER === 'resend') {
+    // Env validation already requires both for a non-mock provider; this
+    // guard keeps a misconfigured deployment from sending nothing silently.
+    if (!env.EMAIL_API_KEY || !env.EMAIL_FROM) {
+      throw new Error(
+        'EMAIL_PROVIDER=resend requires EMAIL_API_KEY and EMAIL_FROM. ' +
+          'Both are server-only; neither may carry a NEXT_PUBLIC_ prefix.',
+      );
+    }
+    return new ResendEmailProvider(env.EMAIL_API_KEY, env.EMAIL_FROM);
+  }
 
   throw new Error(
-    `EMAIL_PROVIDER is set to "${configured}" but no adapter is implemented for it. ` +
-      'Implement the EmailProvider interface in src/lib/email/ and register it here. ' +
-      'Set EMAIL_FROM as well — env validation requires it for any non-mock provider.',
+    `EMAIL_PROVIDER is set to "${env.EMAIL_PROVIDER}" but no adapter is implemented for it. ` +
+      'SMTP would need a mail library added as a dependency — a decision for the ' +
+      'repository owner. Implement the EmailProvider interface in src/lib/email/ ' +
+      'and register it here.',
   );
 }
 

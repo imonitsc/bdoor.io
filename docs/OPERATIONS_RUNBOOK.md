@@ -92,11 +92,12 @@ scanned. Configuring a real scanner is a launch blocker.
 
 Honest list. Each is manual today:
 
-- Compliance reminder **email** is not sent. The daily job
-  (`/api/compliance/reminders`, `CRON_SECRET`) materialises reminder rows and
-  delivers the in-app ones; `channel = 'email'` rows stay pending because the
-  only implemented email adapter is the mock. They start sending when
-  `EMAIL_PROVIDER` and `EMAIL_FROM` are configured and the email leg is wired.
+- Compliance reminder email sends only where `EMAIL_PROVIDER=resend` is
+  configured with `EMAIL_FROM` and `EMAIL_API_KEY`. While the provider is the
+  mock, `channel = 'email'` rows are left pending and untouched — never
+  stamped — so they go out on the first run after a real provider is set.
+  `smtp` remains unimplemented: it needs a mail dependency, which is an
+  owner decision.
 - A customer cannot accept a renewal offer themselves. `case_status_transitions`
   authorises `draft → awaiting_kyc` for the actor `customer`, but the
   `cases_customer_update_draft` RLS policy's `with check (status = 'draft')`
