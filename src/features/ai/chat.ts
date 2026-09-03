@@ -9,7 +9,7 @@ import {
 } from 'ai';
 
 import { checkBudget } from './budget';
-import { auditCitations, auditTelemetry } from './citations';
+import { auditCitations, auditTelemetry, type CitationAudit } from './citations';
 import { LIMITS, isSupportedCountry, usageTags } from './config';
 import { classifyUpstreamError, failureMessage, type AiFailure } from './errors';
 import { answerRoute, classifyRisk, providerLockFor } from './models';
@@ -442,8 +442,10 @@ export function streamAnswer(request: ChatRequest): Response {
       // costs nothing and cannot itself fail the request — only counts are
       // logged, because a sentence lifted out of an answer is answer content
       // and §17 keeps that out of general logs.
+      let citationAudit: { audit: CitationAudit; citationCount: number } | null = null;
       if (status === 'complete') {
         const audit = auditCitations(outcome.text, retrieval.citations.length);
+        citationAudit = { audit, citationCount: retrieval.citations.length };
         if (!audit.ok) {
           logger.warn('ai.answer.citation_audit', {
             ...auditTelemetry(audit),
@@ -471,6 +473,7 @@ export function streamAnswer(request: ChatRequest): Response {
         errorCode,
         country,
         locale,
+        citationAudit,
       });
       await Promise.allSettled(backgroundWrites);
       timings.mark('persisted');

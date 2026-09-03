@@ -325,6 +325,12 @@ export type Database = {
           "status": Database["public"]["Enums"]["ai_completion_status"]
           "error_code": string | null
           "created_at": string
+          "citation_count": number | null
+          "material_claims": number | null
+          "supported_claims": number | null
+          "uncited_claims": number | null
+          "fabricated_marker_count": number | null
+          "citation_audit_ok": boolean | null
         }
         Insert: {
           "id"?: string
@@ -341,6 +347,12 @@ export type Database = {
           "status"?: Database["public"]["Enums"]["ai_completion_status"]
           "error_code"?: string | null
           "created_at"?: string
+          "citation_count"?: number | null
+          "material_claims"?: number | null
+          "supported_claims"?: number | null
+          "uncited_claims"?: number | null
+          "fabricated_marker_count"?: number | null
+          "citation_audit_ok"?: boolean | null
         }
         Update: {
           "id"?: string
@@ -357,6 +369,12 @@ export type Database = {
           "status"?: Database["public"]["Enums"]["ai_completion_status"]
           "error_code"?: string | null
           "created_at"?: string
+          "citation_count"?: number | null
+          "material_claims"?: number | null
+          "supported_claims"?: number | null
+          "uncited_claims"?: number | null
+          "fabricated_marker_count"?: number | null
+          "citation_audit_ok"?: boolean | null
         }
         Relationships: []
       }

@@ -321,6 +321,94 @@ describe('conversations', () => {
   });
 });
 
+describe('the citation audit columns', () => {
+  it('is covered by the transcript policies, not by a policy of its own', async () => {
+    // The migration adds columns rather than a table, on the claim that
+    // row-level security governs rows and the existing ai_messages policies
+    // therefore cover them. This is that claim under test: a customer must not
+    // read another customer's audit any more than another customer's answer.
+    await inRolledBackTransaction(client, async (tx) => {
+      const { rows: mine } = await tx.query<{ id: string }>(
+        `insert into public.ai_conversations (user_id, country, locale)
+         values ($1, 'bd', 'en') returning id`,
+        [USERS.localFounder],
+      );
+      const { rows: theirs } = await tx.query<{ id: string }>(
+        `insert into public.ai_conversations (user_id, country, locale)
+         values ($1, 'bd', 'en') returning id`,
+        [USERS.foreignFounder],
+      );
+
+      await tx.query(
+        `insert into public.ai_messages
+           (conversation_id, role, content, citation_count, material_claims,
+            supported_claims, uncited_claims, fabricated_marker_count, citation_audit_ok)
+         values ($1, 'assistant', 'my answer', 3, 2, 2, 0, 0, true),
+                ($2, 'assistant', 'their answer', 4, 5, 1, 4, 2, false)`,
+        [mine[0]!.id, theirs[0]!.id],
+      );
+
+      await setIdentity(tx, USERS.localFounder);
+
+      const { rows } = await tx.query<{ uncited_claims: number; citation_audit_ok: boolean }>(
+        `select uncited_claims, citation_audit_ok from public.ai_messages`,
+      );
+      expect(rows).toEqual([{ uncited_claims: 0, citation_audit_ok: true }]);
+    });
+  });
+
+  it('reaches a compliance reviewer, who is the person the review queue is for', async () => {
+    await inRolledBackTransaction(client, async (tx) => {
+      const { rows: conversation } = await tx.query<{ id: string }>(
+        `insert into public.ai_conversations (user_id, country, locale)
+         values ($1, 'bd', 'en') returning id`,
+        [USERS.localFounder],
+      );
+      await tx.query(
+        `insert into public.ai_messages
+           (conversation_id, role, content, citation_count, material_claims,
+            supported_claims, uncited_claims, fabricated_marker_count, citation_audit_ok)
+         values ($1, 'assistant', 'an answer stating a fee', 2, 3, 1, 2, 1, false)`,
+        [conversation[0]!.id],
+      );
+
+      await setIdentity(tx, USERS.admin, { aal: 'aal2' });
+
+      const { rows } = await tx.query<{ fabricated_marker_count: number }>(
+        `select fabricated_marker_count from public.ai_messages
+         where citation_audit_ok is false`,
+      );
+      expect(rows).toEqual([{ fabricated_marker_count: 1 }]);
+    });
+  });
+
+  it('leaves the audit null on an older answer rather than inventing a verdict', async () => {
+    // Every row written before the migration, and every failed answer, has no
+    // audit. Null must stay null: defaulting it to true would silently mark
+    // unaudited history as clean, which is the one reading of this data that
+    // would be actively misleading.
+    await inRolledBackTransaction(client, async (tx) => {
+      const { rows: conversation } = await tx.query<{ id: string }>(
+        `insert into public.ai_conversations (user_id, country, locale)
+         values ($1, 'bd', 'en') returning id`,
+        [USERS.localFounder],
+      );
+      await tx.query(
+        `insert into public.ai_messages (conversation_id, role, content)
+         values ($1, 'assistant', 'an answer from before the audit existed')`,
+        [conversation[0]!.id],
+      );
+
+      await setIdentity(tx, USERS.localFounder);
+      const { rows } = await tx.query<{
+        citation_audit_ok: boolean | null;
+        citation_count: number | null;
+      }>(`select citation_audit_ok, citation_count from public.ai_messages`);
+      expect(rows).toEqual([{ citation_audit_ok: null, citation_count: null }]);
+    });
+  });
+});
+
 describe('staff access', () => {
   it('lets a content publisher see drafts and the improvement queue', async () => {
     await inRolledBackTransaction(client, async (tx) => {

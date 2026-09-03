@@ -5,6 +5,43 @@ first; each entry names its merged pull requests. Dates are merge dates.
 
 ## 2026-09-03
 
+- **The citation audit becomes reviewable, and one column had to be stored
+  rather than derived** — #76 computed the audit and threw the verdict away in
+  a log line, so "how often do we state a fee with nothing behind it" — an
+  investor metric in §19 and a review queue in §16.4 — could not be asked at
+  all. Six columns on `ai_messages` make it a query, and `/admin/ai` now lists
+  the answers that failed with the specific uncited sentences.
+
+  The interesting column is `citation_count`, and it exists because the obvious
+  design was wrong. The audit needs to know how many numbered sources the
+  prompt carried, and the plan was to derive that from what was already
+  stored — `source_ids.length + rule_ids.length`. Reading retrieval.ts closely
+  before writing the DDL showed that number is not the citation count:
+  `source_ids` is de-duplicated, so two chunks from one gazette are two
+  numbered citations but a single source id, and the catalogue citation `[1]`
+  has no source id at all. Deriving it would under-count, and an under-count
+  makes legitimate high-numbered markers look fabricated — precisely the false
+  accusation the audit was designed never to make. The real count is recorded.
+
+  Counts are stored; per-sentence detail is not. A column can be indexed,
+  filtered and averaged, and "show me answers with uncited claims" is not a
+  question you can ask by re-running string analysis across a table — so the
+  counts are persisted behind a partial index on the failing rows. The
+  sentences are recomputed from the answer on read, so a reviewer always sees
+  the current detector's reading rather than a verdict frozen at write time,
+  and the answer text keeps living in exactly one place. The two can disagree
+  in principle, because a recomputation runs over the redacted `content`
+  column while the audit ran on the answer as generated; where they differ the
+  stored counts are the record and the sentences are the explanation, and both
+  are shown rather than one being derived from the other.
+
+  No new RLS policy: row-level security governs rows, not columns, so the
+  existing `ai_messages_own_read` and `ai_messages_staff_read` cover these.
+  That is a claim, so it is tested — one customer cannot read another's audit,
+  a compliance reviewer can read the queue, and a pre-migration answer keeps a
+  null verdict rather than defaulting to "clean", which is the one reading of
+  this data that would actively mislead.
+
 - **Answers are now audited against the sources they were given (P0 item 10,
   claim-level half)** — the prompt has always told the model to cite every
   factual regulatory claim, and retrieval has always numbered the sources it
