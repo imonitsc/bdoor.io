@@ -3,7 +3,7 @@ import 'server-only';
 import { aiDb, hasAiDatabase } from '../db';
 import { getDocument, type RegistryDocument, type RegistrySource } from './documents';
 import { detectChanges } from './diff';
-import { extractDocument, sha256Hex } from './extract';
+import { extractDocument } from './extract';
 import { fetchDocument } from './fetcher';
 import { claimDueJobs, completeJob, enqueueJob, failJob, type JobRow } from './jobs';
 import { logger } from '@/lib/logger';
@@ -121,7 +121,7 @@ async function runCheckSource(job: JobRow): Promise<void> {
     return;
   }
 
-  const checksum = sha256Hex(outcome.bytes);
+  const checksum = outcome.contentHash;
   const changed =
     source.last_content_checksum !== null && source.last_content_checksum !== checksum;
 
@@ -233,7 +233,7 @@ async function runFetchDocument(job: JobRow): Promise<void> {
     return;
   }
 
-  const checksum = sha256Hex(outcome.bytes);
+  const checksum = outcome.contentHash;
   const retrievedAt = new Date().toISOString();
 
   // Unchanged content: the record is current; nothing else to do.

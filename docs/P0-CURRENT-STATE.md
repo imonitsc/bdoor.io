@@ -22,7 +22,7 @@ Baseline commit: `5e5b8c4` on `claude/new-session-0n73z6`.
 | 3. Deep-link precedence and async draft saving                   | **In place**                              | —      |
 | 4. Public `Coming soon` / interest-only doors                    | **Done** — no interest-only page remains  | S      |
 | 5. Gateway multi-model routing, budgets, failover, telemetry     | **Partially in place, renamed contract**  | M      |
-| 6. Versioned official-domain allowlist + safe fetcher            | **Absent**                                | L      |
+| 6. Versioned official-domain allowlist + safe fetcher            | **Done** — allowlist ships empty          | M      |
 | 7. Gateway web-search behind a research adapter                  | **Absent**                                | L      |
 | 8. Freshness, live research, evidence labels, review queue       | **Absent**                                | L      |
 | 9. Legal-instrument / provision / coverage schema                | **Absent**                                | L      |
@@ -209,7 +209,13 @@ cap alone lets a slow leak run for a month.
 These four items are the substance of §1.1's claim and none of them exists yet. Searched the
 whole of `src/` and `supabase/migrations/`:
 
-- **No official-domain allowlist**, versioned or otherwise, and no safe exact-page fetcher.
+- **The official-domain allowlist and the safe fetcher now exist** (item 6, shipped
+  2 September 2026). `src/features/ai/research/official-domains.ts` holds the versioned
+  allowlist and `src/features/ai/research/url-safety.ts` the address and scheme predicates;
+  `src/features/ai/registry/fetcher.ts` follows redirects one hop at a time and re-checks
+  each one. The allowlist itself is **empty**: which hosts carry the authority of
+  Bangladeshi law is a regulatory fact and §3.3 forbids inventing one, so `allowlisted()`
+  refuses every host until the owner approves a list. See the owner blocker below.
 - **No web-search adapter.** No search tool is wired behind a server-side boundary.
 - **No evidence states.** Nothing implements `official_live`, fetch-time labelling, or a
   candidate-source review queue. Every fact currently reaching an answer comes from the
@@ -285,7 +291,12 @@ disabled infrastructure.
 5. **Stage-model change for Start** (item 2) — a naming and information-architecture decision.
 6. **Coming-soon service doors** (item 4) — confirm they should 404 rather than offer interest.
 7. **Search tool and official-domain policy** (items 6–7) — which Gateway web-search tool, and
-   the initial authoritative domain list, are owner-approved facts, not model output.
+   the initial authoritative domain list, are owner-approved facts, not model output. The
+   list now has a concrete home: `OFFICIAL_DOMAINS` in
+   `src/features/ai/research/official-domains.ts`, empty, with a unit test that fails if it
+   gains an entry so nobody adds one absent-mindedly. Each entry needs a host, whether its
+   subdomains are covered, and the authority it belongs to; bumping
+   `AI_OFFICIAL_DOMAIN_POLICY_VERSION` records which list an answer was researched under.
 8. **Analyst capacity for the legal corpus** (item 9). §3.3 forbids creating legal facts from
    memory and §6.2 makes verification a human act. Without an analyst entering instruments,
    provisions and gazetted holidays, the rules and obligation chain produces zero rows however
@@ -306,12 +317,12 @@ disabled infrastructure.
 Items 6–9 are one architecture and should not be started piecemeal. The right first move is
 the smallest thing that unblocks the most and invents nothing:
 
-1. Migrate the AI environment contract to §4.1's names (item 5) — mechanical, testable, and a
-   prerequisite for every web-research variable that follows.
-2. Land the versioned official-domain allowlist and the safe exact-page fetcher (item 6) with
-   the allowlist **empty** pending owner approval, so the security boundary exists before
-   anything can fetch through it.
-3. Close the coming-soon doors (item 4) and settle the stage model (item 2), both small and
-   independent of the AI work.
+1. ~~Migrate the AI environment contract to §4.1's names (item 5).~~ Done.
+2. ~~Land the versioned official-domain allowlist and the safe exact-page fetcher (item 6)
+   with the allowlist **empty**, so the security boundary exists before anything can fetch
+   through it.~~ Done — and it turned out to be a live SSRF fix, not only a gate for future
+   research: the ingestion fetcher followed redirects blindly with no address check, so any
+   host it was pointed at could redirect it onto the cloud instance-metadata address.
+3. ~~Close the coming-soon doors (item 4) and settle the stage model (item 2).~~ Done.
 
 Items 7–9 follow once the owner supplies the search tool and the initial domain list.

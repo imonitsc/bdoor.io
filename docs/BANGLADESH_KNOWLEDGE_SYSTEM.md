@@ -28,8 +28,21 @@ ai_registry_documents         one row per document VERSION
                                        verifies fees, publishes)
 ```
 
+- **URL safety** (`src/features/ai/research/`): the checks a URL faces before a
+  socket opens — scheme, redirect approval, and an address classification that
+  refuses loopback, RFC1918, link-local (including the cloud instance-metadata
+  address `169.254.169.254`), CGNAT, multicast and reserved space, in IPv4 and
+  in every IPv6 notation that can carry an IPv4 address. Alongside it,
+  `official-domains.ts` holds the versioned allowlist §6.7 requires for live
+  research. **That list ships empty**: which hosts carry the authority of
+  Bangladeshi law is a regulatory fact and CLAUDE.md §3.3 forbids inventing
+  one, so the gate refuses everything until an owner approves a list. The
+  registry below is unaffected — it is its own admin-curated list of what may
+  be ingested, and everything it produces stops at `review_required`.
 - **Ingestion workers** (`src/features/ai/registry/`): a robots-respecting,
-  rate-limited fetcher; HTML/PDF text extraction with page boundaries
+  rate-limited fetcher that follows redirects one hop at a time so each hop
+  faces the same checks as the URL that was asked for; HTML/PDF text
+  extraction with page boundaries
   preserved as form feeds; sha-256 dedupe; new-version detection with
   fee/deadline/form change alerts; a resumable, idempotent job queue with
   bounded backoff. Originals go to the private `ai-source-documents` bucket,
