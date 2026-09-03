@@ -31,7 +31,7 @@ Baseline commit: `5e5b8c4` on `claude/new-session-0n73z6`.
 | 12. AI evaluation, web-content security, performance gates       | **Partial** — web-content security done   | M      |
 | 13. Funnel, research-quality and investor analytics              | **Substantially in place**                | S      |
 | 14. Policy routes at Version 1.0, indexed                        | **In place**                              | —      |
-| 15. Preview and P0 evidence report                               | **Not started**                           | —      |
+| 15. Preview and P0 evidence report                               | **Done** — 3 §24 lines fail, see report   | M      |
 
 Six of fifteen are effectively unbuilt (items 6–9 plus the parts of 10–11 that depend on
 them), and they are the ones that carry the product claim in §1.1. Everything upstream of
@@ -285,9 +285,22 @@ high-value source monitor with its own cadence.
 
 ## 15. Evidence report
 
-Not started. This document is its input, not the report itself; §24 defines what the report
-must contain, and several of its required lines (AI evaluation, official-domain policy,
-web-search security, coverage report) cannot be produced until items 6–12 exist.
+**Written: `docs/P0-EVIDENCE-REPORT.md`** (3 September 2026). This document is its input, not
+the report itself.
+
+The report confirms what §24 can confirm and states plainly what it cannot. Three of the
+sixteen lines **fail**, and writing the report is what found them:
+
+1. **The AI budget guard is inert.** `ai_usage.estimated_cost_usd` is `0` on all 27 rows ever
+   written; `checkBudget()` sums that column, so the daily and monthly limits cannot trip. The
+   cause is `generationInfo()` swallowing its failure at `logger.debug`, below production's
+   `info` floor — invisible since the first answer on 30 August.
+2. **Answer latency fails §7.3**: measured p75 14,288 ms against a required < 12,000 ms.
+3. **The compliance engine cannot produce anything**: zero published structured rules and zero
+   rows in `public_holidays`.
+
+And the finding that reframes the rest: **production has never had a customer** — zero
+profiles, applications, leads, companies, cases and consent records, against 54 `ai_messages`.
 
 ---
 
