@@ -5,6 +5,29 @@ first; each entry names its merged pull requests. Dates are merge dates.
 
 ## 2026-09-03
 
+- **Per-stage answer latency is recorded, not just logged** — §7.3 requires
+  that "retrieval, rerank, model, first-token and completion latency are
+  separately recorded", and sets two of its five targets on first-token
+  latency. Only completion latency was persisted, so those two targets were
+  not failing — they were **unmeasurable**, and the evidence report's
+  14.3-second answer p75 could not be attributed to a stage. The pipeline had
+  marked all eleven stages per request since the Ask rebuild, then flushed them
+  to one log line and discarded them.
+
+  `ai_usage` gains four nullable millisecond columns — `first_token_ms`,
+  `retrieval_ms`, `rerank_ms`, `model_ms` — written from the marks the request
+  already sets, so the row and the log line cannot disagree. Parallel keyword
+  and vector retrieval counts once, at whichever leg finished last. A stage
+  that never ran stores null rather than zero: the greeting fast path skips six
+  of them, and a zero would say the stage was instant and drag every percentile
+  down with it. Rows written before today keep nulls, which is what those
+  requests were — unmeasured.
+
+  `/admin/ai` renders the five numbers as nearest-rank p75/p95 against the
+  §7.3 targets, so a missed target is visible where the feature is operated
+  rather than in a SQL session. Nearest rank means every number shown is a
+  latency some real request actually had.
+
 - **The spend guard can now tell "nothing spent" from "cannot see spend"** —
   the follow-up to the evidence report's first finding. `checkBudget` summed
   `estimated_cost_usd` and reported "under budget"; every row was zero, so it

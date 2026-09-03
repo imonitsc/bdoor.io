@@ -30,7 +30,7 @@ import { messageTelemetry } from './redaction';
 import { retrieveContext } from './retrieval';
 import { classifyScope, outOfScopeReply } from './scope';
 import { buildSystemPrompt, PROMPT_VERSION } from './system-prompt';
-import type { Timings } from './timings';
+import { stageDurations, type Timings } from './timings';
 import { serverEnv } from '@/lib/env';
 import { logger } from '@/lib/logger';
 
@@ -181,6 +181,7 @@ export function streamAnswer(request: ChatRequest): Response {
           sourceIds: [],
           model: FAST_PATH_MODEL,
           latencyMs: Date.now() - startedAt,
+          stages: stageDurations(timings),
           status: 'complete',
           country,
           locale,
@@ -490,6 +491,7 @@ export function streamAnswer(request: ChatRequest): Response {
         outputTokens: outcome.outputTokens,
         estimatedCostUsd: info?.cost ?? null,
         latencyMs,
+        stages: stageDurations(timings),
         status,
         errorCode,
         country,

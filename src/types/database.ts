@@ -850,6 +850,10 @@ export type Database = {
           "output_tokens": number
           "estimated_cost_usd": number
           "latency_ms": number | null
+          "first_token_ms": number | null
+          "retrieval_ms": number | null
+          "rerank_ms": number | null
+          "model_ms": number | null
           "status": Database["public"]["Enums"]["ai_completion_status"]
           "error_code": string | null
           "created_at": string
@@ -869,6 +873,10 @@ export type Database = {
           "output_tokens"?: number
           "estimated_cost_usd"?: number
           "latency_ms"?: number | null
+          "first_token_ms"?: number | null
+          "retrieval_ms"?: number | null
+          "rerank_ms"?: number | null
+          "model_ms"?: number | null
           "status": Database["public"]["Enums"]["ai_completion_status"]
           "error_code"?: string | null
           "created_at"?: string
@@ -888,6 +896,10 @@ export type Database = {
           "output_tokens"?: number
           "estimated_cost_usd"?: number
           "latency_ms"?: number | null
+          "first_token_ms"?: number | null
+          "retrieval_ms"?: number | null
+          "rerank_ms"?: number | null
+          "model_ms"?: number | null
           "status"?: Database["public"]["Enums"]["ai_completion_status"]
           "error_code"?: string | null
           "created_at"?: string
