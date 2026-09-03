@@ -3,6 +3,50 @@
 Running record of shipped changes (CLAUDE.md Part I, Working Rule 6). Newest
 first; each entry names its merged pull requests. Dates are merge dates.
 
+## 2026-09-03
+
+- **The fetch path's limits actually hold now (P0 item 12, web-content security)** —
+  CLAUDE.md §23.2 requires tests proving that "MIME/size limits and fetch
+  timeouts work" and that "prompt injection or tool instructions inside a
+  webpage/PDF are ignored". Writing them found three defects, two of them in
+  the item-6 change from the day before.
+
+  **The timeout was per-hop, with no overall budget.** `AbortSignal.timeout`
+  was constructed fresh inside the redirect loop, so six hops at 25 seconds
+  plus a 10-second robots fetch for each new origin let one hostile chain hold
+  a serverless function for minutes without any single request ever timing
+  out. Following redirects by hand is what introduced this: `redirect:
+'follow'` had given the whole chain one budget. There is now a
+  `totalTimeoutMs` deadline for the entire call — robots and every hop
+  together — and each request aborts on whichever clock fires first.
+
+  **The size cap was enforced after the body was already in memory.**
+  `arrayBuffer()` materialises everything before `byteLength` can be checked,
+  so the cap governed what was _stored_, never what was _received_; a server
+  that omits `content-length` and streams half a gigabyte exhausts the
+  function before the check it is nominally subject to ever runs. The body is
+  now read through a reader that stops and cancels the response the moment the
+  cap is passed. The test proves it by offering 5,000 chunks and asserting
+  fewer than 20 are pulled.
+
+  **A body-read failure escaped the outcome contract.** Only the `fetch()` call
+  was inside the try, so a transfer that failed after headers — a dropped
+  connection, the new deadline firing mid-stream — threw out of
+  `fetchDocument` instead of returning a `FetchOutcome`, and a job worker
+  expecting a discriminated union got an exception. Aborts now map to
+  `timeout`, everything else to `network`, both retryable.
+
+  The injection tests pin a decision as much as a behaviour. `htmlToText`
+  strips scripts, styles, comments and navigation — the places a page hides
+  text from a reader — and the system prompt states, before the retrieved
+  context rather than after it, that the context is reference material and not
+  instructions. What it deliberately does **not** do is strip hostile text a
+  human would see on the page: silently editing source text would break the
+  content hash and the provenance the ledger depends on, and would hide the
+  page's true content from the reviewer who has to approve it. A test asserts
+  that visible "ignore all previous instructions" survives extraction, so the
+  behaviour cannot be "fixed" by someone who mistakes it for an oversight.
+
 ## 2026-09-02
 
 - **The safe fetcher, which turned out to be a live SSRF fix (P0 item 6)** —
