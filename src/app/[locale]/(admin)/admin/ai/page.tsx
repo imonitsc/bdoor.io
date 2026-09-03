@@ -16,6 +16,7 @@ import { Table, TBody, TD, TH, THead, TR } from '@/components/ui/table';
 import { budgetLimits } from '@/features/ai/budget';
 import { aiEnabled } from '@/features/ai/chat';
 import {
+  citationAuditQueue,
   listSources,
   listUnanswered,
   usageSummary,
@@ -51,11 +52,12 @@ export default async function AdminAiPage({ params }: { params: Promise<{ locale
   const t = await getTranslations('admin.ai');
   const tRegistry = await getTranslations('admin.aiRegistry');
 
-  const [sources, unanswered, usage, coverage] = await Promise.all([
+  const [sources, unanswered, usage, coverage, citationAudit] = await Promise.all([
     listSources(),
     listUnanswered(),
     usageSummary(30),
     coverageReport(),
+    citationAuditQueue(),
   ]);
 
   const limits = budgetLimits();
@@ -213,6 +215,46 @@ export default async function AdminAiPage({ params }: { params: Promise<{ locale
                     {t(`reasons.${question.reason}`)} · {question.locale} ·{' '}
                     {question.created_at.slice(0, 10)}
                   </p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('citationAudit')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {citationAudit.length === 0 ? (
+            <p className="text-muted text-sm">{t('noCitationFindings')}</p>
+          ) : (
+            <ul className="divide-border divide-y">
+              {citationAudit.map((answer) => (
+                <li key={answer.id} className="py-2.5">
+                  <p className="text-muted text-xs">
+                    {t('citationCounts', {
+                      uncited: answer.uncitedClaims,
+                      material: answer.materialClaims,
+                      sources: answer.citationCount,
+                    })}
+                    {answer.fabricatedMarkers > 0
+                      ? ` · ${t('fabricated', { count: answer.fabricatedMarkers })}`
+                      : ''}{' '}
+                    · {answer.createdAt.slice(0, 10)}
+                  </p>
+                  {/* The sentences, not the whole answer: a reviewer needs to
+                      see what was claimed without a citation, and nothing
+                      more. Recomputed on read, so this always shows the
+                      current detector's reading rather than a frozen verdict. */}
+                  <ul className="mt-1 space-y-1">
+                    {answer.claims.slice(0, 3).map((claim, index) => (
+                      <li key={index} className="text-ink text-sm">
+                        {claim.sentence}
+                      </li>
+                    ))}
+                  </ul>
                 </li>
               ))}
             </ul>

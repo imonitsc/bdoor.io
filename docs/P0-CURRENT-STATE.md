@@ -247,9 +247,13 @@ money, proportions, periods, dates, duties — must carry a citation marker, and
 a source that was never retrieved is recorded as fabricated. The audit is deterministic string
 work, not a second model call, so it costs nothing and its verdict is reproducible in a test.
 It establishes the necessary condition, not entailment: whether the cited passage actually
-supports the sentence stays with the §6.7 verifier. Findings are logged as counts only (§17)
-and are not yet persisted per answer or surfaced in the admin trace — that needs a migration
-and is the next increment.
+supports the sentence stays with the §6.7 verifier.
+
+**Findings are now persisted and reviewable** (migration `20260101003800_citation_audit.sql`,
+3 September 2026). Six columns on `ai_messages` record the audit's counts, and `/admin/ai`
+lists the answers that failed it with the specific uncited sentences. `citation_count` is
+stored rather than derived: `source_ids` is de-duplicated and excludes the catalogue citation,
+so deriving the count would under-count and make legitimate markers look fabricated.
 
 Still missing: amendment awareness, which cannot exist before the provision schema in
 item 9.

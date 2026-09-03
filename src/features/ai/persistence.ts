@@ -4,6 +4,7 @@ import { LIMITS } from './config';
 import { aiDb, hasAiDatabase } from './db';
 import type { Database } from '@/types/database';
 import { messageTelemetry, redactSensitive } from './redaction';
+import type { CitationAudit } from './citations';
 import { logger } from '@/lib/logger';
 
 /**
@@ -138,6 +139,16 @@ export type AnswerRecord = {
   errorCode?: string | null;
   country: string;
   locale: 'en' | 'bn';
+  /**
+   * The §7.1 citation audit, when one ran. Absent on the model-free fast paths
+   * and on failures, where there is no generated answer to audit.
+   *
+   * `citationCount` is carried explicitly rather than derived from sourceIds
+   * and ruleIds: those are de-duplicated and exclude the catalogue citation,
+   * so deriving it would under-count and make legitimate markers look
+   * fabricated.
+   */
+  citationAudit?: { audit: CitationAudit; citationCount: number } | null;
 };
 
 /**
@@ -172,6 +183,12 @@ export async function recordAnswer(
       latency_ms: answer.latencyMs,
       status: answer.status,
       error_code: answer.errorCode ?? null,
+      citation_count: answer.citationAudit?.citationCount ?? null,
+      material_claims: answer.citationAudit?.audit.materialClaims ?? null,
+      supported_claims: answer.citationAudit?.audit.supportedClaims ?? null,
+      uncited_claims: answer.citationAudit?.audit.uncitedClaims ?? null,
+      fabricated_marker_count: answer.citationAudit?.audit.fabricatedMarkers.length ?? null,
+      citation_audit_ok: answer.citationAudit?.audit.ok ?? null,
     })
     .select('id');
 

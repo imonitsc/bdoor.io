@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { auditCitations, type ClaimVerdict } from './citations';
 import { EMBEDDING_DIMENSIONS, EMBEDDING_MODEL } from './config';
 import { aiDb, hasAiDatabase } from './db';
 import type { Database } from '@/types/database';
@@ -326,6 +327,61 @@ export async function listUnanswered(): Promise<UnansweredQuestion[]> {
     .order('created_at', { ascending: false })
     .limit(100);
   return data ?? [];
+}
+
+export type CitationAuditRow = {
+  id: string;
+  content: string;
+  citationCount: number;
+  materialClaims: number;
+  supportedClaims: number;
+  uncitedClaims: number;
+  fabricatedMarkers: number;
+  createdAt: string;
+  /** Per-sentence detail, recomputed from the stored answer on read. */
+  claims: ClaimVerdict[];
+};
+
+/**
+ * Answers whose citation audit failed, newest first (§16.4 review queue).
+ *
+ * The counts come from the row — they were computed on the answer as it was
+ * generated, and they are what the partial index makes queryable. The
+ * per-sentence detail is recomputed here instead of being stored, so a
+ * reviewer always sees the CURRENT detector's reading rather than a verdict
+ * frozen at write time, and the answer text keeps living in exactly one place.
+ *
+ * The two can disagree in principle: `content` is redacted before storage, so
+ * a recomputation runs over slightly different text than the audit did. In
+ * practice redaction replaces identifiers, not fees or deadlines. Where they
+ * differ, the stored counts are the record and the sentences are the
+ * explanation — which is why both are shown rather than one being derived
+ * from the other.
+ */
+export async function citationAuditQueue(limit = 50): Promise<CitationAuditRow[]> {
+  if (!hasAiDatabase()) return [];
+  const { data } = await aiDb()
+    .from('ai_messages')
+    .select(
+      'id, content, citation_count, material_claims, supported_claims, uncited_claims, fabricated_marker_count, created_at',
+    )
+    .eq('citation_audit_ok', false)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  return (data ?? []).map((row) => ({
+    id: row.id,
+    content: row.content,
+    citationCount: row.citation_count ?? 0,
+    materialClaims: row.material_claims ?? 0,
+    supportedClaims: row.supported_claims ?? 0,
+    uncitedClaims: row.uncited_claims ?? 0,
+    fabricatedMarkers: row.fabricated_marker_count ?? 0,
+    createdAt: row.created_at,
+    claims: auditCitations(row.content, row.citation_count ?? 0).claims.filter(
+      (claim) => claim.material && !claim.supported,
+    ),
+  }));
 }
 
 export type UsageSummary = {
