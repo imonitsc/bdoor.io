@@ -124,6 +124,22 @@ root cause of the missing cost is **not** fixed: `generationId` is read from
 `providerMetadata.gateway`, whose type in the installed SDK declares only `asyncJob` plus an
 index signature, so the field may simply never arrive. The new logs will settle it.
 
+**Latency was recorded as one number, and §7.3 asks for five (3 September).** The row above
+could report a complete-answer p75 and nothing else, because `latency_ms` was the only
+duration `ai_usage` carried. §7.3 requires that "retrieval, rerank, model, first-token and
+completion latency are separately recorded", and it sets two of its five targets on
+first-token latency — so **the p75 < 2.5 s and p95 < 5 s targets were not failing, they were
+unmeasurable**, and the 14-second p75 could not be attributed to a stage. The pipeline had
+been marking all eleven stages per request since the Ask rebuild, but flushed them to a
+single log line and discarded them.
+
+`ai_usage` now carries `first_token_ms`, `retrieval_ms`, `rerank_ms` and `model_ms` alongside
+`latency_ms`, derived from those same marks so the row and the log line cannot disagree, and
+`/admin/ai` renders the five numbers as p75/p95 against the §7.3 targets. Rows written before
+this carry nulls, which is honest: those requests were never measured per stage. The report
+above is therefore the last one that can only say _that_ an answer was slow — the next can say
+_where_.
+
 Citations: every completed answer is now audited against the sources it was given
 (`src/features/ai/citations.ts`), and the counts are persisted per answer with a review queue
 at `/admin/ai`. The audit establishes that material claims carry a marker and that no marker
@@ -268,7 +284,9 @@ not.
    alternative worth evaluating first.
 2. Add the §7.3 latency gate to CI so a 14-second p75 fails a build instead of a report.
 3. Investigate the p75 itself: retrieval over 25 chunks should not take 14 seconds, which
-   suggests the time is in generation, not search.
+   suggests the time is in generation, not search. **Now measurable** — per-stage latency is
+   persisted from 3 September and shown at `/admin/ai`; the answer needs answers served after
+   that deploy, not another reading of the code.
 
 **Needs an owner decision:**
 

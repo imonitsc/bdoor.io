@@ -457,6 +457,54 @@ describe('liveness', () => {
   });
 });
 
+describe('the stage timing columns', () => {
+  it('keeps a stage that never ran null instead of calling it instant', async () => {
+    // The greeting fast path skips retrieval, rerank and the model entirely.
+    // A zero there would say each stage took no time and would drag every
+    // percentile the §7.3 panel computes toward zero; null says "not measured".
+    await inRolledBackTransaction(client, async (tx) => {
+      await tx.query(
+        `insert into public.ai_usage (model, country, locale, latency_ms, status)
+         values ('fast-path', 'bd', 'en', 40, 'complete')`,
+      );
+
+      const { rows } = await tx.query(
+        `select first_token_ms, retrieval_ms, rerank_ms, model_ms from public.ai_usage`,
+      );
+      expect(rows).toEqual([
+        { first_token_ms: null, retrieval_ms: null, rerank_ms: null, model_ms: null },
+      ]);
+    });
+  });
+
+  it('accepts a measured zero, which is a different statement from null', async () => {
+    await inRolledBackTransaction(client, async (tx) => {
+      await tx.query(
+        `insert into public.ai_usage
+           (model, country, locale, latency_ms, first_token_ms, retrieval_ms,
+            rerank_ms, model_ms, status)
+         values ('m', 'bd', 'en', 9000, 1800, 400, 0, 7000, 'complete')`,
+      );
+      const { rows } = await tx.query<{ rerank_ms: number }>(
+        `select rerank_ms from public.ai_usage`,
+      );
+      expect(rows).toEqual([{ rerank_ms: 0 }]);
+    });
+  });
+
+  it('refuses a negative duration rather than storing a number no request had', async () => {
+    await inRolledBackTransaction(client, async (tx) => {
+      await expect(
+        tx.query(
+          `insert into public.ai_usage
+             (model, country, locale, latency_ms, first_token_ms, status)
+           values ('m', 'bd', 'en', 9000, -1, 'complete')`,
+        ),
+      ).rejects.toThrow(/ai_usage_first_token_ms_check/);
+    });
+  });
+});
+
 function offsetIso(days: number): string {
   const date = new Date();
   date.setUTCDate(date.getUTCDate() + days);

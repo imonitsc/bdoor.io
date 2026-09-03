@@ -1651,6 +1651,28 @@
     "ai": {
       "title": "AI Management",
       "description": "What Ask bdoor AI is allowed to say, what it could not answer, and what it costs. Published sources are the only thing customers ever see.",
+      "latency": {
+        "title": "Answer latency (§7.3)",
+        "metric": "Stage",
+        "p75": "p75",
+        "p95": "p95",
+        "target": "Target",
+        "samples": "Samples",
+        "pass": "Pass",
+        "fail": "Over",
+        "noTarget": "—",
+        "empty": {
+          "title": "No measured answers in the last 30 days",
+          "body": "Stage timings are recorded on every answer served. Nothing has been served since they were added, so there is nothing to judge the targets against yet."
+        },
+        "rows": {
+          "firstToken": "First token",
+          "answer": "Complete answer",
+          "retrieval": "Retrieval",
+          "rerank": "Rerank",
+          "model": "Model"
+        }
+      },
       "knowledge": "Knowledge sources",
       "gaps": "Questions it could not answer",
       "noGaps": "No unanswered questions in the queue.",

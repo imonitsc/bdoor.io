@@ -5,6 +5,7 @@ import { aiDb, hasAiDatabase } from './db';
 import type { Database } from '@/types/database';
 import { messageTelemetry, redactSensitive } from './redaction';
 import type { CitationAudit } from './citations';
+import type { StageDurations } from './timings';
 import { logger } from '@/lib/logger';
 
 /**
@@ -135,6 +136,12 @@ export type AnswerRecord = {
   outputTokens?: number | null;
   estimatedCostUsd?: number | null;
   latencyMs: number;
+  /**
+   * The §7.3 per-stage latencies, when the request was instrumented. Absent
+   * on paths that record an answer without a pipeline (retention backfills,
+   * tests), and each field is independently null when its stage never ran.
+   */
+  stages?: StageDurations | null;
   status: CompletionStatus;
   errorCode?: string | null;
   country: string;
@@ -209,6 +216,10 @@ export async function recordAnswer(
     output_tokens: answer.outputTokens ?? 0,
     estimated_cost_usd: answer.estimatedCostUsd ?? 0,
     latency_ms: answer.latencyMs,
+    first_token_ms: answer.stages?.firstTokenMs ?? null,
+    retrieval_ms: answer.stages?.retrievalMs ?? null,
+    rerank_ms: answer.stages?.rerankMs ?? null,
+    model_ms: answer.stages?.modelMs ?? null,
     status: answer.status,
     error_code: answer.errorCode ?? null,
   });

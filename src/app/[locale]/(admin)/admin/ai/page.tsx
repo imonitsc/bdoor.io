@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { Sparkles } from 'lucide-react';
+import { Gauge, Sparkles } from 'lucide-react';
 
 import {
   AiImportButton,
@@ -22,11 +22,47 @@ import {
   usageSummary,
   type SourceStatus,
 } from '@/features/ai/knowledge';
+import {
+  latencyReport,
+  LATENCY_TARGETS,
+  type LatencyReport,
+  type LatencyStat,
+} from '@/features/ai/latency';
 import { coverageReport } from '@/features/ai/registry/coverage';
 import { Link } from '@/i18n/navigation';
 import { requireCapability } from '@/lib/auth/session';
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
+
+/** One millisecond number, rendered in seconds because the targets are. */
+function ms(value: number | null): string {
+  return value === null ? '—' : `${(value / 1000).toFixed(2)}s`;
+}
+
+/**
+ * The five §7.3 numbers in the order the requirement lists them. Retrieval,
+ * rerank and model have no published target of their own — they exist to say
+ * where a missed answer target went.
+ */
+function latencyRows(report: LatencyReport): readonly {
+  key: 'firstToken' | 'answer' | 'retrieval' | 'rerank' | 'model';
+  stat: LatencyStat;
+  p75Target: number | null;
+  p95Target: number | null;
+}[] {
+  return [
+    {
+      key: 'firstToken',
+      stat: report.firstToken,
+      p75Target: LATENCY_TARGETS.firstTokenP75,
+      p95Target: LATENCY_TARGETS.firstTokenP95,
+    },
+    { key: 'answer', stat: report.answer, p75Target: LATENCY_TARGETS.answerP75, p95Target: null },
+    { key: 'retrieval', stat: report.retrieval, p75Target: null, p95Target: null },
+    { key: 'rerank', stat: report.rerank, p75Target: null, p95Target: null },
+    { key: 'model', stat: report.model, p75Target: null, p95Target: null },
+  ];
+}
 
 const STATUS_TONE: Record<SourceStatus, 'neutral' | 'info' | 'success' | 'warning' | 'danger'> = {
   draft: 'neutral',
@@ -52,12 +88,13 @@ export default async function AdminAiPage({ params }: { params: Promise<{ locale
   const t = await getTranslations('admin.ai');
   const tRegistry = await getTranslations('admin.aiRegistry');
 
-  const [sources, unanswered, usage, coverage, citationAudit] = await Promise.all([
+  const [sources, unanswered, usage, coverage, citationAudit, latency] = await Promise.all([
     listSources(),
     listUnanswered(),
     usageSummary(30),
     coverageReport(),
     citationAuditQueue(),
+    latencyReport(30),
   ]);
 
   const limits = budgetLimits();
@@ -134,6 +171,68 @@ export default async function AdminAiPage({ params }: { params: Promise<{ locale
           </Card>
         ))}
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Gauge className="size-4" aria-hidden="true" />
+            {t('latency.title')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {latency.measured === 0 ? (
+            // Not a failure and not a pass: no answer in the window carried a
+            // stage measurement, so the gate has nothing to judge.
+            <EmptyState title={t('latency.empty.title')} description={t('latency.empty.body')} />
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <THead>
+                  <TR>
+                    <TH>{t('latency.metric')}</TH>
+                    <TH>{t('latency.p75')}</TH>
+                    <TH>{t('latency.p95')}</TH>
+                    <TH>{t('latency.target')}</TH>
+                    <TH>{t('latency.samples')}</TH>
+                  </TR>
+                </THead>
+                <TBody>
+                  {latencyRows(latency).map((row) => (
+                    <TR key={row.key}>
+                      <TD>{t(`latency.rows.${row.key}`)}</TD>
+                      <TD className="tabular-nums">
+                        {ms(row.stat.p75)}
+                        {row.p75Target !== null && row.stat.p75 !== null ? (
+                          <Badge tone={row.stat.p75 <= row.p75Target ? 'success' : 'danger'}>
+                            {row.stat.p75 <= row.p75Target ? t('latency.pass') : t('latency.fail')}
+                          </Badge>
+                        ) : null}
+                      </TD>
+                      <TD className="tabular-nums">
+                        {ms(row.stat.p95)}
+                        {row.p95Target !== null && row.stat.p95 !== null ? (
+                          <Badge tone={row.stat.p95 <= row.p95Target ? 'success' : 'danger'}>
+                            {row.stat.p95 <= row.p95Target ? t('latency.pass') : t('latency.fail')}
+                          </Badge>
+                        ) : null}
+                      </TD>
+                      <TD className="text-muted tabular-nums">
+                        {row.p75Target === null && row.p95Target === null
+                          ? t('latency.noTarget')
+                          : [row.p75Target, row.p95Target]
+                              .filter((value): value is number => value !== null)
+                              .map((value) => ms(value))
+                              .join(' / ')}
+                      </TD>
+                      <TD className="tabular-nums">{row.stat.samples}</TD>
+                    </TR>
+                  ))}
+                </TBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
