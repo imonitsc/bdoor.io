@@ -5,6 +5,37 @@ first; each entry names its merged pull requests. Dates are merge dates.
 
 ## 2026-09-03
 
+- **The P0 evidence report, and the three §24 lines it fails (item 15)** —
+  §24 lists sixteen things a release-gate report must confirm.
+  `docs/P0-EVIDENCE-REPORT.md` is that report, measured rather than asserted:
+  production figures from SQL against the live project, test figures from runs
+  quoted verbatim. Where evidence does not exist the line says so and says why,
+  because a report that asserted the missing lines would be the manufactured
+  quality §15 forbids and would defeat the only purpose a gate has.
+
+  Writing it found a defect nobody had noticed. `ai_usage.estimated_cost_usd`
+  is `0` on all 27 rows ever written — never null, never positive — while
+  tokens are captured fine, and `provider` is null on every row. Both come from
+  `generationInfo()`, which catches its failure at `logger.debug`; production's
+  floor is `info`, so the failure has been invisible since the first answer on
+  30 August. The consequence is the one that matters: `checkBudget()` sums that
+  column, so `AI_DAILY_BUDGET_USD` and the monthly limit have been summing zero
+  and cannot trip. §4.1 requires budget limits "enforced server-side"; they are
+  present in code and ineffective in fact.
+
+  Two more lines fail on measurement rather than inspection. Complete-answer
+  p75 is 14,288 ms against §7.3's < 12,000 ms — production data, not an
+  estimate, and unnoticed because no CI gate fails on it. And the compliance
+  engine has zero published rules and zero gazetted holidays, so a paying
+  subscriber would generate no obligations at all.
+
+  The finding that reframes the others is arithmetic: zero profiles, zero
+  applications, zero leads, zero companies, zero cases, zero consent records —
+  against 54 `ai_messages`. People have asked the assistant questions; nobody
+  has ever opened an account. Feature availability therefore matches capacity
+  trivially rather than in the way §24 intends, and the "specialist reviewed"
+  service mode §8.3 requires has never been exercised against a real provider.
+
 - **The citation audit becomes reviewable, and one column had to be stored
   rather than derived** — #76 computed the audit and threw the verdict away in
   a log line, so "how often do we state a fee with nothing behind it" — an
