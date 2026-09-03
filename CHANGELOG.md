@@ -5,6 +5,32 @@ first; each entry names its merged pull requests. Dates are merge dates.
 
 ## 2026-09-03
 
+- **The spend guard can now tell "nothing spent" from "cannot see spend"** —
+  the follow-up to the evidence report's first finding. `checkBudget` summed
+  `estimated_cost_usd` and reported "under budget"; every row was zero, so it
+  had been reporting that with complete confidence since 30 August while its
+  input was gone. Totalling is now a pure `summariseSpend`, which returns the
+  distinction as `costVisibility`: `no_answers` when the period is genuinely
+  empty, `missing` when it holds answers and not one carries a cost, `ok`
+  otherwise. The `missing` case logs `ai.budget.cost_data_missing`.
+
+  It still allows the answer. Failing closed on a telemetry fault would take
+  Ask down, and `budget.ts`'s own header records that the AI Gateway budget —
+  which rejects with a 402 before the request — is the first line, with this
+  check as the second. That header is also a correction to the evidence report,
+  which described the guard accurately but left a reader to infer that spend
+  was unbounded. The second line was blind; whether the first is configured is
+  an owner question.
+
+  `generationInfo` now warns on both failure paths instead of swallowing one at
+  `debug`, below production's `info` floor — and warns _differently_ on each,
+  because the likeliest cause never reached the `catch` at all. `generationId`
+  is read from `providerMetadata.gateway`, whose type in the installed SDK
+  declares only `asyncJob` plus an index signature, so the field is not a
+  promised part of that object; if it is simply absent the function returned
+  null on its first line and logged nothing. The next occurrence will say which
+  it is within hours. The root cause is deliberately not guessed at here.
+
 - **The P0 evidence report, and the three §24 lines it fails (item 15)** —
   §24 lists sixteen things a release-gate report must confirm.
   `docs/P0-EVIDENCE-REPORT.md` is that report, measured rather than asserted:
