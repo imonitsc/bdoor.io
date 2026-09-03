@@ -41,6 +41,15 @@ export const FETCH_LIMITS = {
   maxCrawlDelayMs: 30_000,
   /** Hops followed before a chain is treated as a loop rather than a move. */
   maxRedirects: 5,
+  /**
+   * The budget for one fetchDocument call — robots.txt and every hop together.
+   *
+   * `timeoutMs` alone is a per-request cap, and a per-request cap multiplies:
+   * six hops plus a robots fetch for each new origin is minutes of a function's
+   * life spent on one hostile chain that never quite times out. This is the
+   * number that actually bounds the work.
+   */
+  totalTimeoutMs: 45_000,
 } as const;
 
 export const USER_AGENT = 'bdoor-knowledge/1.0 (+https://bdoor.io/contact; knowledge ingestion)';
@@ -104,6 +113,10 @@ export type FetchOptions = {
   /** When supplied, EVERY hop's host must be on it. */
   allowlist?: readonly OfficialDomain[];
   maxRedirects?: number;
+  /** Overall budget for the call; defaults to FETCH_LIMITS.totalTimeoutMs. */
+  totalTimeoutMs?: number;
+  /** Body cap; defaults to FETCH_LIMITS.maxBytes. */
+  maxBytes?: number;
 };
 
 /** Parsed robots.txt rules for the `*` agent (we do not claim a special one). */
@@ -265,7 +278,7 @@ async function guard(
 async function request(
   startUrl: URL,
   options: FetchOptions,
-  init: { accept: string; timeoutMs: number },
+  init: { accept: string; timeoutMs: number; deadline: AbortSignal },
 ): Promise<
   | { ok: true; response: Response; chain: string[]; secure: boolean }
   | { ok: false; failure: FetchFailure; status?: number; retryable: boolean }
@@ -284,7 +297,9 @@ async function request(
     try {
       response = await fetch(current, {
         headers: { 'user-agent': USER_AGENT, accept: init.accept },
-        signal: AbortSignal.timeout(init.timeoutMs),
+        // Two clocks: this hop's own cap, and the whole call's deadline.
+        // Whichever fires first ends the request.
+        signal: AbortSignal.any([AbortSignal.timeout(init.timeoutMs), init.deadline]),
         redirect: 'manual',
         // Nothing this fetcher reaches is ours, and nothing it sends should
         // identify a customer: no cookies, no credentials, ever.
@@ -324,7 +339,11 @@ async function request(
   return { ok: false, failure: 'too_many_redirects', retryable: false };
 }
 
-async function robotsFor(origin: URL, options: FetchOptions): Promise<RobotsRules | null> {
+async function robotsFor(
+  origin: URL,
+  options: FetchOptions,
+  deadline: AbortSignal,
+): Promise<RobotsRules | null> {
   const cached = hostState.get(origin.origin);
   if (cached) return cached.robots;
 
@@ -335,6 +354,7 @@ async function robotsFor(origin: URL, options: FetchOptions): Promise<RobotsRule
   const outcome = await request(new URL('/robots.txt', origin), options, {
     accept: 'text/plain',
     timeoutMs: 10_000,
+    deadline,
   });
 
   if (!outcome.ok) {
@@ -358,6 +378,50 @@ async function robotsFor(origin: URL, options: FetchOptions): Promise<RobotsRule
 }
 
 /**
+ * Read a body, stopping the transfer the moment it exceeds the cap.
+ *
+ * The obvious version is `arrayBuffer()` and then a length check, which is
+ * what this replaces. That version enforces the cap on what gets *stored*
+ * while allowing any amount to be *received*: the whole body is materialised
+ * in memory before its size is known, so a host that streams half a gigabyte
+ * exhausts the function before the check it is supposedly subject to ever
+ * runs. The declared `content-length` is no defence either — a hostile server
+ * simply omits the header, and a chunked response has none to omit.
+ *
+ * Returns null when the cap is passed, having cancelled the response so the
+ * remaining bytes are never pulled off the socket.
+ */
+async function readCapped(response: Response, maxBytes: number): Promise<Uint8Array | null> {
+  if (!response.body) return new Uint8Array(0);
+
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    if (!value) continue;
+    total += value.byteLength;
+    if (total > maxBytes) {
+      // Cancel rather than break: breaking leaves the rest of the body coming
+      // down the socket, which is the cost this cap exists to avoid.
+      await reader.cancel().catch(() => undefined);
+      return null;
+    }
+    chunks.push(value);
+  }
+
+  const out = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    out.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return out;
+}
+
+/**
  * Fetch one public document, politely. The caller (a job worker) decides how
  * a failure is retried; `retryable` says whether retrying can possibly help.
  */
@@ -365,11 +429,33 @@ export async function fetchDocument(
   url: string,
   options: FetchOptions = {},
 ): Promise<FetchOutcome> {
+  // One clock for the whole call. `AbortSignal.timeout` cannot express this on
+  // its own because each hop builds its own, so the deadline is a controller
+  // held here and handed to every request the call makes.
+  const deadline = new AbortController();
+  const timer = setTimeout(
+    () => deadline.abort(new DOMException('fetch deadline exceeded', 'TimeoutError')),
+    options.totalTimeoutMs ?? FETCH_LIMITS.totalTimeoutMs,
+  );
+  try {
+    return await runFetch(url, options, deadline.signal);
+  } finally {
+    // Without this the timer keeps the event loop alive for the full budget
+    // after a fast success — in a serverless function, that is billed time.
+    clearTimeout(timer);
+  }
+}
+
+async function runFetch(
+  url: string,
+  options: FetchOptions,
+  deadline: AbortSignal,
+): Promise<FetchOutcome> {
   const checked = await guard(url, options, false);
   if (!checked.ok) return { ok: false, failure: checked.failure, retryable: checked.retryable };
   const parsed = checked.url;
 
-  const robots = await robotsFor(parsed, options);
+  const robots = await robotsFor(parsed, options, deadline);
   if (robots === null) {
     // Could not establish what the site permits — do not crawl it blind.
     return { ok: false, failure: 'robots_disallowed', retryable: true };
@@ -391,6 +477,7 @@ export async function fetchDocument(
   const outcome = await request(parsed, options, {
     accept: ALLOWED_CONTENT_TYPES.join(', '),
     timeoutMs: FETCH_LIMITS.timeoutMs,
+    deadline,
   });
   if (!outcome.ok) return outcome;
   const { response, chain, secure } = outcome;
@@ -412,13 +499,32 @@ export async function fetchDocument(
     return { ok: false, failure: 'unsupported_type', status: response.status, retryable: false };
   }
 
+  const maxBytes = options.maxBytes ?? FETCH_LIMITS.maxBytes;
   const declared = Number(response.headers.get('content-length') ?? 0);
-  if (declared > FETCH_LIMITS.maxBytes) {
+  if (declared > maxBytes) {
     return { ok: false, failure: 'too_large', status: response.status, retryable: false };
   }
 
-  const buffer = new Uint8Array(await response.arrayBuffer());
-  if (buffer.byteLength > FETCH_LIMITS.maxBytes) {
+  // The body is read inside the outcome contract, not outside it. Headers can
+  // arrive fine and the transfer still fail — the connection drops, the
+  // deadline fires mid-stream — and before this, that threw out of
+  // fetchDocument instead of returning a failure, so a job worker expecting a
+  // FetchOutcome got an exception. Aborts are a timeout; anything else is a
+  // network failure, and both are worth retrying.
+  let buffer: Uint8Array | null;
+  try {
+    buffer = await readCapped(response, maxBytes);
+  } catch (error) {
+    const name = (error as Error).name;
+    const timedOut = name === 'TimeoutError' || name === 'AbortError';
+    return {
+      ok: false,
+      failure: timedOut ? 'timeout' : 'network',
+      status: response.status,
+      retryable: true,
+    };
+  }
+  if (buffer === null) {
     return { ok: false, failure: 'too_large', status: response.status, retryable: false };
   }
 

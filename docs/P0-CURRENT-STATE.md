@@ -28,7 +28,7 @@ Baseline commit: `5e5b8c4` on `claude/new-session-0n73z6`.
 | 9. Legal-instrument / provision / coverage schema                | **Absent**                                | L      |
 | 10. Official-source retrieval, amendments, claim-level citations | **Partial**                               | M      |
 | 11. Scheduled source monitoring and change alerts                | **Partial — and currently inert**         | M      |
-| 12. AI evaluation, web-content security, performance gates       | **Partial**                               | M      |
+| 12. AI evaluation, web-content security, performance gates       | **Partial** — web-content security done   | M      |
 | 13. Funnel, research-quality and investor analytics              | **Substantially in place**                | S      |
 | 14. Policy routes at Version 1.0, indexed                        | **In place**                              | —      |
 | 15. Preview and P0 evidence report                               | **Not started**                           | —      |
@@ -253,9 +253,13 @@ high-value source monitor with its own cadence.
 ## 12–14. Evaluation, analytics, policies
 
 - **Evaluation:** a Bangladesh knowledge eval set exists (`tests/unit/bd-knowledge-eval.test.ts`)
-  along with retrieval and citation tests. There are no web-content security tests — there is
-  no web content path to secure yet — and no enforced latency or cost gate in CI. §7.3 and §7.4
-  specify thresholds that nothing currently fails a build on.
+  along with retrieval and citation tests. The web-content security half of §23.2 is now
+  covered — `tests/unit/ai-url-safety.test.ts` for addresses, schemes, redirects and the
+  allowlist, `tests/unit/ai-fetch-limits.test.ts` for MIME, size and time limits and the
+  prompt-injection boundary. (The earlier note here said there was "no web content path to
+  secure yet"; item 6 built one, which is what made these tests possible and necessary.)
+  Still missing: an enforced latency or cost gate in CI. §7.3 and §7.4 specify thresholds
+  that nothing currently fails a build on.
 - **Analytics:** the funnel, quote lifecycle, subscription, cohort retention, obligation
   engagement and renewal conversion instrumentation all exist and are surfaced in the admin
   area. This item is substantially satisfied. Research-quality metrics specifically (§19)
