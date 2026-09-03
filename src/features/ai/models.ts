@@ -83,6 +83,17 @@ export function providerLockFor(model: string): string[] {
   return vendor === 'anthropic' ? [...ANSWER_PROVIDER_ORDER] : [vendor];
 }
 
+/**
+ * CLAUDE.md §4.1: "maximum one automatic answer-model failover per request" —
+ * so an answering chain is at most two models long.
+ *
+ * This is the authoritative place that rule is enforced. `chat.ts` walks
+ * whatever chain it is handed and stops on budget, not on hop count, so a
+ * longer chain there really would hop twice; capping at the source means no
+ * configuration can produce one.
+ */
+const MAX_ANSWER_CHAIN = 2;
+
 export function modelChain(role: ModelRole): string[] {
   const env = serverEnv();
   switch (role) {
@@ -97,14 +108,22 @@ export function modelChain(role: ModelRole): string[] {
         [env.AI_PRIMARY_MODEL ?? DEFAULT_ANSWER_MODEL, env.AI_SECONDARY_MODEL]
           .filter(Boolean)
           .join(','),
-      );
+      ).slice(0, MAX_ANSWER_CHAIN);
     // The expert chain answers high-risk questions. Unconfigured, it is the
     // answer chain — a high-risk question must never get a *weaker* route
     // than a standard one just because no expert model is set.
     case 'expert': {
+      // `AI_EXPERT_MODEL` is comma-separated like every other chain variable,
+      // so "expert = model A, model B" plus a secondary would otherwise
+      // resolve to three models — two failovers, on exactly the high-risk
+      // legal and tax questions where latency is already tightest. The cap
+      // keeps the primary and one hop, whatever the variable says.
       const chain = parseChain(env.AI_EXPERT_MODEL);
       return chain.length > 0
-        ? parseChain([...chain, env.AI_SECONDARY_MODEL].filter(Boolean).join(','))
+        ? parseChain([...chain, env.AI_SECONDARY_MODEL].filter(Boolean).join(',')).slice(
+            0,
+            MAX_ANSWER_CHAIN,
+          )
         : modelChain('answer');
     }
     // Empty by default: the verifier turns on by configuration once it has
