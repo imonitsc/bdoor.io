@@ -167,3 +167,106 @@ test.describe('conversation behaviour', () => {
     await resent;
   });
 });
+
+/**
+ * §7.3: "Send button and Enter key produce the same request exactly once."
+ *
+ * Both halves of that sentence are load-bearing and neither was covered. A
+ * second request is not a cosmetic bug: it is a second retrieval, a second
+ * model call and a second answer billed and written to the ledger, from a
+ * customer who pressed a key twice because the first press looked slow.
+ *
+ * Every case here holds the response open, so the assertions run inside the
+ * window where a double fire is actually possible. Counting real requests is
+ * the only honest way to test "exactly once" — a visible transcript can hide
+ * a duplicate that reached the server.
+ */
+test.describe('one send is one request', () => {
+  /** Count POSTs to the chat route, and hold each one open for `holdMs`. */
+  async function countChatRequests(page: import('@playwright/test').Page, holdMs = 2_000) {
+    const bodies: string[] = [];
+    await page.route('**/api/ai/chat', async (route) => {
+      bodies.push(route.request().postData() ?? '');
+      await new Promise((resolve) => setTimeout(resolve, holdMs));
+      await route.continue();
+    });
+    return bodies;
+  }
+
+  test('pressing Enter twice while the first answer is in flight sends once', async ({ page }) => {
+    await page.goto('/en/ask');
+    const bodies = await countChatRequests(page);
+
+    const arrived = page.waitForRequest('**/api/ai/chat');
+    await page.locator('#ask-bdoor-input').fill('hi');
+    await page.keyboard.press('Enter');
+    await page.keyboard.press('Enter');
+    await page.keyboard.press('Enter');
+
+    // The transcript shows the question optimistically, before the fetch, so
+    // waiting on it proves nothing about the network. Wait for the real
+    // request, then keep watching inside the held window where a duplicate
+    // would land.
+    await arrived;
+    await page.waitForTimeout(1_500);
+    expect(bodies).toHaveLength(1);
+    await expect(page.locator('[data-role="user"]')).toHaveCount(1);
+  });
+
+  test('double-clicking Send sends once', async ({ page }) => {
+    await page.goto('/en/ask');
+    const bodies = await countChatRequests(page);
+
+    const arrived = page.waitForRequest('**/api/ai/chat');
+    await page.locator('#ask-bdoor-input').fill('hi');
+    await page.getByRole('button', { name: 'Send' }).dblclick();
+
+    await arrived;
+    await page.waitForTimeout(1_500);
+    expect(bodies).toHaveLength(1);
+    await expect(page.locator('[data-role="user"]')).toHaveCount(1);
+  });
+
+  test('the Send button and Enter produce the same request', async ({ page }) => {
+    // Parity is the other half of the requirement: two entry points, one
+    // behaviour. A button that posted a differently shaped body would answer
+    // the same question through a different path.
+    await page.goto('/en/ask');
+    const viaEnter = await countChatRequests(page, 200);
+    const enterArrived = page.waitForRequest('**/api/ai/chat');
+    await page.locator('#ask-bdoor-input').fill('hi');
+    await page.keyboard.press('Enter');
+    await enterArrived;
+
+    await page.goto('/en/ask');
+    const viaButton = await countChatRequests(page, 200);
+    const clickArrived = page.waitForRequest('**/api/ai/chat');
+    await page.locator('#ask-bdoor-input').fill('hi');
+    await page.getByRole('button', { name: 'Send' }).click();
+    await clickArrived;
+
+    expect(viaEnter).toHaveLength(1);
+    expect(viaButton).toHaveLength(1);
+
+    // Ids are minted per request, so compare everything else.
+    const shape = (body: string) => {
+      const parsed = JSON.parse(body) as Record<string, unknown>;
+      return JSON.stringify(parsed, (key, value) => (key === 'id' ? '<id>' : value));
+    };
+    expect(shape(viaButton[0]!)).toBe(shape(viaEnter[0]!));
+  });
+
+  test('Shift+Enter writes a newline instead of sending', async ({ page }) => {
+    await page.goto('/en/ask');
+    const bodies = await countChatRequests(page, 200);
+
+    const input = page.locator('#ask-bdoor-input');
+    await input.fill('hi');
+    await input.press('Shift+Enter');
+
+    await expect(input).toHaveValue('hi\n');
+    // Give a wrongly-sent request time to appear before calling it absent.
+    await page.waitForTimeout(1_000);
+    expect(bodies).toHaveLength(0);
+  });
+});
