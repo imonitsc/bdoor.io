@@ -9,6 +9,7 @@ import {
 } from 'ai';
 
 import { checkBudget } from './budget';
+import { auditCitations, auditTelemetry } from './citations';
 import { LIMITS, isSupportedCountry, usageTags } from './config';
 import { classifyUpstreamError, failureMessage, type AiFailure } from './errors';
 import { answerRoute, classifyRisk, providerLockFor } from './models';
@@ -435,6 +436,23 @@ export function streamAnswer(request: ChatRequest): Response {
 
       const latencyMs = Date.now() - startedAt;
       const info = status === 'complete' ? await generationInfo(outcome.generationId) : null;
+
+      // §7.1 step 12: audit the finished answer against the sources it was
+      // given, before it counts as complete. Deterministic and local, so it
+      // costs nothing and cannot itself fail the request — only counts are
+      // logged, because a sentence lifted out of an answer is answer content
+      // and §17 keeps that out of general logs.
+      if (status === 'complete') {
+        const audit = auditCitations(outcome.text, retrieval.citations.length);
+        if (!audit.ok) {
+          logger.warn('ai.answer.citation_audit', {
+            ...auditTelemetry(audit),
+            country,
+            locale,
+            model: modelUsed,
+          });
+        }
+      }
 
       const messageId = await recordAnswer(conversation, {
         content: outcome.text,

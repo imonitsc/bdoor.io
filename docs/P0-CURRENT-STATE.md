@@ -26,7 +26,7 @@ Baseline commit: `5e5b8c4` on `claude/new-session-0n73z6`.
 | 7. Gateway web-search behind a research adapter                  | **Absent**                                | L      |
 | 8. Freshness, live research, evidence labels, review queue       | **Absent**                                | L      |
 | 9. Legal-instrument / provision / coverage schema                | **Absent**                                | L      |
-| 10. Official-source retrieval, amendments, claim-level citations | **Partial**                               | M      |
+| 10. Official-source retrieval, amendments, claim-level citations | **Partial** — claim audit in, amendments  | M      |
 | 11. Scheduled source monitoring and change alerts                | **Partial — and currently inert**         | M      |
 | 12. AI evaluation, web-content security, performance gates       | **Partial** — web-content security done   | M      |
 | 13. Funnel, research-quality and investor analytics              | **Substantially in place**                | S      |
@@ -240,8 +240,18 @@ exist before any live source can be quoted.
 
 Official sources already outrank bdoor commercial content in retrieval, and answers about
 recurring obligations already carry a rule version and review date (shipped as KR-2 and P2-a).
-What is missing is **claim-level** citation — an answer cites its sources, not each individual
-assertion — and any amendment awareness, which cannot exist before the provision schema in
+
+**Claim-level citation is now audited** (`src/features/ai/citations.ts`, shipped 3 September
+2026). Every completed answer is checked against the sources it was given: material claims —
+money, proportions, periods, dates, duties — must carry a citation marker, and a marker naming
+a source that was never retrieved is recorded as fabricated. The audit is deterministic string
+work, not a second model call, so it costs nothing and its verdict is reproducible in a test.
+It establishes the necessary condition, not entailment: whether the cited passage actually
+supports the sentence stays with the §6.7 verifier. Findings are logged as counts only (§17)
+and are not yet persisted per answer or surfaced in the admin trace — that needs a migration
+and is the next increment.
+
+Still missing: amendment awareness, which cannot exist before the provision schema in
 item 9.
 
 `ai_source_change_alerts` exists and `/api/ai/ingestion` runs on a schedule, so the skeleton of

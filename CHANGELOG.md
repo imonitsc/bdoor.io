@@ -5,6 +5,45 @@ first; each entry names its merged pull requests. Dates are merge dates.
 
 ## 2026-09-03
 
+- **Answers are now audited against the sources they were given (P0 item 10,
+  claim-level half)** — the prompt has always told the model to cite every
+  factual regulatory claim, and retrieval has always numbered the sources it
+  may cite. Nothing checked that the finished answer obeyed. §7.1 step 12 puts
+  a "citation-support audit before marking the answer complete" between
+  generation and completion, and §23.2 requires that each material claim map to
+  a supporting section; `src/features/ai/citations.ts` is that check.
+
+  It is deliberately not a model call. A second model asked "is this cited?"
+  would cost money on every answer, spend the completion budget in §7.3, and
+  can be wrong in the same direction as the first. This is deterministic string
+  work — cheap enough to run always, and its verdict is reproducible in a test
+  rather than being an opinion that changes between runs.
+
+  It is also deliberately not an entailment check. Whether the cited passage
+  actually supports the sentence is a semantic question this cannot answer;
+  §6.7 step 9 assigns that to the verifier model. What it establishes is the
+  necessary condition underneath: a claim carrying no marker at all cannot be
+  supported by anything, and a marker naming a source that was never retrieved
+  is fabricated — §7.4 makes that one release-blocking, and it is the single
+  finding here that is certainly a defect rather than a heuristic's opinion.
+
+  Two decisions are pinned by tests so they read as choices rather than gaps.
+  Under-reporting is the safe direction: a false accusation against a good
+  answer would train everyone to ignore the signal, so the detector fires on
+  money, proportions, periods, dates and duties and leaves ordinary prose,
+  bdoor's own offer and questions alone. And Bangla obligation phrasing is not
+  detected: Bengali numerals are, because a figure is a figure in any script,
+  but writing a Bangla modal list from memory would produce a detector whose
+  errors nobody on this codebase can audit. A test asserts the Bangla duty
+  sentence goes unflagged, so the limit is a recorded decision.
+
+  Sentence splitting had to learn what regulatory prose looks like before any
+  of this worked: "Tk 5,000.50" and "s. 184" must not each become their own
+  sentence, or every claim arrives pre-shredded and uncited. Findings are
+  logged as counts only — a sentence lifted out of an answer is answer content,
+  and §17 keeps that out of general logs. Persisting them per answer and
+  showing them in the admin trace needs a migration and is the next increment.
+
 - **The fetch path's limits actually hold now (P0 item 12, web-content security)** —
   CLAUDE.md §23.2 requires tests proving that "MIME/size limits and fetch
   timeouts work" and that "prompt injection or tool instructions inside a
