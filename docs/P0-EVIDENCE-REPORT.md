@@ -108,6 +108,22 @@ survive because they come from the SDK's own `usage` object instead.
 The consequence is the blocking one: `checkBudget()` sums `estimated_cost_usd`, so the daily
 and monthly spend guards have been summing zero. They would not trip under any load.
 
+**Scope correction (3 September, after this report was first written).** `budget.ts`'s own
+header records that AI Gateway budgets — configured per team, project and key, and rejecting
+with HTTP 402 — are the _first_ line of enforcement, and that this application check is the
+second. So the inert guard does not by itself mean spend is unbounded; it means the second
+line was blind. Whether gateway budgets are actually configured is an owner question this
+report cannot answer from the repository.
+
+**Partly fixed the same day.** `checkBudget` now distinguishes "no spend" from "no spend
+data" and logs `ai.budget.cost_data_missing` when a period contains answers and none carries
+a cost. It still allows the answer, because failing closed on a telemetry fault would take
+Ask down and the gateway budget is the cap that actually rejects. `generationInfo` now warns
+on both of its failure paths — separately, so the next occurrence says which one it is. The
+root cause of the missing cost is **not** fixed: `generationId` is read from
+`providerMetadata.gateway`, whose type in the installed SDK declares only `asyncJob` plus an
+index signature, so the field may simply never arrive. The new logs will settle it.
+
 Citations: every completed answer is now audited against the sources it was given
 (`src/features/ai/citations.ts`), and the counts are persisted per answer with a review queue
 at `/admin/ai`. The audit establishes that material claims carry a marker and that no marker
@@ -243,9 +259,13 @@ not.
 
 **No owner input needed:**
 
-1. Fix `generationInfo` cost and provider capture, and raise its swallowed `debug` to `warn`
-   so the next failure is visible within hours rather than after a month. This restores budget
-   enforcement.
+1. ~~Raise `generationInfo`'s swallowed `debug` to `warn`~~ — done 3 September, and both
+   failure paths now warn distinctly. **Still open:** the root cause of the missing cost and
+   provider. Read the next `ai.generation_info.no_id` or `ai.generation_info.failed` in
+   production to tell whether the gateway never supplies a generation id or the lookup throws,
+   then fix accordingly. Do not invent a price table if the gateway cannot supply cost —
+   model pricing is a fact, and `getSpendReport` on the gateway client is the supported
+   alternative worth evaluating first.
 2. Add the §7.3 latency gate to CI so a 14-second p75 fails a build instead of a report.
 3. Investigate the p75 itself: retrieval over 25 chunks should not take 14 seconds, which
    suggests the time is in generation, not search.

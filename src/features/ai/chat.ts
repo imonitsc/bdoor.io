@@ -109,13 +109,34 @@ function writeText(writer: Writer, text: string) {
  * Cost and provider for one generation. Best-effort, after the stream — the
  * gateway settles asynchronously and a miss just leaves cost at zero.
  */
+/**
+ * Cost and serving provider for one generation, from the gateway.
+ *
+ * Both of these were silently absent from every row in `ai_usage` between the
+ * first answer on 30 August 2026 and this change, which mattered because
+ * `checkBudget` sums the cost column: the spend guard was adding up zeros.
+ *
+ * The failure was invisible because it was logged at `debug`, and production's
+ * floor is `info`. Worse, the likeliest cause never reaches the `catch` at all:
+ * `generationId` is read from `providerMetadata.gateway`, whose type in the
+ * installed SDK declares only `asyncJob` plus an index signature — the field is
+ * not a promised part of that object. If it is simply absent, this returns null
+ * on the first line and nothing is ever logged.
+ *
+ * So both paths now warn, and they warn *differently*. The next occurrence
+ * tells us which of the two it is within hours instead of costing another
+ * month of blind spend.
+ */
 async function generationInfo(generationId: string | null) {
-  if (!generationId) return null;
+  if (!generationId) {
+    logger.warn('ai.generation_info.no_id');
+    return null;
+  }
   try {
     const info = await gateway.getGenerationInfo({ id: generationId });
     return { cost: info.totalCost, provider: info.providerName };
   } catch (error) {
-    logger.debug('ai.generation_info.miss', { message: (error as Error).message });
+    logger.warn('ai.generation_info.failed', { message: (error as Error).message });
     return null;
   }
 }
