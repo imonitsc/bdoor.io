@@ -5,6 +5,26 @@ first; each entry names its merged pull requests. Dates are merge dates.
 
 ## 2026-09-03
 
+- **§7.3's "exactly once" is now tested, not assumed** — the requirement reads
+  "Send button and Enter key produce the same request exactly once", and only
+  the Enter key had coverage. Neither the button path nor the "exactly once"
+  half was tested anywhere, and a duplicate send is not cosmetic: it is a
+  second retrieval, a second model call and a second answer billed and written
+  to the ledger, from a customer who pressed a key twice because the first
+  press looked slow.
+
+  Four end-to-end tests now count actual POSTs to `/api/ai/chat` while the
+  response is held open, so each assertion runs inside the window where a
+  duplicate could land: three rapid Enters send once, a double-click on Send
+  sends once, both entry points post an identical body, and Shift+Enter writes
+  a newline without sending. The application passes all four on desktop and
+  mobile — the existing guard (the busy flag plus the cleared draft) does hold.
+
+  Counting requests is the point. The transcript renders the question
+  optimistically, before the fetch, so asserting on what the customer can see
+  would have proved nothing about the network and would have passed over a
+  real duplicate.
+
 - **Per-stage answer latency is recorded, not just logged** — §7.3 requires
   that "retrieval, rerank, model, first-token and completion latency are
   separately recorded", and sets two of its five targets on first-token
