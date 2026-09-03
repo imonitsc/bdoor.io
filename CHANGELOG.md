@@ -5,6 +5,60 @@ first; each entry names its merged pull requests. Dates are merge dates.
 
 ## 2026-09-02
 
+- **The safe fetcher, which turned out to be a live SSRF fix (P0 item 6)** —
+  CLAUDE.md §6.7 requires the research fetcher to "block private IP ranges,
+  non-HTTP(S) schemes, user-supplied redirects, oversized files, unsupported
+  MIME types, recursive crawling and cross-domain redirects that are not
+  explicitly approved". The size and MIME halves already existed. The address
+  and redirect halves did not, and their absence was not theoretical: the
+  ingestion fetcher called `fetch` with `redirect: 'follow'` and no address
+  check whatsoever, so any host it was ever pointed at could answer with a
+  redirect to `http://169.254.169.254/` — the cloud instance-metadata address,
+  which hands out credentials to anything able to make it an HTTP request —
+  or to a service on the loopback interface, and the bytes would have been
+  stored and later cited as a government document. The admin-controlled source
+  registry made that unreachable in practice, not safe; §6.7's live research
+  would have made it reachable.
+
+  Redirects are now followed one hop at a time, and every hop faces the same
+  checks as the URL that was asked for: scheme, host approval, and an address
+  classification that refuses loopback, RFC1918, link-local, CGNAT,
+  benchmarking, documentation, multicast and reserved space — in IPv4 and in
+  every IPv6 notation that can carry an IPv4 address, because `::ffff:127.0.0.1`,
+  `::10.0.0.1` and `64:ff9b::169.254.169.254` are one notation away from
+  bypassing a table that only knows dotted quads. Names are resolved and every
+  answer must be public, not merely the first: a name returning one public and
+  one loopback address is a rebinding attempt. An https chain cannot be walked
+  down onto http. The residual DNS-rebinding window between the check and
+  Node's own resolution is documented in the module rather than papered over —
+  closing it needs a custom dispatcher, and that is a new runtime dependency
+  (§4.2).
+
+  `src/features/ai/research/official-domains.ts` holds the versioned allowlist
+  §6.7 requires, **and it ships empty**. Which hosts carry the authority of
+  Bangladeshi law is a regulatory fact, and §3.3 forbids creating one from
+  model memory; an allowlist assembled from recollection would launder a guess
+  into the one place the pipeline trusts absolutely. So it is a data decision
+  for the owner and a knowledge reviewer, `allowlisted()` refuses every host
+  until they make it, and a unit test fails if the list ever gains an entry, so
+  that nobody adds one absent-mindedly. Host matching is on a label boundary,
+  never a bare suffix — `nbr.gov.bd` must not admit `evil-nbr.gov.bd` — and an
+  IP literal never matches, because an authority is a name and a literal is how
+  a name check gets skipped.
+
+  The registry ingestion path is deliberately not put behind that allowlist. It
+  is already its own admin-curated list of what may be ingested, and everything
+  it produces stops at `review_required` for a human. The allowlist governs the
+  other path: pages opened during a live research run, whose evidence reaches a
+  customer labelled `official_live` without that human step. The weaker the
+  review, the stricter the gate. For the same reason plaintext is refused only
+  when a caller demands TLS — several seeded authority sites are registered
+  over http — but the outcome now reports `secureTransport`, so a reviewer is
+  told the bytes arrived unauthenticated instead of assuming they did not. The
+  fetcher also returns the content hash §6.7 asks for and the full redirect
+  chain; ingestion now takes its checksum from that hash rather than hashing
+  the same bytes a second time.
+
 - **The AI configuration contract, and one variable that needed a guard rather
   than obedience (P0 item 5)** — CLAUDE.md §4.1 names nineteen environment
   variables; two existed. All nineteen exist now — twelve model and limit
