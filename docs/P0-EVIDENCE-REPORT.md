@@ -150,6 +150,58 @@ Evaluation: an evaluation set and answer-contract tests exist and run in CI. The
 enforced latency or cost gate in CI** — §7.3's thresholds fail nothing today, which is how the
 p75 above went unnoticed.
 
+### Rate limits (§23.2)
+
+§23.2 asks for one thing under two headings — "rate limits and daily budgets work" — and this
+report has so far answered only the second half. Read as it stood, a reader would reasonably
+take the endpoint to be bounded without qualification. It is bounded, but the two halves are
+enforced by different mechanisms with very different strength, and they should not be read as
+one guarantee.
+
+**Spend** is capped twice and neither cap is the limiter described below: AI Gateway budgets
+reject with HTTP 402 at the provider boundary, and `checkBudget()` sums `estimated_cost_usd`
+as the second line. That second line has been summing zero since the first answer, for the
+reason set out above; the root cause is still open. Whether the first line is configured is
+an owner question this report cannot answer from the repository.
+
+**Request rate** is capped by three windows in `src/app/api/ai/chat/route.ts`, with the values
+in `src/features/ai/config.ts`: 8 per IP per minute, 120 per IP per day, and 40 per
+conversation per hour, the last falling back to the IP key when a request carries no
+conversation id. Keys are a salted SHA-256 of the forwarded address, so the limiter's memory
+is not a list of visitor IPs.
+
+Those counters live in a per-instance `Map`. That is not a discovery — it is already recorded
+in `docs/SECURITY.md`, `docs/BUILD_REPORT.md` and `docs/OPERATIONS_RUNBOOK.md`. What has not
+been stated is what it does to this particular acceptance criterion, and the three windows do
+not degrade equally:
+
+- The **60-second** window is the one that mostly holds. A script's burst arrives inside the
+  lifetime of a small number of instances, so the constant means roughly what it reads as.
+- The **24-hour** window is the weakest by a wide margin. A serverless instance does not live
+  for a day, and every deployment resets every counter, so "120 per IP per day" is in practice
+  a ceiling per instance per instance-lifetime. The number in the config file is an upper
+  bound on one instance's view, not on a day's traffic from one source.
+- The **hourly** conversation window sits between the two and shares the same ceiling.
+
+So the honest answer to §23.2 splits: daily _budgets_ have a real cap, though not the one this
+application implements; daily _request_ limits do not have one that survives horizontal scale.
+
+Closing it means moving the counters to storage shared across instances. §4.2 points at
+Postgres before a new dependency: one row per hashed key and window start, incremented by an
+upsert that returns the running count, checked before any retrieval or model work happens.
+The cost is a database round trip on every Ask request — including every request that is
+about to be refused, which is precisely the traffic a limiter exists to make cheap. Redis or
+Vercel KV would carry that check far better, and both are a new paid service, which §3.2
+makes an owner decision rather than an implementation one.
+
+No test exercises the windows. `tests/unit/ai-safety.test.ts` asserts only that a
+`rate_limited` failure maps to HTTP 429; the counting itself, and the reset behaviour, are
+uncovered. A test is possible without shared storage, since the counters are process-local:
+either export `overLimit` (it is module-private today) or drive the route handler past each
+threshold. It would at least pin the constants against accidental change. It would not tell
+us anything about the multi-instance behaviour above, and should not be presented as if it
+did.
+
 ## 6. Official-domain policy, web-search/fetch security and PII-redaction tests
 
 The strongest section of this report.
@@ -296,3 +348,7 @@ not.
    entirely, and §3.3 forbids inventing either.
 6. Gazetted public-holiday data and a first published rule, without which Comply is inert.
 7. Branch protection, so this report can run before a deployment rather than after it.
+8. Shared storage for the Ask rate limiter, or an explicit decision to keep it per-instance.
+   Postgres needs no new dependency but adds a round trip to every request, including the ones
+   it is about to refuse; Redis or Vercel KV suits the job far better and is a new paid
+   service, which §3.2 makes the owner's call.
