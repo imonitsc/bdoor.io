@@ -11,7 +11,7 @@ import {
 import { checkBudget } from './budget';
 import { auditCitations, auditTelemetry, type CitationAudit } from './citations';
 import { LIMITS, answerLimits, isSupportedCountry, usageTags } from './config';
-import { classifyUpstreamError, failureMessage, type AiFailure } from './errors';
+import { classifyUpstreamError, failureMessage, noEvidenceReply, type AiFailure } from './errors';
 import { answerRoute, classifyRisk, providerLockFor } from './models';
 import { FAST_PATH_MODEL, greetingReply, isGreeting } from './fast-path';
 import { actionsFor } from './follow-ups';
@@ -87,7 +87,7 @@ type FinalPart = {
 };
 type FailurePart = {
   uiMessageId: string;
-  failure: AiFailure | 'out_of_scope';
+  failure: AiFailure | 'out_of_scope' | 'no_evidence';
   message: string;
 };
 
@@ -266,7 +266,26 @@ export function streamAnswer(request: ChatRequest): Response {
       const userMessagePromise = recordUserMessage(conversation, question);
       const backgroundWrites: Promise<unknown>[] = [userMessagePromise];
 
-      if (retrieval.empty) {
+      // §7.1 step 10 and §23.2: empty retrieval refuses, it does not answer.
+      // This block previously recorded `no_match` and then carried on to the
+      // model with an empty context, leaving the system prompt as the only
+      // thing standing between a customer and an ungrounded legal answer. A
+      // prompt instruction is not a gate.
+      //
+      // `searched` matters: with no knowledge database configured, retrieval
+      // returns empty without looking at anything. Declining there would tell
+      // the customer their question has no approved source when the truth is
+      // that the assistant is misconfigured — so that case falls through to
+      // the model call, whose own failure reports the outage honestly.
+      if (retrieval.empty && retrieval.searched) {
+        const message = noEvidenceReply(locale);
+        writer.write({
+          type: 'data-failure',
+          data: { uiMessageId, failure: 'no_evidence', message } satisfies FailurePart,
+        });
+        writeText(writer, message);
+        writer.write({ type: 'finish' });
+        timings.mark('completed');
         backgroundWrites.push(
           recordUnanswered({
             conversationId: conversation.persisted ? conversation.id : null,
@@ -276,6 +295,11 @@ export function streamAnswer(request: ChatRequest): Response {
             reason: 'no_match',
           }),
         );
+        // The question is already being written; losing it would make the
+        // coverage backlog disagree with the conversation.
+        await Promise.allSettled(backgroundWrites);
+        timings.flush({ path: 'no_evidence', country, locale, status: 'refused' });
+        return;
       }
 
       writer.write({ type: 'data-citations', data: { citations: retrieval.citations } });

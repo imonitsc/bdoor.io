@@ -70,6 +70,17 @@ export type RetrievalResult = {
   complyTrack: ComplyTrack | null;
   /** True when nothing matched — the caller logs an unanswered question. */
   empty: boolean;
+  /**
+   * Whether a search actually ran.
+   *
+   * `empty` alone cannot carry the refusal decision, because it is true for
+   * two unrelated reasons: the corpus was searched and had nothing, or there
+   * is no knowledge database configured to search. The first is a coverage
+   * gap the customer should be told about honestly; the second is an
+   * infrastructure fault, and answering it with "I have no approved source
+   * for this" would blame the question for an outage.
+   */
+  searched: boolean;
 };
 
 /**
@@ -383,6 +394,8 @@ export async function retrieveContext(
       ruleIds: [],
       complyTrack: null,
       empty: true,
+      // Nothing was searched: there is no database to search.
+      searched: false,
     };
   }
 
@@ -489,6 +502,7 @@ export async function retrieveContext(
     // to answer a regulatory question, so the gap is still worth recording —
     // but a published rule is retrieved knowledge, not a gap.
     empty: chunks.length === 0 && rules.length === 0,
+    searched: true,
   };
 
   if (options?.cacheable && !result.empty) cacheSet(cacheKey, result);
