@@ -46,6 +46,21 @@ const COPY: Record<AiFailure, { en: string; bn: string }> = {
   },
 };
 
+/**
+ * The decline when retrieval found nothing to stand on.
+ *
+ * Deliberately NOT an `AiFailure`, for the same reason `out_of_scope` is not:
+ * nothing went wrong. The assistant was asked something it has no approved
+ * source for, and saying so is the correct, complete answer — §7.1 step 10 and
+ * §23.2. Treating it as an error would tell the customer to retry, which
+ * cannot help, and would hide a coverage gap behind what looks like an outage.
+ */
+export function noEvidenceReply(locale: 'en' | 'bn'): string {
+  return locale === 'bn'
+    ? 'এই প্রশ্নের উত্তর দেওয়ার মতো অনুমোদিত সরকারি বা যাচাই করা উৎস আমার কাছে এখনো নেই, তাই অনুমান করে বলব না। একজন বিশেষজ্ঞ এটি দেখে দিতে পারবেন, এবং প্রশ্নটি আমাদের কভারেজ তালিকায় যুক্ত হলো।'
+    : 'I do not have an approved official source that answers this, so I will not guess at it. A specialist can review the question for you, and I have added it to our coverage backlog.';
+}
+
 export function failureMessage(failure: AiFailure, locale: 'en' | 'bn'): string {
   return COPY[failure][locale];
 }

@@ -83,9 +83,11 @@ function AssistantTurn({
   const t = useTranslations('ask');
   const text = messageText(message);
   const citations = messageCitations(message);
-  const failed =
-    (Boolean(meta?.failure) && meta?.failure !== 'out_of_scope') ||
-    Boolean(!text && fallbackFailure);
+  // A decline is not a failure. `out_of_scope` and `no_evidence` are complete,
+  // correct answers — styling them as errors would tell the customer to retry
+  // something that cannot succeed.
+  const declined = meta?.failure === 'out_of_scope' || meta?.failure === 'no_evidence';
+  const failed = (Boolean(meta?.failure) && !declined) || Boolean(!text && fallbackFailure);
 
   return (
     <Message from="assistant">
