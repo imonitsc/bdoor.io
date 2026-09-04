@@ -161,6 +161,100 @@ describe('the seed corpus, loaded and retrieved', () => {
     });
   });
 
+  it('excludes foreign-country, unpublished and restricted sources from the same query', async () => {
+    // §23.2: "Cross-jurisdiction sources are excluded" and "Superseded and
+    // unreviewed sources do not ground an answer". Both are enforced inside
+    // ai_search_knowledge's `live` CTE rather than by RLS, because the public
+    // assistant reaches this function through the service role, which bypasses
+    // every policy — so the function is the only thing standing between a
+    // draft or another country's source and a customer's answer.
+    //
+    // The other tests in this file assert that the RIGHT source comes back.
+    // None of them would fail if a WRONG one came back beside it. Every row
+    // seeded here contains the same distinctive term, so all five are real
+    // keyword matches and only the filters can account for the difference.
+    await inRolledBackTransaction(client, async (tx) => {
+      const body = 'Zaltrix filing procedure for the Zaltrix registry.';
+      const seed = async (
+        slug: string,
+        title: string,
+        country: string,
+        status: string,
+        scope: string,
+      ) => {
+        const { rows } = await tx.query<{ id: string }>(
+          `insert into public.ai_knowledge_sources
+             (slug, title, country, locale, source_type, source_url, body, status, access_scope,
+              last_reviewed_at)
+           values ($1, $2, $3, 'en'::public.locale_code, 'guide'::public.ai_source_type,
+                   'https://example.test/' || $1, $4, $5::public.ai_source_status,
+                   $6::public.ai_access_scope, now())
+           returning id`,
+          [slug, title, country, body, status, scope],
+        );
+        await tx.query(
+          `insert into public.ai_knowledge_chunks (source_id, chunk_index, content, embedding)
+           values ($1, 0, $2, $3::extensions.vector)`,
+          [rows[0]!.id, body, stubVector(body)],
+        );
+      };
+
+      await seed('zaltrix-bd', 'Zaltrix Bangladesh', 'bd', 'published', 'public');
+      await seed('zaltrix-global', 'Zaltrix Global', 'global', 'published', 'public');
+      await seed('zaltrix-us', 'Zaltrix United States', 'us', 'published', 'public');
+      await seed('zaltrix-draft', 'Zaltrix Draft Bangladesh', 'bd', 'draft', 'public');
+      await seed(
+        'zaltrix-restricted',
+        'Zaltrix Restricted Bangladesh',
+        'bd',
+        'published',
+        'restricted',
+      );
+
+      const { rows } = await tx.query<{ title: string }>(
+        `select title from public.ai_search_knowledge(
+           $1::extensions.vector, 'Zaltrix', 'en'::public.locale_code, 'bd', 20)`,
+        [stubVector(body)],
+      );
+      const titles = rows.map((row) => row.title);
+
+      // Present: this country, and 'global' — which must keep working, since
+      // a cap on jurisdiction leakage that also dropped shared sources would
+      // quietly narrow every answer.
+      expect(titles).toContain('Zaltrix Bangladesh');
+      expect(titles).toContain('Zaltrix Global');
+
+      // Absent — the assertions the existing tests cannot make.
+      expect(titles).not.toContain('Zaltrix United States');
+      expect(titles).not.toContain('Zaltrix Draft Bangladesh');
+      expect(titles).not.toContain('Zaltrix Restricted Bangladesh');
+
+      // A negative assertion is worthless if the row was never a match to
+      // begin with, so prove each excluded row is genuinely retrievable and
+      // that only the filter accounts for its absence above.
+      const { rows: viaUs } = await tx.query<{ title: string }>(
+        `select title from public.ai_search_knowledge(
+           $1::extensions.vector, 'Zaltrix', 'en'::public.locale_code, 'us', 20)`,
+        [stubVector(body)],
+      );
+      expect(viaUs.map((row) => row.title)).toContain('Zaltrix United States');
+
+      // The draft and restricted rows have no country that admits them, so
+      // their matchability is shown against the index itself.
+      const { rows: indexed } = await tx.query<{ title: string }>(
+        `select s.title
+         from public.ai_knowledge_chunks c
+         join public.ai_knowledge_sources s on s.id = c.source_id
+         where c.search_vector @@ plainto_tsquery('simple', 'Zaltrix')
+           and s.slug in ('zaltrix-draft', 'zaltrix-restricted')`,
+      );
+      expect(indexed.map((row) => row.title).sort()).toEqual([
+        'Zaltrix Draft Bangladesh',
+        'Zaltrix Restricted Bangladesh',
+      ]);
+    });
+  });
+
   it('keeps every chunk under a size a model can actually use', async () => {
     await inRolledBackTransaction(client, async (tx) => {
       await loadCorpus(tx);
