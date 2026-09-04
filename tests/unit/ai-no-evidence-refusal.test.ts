@@ -20,6 +20,7 @@ const streamText = vi.fn(() => {
 });
 
 let retrievalEmpty = true;
+let retrievalSearched = true;
 
 vi.mock('ai', async (importOriginal) => ({
   ...(await importOriginal<typeof import('ai')>()),
@@ -34,6 +35,7 @@ vi.mock('@/features/ai/retrieval', () => ({
     ruleIds: [],
     complyTrack: null,
     empty: retrievalEmpty,
+    searched: retrievalSearched,
   }),
   ruleCitations: () => [],
 }));
@@ -67,6 +69,7 @@ async function ask(question: string): Promise<string> {
 afterEach(() => {
   streamText.mockClear();
   retrievalEmpty = true;
+  retrievalSearched = true;
 });
 
 describe('an in-scope question the corpus does not cover', () => {
@@ -83,6 +86,24 @@ describe('an in-scope question the corpus does not cover', () => {
     await ask('what is the VAT treatment of bonded warehouse scrap in Bangladesh');
 
     expect(streamText).not.toHaveBeenCalled();
+  });
+
+  it('does not decline when there is no database to search', async () => {
+    // `empty` is true for two unrelated reasons, and only one of them is a
+    // coverage gap. With no knowledge database configured nothing was looked
+    // at, so declining would tell the customer their question has no approved
+    // source when the truth is that the assistant is misconfigured. That case
+    // belongs to the model call and the outage message it produces.
+    //
+    // The e2e suite caught this: `ask-bdoor-ai.spec.ts` runs without
+    // credentials and asserts the customer is told the model cannot be
+    // reached. The first version of this gate declined instead.
+    retrievalSearched = false;
+
+    const body = await ask('how do I register a company in Bangladesh');
+
+    expect(body).not.toContain('no_evidence');
+    expect(streamText).toHaveBeenCalled();
   });
 
   it('still answers when retrieval found something', async () => {

@@ -271,7 +271,13 @@ export function streamAnswer(request: ChatRequest): Response {
       // model with an empty context, leaving the system prompt as the only
       // thing standing between a customer and an ungrounded legal answer. A
       // prompt instruction is not a gate.
-      if (retrieval.empty) {
+      //
+      // `searched` matters: with no knowledge database configured, retrieval
+      // returns empty without looking at anything. Declining there would tell
+      // the customer their question has no approved source when the truth is
+      // that the assistant is misconfigured — so that case falls through to
+      // the model call, whose own failure reports the outage honestly.
+      if (retrieval.empty && retrieval.searched) {
         const message = noEvidenceReply(locale);
         writer.write({
           type: 'data-failure',
