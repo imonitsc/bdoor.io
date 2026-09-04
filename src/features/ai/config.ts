@@ -5,11 +5,14 @@ import { serverEnv } from '@/lib/env';
 /**
  * Ask bdoor AI: the settings that are policy rather than preference.
  *
- * Everything here is deliberately a constant rather than an environment
- * variable. A limit that can be raised by editing a dashboard field is a limit
- * that gets raised at 2am during an incident; these are reviewed in a pull
- * request instead. The two exceptions are the spend caps, which finance owns,
- * and the feature switch.
+ * `LIMITS` below is deliberately constant rather than environment-driven. A
+ * limit that can be raised by editing a dashboard field is a limit that gets
+ * raised at 2am during an incident; these are reviewed in a pull request
+ * instead.
+ *
+ * The exceptions are the four §4.1 limits, the spend caps finance owns, and
+ * the feature switch. Those live in `answerLimits()` and nowhere else — see
+ * the note on it for why they are not also mirrored here.
  */
 
 /**
@@ -85,17 +88,6 @@ export const LIMITS = {
   /** Turns of history replayed to the model, newest last. */
   maxHistoryMessages: 12,
   maxOutputTokens: 1_200,
-  /**
-   * Chunks retrieved per question before the model sees anything, and the
-   * wall-clock ceiling for one answer including retries.
-   *
-   * Both are now `AI_MAX_RETRIEVAL_CHUNKS` and `AI_REQUEST_TIMEOUT_MS`
-   * (CLAUDE.md §4.1) and are read through `answerLimits()` below. The values
-   * here remain the defaults, so an unset environment behaves exactly as it
-   * did when they were constants.
-   */
-  retrievalCount: 8,
-  requestTimeoutMs: 45_000,
   embeddingTimeoutMs: 10_000,
   maxRetries: 2,
   /** Anonymous callers, per IP. */
@@ -108,8 +100,18 @@ export const LIMITS = {
 } as const;
 
 /**
- * The limits §4.1 makes configurable, resolved together so a caller cannot
- * read one from the environment and the other from the constant.
+ * The limits §4.1 makes configurable.
+ *
+ * This is the ONLY place they are resolved, and `retrievalCount` and
+ * `requestTimeoutMs` are deliberately absent from `LIMITS` above rather than
+ * duplicated there as "defaults". They were mirrored once, and every consumer
+ * read the mirror: the environment variables reached this function and this
+ * function reached nobody, so setting either in Vercel did nothing and said
+ * nothing. Their defaults now live in the `serverEnv()` schema, which is the
+ * one place that can supply a value without being bypassed.
+ *
+ * Adding a limit here means adding it here only. If it also appears as a
+ * constant, the constant is what production will use.
  */
 export function answerLimits(): {
   retrievalCount: number;

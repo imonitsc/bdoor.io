@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { detectCountry, LIMITS } from './config';
+import { answerLimits, detectCountry } from './config';
 import { aiDb, hasAiDatabase } from './db';
 import { embedQuery } from './embeddings';
 import { fuseRankedLists, type FusedChunk, type RankedChunk } from './fusion';
@@ -171,8 +171,14 @@ type Rpc = (
   args: Record<string, unknown>,
 ) => PromiseLike<{ data: RankedChunk[] | null; error: { code?: string } | null }>;
 
-/** Candidate pool per list, matching the old hybrid function's inner limits. */
-const CANDIDATES = Math.max(LIMITS.retrievalCount * 4, 40);
+/**
+ * Candidate pool per list, matching the old hybrid function's inner limits.
+ * Read per call, not once at import: `answerLimits()` is the configured value
+ * and a module constant would freeze whatever it happened to be first.
+ */
+function candidatePool(): number {
+  return Math.max(answerLimits().retrievalCount * 4, 40);
+}
 
 /**
  * Question words and connectives that carry no retrieval signal, English and
@@ -287,7 +293,7 @@ async function keywordCandidates(question: string, countries: string[]): Promise
       rpc('ai_search_keyword', {
         query_text: keywordQuery(question),
         p_country: code,
-        candidate_count: CANDIDATES,
+        candidate_count: candidatePool(),
       }),
     ),
   );
@@ -310,7 +316,7 @@ async function semanticCandidates(
       rpc('ai_search_semantic', {
         query_embedding: JSON.stringify(embedding),
         p_country: code,
-        candidate_count: CANDIDATES,
+        candidate_count: candidatePool(),
       }),
     ),
   );
@@ -386,6 +392,7 @@ export async function retrieveContext(
   const mentioned = detectCountry(question);
   const countries = mentioned && mentioned !== country ? [country, mentioned] : [country];
 
+  const { retrievalCount } = answerLimits();
   let chunks: FusedChunk[] = [];
   let rules: StructuredRule[] = [];
   try {
@@ -412,7 +419,7 @@ export async function retrieveContext(
     const merged = new Map<string, FusedChunk>();
     countries.forEach((_, index) => {
       const fused = fuseRankedLists(semanticLists[index] ?? [], keywordLists[index] ?? [], {
-        count: LIMITS.retrievalCount,
+        count: retrievalCount,
         locale,
       });
       for (const chunk of fused) {
@@ -427,7 +434,7 @@ export async function retrieveContext(
         if (aLocale !== bLocale) return bLocale - aLocale;
         return b.score - a.score;
       })
-      .slice(0, LIMITS.retrievalCount);
+      .slice(0, retrievalCount);
 
     // Selection is by relevance; PRESENTATION puts official government sources
     // above bdoor's own content. The model reads the context top-down and the

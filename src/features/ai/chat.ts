@@ -10,7 +10,7 @@ import {
 
 import { checkBudget } from './budget';
 import { auditCitations, auditTelemetry, type CitationAudit } from './citations';
-import { LIMITS, isSupportedCountry, usageTags } from './config';
+import { LIMITS, answerLimits, isSupportedCountry, usageTags } from './config';
 import { classifyUpstreamError, failureMessage, type AiFailure } from './errors';
 import { answerRoute, classifyRisk, providerLockFor } from './models';
 import { FAST_PATH_MODEL, greetingReply, isGreeting } from './fast-path';
@@ -404,6 +404,7 @@ export function streamAnswer(request: ChatRequest): Response {
       // multiplies the wall-clock ceiling. Every hop is counted and logged;
       // the prompt and citation contract are identical on every model.
       timings.mark('model_start');
+      const { requestTimeoutMs } = answerLimits();
       let failoverCount = 0;
       let modelUsed = '';
       let outcome: Attempt = {
@@ -414,7 +415,7 @@ export function streamAnswer(request: ChatRequest): Response {
         failure: 'unknown',
       };
       for (const model of route.chain) {
-        const remainingMs = LIMITS.requestTimeoutMs - (Date.now() - startedAt);
+        const remainingMs = requestTimeoutMs - (Date.now() - startedAt);
         if (modelUsed !== '' && remainingMs < 2_000) break;
         if (modelUsed !== '') {
           failoverCount += 1;
