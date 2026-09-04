@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { LIMITS } from './config';
+import { answerLimits } from './config';
 import { aiDb, hasAiDatabase } from './db';
 import { embedQuery } from './embeddings';
 import { AUTHORITY_BONUS_PER_TIER, RRF_K, type RankedChunk } from './fusion';
@@ -48,7 +48,10 @@ export type RetrievalDiagnostics = {
   includedCount: number;
 };
 
-const CANDIDATES = Math.max(LIMITS.retrievalCount * 4, 40);
+/** Mirrors retrieval.ts: the pool is derived from the configured cut. */
+function candidatePool(): number {
+  return Math.max(answerLimits().retrievalCount * 4, 40);
+}
 
 type Rpc = (
   fn: string,
@@ -77,13 +80,13 @@ export async function retrieveDiagnostics(
     rpc('ai_search_keyword', {
       query_text: keywordQuery(question),
       p_country: country,
-      candidate_count: CANDIDATES,
+      candidate_count: candidatePool(),
     }),
     embedQuery(question).then((embedding) =>
       rpc('ai_search_semantic', {
         query_embedding: JSON.stringify(embedding),
         p_country: country,
-        candidate_count: CANDIDATES,
+        candidate_count: candidatePool(),
       }),
     ),
   ]);
@@ -96,6 +99,7 @@ export async function retrieveDiagnostics(
     logger.warn('ai.diagnostics.semantic_failed', { code: semantic.error.code ?? null });
 
   // Reproduce the fusion arithmetic per chunk, but keep the parts visible.
+  const { retrievalCount } = answerLimits();
   const byChunk = new Map<string, ChunkDiagnostic>();
   const fold = (list: RankedChunk[], leg: 'keyword' | 'semantic') => {
     list.forEach((chunk) => {
@@ -132,7 +136,7 @@ export async function retrieveDiagnostics(
     return b.totalScore - a.totalScore;
   });
   ranked.forEach((entry, index) => {
-    entry.included = index < LIMITS.retrievalCount;
+    entry.included = index < retrievalCount;
   });
 
   // The exclusion sweep: sources the search can never return, that still look
@@ -178,6 +182,6 @@ export async function retrieveDiagnostics(
   return {
     candidates: ranked,
     excluded,
-    includedCount: Math.min(ranked.length, LIMITS.retrievalCount),
+    includedCount: Math.min(ranked.length, retrievalCount),
   };
 }
