@@ -65,6 +65,39 @@ describe('chain resolution', () => {
     expect(models.answerRoute('standard').role).toBe('answer');
   });
 
+  it('caps a multi-valued expert variable at one failover', async () => {
+    // AI_EXPERT_MODEL is comma-separated like every other chain variable, so
+    // "expert = model A, model B" plus a secondary resolved to three models —
+    // two automatic failovers, which §4.1 does not allow, on exactly the
+    // high-risk questions where latency is already tightest. chat.ts walks
+    // whatever chain it is given and breaks on remaining budget rather than
+    // hop count, so the third model really was reachable.
+    const models = await registryWith({
+      AI_EXPERT_MODEL: 'acme/expert-1,acme/expert-2',
+      AI_SECONDARY_MODEL: 'acme/backup-1',
+    });
+    expect(models.modelChain('expert')).toEqual(['acme/expert-1', 'acme/expert-2']);
+    expect(models.answerRoute('high').chain).toHaveLength(2);
+  });
+
+  it('caps the answer chain too, however the variables are set', async () => {
+    const models = await registryWith({
+      AI_PRIMARY_MODEL: 'acme/primary-1,acme/primary-2',
+      AI_SECONDARY_MODEL: 'acme/backup-1',
+    });
+    expect(models.modelChain('answer')).toEqual(['acme/primary-1', 'acme/primary-2']);
+  });
+
+  it('still drops a duplicate rather than spending the hop on the same model', async () => {
+    // The cap is a ceiling, not a filler: de-duplication happens first, so a
+    // secondary equal to the primary still yields one model, not two.
+    const models = await registryWith({
+      AI_EXPERT_MODEL: 'acme/expert-1,acme/expert-1',
+      AI_SECONDARY_MODEL: 'acme/expert-1',
+    });
+    expect(models.modelChain('expert')).toEqual(['acme/expert-1']);
+  });
+
   it('turns the verifier on by configuration alone', async () => {
     const models = await registryWith({ AI_VERIFIER_MODEL: 'acme/verifier-1' });
     expect(models.verifierEnabled()).toBe(true);

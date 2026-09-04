@@ -5,6 +5,24 @@ first; each entry names its merged pull requests. Dates are merge dates.
 
 ## 2026-09-03
 
+- **The expert chain could fail over twice; §4.1 allows one** — found while
+  checking what covered §7.3's failover clause. CLAUDE.md §4.1 permits a
+  "maximum one automatic answer-model failover per request". The answer chain
+  enforced that by construction (primary plus secondary), but the expert chain
+  did not: `AI_EXPERT_MODEL` is comma-separated like every other chain
+  variable, so "expert = model A, model B" with a secondary configured
+  resolved to three models. `chat.ts` walks whatever chain it is handed and
+  breaks on remaining budget rather than hop count, so the third model really
+  was reachable — two failovers, on exactly the high-risk legal and tax
+  questions where latency is already tightest.
+
+  Latent rather than live: it needed a comma an operator could add without
+  thinking twice. The existing test missed it because it only ever set a
+  single-valued expert variable. Both chains are now capped at their source,
+  so no configuration can exceed the rule, and the cap is a ceiling rather
+  than a filler — de-duplication still runs first, so a secondary equal to the
+  primary yields one model rather than being padded to two.
+
 - **§7.3's "exactly once" is now tested, not assumed** — the requirement reads
   "Send button and Enter key produce the same request exactly once", and only
   the Enter key had coverage. Neither the button path nor the "exactly once"
