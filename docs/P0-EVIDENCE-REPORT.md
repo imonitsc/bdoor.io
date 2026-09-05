@@ -124,6 +124,25 @@ root cause of the missing cost is **not** fixed: `generationId` is read from
 `providerMetadata.gateway`, whose type in the installed SDK declares only `asyncJob` plus an
 index signature, so the field may simply never arrive. The new logs will settle it.
 
+**Settled, 4 September — and the hypothesis above was wrong.** The first answer since the
+instrumentation shipped was served at 18:55 UTC, and the log names the failure:
+
+```
+ai.generation_info.failed — "Invalid error response format: Gateway request failed"
+```
+
+Not `ai.generation_info.no_id`. The generation id **is** obtained; the follow-up
+`getGenerationInfo` lookup is what fails, at the gateway. That is why this row also carries
+`estimated_cost_usd = 0.000000` and `provider = null` despite recording 4,659 input and 333
+output tokens from the SDK's own `usage`. `ai.budget.cost_data_missing` fired on the same
+request, correctly reporting ten answers with no cost data against the configured $25 daily
+and $400 monthly caps.
+
+This changes the fix direction. Reading `generationId` from a different field would not have
+helped; the lookup call itself needs to be understood, and `getSpendReport` on the gateway
+client remains the alternative worth evaluating. §3.3 still forbids substituting an invented
+model price table for either.
+
 **Latency was recorded as one number, and §7.3 asks for five (3 September).** The row above
 could report a complete-answer p75 and nothing else, because `latency_ms` was the only
 duration `ai_usage` carried. §7.3 requires that "retrieval, rerank, model, first-token and
@@ -139,6 +158,29 @@ single log line and discarded them.
 this carry nulls, which is honest: those requests were never measured per stage. The report
 above is therefore the last one that can only say _that_ an answer was slow — the next can say
 _where_.
+
+**Where, measured 4 September.** The first answer carrying per-stage timings:
+
+| Stage                | Measured     | §7.3 target |               |
+| -------------------- | ------------ | ----------- | ------------- |
+| Retrieval            | 2,878 ms     | —           |               |
+| Rerank               | 0 ms         | —           |               |
+| **Model generation** | **5,309 ms** | —           |               |
+| First token          | 2,905 ms     | < 2,500 ms  | ❌ **misses** |
+| Complete answer      | 8,192 ms     | < 12,000 ms | ✅            |
+
+Two things the earlier report could not have said. **Model generation is 65% of the
+answer** — the 14.3-second p75 was never a retrieval problem. And within retrieval the
+**keyword leg is the slow one**: the pipeline log puts the vector leg at 1,254 ms and keyword
+at 2,895 ms, the opposite of the usual assumption that the embedding round trip dominates.
+
+First token misses its target because nothing streams until retrieval finishes: 2,905 ms is
+2,878 ms of retrieval plus the model's first byte. Closing that gap means streaming something
+truthful before retrieval completes, not making retrieval faster.
+
+**This is one answer, not a distribution.** It is enough to identify the mechanism and wrong
+to quote as a p75. The percentile row at the top of this section still rests on the 27
+pre-instrumentation answers and will be restated when enough measured rows exist.
 
 Citations: every completed answer is now audited against the sources it was given
 (`src/features/ai/citations.ts`), and the counts are persisted per answer with a review queue
@@ -163,6 +205,14 @@ reject with HTTP 402 at the provider boundary, and `checkBudget()` sums `estimat
 as the second line. That second line has been summing zero since the first answer, for the
 reason set out above; the root cause is still open. Whether the first line is configured is
 an owner question this report cannot answer from the repository.
+
+A **third** control §7.3 requires does not exist at all: "daily and per-answer budget limits
+are enforced server-side", and only the daily and monthly checks are implemented.
+`AI_MAX_COST_USD_PER_ANSWER` is declared and validated in the env schema and consumed by
+nothing. Building it is deliberately deferred rather than forgotten: with
+`estimated_cost_usd` zero on every row, a per-answer cap would compare against a value that
+is always zero — a gate that measures nothing, which must not ship looking like a gate. It
+waits on the cost-telemetry fix above, and that ordering is the point.
 
 **Request rate** is capped by three windows in `src/app/api/ai/chat/route.ts`, with the values
 in `src/features/ai/config.ts`: 8 per IP per minute, 120 per IP per day, and 40 per
@@ -327,18 +377,23 @@ not.
 
 **No owner input needed:**
 
-1. ~~Raise `generationInfo`'s swallowed `debug` to `warn`~~ — done 3 September, and both
-   failure paths now warn distinctly. **Still open:** the root cause of the missing cost and
-   provider. Read the next `ai.generation_info.no_id` or `ai.generation_info.failed` in
-   production to tell whether the gateway never supplies a generation id or the lookup throws,
-   then fix accordingly. Do not invent a price table if the gateway cannot supply cost —
-   model pricing is a fact, and `getSpendReport` on the gateway client is the supported
-   alternative worth evaluating first.
+1. ~~Raise `generationInfo`'s swallowed `debug` to `warn`~~ and ~~read the next failure to
+   tell the two causes apart~~ — both done, and the answer is in §5: the lookup fails
+   (`ai.generation_info.failed`, "Invalid error response format: Gateway request failed"),
+   the id is not missing. **Still open:** fixing it. Understand why `getGenerationInfo`
+   fails against this gateway, and evaluate `getSpendReport` as the alternative. Do not
+   invent a price table if the gateway cannot supply cost — model pricing is a fact (§3.3).
 2. Add the §7.3 latency gate to CI so a 14-second p75 fails a build instead of a report.
-3. Investigate the p75 itself: retrieval over 25 chunks should not take 14 seconds, which
-   suggests the time is in generation, not search. **Now measurable** — per-stage latency is
-   persisted from 3 September and shown at `/admin/ai`; the answer needs answers served after
-   that deploy, not another reading of the code.
+   Note the ordering trap: with almost no measured rows, a gate reading the ledger would
+   measure nothing and pass. It must not ship looking like a gate until there is data behind
+   it.
+3. ~~Investigate the p75 itself~~ — measured 4 September, and the guess in this line was
+   right for the wrong reason. Generation is 65% of the answer, so the time is indeed not in
+   search; but within retrieval it is the **keyword** leg that is slow (2,895 ms against the
+   vector leg's 1,254 ms), not the embedding round trip. **Still open:** first token misses
+   §7.3's 2.5 s target because nothing streams until retrieval completes. Closing it means
+   streaming something truthful earlier, not making retrieval faster. One measured answer
+   identifies the mechanism; a p75 needs more rows.
 
 **Needs an owner decision:**
 
