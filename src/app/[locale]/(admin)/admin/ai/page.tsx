@@ -15,6 +15,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { Table, TBody, TD, TH, THead, TR } from '@/components/ui/table';
 import { budgetLimits } from '@/features/ai/budget';
 import { aiEnabled } from '@/features/ai/chat';
+import { corpusHealth } from '@/features/ai/corpus-health';
 import {
   citationAuditQueue,
   listSources,
@@ -88,13 +89,14 @@ export default async function AdminAiPage({ params }: { params: Promise<{ locale
   const t = await getTranslations('admin.ai');
   const tRegistry = await getTranslations('admin.aiRegistry');
 
-  const [sources, unanswered, usage, coverage, citationAudit, latency] = await Promise.all([
+  const [sources, unanswered, usage, coverage, citationAudit, latency, corpus] = await Promise.all([
     listSources(),
     listUnanswered(),
     usageSummary(30),
     coverageReport(),
     citationAuditQueue(),
     latencyReport(30),
+    corpusHealth(),
   ]);
 
   const limits = budgetLimits();
@@ -153,6 +155,20 @@ export default async function AdminAiPage({ params }: { params: Promise<{ locale
         <Alert tone="warning">{t('needsIndexing', { count: publishedNotIndexed.length })}</Alert>
       ) : null}
 
+      {/* Corpus health. `indexed_at` and "has chunks" are independent once a
+          corpus has been seeded by SQL rather than by `indexSource`, so these
+          read the chunks and the tiers themselves instead of trusting the
+          flag — which is why they catch what the alert above cannot. */}
+      {corpus.vectorLegDead ? <Alert tone="danger">{t('corpusHealth.vectorLegDead')}</Alert> : null}
+      {corpus.noOfficialSource ? (
+        <Alert tone="danger">{t('corpusHealth.noOfficialSource')}</Alert>
+      ) : null}
+      {corpus.missingSeedSlugs.length > 0 ? (
+        <Alert tone="warning">
+          {t('corpusHealth.missingSeed', { count: corpus.missingSeedSlugs.length })}
+        </Alert>
+      ) : null}
+
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
           { label: t('stats.published'), value: String(published.length) },
@@ -161,6 +177,18 @@ export default async function AdminAiPage({ params }: { params: Promise<{ locale
           {
             label: t('stats.spend'),
             value: `$${usage.costUsd.toFixed(2)} / $${limits.monthlyUsd}`,
+          },
+          {
+            label: t('corpusHealth.stats.embedded'),
+            value: `${corpus.embeddedChunks} / ${corpus.chunks}`,
+          },
+          {
+            label: t('corpusHealth.stats.official'),
+            value: `${corpus.officialSources} / ${corpus.publishedSources}`,
+          },
+          {
+            label: t('corpusHealth.stats.unindexed'),
+            value: String(corpus.unindexedSources),
           },
         ].map((stat) => (
           <Card key={stat.label}>

@@ -20,20 +20,31 @@ Read the [verdict](#verdict) first if you read nothing else.
 
 ## Verdict
 
-**Do not promote to production on the strength of this report.** Three findings block it, and
-one of them is a defect nobody had noticed.
+**Do not promote to production on the strength of this report.** Four findings block it, and
+two of them are defects nobody had noticed.
 
-1. **The AI budget guard is inert.** `ai_usage.estimated_cost_usd` is `0` on all 27 rows ever
+1. **Ask bdoor AI cannot cite an official source, and has been running on half of hybrid
+   retrieval since launch.** All 19 published sources carry a null authority tier — they are
+   bdoor's own guides, service pages and policies, and not one is a government reference. All
+   25 chunks have a null embedding, so `ai_search_semantic` returns nothing and every answer
+   ever served has been keyword-only. Meanwhile the repository's reviewed Bangladesh
+   government references (RJSC, NBR, the Companies Act 1994, trade licence, BIDA, Bangladesh
+   Bank, CCI&E, the Gazette) were never imported. §2.2's verified gap — "retrieved internal
+   catalogue content instead of official RJSC process guidance" — is still live, and §7.2's
+   "do not cite only a bdoor service page or published guide for an official process" cannot
+   currently be satisfied by any answer. See
+   [legal-domain coverage](#7-legal-domain-coverage-source-monitor-freshness-unresolved-conflicts).
+2. **The AI budget guard is inert.** `ai_usage.estimated_cost_usd` is `0` on all 27 rows ever
    written — never null, never positive. `checkBudget()` sums that column, so
    `AI_DAILY_BUDGET_USD` and the monthly limit cannot trip. §4.1 requires budget limits
    "enforced server-side"; they are present in code and ineffective in fact. See
    [AI evaluation](#5-ai-evaluation-citations-latency-cost-and-failover).
-2. **Answer latency fails the §7.3 gate.** Measured p75 for a complete answer is **14,288 ms**
+3. **Answer latency fails the §7.3 gate.** Measured p75 for a complete answer is **14,288 ms**
    against a required **< 12,000 ms**. This is production data, not a lab estimate.
-3. **The compliance engine cannot produce anything.** Zero published structured rules and zero
+4. **The compliance engine cannot produce anything.** Zero published structured rules and zero
    rows in `public_holidays`. Even a paying subscriber would generate no obligations.
 
-None of these is a reason for alarm about customer harm today, because — the fourth finding —
+None of these is a reason for alarm about customer harm today, because — the fifth finding —
 **the platform has never had a customer.** See [feature availability](#14-feature-availability-matches-operations-and-provider-capacity).
 
 ---
@@ -124,6 +135,25 @@ root cause of the missing cost is **not** fixed: `generationId` is read from
 `providerMetadata.gateway`, whose type in the installed SDK declares only `asyncJob` plus an
 index signature, so the field may simply never arrive. The new logs will settle it.
 
+**Settled, 4 September — and the hypothesis above was wrong.** The first answer since the
+instrumentation shipped was served at 18:55 UTC, and the log names the failure:
+
+```
+ai.generation_info.failed — "Invalid error response format: Gateway request failed"
+```
+
+Not `ai.generation_info.no_id`. The generation id **is** obtained; the follow-up
+`getGenerationInfo` lookup is what fails, at the gateway. That is why this row also carries
+`estimated_cost_usd = 0.000000` and `provider = null` despite recording 4,659 input and 333
+output tokens from the SDK's own `usage`. `ai.budget.cost_data_missing` fired on the same
+request, correctly reporting ten answers with no cost data against the configured $25 daily
+and $400 monthly caps.
+
+This changes the fix direction. Reading `generationId` from a different field would not have
+helped; the lookup call itself needs to be understood, and `getSpendReport` on the gateway
+client remains the alternative worth evaluating. §3.3 still forbids substituting an invented
+model price table for either.
+
 **Latency was recorded as one number, and §7.3 asks for five (3 September).** The row above
 could report a complete-answer p75 and nothing else, because `latency_ms` was the only
 duration `ai_usage` carried. §7.3 requires that "retrieval, rerank, model, first-token and
@@ -139,6 +169,29 @@ single log line and discarded them.
 this carry nulls, which is honest: those requests were never measured per stage. The report
 above is therefore the last one that can only say _that_ an answer was slow — the next can say
 _where_.
+
+**Where, measured 4 September.** The first answer carrying per-stage timings:
+
+| Stage                | Measured     | §7.3 target |               |
+| -------------------- | ------------ | ----------- | ------------- |
+| Retrieval            | 2,878 ms     | —           |               |
+| Rerank               | 0 ms         | —           |               |
+| **Model generation** | **5,309 ms** | —           |               |
+| First token          | 2,905 ms     | < 2,500 ms  | ❌ **misses** |
+| Complete answer      | 8,192 ms     | < 12,000 ms | ✅            |
+
+Two things the earlier report could not have said. **Model generation is 65% of the
+answer** — the 14.3-second p75 was never a retrieval problem. And within retrieval the
+**keyword leg is the slow one**: the pipeline log puts the vector leg at 1,254 ms and keyword
+at 2,895 ms, the opposite of the usual assumption that the embedding round trip dominates.
+
+First token misses its target because nothing streams until retrieval finishes: 2,905 ms is
+2,878 ms of retrieval plus the model's first byte. Closing that gap means streaming something
+truthful before retrieval completes, not making retrieval faster.
+
+**This is one answer, not a distribution.** It is enough to identify the mechanism and wrong
+to quote as a p75. The percentile row at the top of this section still rests on the 27
+pre-instrumentation answers and will be restated when enough measured rows exist.
 
 Citations: every completed answer is now audited against the sources it was given
 (`src/features/ai/citations.ts`), and the counts are persisted per answer with a review queue
@@ -163,6 +216,14 @@ reject with HTTP 402 at the provider boundary, and `checkBudget()` sums `estimat
 as the second line. That second line has been summing zero since the first answer, for the
 reason set out above; the root cause is still open. Whether the first line is configured is
 an owner question this report cannot answer from the repository.
+
+A **third** control §7.3 requires does not exist at all: "daily and per-answer budget limits
+are enforced server-side", and only the daily and monthly checks are implemented.
+`AI_MAX_COST_USD_PER_ANSWER` is declared and validated in the env schema and consumed by
+nothing. Building it is deliberately deferred rather than forgotten: with
+`estimated_cost_usd` zero on every row, a per-answer cap would compare against a value that
+is always zero — a gate that measures nothing, which must not ship looking like a gate. It
+waits on the cost-telemetry fix above, and that ordering is the point.
 
 **Request rate** is capped by three windows in `src/app/api/ai/chat/route.ts`, with the values
 in `src/features/ai/config.ts`: 8 per IP per minute, 120 per IP per day, and 40 per
@@ -241,6 +302,62 @@ legal-instrument or provision schema (item 9), so amendment awareness and a cove
 not exist to report on.
 
 There are no unresolved source conflicts, because there are almost no sources to conflict.
+
+### Corpus health (measured 6 September 2026)
+
+Counting the chunks was never the whole question. What the corpus is _made of_, and whether
+retrieval can actually read it, were not measured until now. Both fail.
+
+|                                              | Production |
+| -------------------------------------------- | ---------- |
+| Published sources                            | 19         |
+| **Published sources with an authority tier** | **0**      |
+| Chunks                                       | 25         |
+| **Chunks carrying an embedding**             | **0**      |
+| Sources with `indexed_at` set                | 0          |
+| Reviewed seed slugs with no row at all       | 24         |
+
+**Every answer ever served has been keyword-only.** `ai_search_semantic` filters on `embedding
+is not null`, and no chunk satisfies it, so the vector leg of hybrid retrieval has returned an
+empty list on every request since the corpus was seeded on 30 August — which is every request
+there has been: the seed finished at 16:45:34 UTC that day and the first row in `ai_usage` is
+timestamped 20:40:36, so none of the 28 recorded answers predates it. Fusion still succeeded, the
+answer still streamed, and nothing reported a fault — which is precisely why it went unnoticed
+for a week. The 1,254 ms the semantic leg cost in the 4 September measurement was spent
+embedding a query and searching for neighbours that could not exist.
+
+This is not a code defect. The knowledge audit log records the decision verbatim: _"Not yet
+indexed: embeddings are computed by the admin Index action on Vercel; keyword retrieval is
+live."_ The seed wrote chunks by SQL and deferred embedding to a human click that was never
+made. `indexed_at` is null on all 19 sources and the admin page has been showing its
+`needsIndexing` warning the whole time; that half was visible and simply not acted on.
+
+**No answer can cite an authority.** All 19 published sources are bdoor's own content —
+`service_page`, `guide`, `legal_policy` — with `authority_tier` null on every one. There is no
+RJSC, NBR, BIDA or Gazette material in the corpus at all. The ranking work that puts official
+sources above bdoor's commercial content is correct and has nothing to rank: §7.2 forbids
+citing only a bdoor page for an official process, and today there is nothing else to cite.
+
+**The missing content is already written and reviewed.** `BD_REGISTRATION_KNOWLEDGE` carries
+twelve entries in English and Bangla — eleven of them `government_reference` at authority tiers
+1–4, covering RJSC name clearance, incorporation and fees, e-TIN, VAT/BIN, trade licence,
+BIDA, Bangladesh Bank foreign exchange, CCI&E IRC/ERC, the Companies Act 1994 and the
+Bangladesh Gazette. None has a row in the database. The remedy is the two existing audited
+admin actions — **Import**, then **Publish seed**, which walks each source through
+in_review → approved → published and indexes it, recording the clicking admin as reviewer.
+It is a two-click operational task, not a code change, and it must stay a human action:
+publishing regulatory content without a recorded reviewer is what §6.6 forbids.
+
+Until it is done, no §7.2 or §23.2 claim about official-source retrieval can be evidenced,
+however well the pipeline performs.
+
+**What now reports this.** `corpusHealth()` measures the chunks and the tiers directly rather
+than trusting `indexed_at` — the two are independent once a corpus has been seeded by SQL
+instead of through `indexSource`, which is exactly why the existing warning could not catch
+this. The admin knowledge centre raises a danger alert when the vector leg is dead or nothing
+carries a tier, a warning when reviewed seed slugs have no row, and carries the three counts
+as headline figures. `ai.retrieval.semantic_empty` records the same condition per request,
+so the degradation is visible in logs and not only to whoever opens the page.
 
 ## 8–9. WhatsApp and Meta
 
@@ -327,28 +444,44 @@ not.
 
 **No owner input needed:**
 
-1. ~~Raise `generationInfo`'s swallowed `debug` to `warn`~~ — done 3 September, and both
-   failure paths now warn distinctly. **Still open:** the root cause of the missing cost and
-   provider. Read the next `ai.generation_info.no_id` or `ai.generation_info.failed` in
-   production to tell whether the gateway never supplies a generation id or the lookup throws,
-   then fix accordingly. Do not invent a price table if the gateway cannot supply cost —
-   model pricing is a fact, and `getSpendReport` on the gateway client is the supported
-   alternative worth evaluating first.
+1. ~~Raise `generationInfo`'s swallowed `debug` to `warn`~~ and ~~read the next failure to
+   tell the two causes apart~~ — both done, and the answer is in §5: the lookup fails
+   (`ai.generation_info.failed`, "Invalid error response format: Gateway request failed"),
+   the id is not missing. **Still open:** fixing it. Understand why `getGenerationInfo`
+   fails against this gateway, and evaluate `getSpendReport` as the alternative. Do not
+   invent a price table if the gateway cannot supply cost — model pricing is a fact (§3.3).
 2. Add the §7.3 latency gate to CI so a 14-second p75 fails a build instead of a report.
-3. Investigate the p75 itself: retrieval over 25 chunks should not take 14 seconds, which
-   suggests the time is in generation, not search. **Now measurable** — per-stage latency is
-   persisted from 3 September and shown at `/admin/ai`; the answer needs answers served after
-   that deploy, not another reading of the code.
+   Note the ordering trap: with almost no measured rows, a gate reading the ledger would
+   measure nothing and pass. It must not ship looking like a gate until there is data behind
+   it.
+3. ~~Investigate the p75 itself~~ — measured 4 September, and the guess in this line was
+   right for the wrong reason. Generation is 65% of the answer, so the time is indeed not in
+   search; but within retrieval it is the **keyword** leg that is slow (2,895 ms against the
+   vector leg's 1,254 ms), not the embedding round trip. **Still open:** first token misses
+   §7.3's 2.5 s target because nothing streams until retrieval completes. Closing it means
+   streaming something truthful earlier, not making retrieval faster. One measured answer
+   identifies the mechanism; a p75 needs more rows.
+
+**Needs an operator, not a decision:**
+
+4. **Sign in to `/admin/ai` and press Import, then Publish seed.** This is the single highest-
+   value action available on the whole list and it needs no owner judgement beyond the review
+   the content already had: it imports the twelve reviewed Bangladesh government references,
+   publishes them with the clicking admin recorded as reviewer, and indexes every published
+   source — which restores the vector leg and gives regulatory answers an authority to cite
+   for the first time. Nothing else in this report closes two blocking findings at once. It
+   cannot be automated: §6.6 requires a human reviewer on the record, and this session has no
+   admin credentials.
 
 **Needs an owner decision:**
 
-4. `CRON_SECRET` — four scheduled jobs refuse to run without it, which is why zero documents
+5. `CRON_SECRET` — four scheduled jobs refuse to run without it, which is why zero documents
    have been ingested and why no compliance reminder has ever been sent.
-5. The Gateway web-search tool and the initial official-domain list — these block P0 items 7–9
+6. The Gateway web-search tool and the initial official-domain list — these block P0 items 7–9
    entirely, and §3.3 forbids inventing either.
-6. Gazetted public-holiday data and a first published rule, without which Comply is inert.
-7. Branch protection, so this report can run before a deployment rather than after it.
-8. Shared storage for the Ask rate limiter, or an explicit decision to keep it per-instance.
+7. Gazetted public-holiday data and a first published rule, without which Comply is inert.
+8. Branch protection, so this report can run before a deployment rather than after it.
+9. Shared storage for the Ask rate limiter, or an explicit decision to keep it per-instance.
    Postgres needs no new dependency but adds a round trip to every request, including the ones
    it is about to refuse; Redis or Vercel KV suits the job far better and is a new paid
    service, which §3.2 makes the owner's call.

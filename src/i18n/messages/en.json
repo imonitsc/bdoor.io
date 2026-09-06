@@ -1691,6 +1691,17 @@
       "notIndexed": "Not indexed",
       "switchedOff": "Ask bdoor AI is switched off in this environment. Customers do not see it, and nothing on this page is live.",
       "needsIndexing": "{count} published sources have not been indexed. Until they are, the assistant cannot retrieve them.",
+      "corpusHealth": {
+        "title": "Corpus health",
+        "vectorLegDead": "Not one chunk carries an embedding, so semantic search returns nothing and every answer is keyword-only. Hybrid retrieval is running on one leg. Index the published sources to restore it.",
+        "noOfficialSource": "No published source carries an authority tier. Every answer can cite only bdoor's own pages, never RJSC, NBR or the Gazette — whatever retrieval does.",
+        "missingSeed": "{count} reviewed sources in the repository have no row here, including the Bangladesh government references. Import, then publish and index them.",
+        "stats": {
+          "embedded": "Chunks embedded",
+          "official": "Sources with an authority tier",
+          "unindexed": "Published, not indexed"
+        }
+      },
       "correctionPolicy": "To correct an answer, edit the source it came from and re-index it. Never edit a stored answer — an answer is a record of what the assistant said, not source material.",
       "empty": {
         "title": "No knowledge sources yet",
