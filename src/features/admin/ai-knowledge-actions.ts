@@ -12,6 +12,7 @@ import {
   type SourceStatus,
 } from '@/features/ai/knowledge';
 import { seedSources } from '@/features/ai/knowledge-seed';
+import { hasBudget, pendingSeedWork } from '@/features/ai/seed-work';
 import { recordAudit } from '@/lib/audit';
 import { requireCapability } from '@/lib/auth/session';
 
@@ -101,57 +102,78 @@ export async function importKnowledgeSeed(): Promise<ActionResult> {
   return { ok: true, detail: `${created}/${skipped}` };
 }
 
+/** Room to leave for one source: an embedding round trip plus its writes. */
+const SEED_RESERVE_MS = 20_000;
+/** Well inside the route's `maxDuration`, leaving time to record and return. */
+const SEED_BUDGET_MS = 240_000;
+
 /**
- * Publish and index every imported seed source still sitting in draft, in one
- * audited action, then index any published seed source whose chunks are
- * missing. The clicking admin is the recorded reviewer for every step — this
- * walks each source through in_review → approved → published rather than
- * shortcutting the workflow, and it touches ONLY sources whose slug comes from
- * the repo's reviewed seed (never a source authored or edited in the admin).
+ * Publish and index the reviewed seed sources, in one audited action.
+ *
+ * The clicking admin is the recorded reviewer for every step — this walks each
+ * source through in_review → approved → published rather than shortcutting the
+ * workflow, and it touches ONLY sources whose slug comes from the repo's
+ * reviewed seed (never a source authored or edited in the admin).
+ *
+ * It works to a deadline. Indexing costs an embedding round trip plus several
+ * writes per source, and the full seed is dozens of them; a single unbounded
+ * loop is one platform timeout away from stopping midway with nothing said.
+ * So the loop stops cleanly between sources when the budget runs low and
+ * reports exactly what is left, and a second click resumes — `pendingSeedWork`
+ * recomputes the remaining work from the database each time, so nothing is
+ * repeated and nothing is skipped.
  */
 export async function publishImportedSeed(): Promise<ActionResult> {
   const session = await requireCapability('content.publish');
 
-  const seedSlugs = new Set(seedSources().map((candidate) => candidate.slug));
-  const sources = await listSources();
+  const seedSlugs = seedSources().map((candidate) => candidate.slug);
+  const queue = pendingSeedWork(await listSources(), seedSlugs);
 
+  const startedAt = Date.now();
   let published = 0;
   let indexed = 0;
   let failed = 0;
+  let processed = 0;
 
-  for (const source of sources) {
-    if (!seedSlugs.has(source.slug)) continue;
+  for (const item of queue) {
+    if (!hasBudget(startedAt, Date.now(), SEED_BUDGET_MS, SEED_RESERVE_MS)) break;
+    processed += 1;
 
-    let status: SourceStatus = source.status;
-    if (status === 'draft') {
+    let reachedPublished = !item.needsPublish;
+    if (item.needsPublish) {
       for (const step of ['in_review', 'approved', 'published'] as const) {
-        const moved = await transitionSource(source.id, step, session.userId, 'bulk seed publish');
+        const moved = await transitionSource(item.id, step, session.userId, 'bulk seed publish');
         if (!moved.ok) {
           failed += 1;
+          reachedPublished = false;
           break;
         }
-        status = step;
+        reachedPublished = step === 'published';
       }
-      if (status === 'published') published += 1;
+      if (reachedPublished) published += 1;
     }
 
-    const needsIndex = status === 'published' && (source.status === 'draft' || !source.indexed_at);
-    if (needsIndex) {
-      const result = await indexSource(source.id, session.userId);
+    if (reachedPublished && item.needsIndex) {
+      const result = await indexSource(item.id, session.userId);
       if (result.ok) indexed += 1;
       else failed += 1;
     }
   }
 
-  if (published > 0) {
+  const remaining = queue.length - processed;
+
+  if (published > 0 || indexed > 0) {
     await recordAudit({
       action: 'content.published',
       targetType: 'ai_knowledge_source',
       targetId: null,
-      metadata: { surface: 'ask_bdoor_ai', bulk: true, published, indexed, failed },
+      metadata: { surface: 'ask_bdoor_ai', bulk: true, published, indexed, failed, remaining },
     });
   }
 
   await refresh();
-  return { ok: true, detail: `${published} published, ${indexed} indexed, ${failed} failed` };
+  return {
+    ok: true,
+    detail: `${published} published, ${indexed} indexed, ${failed} failed, ${remaining} remaining`,
+  };
 }

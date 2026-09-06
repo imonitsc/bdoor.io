@@ -1684,6 +1684,7 @@
       "importDone": "Import finished ({detail} created/skipped). Everything imported is a draft.",
       "publishSeed": "Publish and index imported content",
       "publishSeedDone": "Done: {detail}. Your account is recorded as the reviewer for every step.",
+      "publishSeedResume": "Run it again to continue where it stopped.",
       "failed": "That did not work. Try again.",
       "index": "Index",
       "reindex": "Re-index",

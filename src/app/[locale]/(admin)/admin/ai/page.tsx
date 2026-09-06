@@ -35,6 +35,14 @@ import { requireCapability } from '@/lib/auth/session';
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
+/**
+ * The seed publish runs from this page and costs an embedding round trip per
+ * source across dozens of them, so it needs the same headroom the scheduled
+ * ingestion route already takes. The action still works to its own shorter
+ * budget and resumes — this is the ceiling, not the plan.
+ */
+export const maxDuration = 300;
+
 /** One millisecond number, rendered in seconds because the targets are. */
 function ms(value: number | null): string {
   return value === null ? '—' : `${(value / 1000).toFixed(2)}s`;
