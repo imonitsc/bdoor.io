@@ -485,11 +485,19 @@ not.
 
 **No owner input needed:**
 
-1. ~~Raise `generationInfo`'s swallowed `debug` to `warn`~~ and ~~read the next failure to
-   tell the two causes apart~~ — both done, and the answer is in §5: the lookup fails
-   (`ai.generation_info.failed`, "Invalid error response format: Gateway request failed"),
-   the id is not missing. **Still open:** fixing it. Understand why `getGenerationInfo`
-   fails against this gateway, and evaluate `getSpendReport` as the alternative. Do not
+1. ~~Raise `generationInfo`'s swallowed `debug` to `warn`~~, ~~read the next failure to tell
+   the two causes apart~~ and ~~work out what the message means~~ — all three done. The
+   message `Invalid error response format: Gateway request failed` has exactly one source in
+   `@ai-sdk/gateway` (`createGatewayErrorFromResponse`), and reading it settles the mechanism:
+   the bare `Gateway request failed` suffix is the `defaultMessage` used **only** on the
+   `APICallError` branch, so the request reached the gateway and came back **non-2xx**; the
+   `Invalid error response format` prefix means the body did not match the gateway's own error
+   schema and so carried no message to report. **Still open:** which non-2xx it is, because
+   the error's `statusCode` was being discarded by the log. That is now recorded, and the
+   distinction decides the owner: **401/403** means the gateway key has no access to the
+   generation endpoint and only an owner can fix it; **404** most plausibly means the lookup
+   runs the instant the stream ends while the gateway settles asynchronously, which is ours to
+   fix by deferring or retrying; **5xx** is transient. The next served answer names it. Do not
    invent a price table if the gateway cannot supply cost — model pricing is a fact (§3.3).
 2. Add the §7.3 latency gate to CI so a 14-second p75 fails a build instead of a report.
    Note the ordering trap: with almost no measured rows, a gate reading the ledger would

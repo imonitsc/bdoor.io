@@ -15,6 +15,7 @@ import { classifyUpstreamError, failureMessage, noEvidenceReply, type AiFailure 
 import { answerRoute, classifyRisk, providerLockFor } from './models';
 import { FAST_PATH_MODEL, greetingReply, isGreeting } from './fast-path';
 import { actionsFor } from './follow-ups';
+import { describeGatewayFailure } from './gateway-error';
 import { safetyIdentifier } from './identity';
 import {
   ensureConversation,
@@ -116,16 +117,16 @@ function writeText(writer: Writer, text: string) {
  * first answer on 30 August 2026 and this change, which mattered because
  * `checkBudget` sums the cost column: the spend guard was adding up zeros.
  *
- * The failure was invisible because it was logged at `debug`, and production's
- * floor is `info`. Worse, the likeliest cause never reaches the `catch` at all:
- * `generationId` is read from `providerMetadata.gateway`, whose type in the
- * installed SDK declares only `asyncJob` plus an index signature — the field is
- * not a promised part of that object. If it is simply absent, this returns null
- * on the first line and nothing is ever logged.
- *
- * So both paths now warn, and they warn *differently*. The next occurrence
- * tells us which of the two it is within hours instead of costing another
- * month of blind spend.
+ * An earlier note here predicted the cause was a missing `generationId`, on the
+ * reasoning that `providerMetadata.gateway` does not promise the field. The
+ * answer served on 4 September disproved that: the log said
+ * `ai.generation_info.failed`, not `no_id`, so the id IS obtained and the
+ * lookup is what fails. Guessing a second time would repeat the mistake, so
+ * this now records what actually discriminates — the status code the gateway
+ * replied with, which decides whether the fix is a key permission (401/403),
+ * our own timing against an asynchronously settled generation (404), or a
+ * retry (5xx). `describeGatewayFailure` explains how that message was traced
+ * to its single source in the SDK.
  */
 async function generationInfo(generationId: string | null) {
   if (!generationId) {
@@ -136,7 +137,7 @@ async function generationInfo(generationId: string | null) {
     const info = await gateway.getGenerationInfo({ id: generationId });
     return { cost: info.totalCost, provider: info.providerName };
   } catch (error) {
-    logger.warn('ai.generation_info.failed', { message: (error as Error).message });
+    logger.warn('ai.generation_info.failed', describeGatewayFailure(error));
     return null;
   }
 }
