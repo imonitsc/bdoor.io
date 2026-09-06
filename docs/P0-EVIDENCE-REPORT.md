@@ -359,6 +359,47 @@ carries a tier, a warning when reviewed seed slugs have no row, and carries the 
 as headline figures. `ai.retrieval.semantic_empty` records the same condition per request,
 so the degradation is visible in logs and not only to whoever opens the page.
 
+### The grounding gate: measured, and deliberately not shipped
+
+§7.1 step 10 requires the answer to be refused or narrowed "if evidence is insufficient", and
+§23.2 lists "empty/low-confidence retrieval refuses safely". The **empty** half shipped in #89.
+The **low-confidence** half is still open, and this is the measurement that says why it has not
+shipped rather than a promise that it will.
+
+The fused score cannot carry it. `fuseRankedLists` computes
+`1/(RRF_K + rank) + (7 - authority_tier) * 0.002` with `RRF_K = 60` — a pure function of
+**rank**. The top hit for a nonsense query scores exactly what the top hit for a perfect query
+scores. Any threshold on it rejects good answers and admits bad ones in equal measure.
+
+The raw signals are better, and were measured against the live corpus on 6 September:
+
+| Query                                     | Chunks matched | Best `ts_rank` |
+| ----------------------------------------- | -------------- | -------------- |
+| bdoor packages / pricing                  | 16             | 0.0887         |
+| company registration Bangladesh           | 11             | 0.0542         |
+| trade licence                             | 6              | **0.0507**     |
+| _company christmas party_                 | 8              | **0.0456**     |
+| _register my car in Dhaka_                | 2              | 0.0276         |
+| _business class flight_                   | 7              | 0.0253         |
+| _photosynthesis_ / _football_ / _cricket_ | **0**          | —              |
+
+Two things follow, and they point in opposite directions.
+
+**Pure nonsense is already handled.** A query sharing no term with the corpus matches nothing,
+so `@@` returns zero rows and #89's empty-retrieval refusal catches it. The gate is not needed
+for that case and never was.
+
+**The case it would be needed for is the one it cannot separate cleanly.** A legitimate
+"trade licence" scores 0.0507; an incidental "company christmas party" scores 0.0456. That is a
+10% gap. A threshold could be placed between them today — and it would be a constant fitted to
+25 chunks of bdoor marketing copy, on a corpus that is one admin click away from gaining
+24 reviewed government-reference sources with different lengths and vocabulary. `ts_rank`
+weighs term frequency against document length, so that import moves every number in the table.
+
+Shipping a threshold now would mean calibrating against a corpus already known to be the wrong
+one. The gate waits on the corpus, not on the code, and the report says so instead of leaving a
+reader to assume §23.2's low-confidence criterion is met.
+
 ## 8–9. WhatsApp and Meta
 
 **Out of scope.** P0W has not started; no WhatsApp code, credentials, templates or Meta business
@@ -472,6 +513,13 @@ not.
    for the first time. Nothing else in this report closes two blocking findings at once. It
    cannot be automated: §6.6 requires a human reviewer on the record, and this session has no
    admin credentials.
+
+   The action now works to a time budget and reports what is left. It has roughly 43 sources
+   to walk, each costing an embedding round trip plus several writes, and it previously ran as
+   one unbounded loop on a page that set no `maxDuration` — while every other long-running
+   route in the repo raises it to 300s. A platform timeout would have stopped it midway with
+   nothing said. If the run reports sources remaining, that is expected: press it again and it
+   resumes, skipping everything already done.
 
 **Needs an owner decision:**
 

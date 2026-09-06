@@ -132,8 +132,18 @@ export function AiPublishSeedButton() {
         onClick={() =>
           startTransition(async () => {
             const result = await publishImportedSeed();
+            if (!result.ok) {
+              setMessage(t('failed'));
+              return;
+            }
+            // The action stops cleanly when its time budget runs low rather
+            // than being cut off mid-source, so "remaining" is a normal
+            // outcome and not a failure. Say so, or the admin reads a partial
+            // run as a finished one.
+            const detail = result.detail ?? '';
+            const stopped = /[1-9]\d* remaining/.test(detail);
             setMessage(
-              result.ok ? t('publishSeedDone', { detail: result.detail ?? '' }) : t('failed'),
+              `${t('publishSeedDone', { detail })}${stopped ? ` ${t('publishSeedResume')}` : ''}`,
             );
           })
         }
