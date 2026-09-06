@@ -36,6 +36,29 @@ export type Timings = {
   flush: (context: Record<string, string | number | boolean | null>) => void;
 };
 
+/**
+ * Whether a stream chunk is the one §7.3 means by "first token".
+ *
+ * `streamText`'s `onChunk` fires for every `TextStreamPart`, and that union
+ * begins with parts that carry no text at all: `start` and `start-step` are
+ * emitted when the model connection opens, and `text-start` announces a text
+ * block before any of it exists. Marking on the first chunk of ANY type
+ * therefore measures when the request reached the model, not when the customer
+ * saw a word.
+ *
+ * That is not a hypothetical difference. The answer served on 4 September
+ * marked `first_token` at 2,905 ms with retrieval ending at 2,895 ms — a
+ * ten-millisecond time to first token, which no real generation achieves.
+ *
+ * §7.3's gate is about the wait a person experiences, so only `text-delta`
+ * counts. The distinction matters most in the case the gate exists for: were
+ * retrieval to get faster, the old mark would report a passing first-token
+ * time while customers still sat watching nothing.
+ */
+export function marksFirstToken(chunkType: string): boolean {
+  return chunkType === 'text-delta';
+}
+
 export function startTimings(): Timings {
   const requestId = crypto.randomUUID();
   const startedAt = performance.now();

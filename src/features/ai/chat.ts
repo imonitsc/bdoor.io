@@ -31,7 +31,7 @@ import { messageTelemetry } from './redaction';
 import { retrieveContext } from './retrieval';
 import { classifyScope, outOfScopeReply } from './scope';
 import { buildSystemPrompt, PROMPT_VERSION } from './system-prompt';
-import { stageDurations, type Timings } from './timings';
+import { marksFirstToken, stageDurations, type Timings } from './timings';
 import { serverEnv } from '@/lib/env';
 import { logger } from '@/lib/logger';
 
@@ -372,8 +372,10 @@ export function streamAnswer(request: ChatRequest): Response {
                 disallowPromptTraining: true,
               },
             },
-            onChunk: () => {
-              timings.mark('first_token');
+            onChunk: ({ chunk }) => {
+              // Only text counts — see `marksFirstToken`. `start`, `start-step`
+              // and `text-start` all arrive before a single word does.
+              if (marksFirstToken(chunk.type)) timings.mark('first_token');
             },
             onError: ({ error }) => {
               const failure = classifyUpstreamError(error);
