@@ -20,20 +20,31 @@ Read the [verdict](#verdict) first if you read nothing else.
 
 ## Verdict
 
-**Do not promote to production on the strength of this report.** Three findings block it, and
-one of them is a defect nobody had noticed.
+**Do not promote to production on the strength of this report.** Four findings block it, and
+two of them are defects nobody had noticed.
 
-1. **The AI budget guard is inert.** `ai_usage.estimated_cost_usd` is `0` on all 27 rows ever
+1. **Ask bdoor AI cannot cite an official source, and has been running on half of hybrid
+   retrieval since launch.** All 19 published sources carry a null authority tier — they are
+   bdoor's own guides, service pages and policies, and not one is a government reference. All
+   25 chunks have a null embedding, so `ai_search_semantic` returns nothing and every answer
+   ever served has been keyword-only. Meanwhile the repository's reviewed Bangladesh
+   government references (RJSC, NBR, the Companies Act 1994, trade licence, BIDA, Bangladesh
+   Bank, CCI&E, the Gazette) were never imported. §2.2's verified gap — "retrieved internal
+   catalogue content instead of official RJSC process guidance" — is still live, and §7.2's
+   "do not cite only a bdoor service page or published guide for an official process" cannot
+   currently be satisfied by any answer. See
+   [legal-domain coverage](#7-legal-domain-coverage-source-monitor-freshness-unresolved-conflicts).
+2. **The AI budget guard is inert.** `ai_usage.estimated_cost_usd` is `0` on all 27 rows ever
    written — never null, never positive. `checkBudget()` sums that column, so
    `AI_DAILY_BUDGET_USD` and the monthly limit cannot trip. §4.1 requires budget limits
    "enforced server-side"; they are present in code and ineffective in fact. See
    [AI evaluation](#5-ai-evaluation-citations-latency-cost-and-failover).
-2. **Answer latency fails the §7.3 gate.** Measured p75 for a complete answer is **14,288 ms**
+3. **Answer latency fails the §7.3 gate.** Measured p75 for a complete answer is **14,288 ms**
    against a required **< 12,000 ms**. This is production data, not a lab estimate.
-3. **The compliance engine cannot produce anything.** Zero published structured rules and zero
+4. **The compliance engine cannot produce anything.** Zero published structured rules and zero
    rows in `public_holidays`. Even a paying subscriber would generate no obligations.
 
-None of these is a reason for alarm about customer harm today, because — the fourth finding —
+None of these is a reason for alarm about customer harm today, because — the fifth finding —
 **the platform has never had a customer.** See [feature availability](#14-feature-availability-matches-operations-and-provider-capacity).
 
 ---
@@ -292,6 +303,62 @@ not exist to report on.
 
 There are no unresolved source conflicts, because there are almost no sources to conflict.
 
+### Corpus health (measured 6 September 2026)
+
+Counting the chunks was never the whole question. What the corpus is _made of_, and whether
+retrieval can actually read it, were not measured until now. Both fail.
+
+|                                              | Production |
+| -------------------------------------------- | ---------- |
+| Published sources                            | 19         |
+| **Published sources with an authority tier** | **0**      |
+| Chunks                                       | 25         |
+| **Chunks carrying an embedding**             | **0**      |
+| Sources with `indexed_at` set                | 0          |
+| Reviewed seed slugs with no row at all       | 24         |
+
+**Every answer ever served has been keyword-only.** `ai_search_semantic` filters on `embedding
+is not null`, and no chunk satisfies it, so the vector leg of hybrid retrieval has returned an
+empty list on every request since the corpus was seeded on 30 August — which is every request
+there has been: the seed finished at 16:45:34 UTC that day and the first row in `ai_usage` is
+timestamped 20:40:36, so none of the 28 recorded answers predates it. Fusion still succeeded, the
+answer still streamed, and nothing reported a fault — which is precisely why it went unnoticed
+for a week. The 1,254 ms the semantic leg cost in the 4 September measurement was spent
+embedding a query and searching for neighbours that could not exist.
+
+This is not a code defect. The knowledge audit log records the decision verbatim: _"Not yet
+indexed: embeddings are computed by the admin Index action on Vercel; keyword retrieval is
+live."_ The seed wrote chunks by SQL and deferred embedding to a human click that was never
+made. `indexed_at` is null on all 19 sources and the admin page has been showing its
+`needsIndexing` warning the whole time; that half was visible and simply not acted on.
+
+**No answer can cite an authority.** All 19 published sources are bdoor's own content —
+`service_page`, `guide`, `legal_policy` — with `authority_tier` null on every one. There is no
+RJSC, NBR, BIDA or Gazette material in the corpus at all. The ranking work that puts official
+sources above bdoor's commercial content is correct and has nothing to rank: §7.2 forbids
+citing only a bdoor page for an official process, and today there is nothing else to cite.
+
+**The missing content is already written and reviewed.** `BD_REGISTRATION_KNOWLEDGE` carries
+twelve entries in English and Bangla — eleven of them `government_reference` at authority tiers
+1–4, covering RJSC name clearance, incorporation and fees, e-TIN, VAT/BIN, trade licence,
+BIDA, Bangladesh Bank foreign exchange, CCI&E IRC/ERC, the Companies Act 1994 and the
+Bangladesh Gazette. None has a row in the database. The remedy is the two existing audited
+admin actions — **Import**, then **Publish seed**, which walks each source through
+in_review → approved → published and indexes it, recording the clicking admin as reviewer.
+It is a two-click operational task, not a code change, and it must stay a human action:
+publishing regulatory content without a recorded reviewer is what §6.6 forbids.
+
+Until it is done, no §7.2 or §23.2 claim about official-source retrieval can be evidenced,
+however well the pipeline performs.
+
+**What now reports this.** `corpusHealth()` measures the chunks and the tiers directly rather
+than trusting `indexed_at` — the two are independent once a corpus has been seeded by SQL
+instead of through `indexSource`, which is exactly why the existing warning could not catch
+this. The admin knowledge centre raises a danger alert when the vector leg is dead or nothing
+carries a tier, a warning when reviewed seed slugs have no row, and carries the three counts
+as headline figures. `ai.retrieval.semantic_empty` records the same condition per request,
+so the degradation is visible in logs and not only to whoever opens the page.
+
 ## 8–9. WhatsApp and Meta
 
 **Out of scope.** P0W has not started; no WhatsApp code, credentials, templates or Meta business
@@ -395,15 +462,26 @@ not.
    streaming something truthful earlier, not making retrieval faster. One measured answer
    identifies the mechanism; a p75 needs more rows.
 
+**Needs an operator, not a decision:**
+
+4. **Sign in to `/admin/ai` and press Import, then Publish seed.** This is the single highest-
+   value action available on the whole list and it needs no owner judgement beyond the review
+   the content already had: it imports the twelve reviewed Bangladesh government references,
+   publishes them with the clicking admin recorded as reviewer, and indexes every published
+   source — which restores the vector leg and gives regulatory answers an authority to cite
+   for the first time. Nothing else in this report closes two blocking findings at once. It
+   cannot be automated: §6.6 requires a human reviewer on the record, and this session has no
+   admin credentials.
+
 **Needs an owner decision:**
 
-4. `CRON_SECRET` — four scheduled jobs refuse to run without it, which is why zero documents
+5. `CRON_SECRET` — four scheduled jobs refuse to run without it, which is why zero documents
    have been ingested and why no compliance reminder has ever been sent.
-5. The Gateway web-search tool and the initial official-domain list — these block P0 items 7–9
+6. The Gateway web-search tool and the initial official-domain list — these block P0 items 7–9
    entirely, and §3.3 forbids inventing either.
-6. Gazetted public-holiday data and a first published rule, without which Comply is inert.
-7. Branch protection, so this report can run before a deployment rather than after it.
-8. Shared storage for the Ask rate limiter, or an explicit decision to keep it per-instance.
+7. Gazetted public-holiday data and a first published rule, without which Comply is inert.
+8. Branch protection, so this report can run before a deployment rather than after it.
+9. Shared storage for the Ask rate limiter, or an explicit decision to keep it per-instance.
    Postgres needs no new dependency but adds a round trip to every request, including the ones
    it is about to refuse; Redis or Vercel KV suits the job far better and is a new paid
    service, which §3.2 makes the owner's call.

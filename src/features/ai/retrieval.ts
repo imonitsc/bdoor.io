@@ -426,6 +426,18 @@ export async function retrieveContext(
 
     rules = ruleRows;
 
+    // A dead vector leg does not look like a failure from here: keyword rows
+    // come back, fusion succeeds, the answer streams. The only visible trace
+    // is that one of the two lists is always empty while the other is not —
+    // which is what an unembedded corpus looks like, and what production has
+    // looked like since the seed. Say it once per request rather than letting
+    // half of hybrid retrieval stay silently switched off.
+    const keywordRows = keywordLists.reduce((sum, list) => sum + list.length, 0);
+    const semanticRows = semanticLists.reduce((sum, list) => sum + list.length, 0);
+    if (semanticRows === 0 && keywordRows > 0) {
+      logger.warn('ai.retrieval.semantic_empty', { keywordRows, countries: countries.length });
+    }
+
     // Fuse per country (ranks are per-list), then merge across countries the
     // way the old per-country hybrid calls merged: dedupe on chunk id keeping
     // the better score, one sort, one cut.
