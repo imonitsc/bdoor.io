@@ -177,7 +177,7 @@ _where_.
 | Retrieval            | 2,878 ms     | —           |               |
 | Rerank               | 0 ms         | —           |               |
 | **Model generation** | **5,309 ms** | —           |               |
-| First token          | 2,905 ms     | < 2,500 ms  | ❌ **misses** |
+| First token¹         | 2,905 ms     | < 2,500 ms  | ❌ **misses** |
 | Complete answer      | 8,192 ms     | < 12,000 ms | ✅            |
 
 Two things the earlier report could not have said. **Model generation is 65% of the
@@ -185,9 +185,22 @@ answer** — the 14.3-second p75 was never a retrieval problem. And within retri
 **keyword leg is the slow one**: the pipeline log puts the vector leg at 1,254 ms and keyword
 at 2,895 ms, the opposite of the usual assumption that the embedding round trip dominates.
 
-First token misses its target because nothing streams until retrieval finishes: 2,905 ms is
-2,878 ms of retrieval plus the model's first byte. Closing that gap means streaming something
-truthful before retrieval completes, not making retrieval faster.
+First token misses its target because nothing streams until retrieval finishes. Closing that
+gap means streaming something truthful before retrieval completes, not making retrieval faster.
+
+**¹ That 2,905 ms was not measuring what §7.3 means, and the number is what gave it away.**
+Retrieval ended at 2,895 ms, so a first token at 2,905 ms implies a ten-millisecond generation
+— which no real model call achieves. The cause: `first_token` was marked in `streamText`'s
+`onChunk` with no type check, and `onChunk` fires for every `TextStreamPart`. That union
+begins with `start` and `start-step`, emitted when the model connection opens, and `text-start`,
+which announces a text block before any of it exists. The mark was landing on the stream
+opening, not on a word.
+
+It is now marked only on `text-delta`. The reported conclusion survives — the real first token
+is _later_ than 2,905 ms, so the target is missed by more, not less — but the gate had been
+measuring a cheaper event than the requirement, and would have reported a pass if retrieval
+alone got faster while customers still watched nothing. The true first-token figure will come
+from the next measured answers; **this row should be read as a floor, not a measurement**.
 
 **This is one answer, not a distribution.** It is enough to identify the mechanism and wrong
 to quote as a p75. The percentile row at the top of this section still rests on the 27
@@ -509,7 +522,9 @@ not.
    vector leg's 1,254 ms), not the embedding round trip. **Still open:** first token misses
    §7.3's 2.5 s target because nothing streams until retrieval completes. Closing it means
    streaming something truthful earlier, not making retrieval faster. One measured answer
-   identifies the mechanism; a p75 needs more rows.
+   identifies the mechanism; a p75 needs more rows — and those rows will now measure the
+   right event, since `first_token` was marking the stream opening rather than the first
+   word until it was fixed to require a `text-delta` chunk.
 
 **Needs an operator, not a decision:**
 
