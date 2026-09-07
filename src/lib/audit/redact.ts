@@ -6,6 +6,41 @@
  * identity number is masked, wherever it appears in the object graph.
  */
 
+/**
+ * Metric keys that survive the deny rule below.
+ *
+ * `SENSITIVE_KEY` matches the bare substring `token`, which is right for
+ * `access_token` and `apiToken` and wrong for the three latency and usage
+ * measurements that happen to contain the same six letters. Production logs
+ * showed `first_token`, `inputTokens` and `outputTokens` as `[redacted]` —
+ * §7.3's headline first-token gate, unreadable in the logs that are supposed
+ * to evidence it. (`ai_usage` stored all three correctly throughout, so this
+ * cost observability, not data.)
+ *
+ * An explicit list rather than a cleverer pattern. `authToken` and
+ * `inputTokens` are the same shape, so no boundary rule separates them, and a
+ * rule that tried would be one subtle regex away from letting a credential
+ * through. Nor may this key off the value being a number: `redact` passes
+ * numbers through untouched, so a numeric NID or account number is caught by
+ * the key rule alone, and blanket-allowing numbers would leak exactly the
+ * identifiers this module exists to stop. Anything not named here still
+ * redacts by default.
+ */
+const SAFE_METRIC_KEY: ReadonlySet<string> = new Set([
+  'first_token',
+  'firstToken',
+  'first_token_ms',
+  'firstTokenMs',
+  'inputTokens',
+  'input_tokens',
+  'outputTokens',
+  'output_tokens',
+  'totalTokens',
+  'total_tokens',
+  'promptTokens',
+  'completionTokens',
+]);
+
 const SENSITIVE_KEY = new RegExp(
   [
     'password',
@@ -75,7 +110,8 @@ export function redact(value: unknown, depth = 0): unknown {
   if (typeof value === 'object') {
     const out: Record<string, unknown> = {};
     for (const [key, val] of Object.entries(value as Record<string, unknown>)) {
-      out[key] = SENSITIVE_KEY.test(key) ? REDACTED : redact(val, depth + 1);
+      const sensitive = SENSITIVE_KEY.test(key) && !SAFE_METRIC_KEY.has(key);
+      out[key] = sensitive ? REDACTED : redact(val, depth + 1);
     }
     return out;
   }

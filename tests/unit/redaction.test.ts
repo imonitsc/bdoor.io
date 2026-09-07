@@ -75,3 +75,58 @@ describe('lastFour', () => {
     expect(lastFour('12')).toBe('12');
   });
 });
+
+/**
+ * Metric keys that contain "token" but are not tokens.
+ *
+ * Production logs showed `first_token`, `inputTokens` and `outputTokens` as
+ * `[redacted]` because `SENSITIVE_KEY` matches the bare substring. §7.3's
+ * headline gate is first-token latency, so the measurement that evidences it
+ * was the one being hidden. These cases pin both halves: the metrics survive,
+ * and every shape of actual credential still does not.
+ */
+describe('metric keys containing "token"', () => {
+  it.each([
+    'first_token',
+    'first_token_ms',
+    'firstTokenMs',
+    'inputTokens',
+    'outputTokens',
+    'totalTokens',
+    'promptTokens',
+    'completionTokens',
+  ])('keeps %s, which is a measurement', (key) => {
+    expect(redactMetadata({ [key]: 4085 })).toEqual({ [key]: 4085 });
+  });
+
+  it.each(['token', 'access_token', 'accessToken', 'authToken', 'refresh_token', 'api_token'])(
+    'still redacts %s, which is a credential',
+    (key) => {
+      expect(redactMetadata({ [key]: 'sk-live-abc123' })).toEqual({ [key]: REDACTED });
+    },
+  );
+
+  it('redacts an unknown key containing token — the allowlist is exhaustive', () => {
+    // A new key is sensitive until someone adds it deliberately. Failing
+    // closed is the only safe default for a rule that guards credentials.
+    expect(redactMetadata({ someNewToken: 'value' })).toEqual({ someNewToken: REDACTED });
+  });
+
+  it('does not let the allowlist rescue a genuinely sensitive sibling', () => {
+    const out = redactMetadata({ inputTokens: 4658, access_token: 'sk-live-abc', nid: 123 });
+
+    expect(out).toEqual({ inputTokens: 4658, access_token: REDACTED, nid: REDACTED });
+  });
+
+  it('keeps a metric nested inside a payload', () => {
+    const out = redactMetadata({ timings: { first_token: 4085, completed: 7414 } });
+
+    expect(out).toEqual({ timings: { first_token: 4085, completed: 7414 } });
+  });
+
+  it('still redacts a numeric identifier, which the key rule alone catches', () => {
+    // redact() passes numbers through untouched, so the key rule is the only
+    // defence here. This is why the fix is an allowlist and not "allow numbers".
+    expect(redactMetadata({ nid: 1990123456789 })).toEqual({ nid: REDACTED });
+  });
+});
