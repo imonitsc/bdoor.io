@@ -154,6 +154,36 @@ helped; the lookup call itself needs to be understood, and `getSpendReport` on t
 client remains the alternative worth evaluating. §3.3 still forbids substituting an invented
 model price table for either.
 
+**Root-caused, 6 September.** The answer served at 18:25 UTC — the first carrying the status
+code that #92 added rather than the bare message — reported:
+
+```
+ai.generation_info.failed  statusCode 404  responseKeys ["error","id","message"]
+```
+
+**404, not 401 or 403.** The gateway key has access; the generation is simply not retrievable
+under that id at the moment we ask. The lookup runs the instant the stream ends and the
+gateway settles asynchronously, so it was racing a write that had not landed. That makes this
+ours to fix rather than an owner blocker, and the fix is to ask again shortly — a bounded
+schedule of two retries at 300 ms and 900 ms, capped at 1.2 s of added function time, on a
+route whose observed persistence completes at 9.2 s with no `maxDuration` set.
+
+Which failures earn a second ask is the part that needed care: a 401 or 403 is a permission
+decision, and asking again cannot change one, so those give up immediately and stay an owner
+blocker if they ever appear. 404 and 5xx retry; everything else, including an error with no
+status at all, does not.
+
+This took three attempts to diagnose, and the sequence is worth recording because two of them
+were wrong: first a guess at a missing `generationId` (disproved 4 September), then a guess
+that the message alone would identify the failure (it did not — it had one source in the SDK
+and carried no status). Only instrumenting the discriminator settled it. The lesson is the
+cheap one: when a hypothesis is wrong twice, stop hypothesising and measure.
+
+**Not yet confirmed in production.** The retry is verified by unit test against an injected
+clock, not by observing a recovered cost on a live answer. `estimated_cost_usd` stays zero
+until an answer is served on the deployed fix, and `ai.generation_info.retried` is the log
+line that will say the schedule worked.
+
 **Latency was recorded as one number, and §7.3 asks for five (3 September).** The row above
 could report a complete-answer p75 and nothing else, because `latency_ms` was the only
 duration `ai_usage` carried. §7.3 requires that "retrieval, rerank, model, first-token and
