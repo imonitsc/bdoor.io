@@ -179,10 +179,36 @@ that the message alone would identify the failure (it did not — it had one sou
 and carried no status). Only instrumenting the discriminator settled it. The lesson is the
 cheap one: when a hypothesis is wrong twice, stop hypothesising and measure.
 
-**Not yet confirmed in production.** The retry is verified by unit test against an injected
-clock, not by observing a recovered cost on a live answer. `estimated_cost_usd` stays zero
-until an answer is served on the deployed fix, and `ai.generation_info.retried` is the log
-line that will say the schedule worked.
+**Confirmed in production, and the retry was not enough (7 September).** The answer served at
+05:24:24 UTC — the first on the deployed fix — logged:
+
+```
+ai.generation_info.failed  statusCode 404  attempts 3
+```
+
+The retry ran exactly as designed and the generation still was not there 1.2 seconds after
+the stream ended. `estimated_cost_usd` remains zero on every row.
+
+This is worth stating precisely, because it is easy to over-read. What is now established:
+the id is obtained, the key has access, the lookup is reached, and it is retried. What is
+**still open**: three 404s inside 1.2 seconds cannot distinguish "the gateway settles more
+slowly than that" from "the generation is never retrievable under this id". Those need
+different fixes — a longer wait versus a different endpoint — and the experiment that would
+separate them requires the gateway key, which is a deployment secret and not available to
+the tooling that produced this report.
+
+So the next change is deliberately **not** a longer retry schedule. That would be a fourth
+guess at a defect that has already cost three, after a missing-`generationId` hypothesis and
+a message-only hypothesis were each disproved by measurement. Instead `ai_usage` gains a
+`generation_id` column and `/admin/ai` gains a **Retry cost lookup** action that runs the
+same lookup with no deadline, minutes or hours later. A row that reconciles proves the slow
+settle and completes the fix; a row that still returns 404 long afterwards proves the id is
+not the route to this data and sends the work to `getSpendReport`. Either way the answer is
+measured rather than assumed, and the column is required by both outcomes.
+
+`AI_MAX_COST_USD_PER_ANSWER` therefore stays unenforced. A per-answer cap over a column that
+is structurally zero would be a gate measuring nothing, and shipping one would misrepresent
+the state of the budget controls.
 
 **Latency was recorded as one number, and §7.3 asks for five (3 September).** The row above
 could report a complete-answer p75 and nothing else, because `latency_ms` was the only
