@@ -1703,6 +1703,14 @@
           "unindexed": "Published, not indexed"
         }
       },
+      "research": {
+        "title": "Live official research is not configured. Answers use the reviewed ledger only.",
+        "blockers": {
+          "disabled": "AI_WEB_RESEARCH_ENABLED is false.",
+          "no_search_tool": "No search tool is selected. AI_WEB_SEARCH_TOOL must name one from the current AI Gateway catalogue.",
+          "empty_allowlist": "The official-domain allowlist is empty, so no host counts as official. Which domains carry the authority of Bangladeshi law is a decision for the owner and a knowledge reviewer."
+        }
+      },
       "correctionPolicy": "To correct an answer, edit the source it came from and re-index it. Never edit a stored answer — an answer is a record of what the assistant said, not source material.",
       "empty": {
         "title": "No knowledge sources yet",

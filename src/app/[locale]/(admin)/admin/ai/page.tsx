@@ -16,6 +16,7 @@ import { Table, TBody, TD, TH, THead, TR } from '@/components/ui/table';
 import { budgetLimits } from '@/features/ai/budget';
 import { aiEnabled } from '@/features/ai/chat';
 import { corpusHealth } from '@/features/ai/corpus-health';
+import { researchReadiness } from '@/features/ai/research/provider';
 import {
   citationAuditQueue,
   listSources,
@@ -107,6 +108,9 @@ export default async function AdminAiPage({ params }: { params: Promise<{ locale
     corpusHealth(),
   ]);
 
+  // Synchronous: configuration only, no query.
+  const research = researchReadiness();
+
   const limits = budgetLimits();
   const published = sources.filter((source) => source.status === 'published');
   const publishedNotIndexed = published.filter((source) => !source.indexed_at);
@@ -174,6 +178,24 @@ export default async function AdminAiPage({ params }: { params: Promise<{ locale
       {corpus.missingSeedSlugs.length > 0 ? (
         <Alert tone="warning">
           {t('corpusHealth.missingSeed', { count: corpus.missingSeedSlugs.length })}
+        </Alert>
+      ) : null}
+
+      {/* Live official research (§6.7). Every blocker below is an owner
+          decision §26 reserves — a tool from the current Gateway catalogue, and
+          which hosts carry the authority of Bangladeshi law. Shown as state so
+          the gap is something an operator can read rather than infer from an
+          assistant that never cites a live source. */}
+      {!research.ready ? (
+        <Alert tone="neutral">
+          <div>
+            <p className="font-medium">{t('research.title')}</p>
+            <ul className="mt-1 list-disc pl-4">
+              {research.blockers.map((blocker) => (
+                <li key={blocker}>{t(`research.blockers.${blocker}`)}</li>
+              ))}
+            </ul>
+          </div>
         </Alert>
       ) : null}
 

@@ -292,9 +292,28 @@ The strongest section of this report.
   including the deliberate decision _not_ to strip hostile text a human would see on the page.
 - **PII redaction** before persistence is tested, and the citation audit's telemetry is asserted
   to contain no answer text.
+- **Outgoing search queries** are built, not cleaned. `genericQuery()` reads the question only to
+  decide which topics it touches and emits words drawn solely from the `ai_topic` enum and the
+  reviewed institution registry, so there is no code path from the customer's characters to the
+  outgoing string. It returns null when no topic is recognised rather than falling back to the
+  raw sentence. The provider boundary accepts only that branded type, so the adapter the owner's
+  tool choice eventually brings cannot be wired up to send the question.
 
-**Not evidenced:** no web _search_ has ever run, because no search tool is configured. §6.7's
-PII-redaction-of-outgoing-queries requirement is therefore untested in practice.
+**Correction to an earlier version of this report.** This section previously said the §6.7
+requirement to redact outgoing queries was "untested in practice". That understated it: the
+requirement was _unimplemented_, because no code constructed an outgoing query at all. The
+statement was true about the tests and wrong about the cause, and the difference matters — a
+missing test is a gap in evidence, a missing implementation is a gap in the product.
+
+It also would not have been fixed by pointing the existing redactor at the query. `redactSensitive`
+masks identifiers inside a preserved sentence, which is right for a transcript store and wrong
+here: "can Rahman Textiles Ltd at 14 Gulshan Avenue reclaim VAT on the 4.2 crore machine we
+imported last March" passes through every one of its rules untouched. A denylist cannot enumerate
+the ways a customer describes their own business, which is why the builder emits fixed vocabulary
+instead.
+
+**Still not evidenced:** no web _search_ has ever run, because no search tool is configured. The
+guarantee above is proven by unit test against the builder, not by observing a live request.
 
 ## 7. Legal-domain coverage, source-monitor freshness, unresolved conflicts
 
@@ -548,8 +567,12 @@ not.
 
 5. `CRON_SECRET` — four scheduled jobs refuse to run without it, which is why zero documents
    have been ingested and why no compliance reminder has ever been sent.
-6. The Gateway web-search tool and the initial official-domain list — these block P0 items 7–9
-   entirely, and §3.3 forbids inventing either.
+6. The Gateway web-search tool and the initial official-domain list — §3.3 and §4.1 forbid this
+   codebase choosing either. The surrounding architecture no longer waits on them: the query
+   builder, the provider boundary and the safe fetcher exist and are tested, and `/admin/ai`
+   now names these two decisions as the remaining blockers. Attaching the owner's tool is
+   implementing one interface. Until then P0 items 7–9 stay open and every answer is
+   ledger-only.
 7. Gazetted public-holiday data and a first published rule, without which Comply is inert.
 8. Branch protection, so this report can run before a deployment rather than after it.
 9. Shared storage for the Ask rate limiter, or an explicit decision to keep it per-instance.
