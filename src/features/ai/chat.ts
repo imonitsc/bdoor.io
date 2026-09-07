@@ -15,7 +15,7 @@ import { classifyUpstreamError, failureMessage, noEvidenceReply, type AiFailure 
 import { answerRoute, classifyRisk, providerLockFor } from './models';
 import { FAST_PATH_MODEL, greetingReply, isGreeting } from './fast-path';
 import { actionsFor } from './follow-ups';
-import { describeGatewayFailure } from './gateway-error';
+import { lookupWithRetry } from './generation-info';
 import { safetyIdentifier } from './identity';
 import {
   ensureConversation,
@@ -107,39 +107,47 @@ function writeText(writer: Writer, text: string) {
 }
 
 /**
- * Cost and provider for one generation. Best-effort, after the stream — the
- * gateway settles asynchronously and a miss just leaves cost at zero.
- */
-/**
  * Cost and serving provider for one generation, from the gateway.
  *
- * Both of these were silently absent from every row in `ai_usage` between the
- * first answer on 30 August 2026 and this change, which mattered because
- * `checkBudget` sums the cost column: the spend guard was adding up zeros.
+ * Both were silently absent from every row in `ai_usage` from the first answer
+ * on 30 August 2026 onwards, which mattered because `checkBudget` sums the cost
+ * column: the spend guard was adding up zeros.
  *
- * An earlier note here predicted the cause was a missing `generationId`, on the
- * reasoning that `providerMetadata.gateway` does not promise the field. The
- * answer served on 4 September disproved that: the log said
- * `ai.generation_info.failed`, not `no_id`, so the id IS obtained and the
- * lookup is what fails. Guessing a second time would repeat the mistake, so
- * this now records what actually discriminates — the status code the gateway
- * replied with, which decides whether the fix is a key permission (401/403),
- * our own timing against an asynchronously settled generation (404), or a
- * retry (5xx). `describeGatewayFailure` explains how that message was traced
- * to its single source in the SDK.
+ * It took two wrong turns to find. The first note here predicted a missing
+ * `generationId`; the answer on 4 September disproved that — the log said
+ * `failed`, not `no_id`. Rather than guess a third time, #92 recorded the
+ * status code, and the answer on 6 September produced it: **404**. Not a
+ * permission problem. We ask the instant the stream ends and the gateway
+ * settles asynchronously, so the lookup was racing a write that had not
+ * landed.
+ *
+ * Hence the short retry schedule in `generation-info.ts`, which also decides
+ * what is worth asking twice — a 401 never is.
  */
 async function generationInfo(generationId: string | null) {
   if (!generationId) {
     logger.warn('ai.generation_info.no_id');
     return null;
   }
-  try {
-    const info = await gateway.getGenerationInfo({ id: generationId });
-    return { cost: info.totalCost, provider: info.providerName };
-  } catch (error) {
-    logger.warn('ai.generation_info.failed', describeGatewayFailure(error));
+
+  const outcome = await lookupWithRetry(
+    () => gateway.getGenerationInfo({ id: generationId }),
+    (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+  );
+
+  if (!outcome.ok) {
+    logger.warn('ai.generation_info.failed', { ...outcome.failure, attempts: outcome.attempts });
     return null;
   }
+
+  // Worth its own line: a cost that only arrives on the second ask says the
+  // settle race is real and the schedule is holding, which a success alone
+  // would not distinguish from a gateway that was never late.
+  if (outcome.attempts > 1) {
+    logger.info('ai.generation_info.retried', { attempts: outcome.attempts });
+  }
+
+  return { cost: outcome.value.totalCost, provider: outcome.value.providerName };
 }
 
 export function streamAnswer(request: ChatRequest): Response {
