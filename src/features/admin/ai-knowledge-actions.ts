@@ -11,6 +11,7 @@ import {
   transitionSource,
   type SourceStatus,
 } from '@/features/ai/knowledge';
+import { reconcileCosts } from '@/features/ai/cost-reconcile';
 import { seedSources } from '@/features/ai/knowledge-seed';
 import { hasBudget, pendingSeedWork } from '@/features/ai/seed-work';
 import { recordAudit } from '@/lib/audit';
@@ -175,5 +176,50 @@ export async function publishImportedSeed(): Promise<ActionResult> {
   return {
     ok: true,
     detail: `${published} published, ${indexed} indexed, ${failed} failed, ${remaining} remaining`,
+  };
+}
+
+/**
+ * Retry the gateway cost lookup for answers that still carry no cost.
+ *
+ * Gated on `content.publish` like the rest of this file. That capability is
+ * about published content rather than finance, but it is the admin gate this
+ * screen already enforces, and the action writes only a cost the gateway
+ * itself supplied — it cannot invent a number (§3.3), and it reads nothing a
+ * knowledge editor cannot already see on this page.
+ *
+ * The detail line reports the failure status codes rather than just a count,
+ * because that is the point: 404s hours after the answer mean the id is not
+ * the route to this data, and no retry schedule will fix it.
+ */
+export async function retryCostLookup(): Promise<ActionResult> {
+  await requireCapability('content.publish');
+
+  const summary = await reconcileCosts();
+  await recordAudit({
+    action: 'ai.cost_reconcile',
+    targetType: 'ai_usage',
+    metadata: {
+      attempted: summary.attempted,
+      reconciled: summary.reconciled,
+      failureStatuses: summary.failureStatuses,
+    },
+  });
+  await refresh();
+
+  if (summary.attempted === 0) {
+    return { ok: true, detail: 'No answers are waiting on a cost.' };
+  }
+
+  const failures = summary.failureStatuses
+    .map((entry) => `${entry.count}x ${entry.statusCode ?? 'no status'}`)
+    .join(', ');
+
+  return {
+    ok: true,
+    detail:
+      `${summary.reconciled} of ${summary.attempted} reconciled` +
+      (summary.reconciled > 0 ? ` ($${summary.recoveredUsd.toFixed(4)})` : '') +
+      (failures ? `; failures: ${failures}` : ''),
   };
 }

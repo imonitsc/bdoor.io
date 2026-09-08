@@ -1748,7 +1748,9 @@
         "expired_only": "শুধু মেয়াদোত্তীর্ণ কনটেন্ট মিলেছে",
         "out_of_scope": "পরিসরের বাইরে",
         "low_confidence": "কম আত্মবিশ্বাস"
-      }
+      },
+      "costRetry": "খরচ পুনরায় যাচাই করুন",
+      "costRetryDone": "সম্পন্ন।"
     },
     "aiRegistry": {
       "navLabel": "নলেজ সেন্টার",

@@ -1748,7 +1748,9 @@
         "expired_only": "Only expired content matched",
         "out_of_scope": "Out of scope",
         "low_confidence": "Low confidence"
-      }
+      },
+      "costRetry": "Retry cost lookup",
+      "costRetryDone": "Done."
     },
     "aiRegistry": {
       "navLabel": "Knowledge centre",

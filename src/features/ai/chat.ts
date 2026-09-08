@@ -526,6 +526,9 @@ export function streamAnswer(request: ChatRequest): Response {
         inputTokens: outcome.inputTokens,
         outputTokens: outcome.outputTokens,
         estimatedCostUsd: info?.cost ?? null,
+        // Stored whether or not the lookup above succeeded — when it failed,
+        // this is the only thing that makes a later attempt possible.
+        generationId: outcome.generationId,
         latencyMs,
         stages: stageDurations(timings),
         status,

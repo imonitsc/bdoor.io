@@ -5,6 +5,7 @@ import { Gauge, Sparkles } from 'lucide-react';
 import {
   AiImportButton,
   AiPublishSeedButton,
+  AiRetryCostLookupButton,
   AiSourceControls,
 } from '@/components/admin/ai-source-controls';
 import { PageHeading } from '@/components/dashboard/page-heading';
@@ -124,6 +125,7 @@ export default async function AdminAiPage({ params }: { params: Promise<{ locale
           <div className="flex flex-wrap items-center gap-2">
             <AiImportButton />
             <AiPublishSeedButton />
+            <AiRetryCostLookupButton />
           </div>
         }
       />

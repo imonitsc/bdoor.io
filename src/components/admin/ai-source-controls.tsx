@@ -8,6 +8,7 @@ import {
   importKnowledgeSeed,
   indexKnowledgeSource,
   publishImportedSeed,
+  retryCostLookup,
   transitionKnowledgeSource,
 } from '@/features/admin/ai-knowledge-actions';
 import type { SourceStatus } from '@/features/ai/knowledge';
@@ -150,6 +151,48 @@ export function AiPublishSeedButton() {
       >
         {pending ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : null}
         {t('publishSeed')}
+      </Button>
+      {message ? (
+        <span className="text-muted text-xs" role="status">
+          {message}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
+/**
+ * Retry the gateway cost lookup for answers that still have none.
+ *
+ * The in-request lookup 404s and #95's bounded retry did not change that, so
+ * every answer still records a cost of zero and the budget guard sums nothing.
+ * Three 404s inside 1.2 seconds cannot say whether the gateway settles slowly
+ * or the id is not how this data is reached; the same lookup run hours later
+ * can, which is what this button is for.
+ *
+ * Manual on purpose. A scheduled job would need `CRON_SECRET`, which is unset
+ * in production, and a fourth guess at this defect does not deserve one until
+ * a click has shown which failure it actually is.
+ */
+export function AiRetryCostLookupButton() {
+  const t = useTranslations('admin.ai');
+  const [pending, startTransition] = useTransition();
+  const [message, setMessage] = useState<string | null>(null);
+
+  return (
+    <div className="flex items-center gap-2">
+      <Button
+        variant="secondary"
+        disabled={pending}
+        onClick={() =>
+          startTransition(async () => {
+            const result = await retryCostLookup();
+            setMessage(result.ok ? (result.detail ?? t('costRetryDone')) : t('failed'));
+          })
+        }
+      >
+        {pending ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : null}
+        {t('costRetry')}
       </Button>
       {message ? (
         <span className="text-muted text-xs" role="status">

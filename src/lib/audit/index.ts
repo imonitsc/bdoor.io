@@ -62,6 +62,7 @@ export type AuditAction =
   | 'case.disclosure_recorded'
   | 'metrics.snapshot_recorded'
   | 'partner.export'
+  | 'ai.cost_reconcile'
   | 'content.published'
   | 'content.unpublished'
   | 'service.updated'

@@ -849,6 +849,7 @@ export type Database = {
           "input_tokens": number
           "output_tokens": number
           "estimated_cost_usd": number
+          "generation_id": string | null
           "latency_ms": number | null
           "first_token_ms": number | null
           "retrieval_ms": number | null
@@ -872,6 +873,7 @@ export type Database = {
           "input_tokens"?: number
           "output_tokens"?: number
           "estimated_cost_usd"?: number
+          "generation_id"?: string | null
           "latency_ms"?: number | null
           "first_token_ms"?: number | null
           "retrieval_ms"?: number | null
@@ -895,6 +897,7 @@ export type Database = {
           "input_tokens"?: number
           "output_tokens"?: number
           "estimated_cost_usd"?: number
+          "generation_id"?: string | null
           "latency_ms"?: number | null
           "first_token_ms"?: number | null
           "retrieval_ms"?: number | null

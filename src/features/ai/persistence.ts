@@ -135,6 +135,12 @@ export type AnswerRecord = {
   inputTokens?: number | null;
   outputTokens?: number | null;
   estimatedCostUsd?: number | null;
+  /**
+   * The gateway's id for this generation, stored so the cost can be looked up
+   * again later. The in-request lookup races the gateway's own settle and has
+   * returned 404 on every answer; without the id there is no second chance.
+   */
+  generationId?: string | null;
   latencyMs: number;
   /**
    * The §7.3 per-stage latencies, when the request was instrumented. Absent
@@ -215,6 +221,7 @@ export async function recordAnswer(
     input_tokens: answer.inputTokens ?? 0,
     output_tokens: answer.outputTokens ?? 0,
     estimated_cost_usd: answer.estimatedCostUsd ?? 0,
+    generation_id: answer.generationId ?? null,
     latency_ms: answer.latencyMs,
     first_token_ms: answer.stages?.firstTokenMs ?? null,
     retrieval_ms: answer.stages?.retrievalMs ?? null,
