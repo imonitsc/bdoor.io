@@ -2444,6 +2444,13 @@
     "stalled": "Still working — this is taking longer than usual.",
     "voiceInput": "Speak your question",
     "voiceStop": "Stop listening",
+    "voiceError": {
+      "denied": "bdoor cannot use your microphone. Allow microphone access for this site in your browser settings, then try again.",
+      "noMicrophone": "No microphone was found. Check that one is connected and not in use by another app.",
+      "noSpeech": "Nothing was heard. Try again, closer to the microphone.",
+      "network": "Speech recognition needs a connection and could not reach it. Check your network, or type your question instead.",
+      "unknown": "Voice input stopped unexpectedly. Please type your question instead."
+    },
     "followUps": "Ask next",
     "startProcess": "Start this process",
     "trackComply": "Track this for your company"

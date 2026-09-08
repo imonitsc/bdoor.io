@@ -3,6 +3,13 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { ArrowUp, Mic, MicOff, Square } from 'lucide-react';
 
+import {
+  appendTranscript,
+  finalTranscript,
+  voiceErrorKey,
+  type SpeechResultEvent,
+  type VoiceErrorKey,
+} from '@/features/ai/voice-input';
 import { cn } from '@/lib/utils/cn';
 
 /**
@@ -17,11 +24,15 @@ import { cn } from '@/lib/utils/cn';
 type SpeechRecognitionLike = {
   lang: string;
   interimResults: boolean;
+  /** Off by default, which ends recognition at the first pause. */
+  continuous: boolean;
   start: () => void;
   stop: () => void;
-  onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
+  /** Stops without delivering pending results; reports the `aborted` code. */
+  abort: () => void;
+  onresult: ((event: SpeechResultEvent) => void) | null;
   onend: (() => void) | null;
-  onerror: (() => void) | null;
+  onerror: ((event: { error: string }) => void) | null;
 };
 
 function speechRecognition(): (new () => SpeechRecognitionLike) | null {
@@ -47,6 +58,7 @@ export function PromptInput({
   stopLabel,
   voiceLabel,
   voiceStopLabel,
+  voiceErrorLabels,
   locale,
   autoFocus,
   className,
@@ -62,6 +74,8 @@ export function PromptInput({
   stopLabel: string;
   voiceLabel: string;
   voiceStopLabel: string;
+  /** One line per failure the browser can report. */
+  voiceErrorLabels: Record<VoiceErrorKey, string>;
   locale: 'en' | 'bn';
   autoFocus?: boolean;
   className?: string;
@@ -69,6 +83,14 @@ export function PromptInput({
   const textarea = useRef<HTMLTextAreaElement>(null);
   const recognizer = useRef<SpeechRecognitionLike | null>(null);
   const [listening, setListening] = useState(false);
+  const [voiceError, setVoiceError] = useState<VoiceErrorKey | null>(null);
+  // Speech arrives asynchronously, long after the render that started it. A
+  // ref is what lets the handler append to the CURRENT text instead of to a
+  // snapshot taken when the microphone opened.
+  const latestValue = useRef(value);
+  useEffect(() => {
+    latestValue.current = value;
+  }, [value]);
   // Server renders no mic; the browser reveals one only where speech
   // recognition genuinely exists. useSyncExternalStore keeps hydration clean.
   const voiceAvailable = useSyncExternalStore(
@@ -91,31 +113,51 @@ export function PromptInput({
   const submit = () => {
     const text = value.trim();
     if (!text || busy) return;
+    // Sending the question ends the dictation of it; otherwise the microphone
+    // stays open and the next phrase lands in an already-sent box.
+    if (listening) stopListening();
     onSubmit(text);
   };
 
+  // A live microphone must not outlive the composer.
+  useEffect(() => {
+    return () => {
+      recognizer.current?.abort();
+      recognizer.current = null;
+    };
+  }, []);
+
+  const stopListening = useCallback(() => {
+    recognizer.current?.stop();
+  }, []);
+
   const toggleVoice = () => {
     if (listening) {
-      recognizer.current?.stop();
+      stopListening();
       return;
     }
     const Recognition = speechRecognition();
     if (!Recognition) return;
+
     const instance = new Recognition();
     instance.lang = locale === 'bn' ? 'bn-BD' : 'en-US';
     instance.interimResults = false;
+    // Without this, recognition ends at the first pause and a dictated
+    // sentence stops halfway through.
+    instance.continuous = true;
+
     instance.onresult = (event) => {
-      const transcript = Array.from({ length: event.results.length }, (_, i) => {
-        const alternative = event.results[i]?.[0];
-        return alternative?.transcript ?? '';
-      })
-        .join(' ')
-        .trim();
-      if (transcript) onChange(value ? `${value} ${transcript}` : transcript);
+      const transcript = finalTranscript(event);
+      if (transcript) onChange(appendTranscript(latestValue.current, transcript));
     };
     instance.onend = () => setListening(false);
-    instance.onerror = () => setListening(false);
+    instance.onerror = (event) => {
+      setListening(false);
+      setVoiceError(voiceErrorKey(event.error));
+    };
+
     recognizer.current = instance;
+    setVoiceError(null);
     setListening(true);
     instance.start();
   };
@@ -123,7 +165,7 @@ export function PromptInput({
   return (
     <form
       className={cn(
-        'border-border-strong bg-surface focus-within:border-primary flex items-end gap-1.5 rounded-[var(--radius-panel)] border p-2 shadow-sm transition-colors',
+        'border-border-strong bg-surface focus-within:border-primary flex flex-wrap items-end gap-1.5 rounded-[var(--radius-panel)] border p-2 shadow-sm transition-colors',
         className,
       )}
       onSubmit={(event) => {
@@ -194,6 +236,15 @@ export function PromptInput({
           <ArrowUp className="size-4" aria-hidden="true" />
         </button>
       )}
+
+      {/* Why nothing happened. Previously every failure — a denied
+          permission, a muted device, being offline — looked identical to a
+          button that did nothing. */}
+      {voiceError ? (
+        <p role="status" className="text-danger w-full px-2 pb-1 text-xs">
+          {voiceErrorLabels[voiceError]}
+        </p>
+      ) : null}
     </form>
   );
 }

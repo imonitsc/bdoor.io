@@ -304,6 +304,13 @@ export function AskBdoorPanel({
         stopLabel={t('stop')}
         voiceLabel={t('voiceInput')}
         voiceStopLabel={t('voiceStop')}
+        voiceErrorLabels={{
+          denied: t('voiceError.denied'),
+          noMicrophone: t('voiceError.noMicrophone'),
+          noSpeech: t('voiceError.noSpeech'),
+          network: t('voiceError.network'),
+          unknown: t('voiceError.unknown'),
+        }}
         locale={locale}
         autoFocus={autoFocus}
       />
